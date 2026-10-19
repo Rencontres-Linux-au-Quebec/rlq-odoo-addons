@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Filet de sécurité : chaque jour, l'étiquette de contact de chaque groupe d'inscrits (groupe d'un billet ou d'une réponse de sondage)
+         est créée si elle manque et ses membres sont resynchronisés (ajouts ou retraits faits hors de l'interface : import, SQL, script).
+         Les changements faits dans l'interface sont déjà synchronisés immédiatement. -->
+    <record id="ir_cron_etiquettes_groupes" model="ir.cron">
+        <field name="name">RLQ Groupes d'inscrits : synchronisation des étiquettes de contact</field>
+        <field name="model_id" ref="base.model_res_groups"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_rlq_synchroniser_etiquettes()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- noupdate : une valeur modifiée par un administrateur (Réglages > Technique > Paramètres système) n'est jamais écrasée. 0 = aucune étiquette. -->
+    <data noupdate="1">
+        <record id="ir_config_parameter_etiquettes_groupes" model="ir.config_parameter">
+            <field name="key">rlq_survey_report.etiquettes_groupes</field>
+            <field name="value">1</field>
+        </record>
+    </data>
+
+</odoo>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Modèle du courriel « Vos réponses au sondage » (v1.94.0), envoyé au participant
+         quand il termine un sondage dont la case « Envoyer ses réponses au participant »
+         est cochée. noupdate="1" : vos modifications du texte ne sont pas écrasées par
+         une mise à jour (-u). Le corps utilise le champ calculé rlq_reponses_html. -->
+    <data noupdate="1">
+        <record id="mail_template_reponses_participant" model="mail.template">
+            <field name="name">Sondage : vos réponses (rlq_survey_report)</field>
+            <field name="model_id" ref="survey.model_survey_user_input"/>
+            <field name="subject">Vos réponses : {{ object.survey_id.title }}</field>
+            <field name="email_from">{{ object.survey_id.user_id.email_formatted or user.company_id.email_formatted or user.email_formatted }}</field>
+            <field name="email_to">{{ object.email or object.partner_id.email }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+<div style="margin:0; padding:0; font-size:14px;">
+    <p>Bonjour<t t-if="object.partner_id.name"> <t t-out="object.partner_id.name"/></t>,</p>
+    <p>Merci d'avoir répondu au sondage <strong><t t-out="object.survey_id.title"/></strong>.
+       Voici, pour vos dossiers, une copie de vos réponses :</p>
+    <t t-out="object.rlq_reponses_html"/>
+    <p style="color:#666; font-size:12px;">Ce courriel est envoyé automatiquement, une seule fois, à l'adresse
+       que vous avez utilisée pour répondre. Il n'est conservé dans aucun courriel sortant après son envoi.</p>
+</div>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,24 @@
+# Configuration de ruff pour rlq_survey_report (lancée par run-all.sh).
+#
+# Volontairement RESTREINTE aux règles qui détectent de vrais bogues : erreurs
+# de syntaxe (E9), erreurs d'instruction (E7), imports mal placés (E4), pyflakes
+# (F : noms indéfinis, imports et variables inutilisés...) et bugbear (B : pièges
+# classiques). Le style (longueur de ligne, tri des imports, déclaration
+# d'encodage...) est laissé de côté : cette version de ruff active par défaut un
+# jeu de règles très large, dont plusieurs contredisent les conventions d'Odoo.
+target-version = "py310"   # Odoo 18 exige Python 3.10 ou plus
+line-length = 200          # non appliquée (E501 n'est pas sélectionnée)
+
+[lint]
+select = ["E4", "E7", "E9", "F", "B"]
+# B905 (zip sans strict=) ignorée : passer à strict=True ferait PLANTER la génération
+# si deux listes parallèles n'avaient pas exactement la même longueur, ce qui passe
+# peut-être silencieusement aujourd'hui - un changement de comportement qu'on ne peut
+# pas valider sans instance Odoo.
+ignore = ["B905"]
+
+[lint.per-file-ignores]
+# Odoo EXIGE ces imports : c'est ainsi que les modèles sont chargés.
+"__init__.py" = ["F401"]
+# Le manifeste est un simple dictionnaire, pas du code à exécuter.
+"__manifest__.py" = ["B018"]

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_pdf_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <main>
+                    <!-- Déclaration explicite de l'encodage : wkhtmltopdf peut mal
+                         interpréter les caractères accentués sans cette balise en
+                         tête de contenu, même quand le conteneur englobant la
+                         fournit déjà normalement. -->
+                    <meta charset="utf-8"/>
+                    <div class="page">
+                        <style>
+                            /* Couleurs figées (valeurs fixes, sans var()) : wkhtmltopdf
+                               ne garantit pas la prise en charge des variables CSS
+                               personnalisées, ce qui rendait les histogrammes invisibles
+                               (fond et remplissage transparents) - seul le thème "bleu"
+                               est reproduit ici, indépendamment du thème choisi à l'écran.
+                               Largeur/affichage figés en plus des couleurs : le moteur de
+                               rendu de wkhtmltopdf (WebKit ancien) a des bogues connus avec
+                               flexbox (utilisé par .barre-cadre via flex:1 pour remplir
+                               l'espace disponible) - une largeur fixe, indépendante de tout
+                               calcul flexbox, garantit que la barre a une largeur réelle
+                               plutôt que de s'effondrer à 0px. */
+                            .rlq-rapport .barre-cadre {
+                                background: #e6ecef !important; display: inline-block !important;
+                                width: 140px !important; min-width: 140px !important; flex: none !important;
+                            }
+                            .rlq-rapport .barre-remplie { background: #bfe2ec !important; display: block !important; }
+                            .rlq-rapport .barre-valeur { color: #12242e !important; }
+                            .rlq-rapport .barre-valeur.pct-vert { color: #1f7a3d !important; }
+                            .rlq-rapport .barre-valeur.pct-jaune { color: #a68b00 !important; }
+                            .rlq-rapport .barre-valeur.pct-orange { color: #c8720a !important; }
+                            .rlq-rapport .barre-valeur.pct-rouge { color: #c0392b !important; }
+                            .rlq-rapport .val-positive { color: #1f7a3d !important; }
+                            .rlq-rapport .val-negative { color: #b3261e !important; }
+                            .rlq-rapport .val-neutre { color: #a68b00 !important; }
+                            .rlq-rapport .val-bleu { color: #1b6ec2 !important; }
+                            .rlq-rapport section.rencontre, .rlq-rapport section.personne,
+                            .rlq-rapport nav.table-matieres { background: #ffffff !important; }
+                            .rlq-rapport table.tableau th,
+                            .rlq-rapport tr.entete-groupe td,
+                            .rlq-rapport table.tableau-personne td.col-question,
+                            .rlq-rapport table.tableau-personne th.col-question { background: #eef3f6 !important; }
+                            .rlq-rapport h2, .rlq-rapport h3, .rlq-rapport tr.entete-groupe td { color: #1b4965 !important; }
+                            .rlq-rapport .badge { background: #62b6cb !important; color: #ffffff !important; }
+                            /* Listes dépliables : converties en blocs toujours visibles par
+                               _html_pour_pdf() (voir le modèle Python), puisque
+                               l'interactivité n'existe pas à l'impression et que rien ne
+                               garantit qu'un CSS forçant leur ouverture soit respecté. */
+                            .detail-oui-pdf { margin: .3rem 0; }
+                            .detail-oui-pdf-titre { font-weight: 700; color: #1b4965; margin-bottom: .2rem; }
+                            .a-tooltip::after { content: none !important; }
+                            /* Les règles de saut de page (par rencontre et/ou par
+                               participant) ne sont PAS fixées ici : elles sont
+                               maintenant deux options configurables dans le wizard,
+                               générées dynamiquement par _html_pour_pdf() (voir le
+                               modèle Python) puisqu'un saut de page forcé sur CHAQUE
+                               participant s'est avéré, pour un très grand nombre
+                               d'entre eux (ex. ~190 pour la Journée Portes Ouvertes),
+                               produire un document PDF si volumineux que sa
+                               génération s'arrêtait prématurément (observé : tronqué
+                               à 86 pages). */
+                        </style>
+                        <h1 style="text-align:center;color:#1b4965;font-family:'Segoe UI',Arial,sans-serif;">
+                            Rapport de sondage
+                        </h1>
+                        <t t-out="doc._html_pour_pdf()"/>
+                    </div>
+                </main>
+            </t>
+        </t>
+    </template>
+
+    <!-- Format de page dédié, 8 x 14 po (proche du format Legal), en
+         orientation paysage - plus adapté aux tableaux larges du rapport
+         (nombreuses colonnes de statistiques, listes de participants,
+         etc.). Dimensions explicites en mm (203.2 x 355.6 = 8 x 14 po)
+         plutôt qu'un nom de format présupposé ("Legal"), pour éviter toute
+         incertitude sur les valeurs reconnues par le champ "format". -->
+    <record id="paperformat_rlq_landscape" model="report.paperformat">
+        <field name="name">Rapport de sondage - 11x17 Portrait (A3)</field>
+        <field name="default" eval="False"/>
+        <field name="format">custom</field>
+        <field name="page_height">432</field>
+        <field name="page_width">279</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">3</field>
+        <field name="margin_bottom">3</field>
+        <field name="margin_left">3</field>
+        <field name="margin_right">3</field>
+        <field name="header_spacing">3</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_report_rlq_survey" model="ir.actions.report">
+        <field name="name">Rapport de sondage (PDF)</field>
+        <field name="model">rlq.survey.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">rlq_survey_report.report_pdf_document</field>
+        <field name="report_file">rlq_survey_report.report_pdf_document</field>
+        <field name="print_report_name">'RapportSondage-%s' % ((object.write_date or object.create_date).strftime('%Y%m%d.%H%M%S') if (object.write_date or object.create_date) else object.id)</field>
+        <field name="paperformat_id" ref="paperformat_rlq_landscape"/>
+    </record>
+
+</odoo>

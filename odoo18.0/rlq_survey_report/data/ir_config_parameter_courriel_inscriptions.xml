@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Paramètre système « rlq_survey_report.courriel_inscriptions » : adresse(s) à avertir quand un
+         événement atteint son nombre d'inscriptions (plusieurs adresses séparées par des virgules).
+         Créé VIDE seulement s'il est absent (balise <function>, hors noupdate, comme le mot de passe
+         par défaut : un <record> serait rechargé en mode « init » et écraserait la valeur de
+         l'administrateur). Vide : le courriel de la société est utilisé.
+         Réglages > Technique > Paramètres système. -->
+    <function model="event.event" name="_creer_parametre_courriel_inscriptions_si_absent"/>
+</odoo>

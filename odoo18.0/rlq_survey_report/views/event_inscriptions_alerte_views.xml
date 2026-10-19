@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Bloc « Avertissement par courriel » sur le formulaire de l'événement (event.view_event_form,
+         nom de vue standard d'Odoo). xpath sur //sheet (la feuille du formulaire, toujours présente)
+         plutôt que sur un champ précis dont la position a pu changer : un xpath qui échoue à
+         l'installation casserait le module entier (même précaution que event_ticket_survey_views.xml).
+         SI CETTE VUE N'EXISTE PAS SOUS CE NOM : les champs rlq_alerte_* existent quand même sur
+         event.event (voir NOTES_VALIDATION.md). -->
+    <record id="view_event_form_rlq_alerte" model="ir.ui.view">
+        <field name="name">event.event.form.rlq.alerte</field>
+        <field name="model">event.event</field>
+        <field name="inherit_id" ref="event.view_event_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Avertissements par courriel (inscriptions, sondages)" name="rlq_alerte">
+                    <group>
+                        <field name="rlq_alerte_active"/>
+                        <field name="rlq_alerte_seuil" invisible="not rlq_alerte_active"/>
+                        <field name="rlq_alerte_repeter" invisible="not rlq_alerte_active"/>
+                        <field name="rlq_alerte_sondage"/>
+                        <field name="rlq_alerte_courriel" invisible="not rlq_alerte_active and not rlq_alerte_sondage"
+                               placeholder="vide : paramètre système, puis courriel de la société"/>
+                    </group>
+                    <group>
+                        <field name="rlq_inscriptions_comptees"/>
+                        <field name="rlq_alerte_envoyee" invisible="not rlq_alerte_envoyee"/>
+                        <field name="rlq_alerte_palier" invisible="not rlq_alerte_repeter or not rlq_alerte_palier"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

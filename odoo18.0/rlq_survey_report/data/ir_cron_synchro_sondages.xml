@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- v1.106.0 : synchronisation périodique PAR SONDAGE. Toutes les 5 minutes, traite les sondages (et, depuis v1.107.0, les événements) dont la case « Synchronisation périodique » est cochée
+         et dont l'intervalle choisi (N minutes, minimum 5) est écoulé : groupes des réponses appliqués aux participants + étiquettes de contact mises à jour.
+         Sans aucun sondage ni événement coché, elle est désactivée (v1.108.0). -->
+    <record id="ir_cron_synchro_sondages" model="ir.cron">
+        <field name="name">RLQ Sondages et événements : synchronisation périodique des groupes et étiquettes</field>
+        <field name="model_id" ref="survey.model_survey_survey"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_rlq_synchroniser_sondages()
+env['event.event']._cron_rlq_synchroniser_evenements()</field>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+    </record>
+
+    <!-- v1.108.0 : la tâche n'est ACTIVE que si un sondage ou un événement a la case cochée (voir _rlq_ajuster_cron) ; le champ « active » n'est donc plus
+         imposé ici (une mise à jour du module ne la réactive plus) et cet appel l'aligne à chaque installation ou mise à jour. -->
+    <function model="survey.survey" name="_rlq_ajuster_cron"/>
+
+</odoo>

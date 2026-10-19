@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- noupdate="1" : une valeur modifiée par un administrateur via
+         Réglages > Technique > Paramètres système ne sera jamais
+         écrasée par une future mise à jour de ce module - seule la
+         création initiale (si le paramètre n'existe pas encore) est
+         affectée par ce fichier. -->
+    <data noupdate="1">
+        <record id="ir_config_parameter_url_aide" model="ir.config_parameter">
+            <field name="key">rlq_survey_report.url_aide</field>
+            <field name="value">https://www.rencontres-linux.quebec/odoo/action-908/50/action-909/117</field>
+        </record>
+    </data>
+</odoo>

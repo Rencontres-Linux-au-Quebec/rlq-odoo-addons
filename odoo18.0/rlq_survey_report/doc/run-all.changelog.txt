@@ -1,0 +1,72 @@
+Journal des changements de run-all.sh (version la plus récente en premier)
+==========================================================================
+
+Version 1.1.20261016.114848 — 2026-10-16
+  Short title: standalone tests also run tests/test_email_check.py.
+  Reason: module 1.109.0 (invalid e-mail addresses of registrations): the rules of models/email_check.py are pure Python, testable without Odoo.
+  Changes: etape_tests_autonomes() runs « unittest tests.test_report_builder tests.test_email_check ».
+  Bugs fixed: none.
+  Safeguards and edge cases: none new.
+  Checks: bash -n run-all.sh; the two standalone modules pass.
+  Action required: none.
+
+Version 1.0.20261002.131909 — 2026-10-02
+  Titre court : version initiale - lance toutes les vérifications du module en une
+    commande (ruff, syntaxe et manifeste, tests autonomes) et, si PostgreSQL et Odoo
+    sont disponibles, crée une base PostgreSQL de test, y exécute les tests Odoo, puis
+    la supprime.
+  Motif de la demande : pouvoir faire « tous les tests » d'un seul coup, y compris les
+    tests Odoo de tests/test_wizard.py qui n'ont jamais pu être exécutés pendant le
+    développement faute d'instance Odoo, avec une base PostgreSQL de test dédiée.
+  Détail des modifications :
+    - Nouveau fichier run-all.sh (à la racine du module). Options, par ordre
+      alphabétique : --bd, --changelog, --garder-bd, --help, --sans-odoo,
+      --supprimer-bd, --version.
+    - Nouveau fichier ruff.toml : règles restreintes aux vrais bogues (E4, E7, E9, F, B).
+    - Nouveaux fichiers scripts/run-all.conf.exemple et scripts/LISEZMOI.md.
+    - Configuration lue dans /etc/default/run-all.conf puis ~/.run-all.cfg (les options de
+      la ligne de commande ont priorité) ; le script indique quels fichiers ont été lus et
+      résume les options importantes.
+    - Cinq étapes : outils, ruff, syntaxe et manifeste (Python, XML, fichiers listés dans
+      le manifeste, imports de __init__.py), tests autonomes, base PostgreSQL + tests Odoo.
+    - Journaux de chaque étape conservés dans un dossier temporaire, dont le chemin est
+      affiché ; les 25 dernières lignes sont montrées en cas d'échec.
+  Bugs corrigés : aucun en production (première version). Deux bogues découverts et
+    corrigés PENDANT la validation, avant cette livraison :
+    - Symptôme : « ROUGE: unbound variable » sur une option invalide ou une clé inconnue
+      du fichier de configuration. Diagnostic : les couleurs n'étaient initialisées
+      qu'après la lecture des options. Correction : valeurs vides par défaut.
+    - Symptôme : plantage sous un vrai terminal (« COLORFGBG: unbound variable »).
+      Diagnostic : cette variable est souvent non définie et « set -u » est actif.
+      Correction : ${COLORFGBG:-}. Invisible hors terminal : trouvé grâce à un terminal
+      simulé.
+  Garde-fous et cas limites :
+    - Le nom de la base de test doit commencer par « test » ou « rlq_test » et ne contenir
+      que lettres, chiffres et « _ » : tout autre nom est refusé AVANT toute commande, et
+      seule cette base est supprimée. Une tentative d'injection SQL dans le nom est refusée.
+    - La base est supprimée même si les tests échouent ou si le script est interrompu
+      (Ctrl+C / SIGTERM), sauf avec --garder-bd.
+    - Une base de test du même nom déjà présente est supprimée puis recréée.
+    - Outil absent (ruff, psql, createdb, dropdb, odoo-bin) : l'étape est IGNORÉE avec la
+      raison, sans échec ; un échec réel donne le code de sortie 1.
+    - Zéro test Odoo exécuté est traité comme un échec (module hors de l'addons_path ?).
+    - Le mot de passe PostgreSQL n'est jamais lu dans un fichier de configuration
+      (PGPASSWORD ou ~/.pgpass) ; les clés inconnues sont signalées et ignorées.
+    - Sans terminal (sortie redirigée) ou avec NO_COLOR : aucun code de couleur.
+    - Ne laisse aucun fichier de cache dans le module (ruff --no-cache, PYTHONDONTWRITEBYTECODE) :
+      le dossier est déployé tel quel.
+  Vérifications effectuées :
+    - EXÉCUTION RÉELLE des étapes 1 à 4 sur le module : ruff sans problème, syntaxe et
+      manifeste, 124 tests autonomes passés.
+    - Étape 5 validée UNIQUEMENT avec de fausses commandes (psql, createdb, dropdb,
+      odoo-bin) qui enregistrent leurs appels : ordre des opérations, garde-fou sur le nom,
+      suppression après échec, --garder-bd, base déjà existante, zéro test, --supprimer-bd,
+      priorité de la configuration, ruff absent, interruption par SIGTERM, absence de
+      couleurs hors terminal, couleurs sous terminal simulé.
+    - PAS de PostgreSQL ni d'Odoo réels dans l'environnement de développement : la
+      création réelle de la base et l'exécution réelle des tests Odoo n'ont PAS été
+      vérifiées. Le format exact du résumé des tests dans le journal d'Odoo est une
+      hypothèse (repli sur le code de retour d'odoo-bin si absent). Shellcheck absent.
+  Action requise : lancer ./run-all.sh sur une machine où PostgreSQL et Odoo sont installés
+    (voir scripts/LISEZMOI.md) et nous transmettre le résultat, surtout en cas d'échec :
+    c'est la première exécution réelle de tests/test_wizard.py.

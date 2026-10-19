@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- v1.109.0 — automatic correction of an e-mail address at registration time (models/event_registration_email.py):
+         syntax (default: punctuation / spaces only, no letter changed), off (never), typos (also a misspelled popular domain: gmial.com -> gmail.com).
+         noupdate: a value changed in Settings > Technical > System Parameters survives the module updates. -->
+    <record id="param_registration_email_autofix" model="ir.config_parameter">
+        <field name="key">rlq_survey_report.registration_email_autofix</field>
+        <field name="value">syntax</field>
+    </record>
+</odoo>

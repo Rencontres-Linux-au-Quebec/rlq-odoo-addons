@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Mot de passe PAR DÉFAUT pré-rempli (masqué) dans le formulaire du rapport.
+
+         Volontairement PAS un <record> : un enregistrement créé par un fichier de données
+         est RECHARGÉ en mode « init » (module installé avec -i, ou réinstallé) MÊME avec
+         noupdate="1", qui ne protège que contre -u - le mot de passe défini par
+         l'administrateur était alors remplacé par le marqueur. La fonction ci-dessous crée
+         le paramètre SEULEMENT s'il n'existe pas : une valeur existante, même vide, n'est
+         jamais remplacée, quelle que soit la façon dont le module est installé ou mis à jour.
+
+         Hors <data noupdate="1"> exprès : une balise <function> en noupdate n'est pas
+         exécutée lors d'une mise à jour, et la création ne se ferait alors jamais sur une
+         base qui n'avait pas encore ce paramètre.
+
+         La valeur livrée n'est qu'un MARQUEUR, refusé par le module tant qu'il n'est pas
+         remplacé : Paramètres/Réglages > Technique > Paramètres système, clé
+         rlq_survey_report.mot_de_passe_defaut (une valeur vide désactive le pré-remplissage). -->
+    <function model="rlq.survey.report.wizard" name="_creer_parametre_mot_de_passe_si_absent"/>
+</odoo>

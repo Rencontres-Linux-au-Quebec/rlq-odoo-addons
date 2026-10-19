@@ -1,0 +1,33 @@
+# Modèle de configuration de run-all.sh.
+# Copiez ce fichier vers ~/.run-all.cfg (ou /etc/default/run-all.conf pour toute la machine)
+# et gardez seulement les lignes à modifier. Lecture : d'abord /etc/default/run-all.conf,
+# puis ~/.run-all.cfg ; les options de la ligne de commande ont priorité sur les deux.
+# Format : CLÉ=valeur (pas d'espace autour du =). Les lignes commençant par # sont ignorées.
+
+# --- Base de test PostgreSQL. Le nom DOIT commencer par « test » ou « rlq_test » :
+#     le script refuse tout autre nom et ne supprime que cette base.
+BD_NOM=rlq_test
+
+# --- Connexion PostgreSQL (vide = valeurs par défaut de libpq : socket local, utilisateur courant).
+#     Mot de passe : variable PGPASSWORD ou fichier ~/.pgpass (jamais dans ce fichier).
+#PG_HOTE=localhost
+#PG_PORT=5432
+#PG_UTILISATEUR=odoo
+
+# --- Odoo
+#ODOO_BIN=/opt/odoo/odoo-bin
+#ODOO_CONF=/etc/odoo/odoo.conf
+# Si odoo.conf ne contient pas déjà le dossier PARENT du module dans addons_path :
+#ODOO_ADDONS=/opt/odoo/addons,/opt/odoo/odoo/addons,/chemin/vers/le/dossier/parent/du/module
+# Étiquettes de tests Odoo (« /module » = tous les tests du module) :
+#ODOO_TEST_TAGS=/rlq_survey_report
+
+# --- ruff (vide = celui du PATH, sinon python3 -m ruff)
+#RUFF_BIN=/usr/local/bin/ruff
+
+# --- Apparence : auto | clair | sombre (couleur des numéros de version avec --changelog)
+#THEME=auto
+
+# --- Comportement par défaut (oui | non)
+#GARDER_BD=non
+#SANS_ODOO=non
