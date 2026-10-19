@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Groupes des inscrits (v1.98.0). Mêmes précautions que les autres vues du module : xpath sur //sheet (toujours
+         présent dans un formulaire) et //list (racine d'une vue liste depuis Odoo 17/18) plutôt que sur un champ précis ;
+         un xpath qui échoue à l'installation casserait le module entier. SI UNE VUE N'EXISTE PAS SOUS CE NOM : les champs
+         existent quand même (voir NOTES_VALIDATION.md, section -67). -->
+    <record id="view_event_form_rlq_groupes" model="ir.ui.view">
+        <field name="name">event.event.form.rlq.groupes</field>
+        <field name="model">event.event</field>
+        <field name="inherit_id" ref="event.view_event_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Groupes des inscrits (un par type de billet)" name="rlq_groupes">
+                    <group>
+                        <field name="rlq_groupe_prefixe" placeholder="ex. JPOL26 : groupes RLQ-JPOL26-Visiteur, RLQ-JPOL26-Bénévole… (« RLQ- » est ajouté seul)"/>
+                    </group>
+                    <group>
+                        <button name="action_rlq_synchroniser_groupes" type="object" class="btn-secondary"
+                                string="Créer / synchroniser les groupes"
+                                invisible="not rlq_groupe_prefixe"
+                                help="Crée les groupes manquants et y place les inscrits qui ont déjà un compte portail."/>
+                        <field name="rlq_synchro_active" invisible="not rlq_groupe_prefixe"/>
+                        <field name="rlq_synchro_minutes" invisible="not rlq_groupe_prefixe or not rlq_synchro_active"/>
+                        <field name="rlq_synchro_derniere" invisible="not rlq_synchro_active"/>
+                        <field name="rlq_synchro_resultat" invisible="not rlq_synchro_active"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_event_ticket_tree_rlq_groupe" model="ir.ui.view">
+        <field name="name">event.event.ticket.tree.rlq.groupe</field>
+        <field name="model">event.event.ticket</field>
+        <field name="inherit_id" ref="event.event_event_ticket_view_tree_from_event"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="rlq_group_id" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_event_registration_form_rlq_groupe" model="ir.ui.view">
+        <field name="name">event.registration.form.rlq.groupe</field>
+        <field name="model">event.registration</field>
+        <field name="inherit_id" ref="event.view_event_registration_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group name="rlq_groupe" string="Groupe de discussion">
+                    <field name="rlq_groupe_refus"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Colonne « Groupe Odoo » dans les réponses suggérées d'une question de sondage (liste intégrée au formulaire de la question,
+         survey.survey_question_form, nom de vue standard d'Odoo 17/18). SI CE xpath ne trouve pas la liste : le champ
+         rlq_group_id existe quand même sur survey.question.answer (voir NOTES_VALIDATION.md, section -67). -->
+    <record id="view_survey_question_form_rlq_groupe" model="ir.ui.view">
+        <field name="name">survey.question.form.rlq.groupe</field>
+        <field name="model">survey.question</field>
+        <field name="inherit_id" ref="survey.survey_question_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='suggested_answer_ids']/list" position="inside">
+                <field name="rlq_group_id" options="{'no_open': True}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Bouton sur le sondage : applique les groupes des réponses à tous ceux qui l'ont déjà soumis (v1.103.0). Même xpath prudent //sheet. -->
+    <record id="view_survey_survey_form_rlq_groupes_participants" model="ir.ui.view">
+        <field name="name">survey.survey.form.rlq.groupes.participants</field>
+        <field name="model">survey.survey</field>
+        <field name="inherit_id" ref="survey.survey_survey_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Groupes des réponses" name="rlq_groupes_participants">
+                    <button name="action_rlq_appliquer_groupes_participants" type="object" class="btn-secondary"
+                            string="Appliquer les groupes aux participants"
+                            invisible="not id"
+                            help="Après avoir lié un groupe à une réponse (colonne « Groupe Odoo »), l'applique à toutes les personnes qui ont déjà terminé ce sondage."/>
+                    <field name="rlq_synchro_active"/>
+                    <field name="rlq_synchro_minutes" invisible="not rlq_synchro_active"/>
+                    <field name="rlq_synchro_derniere" invisible="not rlq_synchro_active"/>
+                    <field name="rlq_synchro_resultat" invisible="not rlq_synchro_active"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Assistant « Vérifier les groupes et étiquettes » (v1.104.0) : aperçu d'abord, changements seulement après confirmation.
+         Le menu est sous « Rapports détaillés » (menu_rlq_survey_report_in_survey_app, défini dans rlq_survey_report_views.xml,
+         chargé avant ce fichier). Réservé aux responsables des sondages. -->
+    <record id="view_rlq_groupes_verification_form" model="ir.ui.view">
+        <field name="name">rlq.groupes.verification.form</field>
+        <field name="model">rlq.groupes.verification</field>
+        <field name="arch" type="xml">
+            <form string="Vérifier les groupes et étiquettes">
+                <sheet>
+                    <field name="etat" invisible="1"/>
+                    <p invisible="etat != 'apercu'">
+                        Aperçu des changements : <strong>rien n'est modifié</strong> tant que vous n'avez pas cliqué sur « Appliquer les changements »
+                        (et confirmé).
+                    </p>
+                    <field name="nb_changements" invisible="1"/>
+                    <field name="resume" nolabel="1"/>
+                </sheet>
+                <footer>
+                    <button name="action_appliquer" type="object" class="btn-primary" string="Appliquer les changements"
+                            invisible="etat != 'apercu' or nb_changements == 0"
+                            confirm="Appliquer maintenant ces changements (groupes, étiquettes et appartenance des participants) ?"/>
+                    <button string="Fermer" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rlq_groupes_verification" model="ir.actions.act_window">
+        <field name="name">Vérifier les groupes et étiquettes</field>
+        <field name="res_model">rlq.groupes.verification</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_rlq_groupes_verification"
+              name="Vérifier les groupes et étiquettes"
+              parent="menu_rlq_survey_report_in_survey_app"
+              action="action_rlq_groupes_verification"
+              sequence="90"
+              groups="survey.group_survey_manager"/>
+
+    <!-- v1.106.0 : menu « Synchronisation périodique » : liste modifiable en place des sondages (case, intervalle en minutes, dernier passage)
+         avec le bouton « Synchroniser maintenant » sur la ligne sélectionnée. Réservé aux responsables des sondages. -->
+    <record id="view_survey_survey_list_rlq_synchro" model="ir.ui.view">
+        <field name="name">survey.survey.list.rlq.synchro</field>
+        <field name="model">survey.survey</field>
+        <field name="arch" type="xml">
+            <list string="Synchronisation périodique des groupes et étiquettes" editable="bottom" create="0" delete="0">
+                <field name="title" readonly="1"/>
+                <field name="rlq_synchro_active"/>
+                <field name="rlq_synchro_minutes" readonly="not rlq_synchro_active"/>
+                <field name="rlq_synchro_derniere"/>
+                <field name="rlq_synchro_resultat"/>
+                <button name="action_rlq_appliquer_groupes_participants" type="object" icon="fa-refresh" string="Synchroniser maintenant"
+                        help="Applique tout de suite les groupes des réponses et met à jour les étiquettes de ce sondage."/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_survey_survey_search_rlq_synchro" model="ir.ui.view">
+        <field name="name">survey.survey.search.rlq.synchro</field>
+        <field name="model">survey.survey</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="title"/>
+                <filter name="rlq_synchro_actifs" string="Synchronisation active" domain="[('rlq_synchro_active', '=', True)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_rlq_synchro_sondages" model="ir.actions.act_window">
+        <field name="name">Synchronisation périodique des sondages</field>
+        <field name="res_model">survey.survey</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_survey_survey_list_rlq_synchro"/>
+        <field name="search_view_id" ref="view_survey_survey_search_rlq_synchro"/>
+    </record>
+
+    <menuitem id="menu_rlq_synchro_sondages"
+              name="Synchronisation périodique (sondages)"
+              parent="menu_rlq_survey_report_in_survey_app"
+              action="action_rlq_synchro_sondages"
+              sequence="95"
+              groups="survey.group_survey_manager"/>
+
+    <!-- v1.106.0 : le guide utilisateur, dans Odoo (contrôleur controllers/aide.py), pour tous les utilisateurs des sondages. -->
+    <record id="action_rlq_guide_utilisation" model="ir.actions.act_url">
+        <field name="name">Guide d'utilisation</field>
+        <field name="url">/rlq_survey_report/aide</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_rlq_guide_utilisation"
+              name="Guide d'utilisation"
+              parent="menu_rlq_survey_report_in_survey_app"
+              action="action_rlq_guide_utilisation"
+              sequence="99"
+              groups="survey.group_survey_user"/>
+
+    <!-- v1.107.0 : même liste pour les ÉVÉNEMENTS (groupes des billets). Le bouton de ligne synchronise tout de suite. -->
+    <record id="view_event_event_list_rlq_synchro" model="ir.ui.view">
+        <field name="name">event.event.list.rlq.synchro</field>
+        <field name="model">event.event</field>
+        <field name="arch" type="xml">
+            <list string="Synchronisation périodique des événements" editable="bottom" create="0" delete="0">
+                <field name="name" readonly="1"/>
+                <field name="date_end" readonly="1"/>
+                <field name="rlq_groupe_prefixe" readonly="1"/>
+                <field name="rlq_synchro_active" readonly="not rlq_groupe_prefixe"/>
+                <field name="rlq_synchro_minutes" readonly="not rlq_synchro_active"/>
+                <field name="rlq_synchro_derniere"/>
+                <field name="rlq_synchro_resultat"/>
+                <button name="action_rlq_synchroniser_groupes" type="object" icon="fa-refresh" string="Synchroniser maintenant" invisible="not rlq_groupe_prefixe"
+                        help="Crée les groupes manquants, y place les inscrits et met à jour les étiquettes de cet événement, tout de suite."/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_rlq_synchro_evenements" model="ir.actions.act_window">
+        <field name="name">Synchronisation périodique des événements</field>
+        <field name="res_model">event.event</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_event_event_list_rlq_synchro"/>
+        <field name="domain">[('rlq_groupe_prefixe', '!=', False)]</field>
+    </record>
+
+    <menuitem id="menu_rlq_synchro_evenements"
+              name="Synchronisation périodique (événements)"
+              parent="menu_rlq_survey_report_in_survey_app"
+              action="action_rlq_synchro_evenements"
+              sequence="96"
+              groups="survey.group_survey_manager"/>
+
+    <!-- v1.108.0 : sommaire en lecture seule de la synchronisation (tâche planifiée active ou non, synchronisations immédiates, intervalle par défaut, sondages et événements cochés). -->
+    <record id="view_rlq_synchro_sommaire_form" model="ir.ui.view">
+        <field name="name">rlq.synchro.sommaire.form</field>
+        <field name="model">rlq.synchro.sommaire</field>
+        <field name="arch" type="xml">
+            <form string="Synchronisation : sommaire" create="0" edit="0">
+                <sheet>
+                    <field name="resume" nolabel="1"/>
+                </sheet>
+                <footer>
+                    <button string="Fermer" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rlq_synchro_sommaire" model="ir.actions.act_window">
+        <field name="name">Synchronisation : sommaire</field>
+        <field name="res_model">rlq.synchro.sommaire</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_rlq_synchro_sommaire"
+              name="Synchronisation : sommaire"
+              parent="menu_rlq_survey_report_in_survey_app"
+              action="action_rlq_synchro_sommaire"
+              sequence="97"
+              groups="survey.group_survey_manager"/>
+
+</odoo>

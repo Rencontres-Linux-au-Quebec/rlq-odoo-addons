@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Ajoute le champ "Sondage pour ce type de billet" à la liste éditable
+         des billets intégrée au formulaire de l'événement
+         (event.event_event_ticket_view_tree_from_event - nom de vue standard
+         d'Odoo depuis plusieurs versions). xpath ciblant //list (la racine du
+         gabarit - RENOMMÉE de <tree> à <list> depuis Odoo 17/18, erreur de
+         ma part en v1.73.0 : "L'élément '<xpath expr=\"//tree\">' ne peut
+         être localisé dans la vue parente", confirmé par le journal de
+         chargement du module - <tree> n'existe simplement plus comme
+         élément racine d'une vue liste sur cette version) plutôt qu'une
+         colonne précise dont la position a pu changer sur cette instance -
+         un xpath qui échoue à l'installation casserait le module entier,
+         un risque à éviter pour un simple ajout de champ (même précaution
+         que pour la vue du formulaire natif du Sondage, voir
+         rlq_survey_report_views.xml).
+
+         SI CETTE VUE N'EXISTE PAS SOUS CE NOM SUR VOTRE INSTANCE (ERPLibre
+         personnalise parfois les vues standards) : le champ rlq_survey_id
+         existe malgré tout sur le modèle event.event.ticket (visible via un
+         éditeur de vue/Studio, ou en l'ajoutant vous-même à la vue de votre
+         choix) - seul cet AFFICHAGE automatique ne fonctionnerait pas. Voir
+         NOTES_VALIDATION.md. -->
+    <record id="view_event_ticket_tree_rlq_survey" model="ir.ui.view">
+        <field name="name">event.event.ticket.tree.rlq.survey</field>
+        <field name="model">event.event.ticket</field>
+        <field name="inherit_id" ref="event.event_event_ticket_view_tree_from_event"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="rlq_survey_id" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,29 @@
+/*
+ * Liste « Historique et fichiers déjà générés » (modèle rlq.survey.report.acces).
+ *
+ * La colonne « Télécharger » affiche le nom du fichier (widget binaire) : elle est
+ * élargie et son texte passe à la ligne, pour que le NOM COMPLET soit toujours
+ * visible - le widget binaire d'Odoo n'offre pas d'infobulle, et les noms de
+ * fichiers générés peuvent être très longs (filtres, plage de dates, horodatage).
+ *
+ * Cible le nom de champ `fichier_telecharger`, propre à ce module : aucune autre
+ * liste d'Odoo n'est touchée. `!important` : Odoo fixe la largeur des colonnes en
+ * style en ligne après le rendu, qu'une règle ordinaire ne peut pas surcharger.
+ * Si ces sélecteurs ne correspondaient pas à la structure de votre version
+ * d'Odoo, rien ne casse : la colonne garde simplement sa largeur automatique.
+ */
+.o_list_renderer th[data-name="fichier_telecharger"],
+.o_list_renderer td[name="fichier_telecharger"] {
+    width: 46rem !important;
+    min-width: 46rem !important;
+}
+
+.o_list_renderer td[name="fichier_telecharger"],
+.o_list_renderer td[name="fichier_telecharger"] a,
+.o_list_renderer td[name="fichier_telecharger"] span {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+}

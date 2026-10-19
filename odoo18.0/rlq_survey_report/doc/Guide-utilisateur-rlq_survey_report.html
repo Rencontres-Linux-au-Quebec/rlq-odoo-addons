@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guide utilisateur — Rapport de sondage</title>
+<style>
+  :root { --bg:#fff; --texte:#1d2733; --attenue:#5a6776; --bord:#d5dbe3; --accent:#1b6ec2; --fond-th:#eef3f9; --fond-code:#f3f5f8;
+          --info:#e7f1fb; --info-b:#5b9bd5; --alerte:#fff3cd; --alerte-b:#e0b400; --danger:#fdecea; --danger-b:#d93025; --ok:#eaf6ee; --ok-b:#2f9e5a; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#14181d; --texte:#e4e8ee; --attenue:#9aa6b4; --bord:#323a45; --accent:#6fb1f2; --fond-th:#1e2630; --fond-code:#1e242c;
+            --info:#17283a; --info-b:#3d78b0; --alerte:#3a3114; --alerte-b:#b8920a; --danger:#3a1a17; --danger-b:#c0392b; --ok:#16301f; --ok-b:#2f8a52; } }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--texte); font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  .page { max-width:980px; margin:0 auto; padding:1.5rem 1.2rem 4rem; }
+  h1 { font-size:2rem; margin:.2rem 0 .3rem; }
+  h2 { font-size:1.45rem; margin:2.6rem 0 .8rem; padding-bottom:.35rem; border-bottom:2px solid var(--bord); }
+  h3 { font-size:1.15rem; margin:1.8rem 0 .5rem; }
+  p, li { max-width:75ch; }
+  a { color:var(--accent); }
+  code { background:var(--fond-code); padding:.1rem .35rem; border-radius:4px; font-size:.92em; }
+  .meta { color:var(--attenue); margin:0 0 1.2rem; }
+  table { border-collapse:collapse; width:100%; margin:.8rem 0 1.2rem; font-size:.95rem; }
+  th, td { border:1px solid var(--bord); padding:.5rem .65rem; text-align:left; vertical-align:top; }
+  th { background:var(--fond-th); }
+  .encadre { border-left:5px solid var(--info-b); background:var(--info); padding:.7rem 1rem; margin:1rem 0; border-radius:4px; }
+  .encadre.attention { border-color:var(--alerte-b); background:var(--alerte); }
+  .encadre.danger { border-color:var(--danger-b); background:var(--danger); }
+  .encadre.ok { border-color:var(--ok-b); background:var(--ok); }
+  .encadre p:first-child { margin-top:0; } .encadre p:last-child { margin-bottom:0; }
+  nav.toc { border:1px solid var(--bord); border-radius:8px; padding:.8rem 1.2rem; margin:1.2rem 0 2rem; background:var(--fond-th); }
+  nav.toc ol { margin:.3rem 0; columns:2; column-gap:2rem; } nav.toc li { break-inside:avoid; }
+  figure.capture { border:2px dashed var(--bord); border-radius:8px; padding:.7rem 1rem; margin:1rem 0; color:var(--attenue); font-size:.9rem; background:var(--fond-code); }
+  figure.capture b { color:var(--texte); }
+  .r { color:#b3261e; font-weight:600; } .j { color:#a68b00; font-weight:600; } .b { color:#1b6ec2; font-weight:600; } .v { color:#1f7a3d; font-weight:600; }
+  .pastille { display:inline-block; padding:0 .5rem; border-radius:999px; font-size:.82rem; font-weight:600; border:1px solid var(--bord); background:var(--fond-th); }
+  @media (max-width:700px) { nav.toc ol { columns:1; } }
+  @media print { nav.toc { display:none; } h2 { page-break-after:avoid; } table, figure { page-break-inside:avoid; } a { color:inherit; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>Guide utilisateur — Rapport de sondage</h1>
+<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.111.0</strong> — mis à jour le 2026-10-16.<br>
+Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
+
+<p>Ce module produit un compte-rendu détaillé — à l'écran, en fichier HTML, en PDF ou en Excel — des réponses à un ou plusieurs sondages Odoo, notamment les sondages de satisfaction envoyés après chaque rencontre. Il aide à repérer ce qui va bien, ce qui se dégrade, et à suivre les actions entreprises d'une rencontre à l'autre.</p>
+
+<div class="encadre">
+  <p><strong>Nouveautés depuis la version précédente de ce guide :</strong> les <em>adresses courriel invalides</em> des inscriptions, repérées, corrigées et renvoyées (§&nbsp;13) · les <em>groupes et étiquettes</em> des inscrits et des sondages, avec la mise à jour périodique par sondage (§&nbsp;12) · la <em>Note globale</em> et ses signaux de suivi (§&nbsp;6) · l'<em>anonymisation</em> des participants (§&nbsp;4) · un mot de passe demandé seulement quand c'est utile, avec un mot de passe par défaut (§&nbsp;5) · le filtre par présentateur et l'appréciation des présentateurs · les <em>actions de suivi</em> (§&nbsp;8) · l'<em>historique et les fichiers déjà générés</em> (§&nbsp;9) · une colonne par soumission dans la fiche d'un participant (§&nbsp;7) · un sondage différent par type de billet (§&nbsp;11).</p>
+</div>
+
+<nav class="toc" aria-label="Table des matières">
+  <strong>Table des matières</strong>
+  <ol>
+    <li><a href="#acces">Accéder au rapport</a></li>
+    <li><a href="#generer">Générer un rapport, pas à pas</a></li>
+    <li><a href="#formulaire">Le formulaire en détail</a></li>
+    <li><a href="#anonymisation">Anonymisation et confidentialité</a></li>
+    <li><a href="#mdp">Mot de passe</a></li>
+    <li><a href="#lire">Lire le rapport</a></li>
+    <li><a href="#participant">La fiche d'un participant</a></li>
+    <li><a href="#suivi">Actions de suivi et commentaires internes</a></li>
+    <li><a href="#historique">Historique et fichiers déjà générés</a></li>
+    <li><a href="#excel">Export Excel</a></li>
+    <li><a href="#billets">Un sondage par type de billet</a></li>
+    <li><a href="#groupes">Groupes et étiquettes des inscrits et des sondages</a></li>
+    <li><a href="#courriels-invalides">Adresses courriel invalides des inscriptions</a></li>
+    <li><a href="#admin">Pour les administrateurs</a></li>
+    <li><a href="#depannage">Dépannage</a></li>
+    <li><a href="#limites">Limites et prudence</a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ 1 -->
+<h2 id="acces">1. Accéder au rapport</h2>
+<p>Dans le menu <strong>Sondage</strong>, ouvrez <strong>Rapports détaillés</strong>. Seules les personnes ayant au moins le rôle « Utilisateur » du module Sondage voient ce menu. Il contient trois entrées :</p>
+<table>
+  <tr><th>Entrée</th><th>À quoi elle sert</th></tr>
+  <tr><td><strong>Sélection manuelle des sondages</strong></td><td>Ouvre le formulaire de génération, à blanc. C'est le point de départ habituel (voir §&nbsp;2).</td></tr>
+  <tr><td><strong>Actions de suivi (amélioration continue)</strong></td><td>Liste de tous les sondages, avec une colonne modifiable pour noter ce qui a été fait suite à chaque rencontre (voir §&nbsp;8).</td></tr>
+  <tr><td><strong>Historique et fichiers déjà générés</strong></td><td>Qui a généré quoi, quand — et téléchargement des fichiers déjà produits, sans les régénérer (voir §&nbsp;9).</td></tr>
+</table>
+<figure class="capture"><b>Capture à ajouter — <code>01-menu-sondage.png</code></b><br>Le menu Sondage déroulé, avec « Rapports détaillés » et ses trois entrées.</figure>
+<div class="encadre"><p>Les anciens sous-menus « Premier mardi du mois », « Pause café », « Portes ouvertes »… n'existent plus : ils sont remplacés par la liste <strong>Filtrer par titre</strong> du formulaire (§&nbsp;3), qui fait la même chose sans quitter l'écran.</p></div>
+
+<!-- ============================================================ 2 -->
+<h2 id="generer">2. Générer un rapport, pas à pas</h2>
+<ol>
+  <li><strong>Cochez la confirmation</strong> en haut du formulaire (« Je confirme être responsable des renseignements personnels de ce rapport »). Le bouton Générer refuse de fonctionner sans elle, et elle est à recocher à chaque génération.</li>
+  <li><strong>Choisissez les sondages</strong> (les « rencontres »), de l'une de ces trois façons :
+    <ul>
+      <li>à la main : <em>Ajouter une ligne</em> dans « Sondages (rencontres) à inclure » ;</li>
+      <li>par catégorie : la liste <em>Filtrer par titre</em> (Tous, Pause café, Portes ouvertes, Premier mardi du mois, ou un mot-clé de votre choix) ;</li>
+      <li>par personne : la liste <em>Filtrer par présentateur</em>, pour ne garder que les rencontres où cette personne a présenté — pratique pour lui envoyer un rapport ciblé.</li>
+    </ul>
+    Une ligne « Ampleur de la génération » indique combien de sondages et de réponses seront traités.</li>
+  <li><strong>Ajustez les filtres</strong> à gauche (exclusions, plage de dates…) et les <strong>options</strong> à droite (§&nbsp;3).</li>
+  <li><strong>Décidez de l'anonymisation</strong> : la case « Anonymiser les participants » est cochée par défaut (§&nbsp;4). Elle détermine aussi si un mot de passe sera demandé (§&nbsp;5).</li>
+  <li><strong>Choisissez le format de sortie</strong> — à l'écran, fichier HTML ou fichier PDF — puis cliquez sur <strong>Générer</strong>.</li>
+  <li>Une fois le rapport affiché, vous pouvez le <strong>télécharger</strong> (HTML, PDF), l'<strong>exporter en Excel</strong>, ou <strong>Modifier les paramètres</strong> pour recommencer sans tout ressaisir.</li>
+</ol>
+<figure class="capture"><b>Capture à ajouter — <code>03-formulaire-complet.png</code></b><br>Le formulaire en entier, de la confirmation jusqu'aux boutons.</figure>
+
+<!-- ============================================================ 3 -->
+<h2 id="formulaire">3. Le formulaire en détail</h2>
+
+<h3>Colonne de gauche — sélection, filtres et exclusions</h3>
+<table>
+  <tr><th>Champ</th><th>Effet</th></tr>
+  <tr><td><strong>Filtrer par titre</strong></td><td>Choisit les sondages d'une catégorie et <strong>remplace</strong> la sélection actuelle. <em>Tous les sondages</em> = tous ceux qui ont reçu au moins une réponse (terminée ou en cours). Les catégories reconnaissent des mots du titre (« pause café », « portes ouvertes ») ou une date tombant le premier mardi du mois. <em>Autre</em> permet de saisir son propre mot-clé.</td></tr>
+  <tr><td><strong>Mot-clé personnalisé</strong></td><td>Apparaît seulement avec « Autre » : tout sondage dont le titre contient ce mot est choisi.</td></tr>
+  <tr><td><strong>Minimum ayant débuté ou terminé?</strong></td><td>Avec une catégorie choisie : écarte les sondages ayant reçu moins de réponses que ce nombre (les invitations jamais ouvertes ne comptent pas). Défaut : 1.</td></tr>
+  <tr><td><strong>Exclure si le titre contient</strong></td><td>Avec une catégorie choisie : retire de la sélection tout sondage dont le titre contient ce texte.</td></tr>
+  <tr><td><strong>Sondages des N derniers mois</strong></td><td>Avec une catégorie choisie : ne garde que les sondages des N derniers mois (date lue dans le titre, sinon date de création). 0 = aucune limite.</td></tr>
+  <tr><td><strong>Filtrer par présentateur</strong></td><td>Liste des présentateurs reconnus dans <em>tous</em> les sondages. En choisir un remplace la sélection par uniquement ses rencontres. Un présentateur est reconnu quand le titre d'une présentation se termine par son nom entre crochets ou parenthèses : « Titre [Nom Prénom] ».</td></tr>
+  <tr><td><strong>Participants à exclure</strong></td><td>Retire entièrement des personnes du rapport, avec toutes leurs réponses.</td></tr>
+  <tr><td><strong>Exclure par étiquette</strong></td><td>Retire toute personne portant l'une de ces étiquettes (sur sa fiche contact), quel que soit le sondage. Peut être pré-rempli selon la configuration de votre instance.</td></tr>
+  <tr><td><strong>Exclure les sondages dont le titre contient</strong></td><td>Mots séparés par une virgule, sans tenir compte de la casse. Vide par défaut : ajoutez-y par exemple « test » pour ne jamais inclure un sondage d'essai.</td></tr>
+  <tr><td><strong>À partir du</strong> / <strong>Jusqu'au</strong></td><td>Limitent les réponses considérées à une plage de dates. Vide = aucune limite.</td></tr>
+  <tr><td><strong>Limiter aux dernières X heures?</strong></td><td>0 = aucune limite. Sinon, ne retient que les réponses des X dernières heures — utile pour un suivi à chaud juste après une rencontre. Se combine avec les deux dates : le plus restrictif s'applique. Le nom du fichier le reflète (ex. <code>…-24h-…</code>).</td></tr>
+</table>
+
+<h3>Colonne de droite — format et options</h3>
+<table>
+  <tr><th>Option</th><th>Défaut</th><th>Effet</th></tr>
+  <tr><td><strong>Format de sortie</strong></td><td>À l'écran</td><td>« À l'écran, dans Odoo », « Fichier HTML » ou « Fichier PDF ». Une fois le rapport affiché, les boutons de téléchargement restent disponibles.</td></tr>
+  <tr><td><strong>Inclure les réponses partielles (non terminées)</strong></td><td>coché</td><td>Compte aussi les réponses commencées mais non terminées.</td></tr>
+  <tr><td><strong>Voir les personnes n'ayant pas répondu</strong></td><td>décoché</td><td>Ajoute, par rencontre, les invités qui n'ont jamais commencé. Suppose que ces invitations existent dans Odoo, ce qui dépend de la façon dont vos sondages sont envoyés.</td></tr>
+  <tr><td><strong>Ventiler les notes (liste dépliable détaillée)</strong></td><td>coché</td><td>Sous chaque note moyenne, une liste dépliable indique qui a donné quelle note.</td></tr>
+  <tr><td><strong>Combiner les réponses d'un utilisateur à un même sondage</strong></td><td>décoché</td><td>Voir §&nbsp;7.</td></tr>
+  <tr><td><strong>Dédoublonner les réponses libres avec compteur</strong></td><td>coché</td><td>Regroupe les réponses libres identiques avec un compteur (×2, ×3…).</td></tr>
+  <tr><td><strong>Anonymiser les participants</strong></td><td>coché</td><td>Voir §&nbsp;4.</td></tr>
+  <tr><td><strong>Ajouter une section « À surveiller » (notes ≤ 2)</strong></td><td>coché</td><td>Liste, à la fin du rapport, toutes les notes de 2 ou moins.</td></tr>
+  <tr><td><strong>Mot de passe du fichier</strong> / <strong>Confirmer</strong></td><td>pré-rempli, masqué</td><td>Voir §&nbsp;5.</td></tr>
+</table>
+<figure class="capture"><b>Capture à ajouter — <code>05-colonne-gauche.png</code> et <code>06-colonne-droite.png</code></b><br>Gros plan sur chacune des deux colonnes.</figure>
+
+<h3>Boutons</h3>
+<table>
+  <tr><th>Bouton</th><th>Effet</th></tr>
+  <tr><td><strong>Générer</strong></td><td>Lance la génération selon le format choisi.</td></tr>
+  <tr><td><strong>Télécharger en HTML</strong> / <strong>Télécharger en PDF</strong></td><td>Après une génération à l'écran : télécharge le rapport affiché, sans tout régénérer.</td></tr>
+  <tr><td><strong>Options PDF</strong></td><td>Ouvre une petite fenêtre : « Tableaux de réponses par participant dans le PDF » (à décocher si un très gros PDF échoue), « Saut de page forcé par rencontre », « Saut de page forcé par participant » (à décocher s'il y a un très grand nombre de participants : le PDF peut devenir trop volumineux).</td></tr>
+  <tr><td><strong>Exporter en Excel</strong></td><td>Voir §&nbsp;10. Toujours protégé par mot de passe.</td></tr>
+  <tr><td><strong>Modifier les paramètres</strong></td><td>Revient au formulaire sans perdre vos choix.</td></tr>
+  <tr><td><strong>Aide</strong></td><td>Ouvre la page d'aide du module dans un nouvel onglet (son adresse est un réglage d'administrateur, §&nbsp;14).</td></tr>
+  <tr><td><strong>Fermer</strong></td><td>Ferme la fenêtre sans rien enregistrer.</td></tr>
+</table>
+
+<!-- ============================================================ 4 -->
+<h2 id="anonymisation">4. Anonymisation et confidentialité</h2>
+<p>Avec « Anonymiser les participants » coché (par défaut), le rapport est conçu pour être partagé sans exposer les répondants :</p>
+<table>
+  <tr><th>Ce qui est…</th><th>Détail</th></tr>
+  <tr><td><strong>Remplacé</strong></td><td>Le nom de chaque participant devient « Participant 1 », « Participant 2 »… — le même numéro partout pour une même personne, y compris quand le nom contient des parenthèses, un point ou une apostrophe (par exemple « Nom (organisation) »).</td></tr>
+  <tr><td><strong>Conservé pour les présentateurs, à trois endroits seulement</strong></td><td>Le titre de leurs présentations, la ligne « Présentateur(s) » de chaque rencontre et la section « Appréciation des présentateurs » : ils y sont déjà identifiés publiquement. Partout ailleurs — y compris la liste des participants — un présentateur qui a aussi répondu est anonymisé comme les autres.</td></tr>
+  <tr><td><strong>Retiré entièrement</strong></td><td>Courriel (avec son lien ✉ et les champs « Courriels » à copier), téléphone, mobile, ville, pays, étiquettes, et les lignes « Sondages remplis » et « Événements inscrits » (une longue suite de dates peut suffire à reconnaître quelqu'un).</td></tr>
+  <tr><td><strong>Rendu inoffensif</strong></td><td>Les liens vers l'administration d'Odoo (configuration du sondage, « Tester sondage », événement) deviennent du texte simple. Tout texte qui a la forme d'un courriel est remplacé par « [courriel masqué] », même écrit dans une réponse libre — c'est le seul cas où ce texte peut apparaître.</td></tr>
+  <tr><td><strong>Laissé tel quel</strong></td><td>Le <em>contenu</em> des réponses libres.</td></tr>
+</table>
+<div class="encadre attention">
+  <p><strong>Ce qu'aucun outil ne peut garantir.</strong> Un commentaire peut trahir son auteur par son contenu (« j'étais le seul technicien présent en août… »), et quand une question n'a que deux ou trois répondants, « Participant 1 » reste souvent devinable par ceux qui étaient là. <strong>Avant de diffuser un rapport au-delà de l'équipe, relisez les réponses libres</strong> et vérifiez le nombre de répondants par question. Une fonction comme « À surveiller », qui relie une note basse à un commentaire, augmente encore ce risque.</p>
+</div>
+<div class="encadre danger">
+  <p><strong>L'export Excel n'est pas anonymisé.</strong> Il contient les vrais noms et courriels, quelle que soit la case. C'est pourquoi un mot de passe y reste toujours obligatoire, et pourquoi son nom de fichier ne contient jamais « anonyme ».</p>
+</div>
+<p>Cette anonymisation est une aide technique, pas un avis juridique : pour savoir si un rapport peut être rendu public au regard de la Loi 25 ou du RGPD, consultez une personne qualifiée.</p>
+
+<!-- ============================================================ 5 -->
+<h2 id="mdp">5. Mot de passe</h2>
+<p>Un mot de passe protège les fichiers qui contiennent des renseignements personnels. Il n'est demandé que lorsque c'est utile :</p>
+<table>
+  <tr><th>Ce que vous faites</th><th>Mot de passe</th></tr>
+  <tr><td>Afficher un rapport <strong>anonymisé</strong> à l'écran</td><td><span class="pastille">jamais</span></td></tr>
+  <tr><td>Télécharger un HTML ou un PDF <strong>anonymisé</strong></td><td><span class="pastille">jamais</span> — le fichier est livré en clair, sans « enc » dans son nom</td></tr>
+  <tr><td>Afficher un rapport <strong>non anonymisé</strong> à l'écran</td><td><span class="pastille">requis</span></td></tr>
+  <tr><td>Télécharger un HTML ou un PDF <strong>non anonymisé</strong></td><td><span class="pastille">requis</span> — le fichier est chiffré</td></tr>
+  <tr><td>Exporter en <strong>Excel</strong></td><td><span class="pastille">toujours</span> — l'Excel n'est jamais anonymisé</td></tr>
+</table>
+
+<h3>Le mot de passe par défaut</h3>
+<p>Les deux champs sont <strong>pré-remplis et masqués</strong> avec le mot de passe par défaut de votre organisation. Le bouton <strong>Afficher le mot de passe</strong> le montre dans un message à l'écran. Vous pouvez le remplacer pour un rapport précis : tapez-en un autre dans les deux champs.</p>
+<div class="encadre attention">
+  <p><strong>Un encadré jaune « Le mot de passe par défaut n'a pas été changé »</strong> apparaît tant que la valeur est encore <code>!CHANGE-MOI@</code>, le marqueur livré avec le module : il est <em>refusé</em>. Un administrateur doit définir le vrai mot de passe par défaut (§&nbsp;14) ; le bouton <strong>Ouvrir le paramètre</strong>, réservé aux administrateurs, y mène directement. En attendant, saisissez votre propre mot de passe dans les deux champs.</p>
+</div>
+<figure class="capture"><b>Capture à ajouter — <code>15-avertissement-mot-de-passe.png</code></b><br>L'encadré jaune au-dessus des champs du mot de passe.</figure>
+
+<h3>Critères</h3>
+<ul>
+  <li>Au moins 12 caractères, dont une minuscule, une majuscule, un chiffre et un caractère spécial (<code>! @ # $ % &amp; * ? -</code>).</li>
+  <li>Un message sous le champ indique en direct ce qui manque, et si les deux saisies correspondent. Le mot de passe lui-même n'est jamais réaffiché sans votre demande.</li>
+  <li>Si un mot de passe manque au moment de générer ou de télécharger, une petite fenêtre le demande ; une fois « Continuer » cliqué, l'action reprend normalement.</li>
+</ul>
+
+<h3>Comment la protection fonctionne</h3>
+<ul>
+  <li><strong>PDF</strong> : chiffrement standard (AES-256), compatible avec les lecteurs PDF usuels.</li>
+  <li><strong>HTML</strong> : le fichier s'ouvre sur un écran demandant le mot de passe ; le contenu est déchiffré dans le navigateur.</li>
+  <li><strong>Excel</strong> : livré dans une archive ZIP chiffrée en AES.</li>
+</ul>
+<div class="encadre attention"><p><strong>Transmettez le mot de passe par un autre moyen que le fichier</strong> (de vive voix, ou un message séparé) : l'envoyer dans le même courriel annule la protection.</p></div>
+
+<!-- ============================================================ 6 -->
+<h2 id="lire">6. Lire le rapport</h2>
+<p>Le rapport à l'écran et le fichier HTML ont le même contenu, dans cet ordre :</p>
+<ol>
+  <li><strong>Sélecteur de thème</strong> (Bleu, Sombre, Vert, Violet) pour changer les couleurs sans régénérer.</li>
+  <li><strong>Le titre du sondage</strong>, en grand, quand un seul sondage est sélectionné — et dans le nom du fichier.</li>
+  <li><strong>Un avis sur les renseignements personnels</strong> : son texte diffère selon que le rapport est anonymisé ou non.</li>
+  <li><strong>Date et heure de génération</strong> (heure locale), puis les <strong>avertissements</strong> éventuels (sondage sans réponse, date non reconnue dans un titre…).</li>
+  <li><strong>Paramètres utilisés pour ce rapport</strong> : tous les filtres et options choisis, pour pouvoir le refaire à l'identique plus tard.</li>
+  <li><strong>Tableau récapitulatif</strong> (inscrits, terminés, débutés) avec ses graphiques d'évolution et le <strong>taux de réponse</strong>.</li>
+  <li><strong>Tendance de la Note globale</strong> (voir plus bas).</li>
+  <li><strong>Synthèse</strong> (si plusieurs rencontres) : « Ce qui a le plus bougé depuis la dernière rencontre », tendance de chaque question, et la liste consolidée des actions de suivi.</li>
+  <li><strong>Une section par rencontre</strong>, la plus récente en premier : sa Note globale, ses actions de suivi, les présentateurs, les participants, la répartition présents / inscrits / non-inscrits à l'événement, puis le détail question par question.</li>
+  <li><strong>Une fiche par participant</strong> (§&nbsp;7).</li>
+  <li><strong>À surveiller</strong> : toutes les notes de 2 ou moins, avec leur date, la question et — si la même personne en a écrit un — son commentaire libre.</li>
+  <li><strong>Appréciation des présentateurs</strong> : note moyenne par présentateur, détail des votants, et une flèche de tendance quand il a présenté plusieurs fois.</li>
+</ol>
+<figure class="capture"><b>Capture à ajouter — <code>09-rapport-entete.png</code>, <code>10-rapport-rencontre.png</code></b><br>Le début d'un rapport, et une section de rencontre type.</figure>
+
+<h3>Les nombres et les couleurs</h3>
+<p>Les notes sont exprimées en <strong>pourcentage de l'échelle</strong> : valeur ÷ maximum × 100 (un 4 sur 5 vaut 80&nbsp;%). La couleur, elle, suit la note elle-même, partout (chiffres, barres, histogrammes) :</p>
+<table>
+  <tr><th>Note</th><th>Couleur</th></tr>
+  <tr><td>1 ou 2</td><td><span class="r">rouge</span></td></tr>
+  <tr><td>3</td><td><span class="j">jaune</span></td></tr>
+  <tr><td>4</td><td><span class="b">bleu</span></td></tr>
+  <tr><td>5</td><td><span class="v">vert</span></td></tr>
+</table>
+<p>Les statistiques affichées sont : <strong>Min</strong>, <strong>Moy</strong> (moyenne), <strong>Max</strong>, <strong>É-T</strong> (écart-type : à quel point les notes varient) et <strong>P95</strong> (95<sup>e</sup> centile : la note sous laquelle se trouvent 95&nbsp;% des réponses). La question d'auto-évaluation « Niveau de connaissance ? » n'est volontairement pas colorée : une note basse n'y signale pas un problème.</p>
+
+<h3>La Note globale — la mesure à suivre dans le temps</h3>
+<p>C'est une moyenne unique par rencontre, combinant « Organisation et logistique », « Satisfaction globale » et les présentations. Elle apparaît en tête de chaque rencontre et, en tendance, au début du rapport. Trois aides à la lecture :</p>
+<ul>
+  <li><strong>Comparaison</strong> : la note d'une rencontre est comparée à la moyenne des 6 rencontres précédentes <em>de la même catégorie</em> — une Pause café avec les Pause café, pas avec des Portes ouvertes.</li>
+  <li><strong>Contour marqué</strong> sur une barre : cette rencontre s'écarte de plus d'un écart-type de la moyenne de toutes les rencontres affichées. C'est un signal à examiner, pas forcément un problème.</li>
+  <li><strong>Message de dérive</strong> : les 3 dernières rencontres sont chacune plus basses (⚠) ou plus hautes (✓) que la précédente. Une dérive lente révèle souvent un problème de fond qu'un accident isolé ne montrerait pas.</li>
+</ul>
+
+<!-- ============================================================ 7 -->
+<h2 id="participant">7. La fiche d'un participant</h2>
+<ul>
+  <li><strong>En-tête</strong> : le nom (ou « Participant N ») et le nombre de participations. Si le rapport n'est <em>pas</em> anonymisé : courriel, téléphone / mobile / ville / pays sur une seule ligne, étiquettes, nombre de sondages remplis et d'événements inscrits avec leurs dates cliquables.</li>
+  <li><strong>Tableau des réponses</strong> : une ligne par question. Par défaut, <strong>chaque soumission a sa propre colonne</strong>, avec sur trois lignes : la date du sondage, la date et l'heure réelles de la réponse, et le temps mis à répondre. Si une personne a répondu plusieurs fois au même sondage, vous voyez chaque tentative. Un badge « Entrée test » signale une réponse d'essai.</li>
+  <li><strong>Choix multiples</strong> : chaque réponse cochée est sur sa propre ligne.</li>
+  <li><strong>Combiner les réponses d'un utilisateur à un même sondage</strong> (option, §&nbsp;3) : revient à une seule colonne par rencontre. Une section « Détail des soumissions » réapparaît alors, pour ne pas perdre les tentatives multiples.</li>
+  <li>Un <strong>commentaire interne</strong> noté sur une réponse (§&nbsp;8) est rappelé ici.</li>
+</ul>
+<figure class="capture"><b>Capture à ajouter — <code>11-rapport-participant.png</code></b><br>Une fiche de participant avec son tableau de réponses.</figure>
+
+<!-- ============================================================ 8 -->
+<h2 id="suivi">8. Actions de suivi et commentaires internes</h2>
+<p>Un rapport montre où sont les problèmes ; ces deux champs permettent de noter ce qu'on en a fait, et de le retrouver la fois suivante.</p>
+<h3>Actions de suivi (par rencontre)</h3>
+<p>Notez, en texte libre, ce qui a été entrepris suite aux commentaires de cette rencontre (par exemple « Projecteur remplacé suite aux plaintes »). Deux endroits pour le faire : le menu <strong>Rapports détaillés → Actions de suivi (amélioration continue)</strong>, qui liste tous les sondages avec une colonne modifiable directement ; ou la fiche du sondage elle-même, dans le bloc « Amélioration continue ». La note est <strong>conservée</strong> et rappelée dans la section de cette rencontre à chaque rapport, ainsi que dans la liste consolidée de la Synthèse.</p>
+<h3>Commentaire interne (par réponse)</h3>
+<p>Sur la fiche de la réponse d'<em>une</em> personne, le bloc « Commentaire (interne) » permet à l'équipe de noter une précision. Il est rappelé dans la fiche de cette personne, une fois le rapport généré.</p>
+
+<!-- ============================================================ 9 -->
+<h2 id="historique">9. Historique et fichiers déjà générés</h2>
+<p>Le menu <strong>Rapports détaillés → Historique et fichiers déjà générés</strong> garde une trace de chaque rapport affiché ou téléchargé, et permet de récupérer le fichier sans le régénérer.</p>
+<table>
+  <tr><th>Colonne</th><th>Contenu</th></tr>
+  <tr><td>Date et heure · Utilisateur · Action</td><td>Qui a fait quoi : affiché à l'écran, téléchargé (HTML ou PDF) ou exporté (Excel).</td></tr>
+  <tr><td><strong>Télécharger</strong></td><td>Le fichier lui-même : cliquez sur son nom pour l'obtenir. La colonne est large et le nom passe à la ligne, pour que le <strong>nom complet soit toujours visible</strong>.</td></tr>
+  <tr><td>Anonymisé</td><td>Si le rapport l'était.</td></tr>
+  <tr><td>Nombre de sondages inclus · Dates des sondages inclus</td><td>Le périmètre du rapport.</td></tr>
+</table>
+<figure class="capture"><b>Capture à ajouter — <code>14-historique-fichiers.png</code></b><br>La liste, avec la colonne « Télécharger ».</figure>
+<ul>
+  <li>La liste est en <strong>lecture seule</strong> : on ne peut ni créer, ni modifier, ni supprimer une ligne à la main, pour que l'historique reste digne de confiance.</li>
+  <li><strong>Conservation</strong> : les copies <em>anonymisées</em> sont gardées jusqu'à suppression manuelle ; les copies <em>non anonymisées</em> (qui contiennent de vrais noms) sont supprimées automatiquement après 3 jours.</li>
+</ul>
+<div class="encadre attention"><p>Cet historique est une bonne pratique de traçabilité. Ce n'est <strong>pas</strong> le registre des incidents de confidentialité qu'exige la Loi 25, qui est un document distinct, portant sur les incidents et non sur les accès normaux.</p></div>
+
+<!-- ============================================================ 10 -->
+<h2 id="excel">10. Export Excel</h2>
+<p>Le bouton <strong>Exporter en Excel</strong> produit un classeur à quatre feuilles, dans une archive ZIP protégée par mot de passe :</p>
+<table>
+  <tr><th>Feuille</th><th>Contenu</th></tr>
+  <tr><td>Participations</td><td>Une ligne par personne et par sondage, avec statut et dates.</td></tr>
+  <tr><td>Réponses</td><td>Chaque réponse individuelle, en structure plate adaptée à un tableau croisé dynamique.</td></tr>
+  <tr><td>Réponses libres</td><td>Seulement les questions à texte libre.</td></tr>
+  <tr><td>Note globale</td><td>La note composite de chaque rencontre, pour vos propres graphiques.</td></tr>
+</table>
+<p>Rappel : cet export contient les <strong>vrais noms</strong> (§&nbsp;4).</p>
+
+<!-- ============================================================ 11 -->
+<h2 id="billets">11. Un sondage par type de billet</h2>
+<p>Pour envoyer un sondage différent selon le billet choisi à l'inscription (bénévole, visiteur, commanditaire…) :</p>
+<ol>
+  <li>Dans la liste des billets d'un événement, choisissez, sur chaque billet, le champ <strong>Sondage pour ce type de billet</strong>.</li>
+  <li>Chaque inscription obtient alors un champ <strong>Lien du sondage (type de billet)</strong>, qui contient l'adresse du bon sondage.</li>
+  <li>Insérez ce champ dans vos modèles de courriel (avec l'outil « Placeholder dynamique ») pour que chaque personne reçoive le lien qui lui correspond.</li>
+</ol>
+<p>Cette fonction repose sur le module Événements d'Odoo, dont le module dépend.</p>
+<h3 id="reponses">Envoyer au participant une copie de ses réponses</h3>
+<p>Pour que chaque personne reçoive par courriel ses propres réponses dès qu'elle termine un sondage :</p>
+<ol>
+  <li>Ouvrez le sondage (Sondages), repérez le bloc <strong>Courriel de réponses au participant</strong> et cochez <strong>Envoyer ses réponses au participant</strong>. La case est décochée par défaut, sondage par sondage.</li>
+  <li>Facultatif : choisissez un autre <strong>Modèle du courriel de réponses</strong>. Par défaut, le modèle « Sondage : vos réponses (rlq_survey_report) » est utilisé ; son texte se modifie dans Réglages &gt; Technique &gt; Modèles de courriel (insérez les réponses avec <code>object.rlq_reponses_html</code>).</li>
+</ol>
+<p>Le courriel part vers l'adresse connue du participant (invitation par courriel, utilisateur connecté, ou courriel de sa participation). Rien n'est envoyé pour un essai (bouton « Tester »), pour une personne sans adresse, ni deux fois pour la même participation. Le courriel est supprimé des courriels sortants après son envoi, et un échec d'envoi ne bloque jamais la soumission du sondage (il est inscrit dans les journaux du serveur). Le serveur de courriel sortant d'Odoo doit être configuré.</p>
+
+<h3 id="alerte-inscriptions">Être averti quand un événement atteint N inscriptions</h3>
+<p>Pour recevoir un courriel quand un événement atteint un certain nombre d'inscriptions :</p>
+<ol>
+  <li>Ouvrez l'événement (Événements) et descendez au bloc <strong>Avertissement par courriel après N inscriptions</strong>. Cochez <strong>Avertir par courriel après N inscriptions</strong> (décochée par défaut, événement par événement).</li>
+  <li>Indiquez <strong>Nombre d'inscriptions (N)</strong>. Facultatif : <strong>Courriel à avertir</strong> pour cet événement (plusieurs adresses séparées par des virgules).</li>
+</ol>
+<p>Pour être aussi averti à chaque sondage complété, cochez <strong>Avertir aussi à chaque sondage complété</strong> (case indépendante de la précédente). Le courriel est envoyé quand une personne termine le sondage d'un type de billet de l'événement (ou le sondage de l'événement) ; il donne son nom, son billet et le nombre de sondages complétés sur les inscriptions confirmées, jamais ses réponses ni son courriel. Un seul courriel par participation ; rien pour un essai.</p>
+<p>Sans courriel propre à l'événement, le courriel part vers l'adresse du paramètre système <code>rlq_survey_report.courriel_inscriptions</code> (voir section 14) et, si ce paramètre est vide, vers le courriel par défaut d'Odoo (celui de la société). Seules les inscriptions confirmées ou présentes comptent. Le courriel part <strong>une seule fois</strong> ; changer N ou recocher la case réarme l'avertissement (si le seuil est déjà atteint, il part tout de suite). Il ne contient aucune donnée personnelle des inscrits ; une note « Avertissement envoyé à … » s'ajoute au fil de l'événement.</p>
+
+<!-- ============================================================ 12 -->
+<h2 id="groupes">12. Groupes et étiquettes des inscrits et des sondages</h2>
+<p>Cette fonction range automatiquement les personnes dans des <strong>groupes Odoo</strong> (utilisables, par exemple, pour abonner un canal Discuss) et leur pose une <strong>étiquette de contact</strong> du même nom (utile pour les listes de diffusion et les filtres).</p>
+<h3>Un groupe par type de billet</h3>
+<ol>
+  <li>Ouvrez l'événement et remplissez <strong>Préfixe des groupes</strong> (ex. <code>JPOL26</code>). Vide = fonction désactivée pour cet événement.</li>
+  <li>Chaque billet reçoit un groupe nommé <code>RLQ-JPOL26-Visiteur</code>, <code>RLQ-JPOL26-Bénévole</code>… (créé s'il n'existe pas ; modifiable à la main sur la ligne du billet).</li>
+  <li>Une inscription confirmée ou présente ajoute le compte de la personne au groupe de son billet ; une annulation ou un refus l'en retire. Les groupes créés avant la v1.104 (sans « RLQ- ») ne sont pas renommés.</li>
+</ol>
+<h3>Un groupe selon la réponse à un sondage</h3>
+<ol>
+  <li>Ouvrez la question (choix de réponses) du sondage : dans la colonne <strong>Groupe Odoo</strong>, choisissez le groupe de chaque réponse (ex. « Oui » → <code>RLQ-JPOL26-Présentiel</code>). Tapez un nom puis « Créer » pour créer un groupe.</li>
+  <li>À la fin du sondage, la personne est ajoutée au groupe de sa <em>dernière</em> réponse (« Oui » puis « Non » : elle est retirée).</li>
+  <li>Sur le formulaire du sondage, le bouton <strong>Appliquer les groupes aux participants</strong> traite tout de suite les personnes qui ont déjà répondu et met à jour les étiquettes. Il est relançable sans danger.</li>
+</ol>
+<h3>Mise à jour périodique d'un sondage (nouveau, v1.106)</h3>
+<p>Pour qu'un sondage soit remis à jour tout seul pendant que les gens répondent :</p>
+<ol>
+  <li>Menu <strong>Sondages → Rapports détaillés → Synchronisation périodique (sondages)</strong> (responsables des sondages), ou bloc <strong>Groupes des réponses</strong> du formulaire du sondage.</li>
+  <li>Cochez <strong>Synchronisation périodique</strong> sur la ligne du sondage voulu et indiquez <strong>Toutes les (minutes)</strong> : <em>N</em> minutes, minimum 5.</li>
+  <li>Les colonnes <em>Dernière synchronisation</em> et <em>Résultat</em> montrent le dernier passage ; la flèche circulaire de la ligne synchronise tout de suite.</li>
+</ol>
+<div class="encadre">
+  <p>Une tâche planifiée (« RLQ Sondages et événements : synchronisation périodique des groupes et étiquettes ») s'exécute toutes les 5 minutes et ne traite que les sondages et événements cochés dont l'intervalle est écoulé : un intervalle de 15 minutes est donc respecté à ± 5 minutes près. <strong>Depuis la v1.108, cette tâche n'est active que si au moins une case est cochée</strong> ; sans case cochée, elle est désactivée et n'écrit plus rien dans le journal d'Odoo (elle se réactive seule dès qu'on coche une case). Les groupes sont de toute façon mis à jour <strong>tout de suite</strong> à chaque inscription créée ou modifiée, à chaque sondage terminé et à chaque création de compte : la synchronisation périodique ne sert qu'à rattraper un changement fait à la main.</p>
+  <p>L'intervalle proposé pour un nouveau sondage ou événement est de 15 minutes ; pour le changer : <em>Paramètres → Technique → Paramètres système</em>, clé <code>rlq_survey_report.synchro_minutes_defaut</code> (minimum 5). Le menu <strong>Sondages → Rapports détaillés → Synchronisation : sommaire</strong> dit en un coup d'œil si la tâche est active, quels sondages et événements sont cochés, et quel est l'intervalle par défaut.</p>
+</div>
+<h3>Mise à jour d'un événement précis (nouveau, v1.107)</h3>
+<p>Même principe pour les événements : menu <strong>Sondages → Rapports détaillés → Synchronisation périodique (événements)</strong> (événements qui ont un préfixe de groupes), ou bloc <strong>Groupes des inscrits</strong> du formulaire de l'événement. La flèche circulaire d'une ligne (ou le bouton « Créer / synchroniser les groupes ») met l'événement à jour tout de suite ; la case et l'intervalle (<em>N</em> minutes, minimum 5) le font automatiquement <strong>jusqu'au lendemain de la fin de l'événement</strong>, puis la synchronisation s'arrête seule.</p>
+<h3>Vérifier et corriger</h3>
+<p>Menu <strong>Sondages → Rapports détaillés → Vérifier les groupes et étiquettes</strong> : un aperçu liste ce qui serait changé (groupes de billets manquants, étiquettes à créer ou renommer, participants à ajouter ou retirer). <strong>Rien n'est modifié</strong> avant le clic sur « Appliquer les changements » et la confirmation.</p>
+<h3>Étiquettes</h3>
+<ul>
+  <li>L'étiquette porte le nom du groupe ; renommer le groupe renomme l'étiquette ; supprimer le groupe supprime l'étiquette (sauf si un autre groupe l'utilise).</li>
+  <li>Une tâche quotidienne rattrape les changements faits hors de l'interface (import, script). Pour tout désactiver : paramètre système <code>rlq_survey_report.etiquettes_groupes</code> = <code>0</code>.</li>
+</ul>
+<div class="encadre attention">
+  <p><strong>Vie privée :</strong> un refus (« Ne pas ajouter au groupe ») est respecté à chaque synchronisation. Les personnes sans compte portail sont ajoutées à la création de leur compte.</p>
+</div>
+
+<!-- ============================================================ 13 -->
+<h2 id="courriels-invalides">13. Adresses courriel invalides des inscriptions <span class="pastille">nouveau, v1.109</span></h2>
+<p>Une personne qui écrit <code>marie@gmail'com</code> (apostrophe au lieu du point) ne reçoit jamais sa confirmation. Le module repère maintenant chaque inscription dont l'adresse est <strong>invalide</strong> (impossible à livrer telle quelle), contient une <strong>faute de frappe probable</strong> (<code>gmial.com</code>, <code>hotmal.com</code>) ou est <strong>jetable</strong>, et propose la correction quand elle se devine sans demander à la personne.</p>
+<ul>
+  <li><strong>À l'inscription</strong> : une erreur de ponctuation ou d'espace qui ne change aucune lettre (<code>gmail'com</code>, <code>gmail..com</code>, <code>marie @gmail.com</code>) est corrigée automatiquement <em>avant</em> la création de l'inscription — le courriel de confirmation part donc à la bonne adresse ; une note est ajoutée à l'inscription. L'inscription n'est jamais refusée.</li>
+  <li><strong>Menu Événements → Courriels invalides → Inscriptions avec un courriel invalide</strong> (aussi dans Sondages → Rapports détaillés) : la liste, avec la correction suggérée. Le bouton <strong>Corriger et renvoyer</strong> (sur une ligne, ou sur plusieurs lignes cochées) ouvre une fenêtre où l'on accepte ou modifie chaque adresse ; il corrige l'inscription, son contact (seulement s'il porte la même adresse erronée), remet en file les courriels en échec de cette inscription et renvoie la confirmation.</li>
+  <li><strong>Menu Événements → Courriels invalides → Courriels en échec</strong> (administrateurs) : les courriels sortants en « Échec d'envoi ».</li>
+</ul>
+<h3>Pas à pas : corriger une adresse et renvoyer la confirmation</h3>
+<ol>
+  <li>Ouvrez <strong>Événements → Courriels invalides → Inscriptions avec un courriel invalide</strong>. Les lignes rouges sont des adresses <em>invalides</em>, les jaunes des <em>fautes de frappe probables</em> ; le filtre « Non annulées » est actif par défaut.</li>
+  <li>Cochez une ou plusieurs inscriptions, puis cliquez <strong>Corriger et renvoyer</strong> (ou l'enveloppe au bout d'une ligne).</li>
+  <li>Dans la fenêtre, la colonne <strong>Courriel corrigé</strong> contient la suggestion : acceptez-la ou tapez l'adresse exacte (par exemple après avoir appelé la personne). Une adresse encore invalide est refusée, avec la raison.</li>
+  <li>Laissez cochées <strong>Corriger aussi le contact</strong> et <strong>Renvoyer les courriels</strong>, puis cliquez <strong>Corriger</strong>. Une note « Adresse courriel corrigée : ancienne → nouvelle (N courriel(s) renvoyé(s)) » s'ajoute au fil de l'inscription.</li>
+</ol>
+<table>
+  <tr><th>Repérage</th><th>Exemple</th><th>Ce qui se passe</th></tr>
+  <tr><td><span class="r">Adresse invalide</span></td><td><code>marie@gmail'com</code>, <code>marie claude@gmail.com</code>, <code>a@b</code></td><td>Ne peut recevoir aucun courriel. Corrigée automatiquement à l'inscription si seule la ponctuation est en cause ; sinon, à corriger dans le menu.</td></tr>
+  <tr><td><span class="j">Faute de frappe probable</span></td><td><code>gmial.com</code>, <code>hotmal.com</code>, <code>gmail.con</code></td><td>Adresse valide mais domaine courant mal écrit : correction suggérée, jamais appliquée sans vous (sauf réglage <code>typos</code>).</td></tr>
+  <tr><td><span class="b">Adresse jetable</span></td><td><code>…@yopmail.com</code>, <code>…@mailinator.com</code></td><td>Boîte temporaire : la personne ne lira sans doute pas les rappels. Rien n'est changé ; à vous de juger.</td></tr>
+</table>
+<div class="encadre note">
+  <p>L'identifiant de connexion d'un compte Odoo n'est jamais modifié (la personne se connecte peut-être avec). Paramètre système <code>rlq_survey_report.registration_email_autofix</code> : <code>syntax</code> (défaut), <code>off</code> (aucune correction automatique, seulement le repérage) ou <code>typos</code> (corrige aussi un domaine courant mal écrit, ex. <code>gmial.com</code>).</p>
+</div>
+
+<!-- ============================================================ 14 -->
+<h2 id="admin">14. Pour les administrateurs</h2>
+<h3>Paramètres système</h3>
+<p>Réglages modifiables sans toucher au code, dans <strong>Paramètres (ou Réglages) → Technique → Paramètres système</strong> (le menu Technique exige le mode développeur) :</p>
+<table>
+  <tr><th>Clé</th><th>Rôle</th></tr>
+  <tr><td><code>rlq_survey_report.mot_de_passe_defaut</code></td><td>Le mot de passe pré-rempli dans le formulaire. <strong>À définir après l'installation</strong> : la valeur livrée (<code>!CHANGE-MOI@</code>) est refusée. Le module ne crée ce paramètre que s'il n'existe pas : ni une mise à jour, ni une réinstallation ne remplacent une valeur déjà définie. Pour désactiver le pré-remplissage, <em>videz la valeur</em> plutôt que de supprimer le paramètre (une mise à jour le recréerait avec le marqueur).</td></tr>
+  <tr><td><code>rlq_survey_report.courriel_inscriptions</code></td><td>Adresse(s) à avertir (séparées par des virgules) quand un événement atteint son nombre d'inscriptions et n'a pas de courriel propre. Créé vide par le module. Vide : le courriel de la société est utilisé.</td></tr>
+  <tr><td><code>rlq_survey_report.url_aide</code></td><td>L'adresse ouverte par le bouton « Aide ».</td></tr>
+  <tr><td><code>rlq_survey_report.etiquettes_groupes</code></td><td>1 (défaut) : étiquettes de contact pour les groupes des inscrits ; 0 : aucune étiquette (§&nbsp;12).</td></tr>
+  <tr><td><code>rlq_survey_report.registration_email_autofix</code></td><td>Correction automatique des adresses courriel à l'inscription : <code>syntax</code> (défaut : ponctuation et espaces seulement), <code>off</code>, <code>typos</code> (aussi un domaine courant mal écrit). Voir la section 13.</td></tr>
+</table>
+<h3>Entretien automatique</h3>
+<p>Deux autres tâches planifiées concernent les groupes (§&nbsp;12) : une quotidienne pour les étiquettes et une toutes les 5 minutes pour la synchronisation périodique des sondages et événements cochés (désactivée tant que rien n'est coché). Une tâche planifiée quotidienne supprime les copies <em>non anonymisées</em> de plus de 3 jours (<em>Paramètres → Technique → Tâches planifiées</em>).</p>
+<h3>Droits d'accès</h3>
+<p>Le groupe « Sondage : Utilisateur » (et plus) accède au rapport et à l'historique. Seul le groupe Administrateur gère l'historique en entier, voit le bouton « Ouvrir le paramètre » et peut modifier le mot de passe par défaut.</p>
+<h3>Bibliothèques Python</h3>
+<p>Le PDF protégé, le HTML protégé, l'Excel et son archive chiffrée utilisent des bibliothèques Python (<code>pypdf</code>, <code>cryptography</code>, <code>openpyxl</code>, <code>pyzipper</code>). Si l'une manque, un message clair s'affiche au moment d'utiliser la fonction concernée ; le reste du module continue de fonctionner.</p>
+<h3>Vérifier le module avant une mise en production</h3>
+<p>Le dossier du module contient <code>run-all.sh</code> : il lance ruff, les contrôles de syntaxe, les tests autonomes et — si PostgreSQL et Odoo sont installés — crée une base de test dédiée pour exécuter les tests Odoo, puis la supprime. Voir <code>scripts/LISEZMOI.md</code>. Les notes de conception se trouvent dans <code>doc/</code> (<code>CONTEXTE.md</code>, <code>CHANGELOG.md</code>, <code>NOTES_VALIDATION.md</code>).</p>
+
+<!-- ============================================================ 15 -->
+<h2 id="depannage">15. Dépannage</h2>
+<table>
+  <tr><th>Symptôme</th><th>Cause probable / solution</th></tr>
+  <tr><td>Le bouton Générer ne fait rien</td><td>Vérifiez qu'au moins un sondage est sélectionné et que la case de confirmation est cochée.</td></tr>
+  <tr><td>Le mot de passe par défaut est redevenu « !CHANGE-MOI@ »</td><td>Avec une version antérieure à la 1.93, une réinstallation du module pouvait remplacer la valeur définie. Redéfinissez-la une fois (§&nbsp;14) : elle n'est plus jamais écrasée ensuite.</td></tr>
+  <tr><td>« Le mot de passe par défaut n'a pas encore été personnalisé »</td><td>Le mot de passe pré-rempli est encore le marqueur livré. Saisissez le vôtre dans les deux champs, ou demandez à un administrateur de définir le mot de passe par défaut (§&nbsp;14).</td></tr>
+  <tr><td>On me demande un mot de passe pour un rapport anonymisé</td><td>Vérifiez que « Anonymiser les participants » est bien coché : sans anonymisation, un mot de passe est requis, même à l'écran. L'export Excel en exige toujours un.</td></tr>
+  <tr><td>Un sondage attendu manque dans une catégorie</td><td>Le critère de la catégorie (mot du titre, date) ne correspond peut-être pas à son titre exact : ajoutez-le à la main, ou vérifiez « Exclure les sondages dont le titre contient » et « Minimum ayant débuté ou terminé? ».</td></tr>
+  <tr><td>La liste « Filtrer par présentateur » est vide ou incomplète</td><td>Un présentateur est reconnu seulement si le titre de sa présentation se termine par son nom entre crochets ou parenthèses : « Titre [Nom Prénom] ».</td></tr>
+  <tr><td>Pas de Note globale pour une rencontre</td><td>Aucune des trois questions qui la composent n'a de réponse numérique pour cette rencontre.</td></tr>
+  <tr><td>Un contour marqué ou un message de dérive</td><td>Ce sont des signaux à examiner (§&nbsp;6), pas forcément un problème confirmé.</td></tr>
+  <tr><td>Un lien de date ouvre l'administration d'Odoo au lieu de défiler dans le rapport</td><td>Ce sondage ou événement n'est pas inclus dans ce rapport.</td></tr>
+  <tr><td>La génération d'un PDF échoue ou reste incomplète</td><td>Dans « Options PDF », décochez « Tableaux de réponses par participant » et/ou « Saut de page forcé par participant ».</td></tr>
+  <tr><td>Un avertissement dit qu'une date n'a pas été reconnue</td><td>Le titre du sondage ne suit pas le format attendu (ex. « 4 août 2026 ») : le message cite le titre en cause.</td></tr>
+  <tr><td>Le nom d'un fichier est coupé dans l'historique</td><td>Le nom complet passe à la ligne dans la colonne « Télécharger » ; si ce n'était pas le cas, faites actualiser la page (Ctrl+F5) après la mise à jour du module.</td></tr>
+  <tr><td>Une personne inscrite n'a jamais reçu sa confirmation</td><td>Regardez <strong>Événements → Courriels invalides</strong> : si son adresse y figure, « Corriger et renvoyer » (§&nbsp;13). Sinon, un administrateur vérifie <strong>Courriels en échec</strong> (cause de l'échec) ; sur le serveur, <code>odoo-mail-retry.py</code> liste et renvoie les courriels en échec.</td></tr>
+  <tr><td>Une adresse a été corrigée toute seule à l'inscription</td><td>Normal : seule la ponctuation ou les espaces étaient en cause (<code>gmail'com</code> → <code>gmail.com</code>) ; une note dans le fil de l'inscription montre l'adresse d'origine. Pour désactiver : paramètre <code>rlq_survey_report.registration_email_autofix</code> = <code>off</code> (§&nbsp;14).</td></tr>
+</table>
+
+<!-- ============================================================ 16 -->
+<h2 id="limites">16. Limites et prudence</h2>
+<ul>
+  <li><strong>L'anonymisation réduit le risque, elle ne l'élimine pas</strong> : le contenu des réponses libres et un petit nombre de répondants peuvent permettre de reconnaître quelqu'un (§&nbsp;4).</li>
+  <li><strong>Ni ce module ni ce guide ne donnent d'avis juridique.</strong> La conformité à la Loi 25 ou au RGPD, surtout pour une diffusion publique, relève d'une personne qualifiée.</li>
+  <li>L'historique des accès n'est pas le registre des incidents de confidentialité (§&nbsp;9).</li>
+  <li>Le module a été développé sans accès direct à une instance Odoo : après une mise à jour, vérifiez les écrans décrits ici et signalez tout écart.</li>
+</ul>
+
+<p class="meta" style="margin-top:3rem">© Services-Linux Conseils Inc (Martial@Bigras.ca, Martial.Bigras@Services-Conseils-Linux.com) — module <code>rlq_survey_report</code>, licence AGPL-3.</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Ajoute le champ "Actions de suivi" au formulaire natif du sondage
+         (survey.survey_survey_view_form) - xpath ciblant //sheet (le
+         conteneur principal, quasi certain d'exister sur n'importe quelle
+         version) plutôt qu'un élément plus spécifique (notebook, champ
+         précis) dont la présence/structure exacte n'a pas pu être vérifiée
+         sans accès à une instance - un xpath qui échoue à l'installation
+         casserait le module entier, un risque à éviter pour un simple
+         ajout de champ. -->
+    <record id="view_survey_survey_form_rlq_actions" model="ir.ui.view">
+        <field name="name">survey.survey.form.rlq.actions</field>
+        <field name="model">survey.survey</field>
+        <field name="inherit_id" ref="survey.survey_survey_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Amélioration continue">
+                    <field name="rlq_actions_suivi" nolabel="1" placeholder="Actions entreprises suite aux commentaires ou signaux de cette rencontre..."/>
+                </group>
+                <group string="Courriel de réponses au participant">
+                    <field name="rlq_envoyer_reponses"/>
+                    <field name="rlq_modele_courriel_reponses" invisible="not rlq_envoyer_reponses"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Ajoute un champ "Commentaire (interne)" au formulaire natif d'une
+         réponse individuelle (survey.user_input) - pour qu'un membre de
+         l'équipe (rôle Sondage : Utilisateur ou plus) puisse commenter la
+         réponse d'UNE personne précise, rappelé ensuite dans le rapport de
+         rlq_survey_report. Même précaution défensive que ci-dessus (xpath
+         sur //sheet plutôt qu'un élément précis).
+
+         NON VÉRIFIÉ SANS ACCÈS À UNE INSTANCE : l'external ID
+         "survey.survey_user_input_view_form" est choisi PAR ANALOGIE avec
+         "survey.survey_survey_view_form" (confirmé fonctionner sur cette
+         instance pour survey.survey, voir le bloc ci-dessus) - PAS
+         confirmé lui-même. Si l'installation échoue précisément sur ce
+         bloc avec une erreur "External ID not found", corrigez ou retirez
+         ce bloc seul - le champ rlq_commentaire_staff reste malgré tout
+         utilisable sur le modèle (ex. via un éditeur de vue/Studio). -->
+    <record id="view_survey_user_input_form_rlq_commentaire" model="ir.ui.view">
+        <field name="name">survey.user_input.form.rlq.commentaire</field>
+        <field name="model">survey.user_input</field>
+        <field name="inherit_id" ref="survey.survey_user_input_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Commentaire (interne)">
+                    <field name="rlq_commentaire_staff" nolabel="1" placeholder="Note libre sur cette réponse précise, visible dans le rapport une fois généré..."/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Vue liste autonome et dédiée pour survey.survey (plutôt qu'une simple
+         sous-vue en ligne dans le formulaire) : la sous-vue en ligne d'un
+         champ Many2many ne gouverne que l'affichage des lignes DÉJÀ
+         sélectionnées dans le formulaire - la fenêtre "Ajouter une ligne"
+         (pour choisir un NOUVEAU sondage) ouvre, elle, un sélecteur qui
+         utilise la vue liste PAR DÉFAUT de Sondage si aucune n'est précisée
+         explicitement via le contexte - d'où les colonnes non désirées
+         (Responsable, Taux de réussite, etc.) qui y apparaissaient malgré
+         leur absence de la sous-vue en ligne. Référencée par les deux clés
+         de contexte possibles (list_view_ref pour Odoo 17+, tree_view_ref
+         pour compatibilité) sur le champ survey_ids ci-dessous, pour que
+         CETTE vue gouverne aussi bien l'affichage intégré que la fenêtre
+         de sélection. -->
+    <record id="view_survey_survey_list_rlq" model="ir.ui.view">
+        <field name="name">survey.survey.list.rlq</field>
+        <field name="model">survey.survey</field>
+        <field name="arch" type="xml">
+            <list create="false">
+                <field name="title"/>
+                <field name="rlq_date_titre" string="Date (titre)"/>
+                <field name="rlq_jour_semaine" string="Jour de la semaine" optional="hide"/>
+                <field name="create_date" string="Date de création" optional="hide"/>
+                <field name="rlq_answer_count" string="Inscrit"/>
+                <field name="rlq_answer_done_count" string="Terminé"/>
+                <field name="rlq_answer_in_progress_count" string="Débuté sans terminer"/>
+                <field name="rlq_answer_duration_avg_seconds" string="Durée moyenne (s)" optional="hide"/>
+                <field name="rlq_question_count" string="Nb. questions" optional="hide"/>
+                <field name="user_id" string="Responsable" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Petite vue dédiée, utilisée uniquement quand un mot de passe est
+         requis (format HTML/PDF) mais n'a pas encore été saisi - plutôt
+         qu'un simple message d'erreur, action_generate() rouvre le même
+         enregistrement avec cette vue réduite, demandant directement le
+         mot de passe. Le bouton "Continuer" relance action_generate(),
+         qui reprend alors normalement (le mot de passe étant maintenant
+         renseigné) sans perdre aucun des autres paramètres déjà choisis. -->
+    <record id="view_rlq_survey_report_wizard_form_password" model="ir.ui.view">
+        <field name="name">rlq.survey.report.wizard.form.password</field>
+        <field name="model">rlq.survey.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Mot de passe requis">
+                <sheet>
+                    <div class="alert alert-warning" role="alert">
+                        Ce rapport contient des renseignements personnels : un mot de passe est
+                        requis pour le télécharger en HTML ou en PDF, ou pour l'afficher à
+                        l'écran sans anonymisation (Loi 25 au Québec, RGPD en Europe).
+                    </div>
+                    <group>
+                        <field name="mot_de_passe" password="True"/>
+                        <field name="mot_de_passe_confirmation" password="True"/>
+                        <field name="apercu_solidite_mot_de_passe" nolabel="1" colspan="2"
+                               invisible="not apercu_solidite_mot_de_passe"/>
+                    </group>
+                    <div class="text-muted" style="font-size: .85rem;">
+                        Critères minimaux (niveau PCI DSS v4.0) : au moins 12 caractères, une
+                        minuscule, une majuscule, un chiffre et un caractère spécial
+                        (ex. ! @ # $ %).
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_continuer_apres_mot_de_passe" type="object" string="Continuer" class="btn-primary"/>
+                    <button name="action_annuler_mot_de_passe" type="object" string="Annuler" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Petite vue dédiée aux options spécifiques au PDF (rarement
+         utilisée, donc retirée du formulaire principal pour l'alléger) -
+         accessible via un bouton "Options PDF" à côté de "Télécharger en
+         PDF". Cocher/décocher ces cases ici les enregistre normalement
+         sur le même enregistrement (tout bouton de type "object" enregistre
+         les champs modifiés avant d'exécuter sa méthode) ; le bouton "OK"
+         ramène simplement à la vue principale, sans autre effet. -->
+    <record id="view_rlq_survey_report_wizard_form_options_pdf" model="ir.ui.view">
+        <field name="name">rlq.survey.report.wizard.form.options.pdf</field>
+        <field name="model">rlq.survey.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Options PDF">
+                <sheet>
+                    <group>
+                        <field name="pdf_tableaux_participants"/>
+                        <field name="pdf_saut_page_rencontre"/>
+                        <field name="pdf_saut_page_participant"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_fermer_options_pdf" type="object" string="OK" class="btn-primary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_rlq_survey_report_wizard_form" model="ir.ui.view">
+        <field name="name">rlq.survey.report.wizard.form</field>
+        <field name="model">rlq.survey.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Rapport de sondage">
+                <sheet>
+                    <div class="alert alert-info" role="alert" invisible="state != 'draft'"
+                         style="display:flex;align-items:flex-start;gap:.6rem;">
+                        <span style="background:#fff;border:2px solid #000;border-radius:4px;
+                                     padding:1px 3px;display:inline-flex;flex-shrink:0;margin-top:2px;">
+                            <field name="confirmation_renseignements_personnels" nolabel="1"/>
+                        </span>
+                        <label for="confirmation_renseignements_personnels" style="margin:0;"
+                               string="Ce rapport contient des renseignements personnels sur les participants (noms, coordonnées). Je confirme être responsable de leur confidentialité et m'engage à ne le partager qu'avec les personnes autorisées."/>
+                    </div>
+                    <div class="oe_title" style="display:flex;align-items:baseline;justify-content:space-between;gap:.8rem;width:100%;">
+                        <h1 style="margin-bottom:0;">Rapport de sondage</h1>
+                        <field name="debug_info" readonly="1" nolabel="1" class="text-muted"
+                               style="font-weight:normal;font-size:.85rem;"/>
+                    </div>
+                    <group invisible="state != 'draft'">
+                        <!-- Colonnes détaillées dans view_survey_survey_list_rlq ci-dessus
+                             (référencée via le contexte pour aussi gouverner la fenêtre
+                             d'ajout) - reprise ici en ligne pour l'affichage intégré des
+                             sondages déjà sélectionnés, avec le même contenu. -->
+                        <div colspan="2" class="text-muted" style="font-weight:600;margin-bottom:.2rem;">
+                            Sondages (rencontres) à inclure
+                        </div>
+                        <field name="survey_ids" colspan="2" nolabel="1"
+                               options="{'no_create': True, 'no_create_edit': True}"
+                               context="{'list_view_ref': 'rlq_survey_report.view_survey_survey_list_rlq',
+                                         'tree_view_ref': 'rlq_survey_report.view_survey_survey_list_rlq'}">
+                            <list create="false">
+                                <field name="title"/>
+                                <field name="rlq_date_titre" string="Date (titre)"/>
+                                <field name="rlq_jour_semaine" string="Jour de la semaine" optional="hide"/>
+                                <field name="create_date" string="Date de création" optional="hide"/>
+                                <field name="rlq_answer_count" string="Inscrit"/>
+                                <field name="rlq_answer_done_count" string="Terminé"/>
+                                <field name="rlq_answer_in_progress_count" string="Débuté sans terminer"/>
+                                <field name="rlq_answer_duration_avg_seconds" string="Durée moyenne (s)" optional="hide"/>
+                                <field name="rlq_question_count" string="Nb. questions" optional="hide"/>
+                                <field name="user_id" string="Responsable" optional="hide"/>
+                            </list>
+                        </field>
+                        <field name="apercu_ampleur" nolabel="1" colspan="2"
+                               class="text-muted" invisible="not apercu_ampleur"
+                               style="font-size: .9rem;"/>
+                        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+                            <group style="flex:0 0 45%;">
+                                <field name="filtre_titre_predefini"/>
+                                <field name="filtre_titre_autre" invisible="filtre_titre_predefini != 'autre'"/>
+                                <field name="filtre_participants_min" invisible="not filtre_titre_predefini"/>
+                                <field name="filtre_exclure_titre_contient" invisible="not filtre_titre_predefini"/>
+                                <field name="filtre_derniers_mois" invisible="not filtre_titre_predefini"/>
+                                <field name="filtre_presentateur"/>
+                                <field name="exclude_partner_ids" widget="many2many_tags"
+                                       options="{'no_create': True}" style="max-width:66%;"/>
+                                <field name="exclude_tag_ids" widget="many2many_tags"
+                                       options="{'no_create': True}" style="max-width:66%;"/>
+                                <field name="exclude_title_keywords"/>
+                                <field name="date_from"/>
+                                <field name="date_to"/>
+                                <field name="filtre_dernieres_heures"/>
+                            </group>
+                            <!-- Colonne de droite plus large (55% plutôt que 50%) : ses
+                                 cases à cocher ont des libellés plus longs que les champs
+                                 de gauche, et s'enroulaient sur 3 lignes dans une colonne
+                                 de largeur fixe égale, malgré de l'espace inutilisé. -->
+                            <div style="flex:1 1 50%;min-width:280px;">
+                                <group>
+                                    <field name="output_format" widget="radio"/>
+                                </group>
+                                <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+                                    <field name="include_partial" nolabel="1"/>
+                                    <label for="include_partial" string="Inclure les réponses partielles (non terminées)" style="margin:0;"/>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+                                    <field name="voir_non_repondants" nolabel="1"/>
+                                    <label for="voir_non_repondants" string="Voir les personnes n'ayant pas répondu" style="margin:0;"/>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+                                    <field name="ventiler_matrices" nolabel="1"/>
+                                    <label for="ventiler_matrices" string="Ventiler les notes (liste dépliable détaillée)" style="margin:0;"/>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+                                    <field name="combiner_reponses_meme_sondage" nolabel="1"/>
+                                    <label for="combiner_reponses_meme_sondage" string="Combiner les réponses d'un utilisateur à un même sondage" style="margin:0;"/>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+                                    <field name="dedupliquer_textes" nolabel="1"/>
+                                    <label for="dedupliquer_textes" string="Dédoublonner les réponses libres avec compteur" style="margin:0;"/>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+                                    <field name="anonymiser" nolabel="1"/>
+                                    <label for="anonymiser" string="Anonymiser les participants" style="margin:0;"/>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+                                    <field name="inclure_section_surveiller" nolabel="1"/>
+                                    <label for="inclure_section_surveiller" string="Ajouter une section « À surveiller » (notes ≤ 2)" style="margin:0;"/>
+                                </div>
+                                <div class="alert alert-warning" role="alert"
+                                     invisible="not avertissement_mot_de_passe_defaut">
+                                    <field name="avertissement_mot_de_passe_defaut" nolabel="1" readonly="1"/>
+                                    <button name="action_ouvrir_parametre_mot_de_passe" type="object"
+                                            string="Ouvrir le paramètre" class="btn-link"
+                                            groups="base.group_system"
+                                            style="text-decoration:underline !important;"/>
+                                </div>
+                                <group>
+                                    <field name="mot_de_passe" password="True"/>
+                                    <field name="mot_de_passe_confirmation" password="True"/>
+                                    <field name="apercu_solidite_mot_de_passe" nolabel="1"
+                                           invisible="not apercu_solidite_mot_de_passe"/>
+                                </group>
+                                <div style="margin-bottom:.5rem;">
+                                    <button name="action_afficher_mot_de_passe" type="object"
+                                            string="Afficher le mot de passe" class="btn-link"
+                                            style="text-decoration:underline !important;"/>
+                                </div>
+                            </div>
+                        </div>
+                    </group>
+                    <div class="text-muted" invisible="state != 'draft'" style="font-size: .85rem;">
+                        Obligatoire pour un téléchargement HTML/PDF (pas pour un affichage à
+                        l'écran) - renseignements personnels à protéger (Loi 25, RGPD).
+                        Critères (PCI DSS v4.0) : 12 caractères min., une minuscule, une
+                        majuscule, un chiffre, un caractère spécial (ex. ! @ # $ %).
+                    </div>
+                    <!-- Les boutons d'action sont uniquement dans le <footer> : Odoo
+                         les affiche correctement puisque cette fiche s'ouvre en
+                         fenêtre modale (target="new"). -->
+                    <div invisible="state != 'done'">
+                        <field name="report_html" widget="html" readonly="1" nolabel="1"/>
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_generate" type="object" string="Générer"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <span class="text-muted" invisible="state != 'draft'" style="align-self:center;">
+                        ⏳ La génération peut prendre quelques secondes après le clic sur
+                        « Générer » - merci de patienter sans cliquer plusieurs fois.
+                    </span>
+                    <button name="action_download_html" type="object" string="Télécharger en HTML"
+                            class="btn-secondary" invisible="state != 'done'"/>
+                    <button name="action_download_pdf" type="object" string="Télécharger en PDF"
+                            class="btn-secondary" invisible="state != 'done'"/>
+                    <button name="action_ouvrir_options_pdf" type="object" string="Options PDF"
+                            class="btn-secondary" invisible="state != 'done'"/>
+                    <button name="action_export_excel" type="object" string="Exporter en Excel"
+                            class="btn-secondary" invisible="state != 'done'"/>
+                    <button name="action_back" type="object" string="Modifier les paramètres"
+                            invisible="state != 'done'"/>
+                    <button name="action_ouvrir_aide" type="object" string="Aide" class="btn-link" style="text-decoration:underline !important;"/>
+                    <button string="Fermer" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rlq_survey_report_wizard" model="ir.actions.act_window">
+        <field name="name">Rapport de sondage</field>
+        <field name="res_model">rlq.survey.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <!-- "dialog_size" : tentative pour obtenir une fenêtre plus large (utile
+             avec plus de colonnes/plus de contenu) ; sans effet indésirable si
+             cette clé de contexte n'est pas reconnue par cette version. -->
+        <field name="context">{'dialog_size': 'extra-large'}</field>
+    </record>
+
+    <!-- Actions serveur : chacune calcule la liste des sondages de la
+         catégorie visée, puis ouvre le wizard avec cette sélection déjà
+         faite (survey_ids pré-rempli), pour éviter d'avoir à les choisir
+         un par un à chaque fois. Les critères de classement (titre
+         contenant "premier mardi"/"pause café"/"portes ouvertes", ou plus
+         de 100 inscriptions pour le sondage annuel) sont des hypothèses à
+         ajuster si besoin - voir NOTES_VALIDATION.md. -->
+    <record id="action_server_premier_mardi" model="ir.actions.server">
+        <field name="name">Rapport - Premier mardi du mois</field>
+        <field name="model_id" ref="model_rlq_survey_report_wizard"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_menu_premier_mardi()</field>
+    </record>
+
+    <record id="action_server_pause_cafe" model="ir.actions.server">
+        <field name="name">Rapport - Pause café</field>
+        <field name="model_id" ref="model_rlq_survey_report_wizard"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_menu_pause_cafe()</field>
+    </record>
+
+    <record id="action_server_annuel" model="ir.actions.server">
+        <field name="name">Rapport - Sondage annuel (&gt;100 inscriptions)</field>
+        <field name="model_id" ref="model_rlq_survey_report_wizard"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_menu_annuel()</field>
+    </record>
+
+    <record id="action_server_portes_ouvertes" model="ir.actions.server">
+        <field name="name">Rapport - Portes ouvertes</field>
+        <field name="model_id" ref="model_rlq_survey_report_wizard"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_menu_portes_ouvertes()</field>
+    </record>
+
+    <record id="action_server_autres" model="ir.actions.server">
+        <field name="name">Rapport - Tous les autres sondages</field>
+        <field name="model_id" ref="model_rlq_survey_report_wizard"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_menu_autres()</field>
+    </record>
+
+    <!-- Menu conteneur "Rapports détaillés", directement dans le menu "Sondage"
+         existant, comme demandé - avec les mêmes entrées que sous "Rapport de
+         sondage" plus haut (sélection manuelle + les 4 raccourcis par
+         catégorie).
+         ATTENTION : "survey.menu_surveys" est le nom habituel du menu racine
+         de l'application Sondages dans Odoo 18 CE, mais s'il diffère sur votre
+         instance (ex. distribution personnalisée), l'installation du module
+         échouera sur CE bloc précis avec une erreur explicite ("External ID
+         not found: survey.menu_surveys"). Il suffira alors de corriger ou de
+         retirer ce bloc - le menu "Rapport de sondage" plus haut restera
+         fonctionnel dans tous les cas. -->
+    <menuitem id="menu_rlq_survey_report_in_survey_app"
+              name="Rapports détaillés"
+              parent="survey.menu_surveys"
+              sequence="50"
+              groups="survey.group_survey_user"/>
+
+    <menuitem id="menu_rlq_survey_report_in_survey_app_manuel"
+              name="Sélection manuelle des sondages"
+              parent="menu_rlq_survey_report_in_survey_app"
+              action="action_rlq_survey_report_wizard"
+              sequence="10"
+              groups="survey.group_survey_user"/>
+
+    <!-- Accès dédié et FIABLE au champ "Actions de suivi" - la vue héritée
+         du formulaire natif du Sondage (plus haut, view_survey_survey_form_rlq_actions)
+         dépend d'un xpath sur le formulaire natif dont la structure exacte
+         n'a pas pu être vérifiée sans accès à une instance - possiblement
+         ajoutée mais peu visible (après un bloc d'onglets, tout en bas du
+         formulaire). CETTE liste-ci, entièrement définie par nous-mêmes,
+         ne dépend d'aucune structure de vue externe - garantie de
+         fonctionner et de rester facile à trouver. -->
+    <record id="view_survey_survey_list_actions_suivi" model="ir.ui.view">
+        <field name="name">survey.survey.list.actions.suivi</field>
+        <field name="model">survey.survey</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" create="false">
+                <field name="title"/>
+                <field name="rlq_date_titre" string="Date (titre)"/>
+                <field name="rlq_actions_suivi" string="Actions de suivi (amélioration continue)"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_rlq_actions_suivi" model="ir.actions.act_window">
+        <field name="name">Actions de suivi (amélioration continue)</field>
+        <field name="res_model">survey.survey</field>
+        <field name="view_mode">list,form</field>
+        <field name="views" eval="[(ref('view_survey_survey_list_actions_suivi'), 'list'), (False, 'form')]"/>
+    </record>
+
+    <menuitem id="menu_rlq_actions_suivi"
+              name="Actions de suivi (amélioration continue)"
+              parent="menu_rlq_survey_report_in_survey_app"
+              action="action_rlq_actions_suivi"
+              sequence="70"
+              groups="survey.group_survey_user"/>
+
+    <!-- Historique d'accès aux rapports (v1.77.0), et depuis v1.80.0
+         bibliothèque de fichiers déjà générés (téléchargeables
+         directement depuis cette liste, sur demande) - traçabilité de
+         qui a affiché/téléchargé un rapport, et quand. Entièrement en
+         LECTURE SEULE dans l'interface pour les CHAMPS DE L'HISTORIQUE
+         eux-mêmes (create/edit/delete tous à "false") - les entrées ne
+         sont créées QUE par le code (_journaliser_acces() dans le
+         wizard), jamais manuellement, pour que cet historique reste
+         digne de confiance. Le champ "Télécharger" reste cliquable même
+         en lecture seule (un widget binary n'exige pas le mode édition
+         pour déclencher un téléchargement) - widget="binary" EXPLICITE
+         (v1.84.0, CORRECTIF : sans lui, une vue liste n'affiche pas
+         toujours l'icône/le lien de téléchargement pour un champ Binary,
+         même s'il contient des données) - c'est une COPIE INDÉPENDANTE
+         du fichier (fichier_telecharger, attachment="False" sur le champ),
+         PAS un lien vers la pièce jointe elle-même (attachment_id, gardée
+         à titre de référence seulement) - voir le docstring du modèle
+         pour le correctif critique de v1.83.0 qui explique ce choix
+         (une règle d'accès sur ir.attachment avait cassé l'accès aux
+         pièces jointes de tout Odoo pour le groupe Sondage). Voir aussi
+         la portée exacte de cette fonctionnalité (bonne pratique de
+         traçabilité, PAS le registre d'incidents de confidentialité
+         exigé par la Loi 25) dans NOTES_VALIDATION.md. -->
+    <record id="view_rlq_survey_report_acces_list" model="ir.ui.view">
+        <field name="name">rlq.survey.report.acces.list</field>
+        <field name="model">rlq.survey.report.acces</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" delete="false" default_order="date_acces desc">
+                <field name="date_acces"/>
+                <field name="user_id"/>
+                <field name="action"/>
+                <!-- v1.92.0 : le nom du fichier n'est plus une colonne à part (il doublait la
+                     colonne « Télécharger », qui l'affiche déjà) - le champ reste dans la vue,
+                     masqué, car le widget binaire en a besoin (attribut filename). La largeur
+                     de « Télécharger » est réglée par static/src/css/historique_fichiers.css. -->
+                <field name="nom_fichier" column_invisible="1"/>
+                <field name="fichier_telecharger" widget="binary" filename="nom_fichier" string="Télécharger"/>
+                <field name="anonymise"/>
+                <field name="nb_sondages"/>
+                <field name="resume_sondages" widget="text"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_rlq_survey_report_acces" model="ir.actions.act_window">
+        <field name="name">Historique et fichiers déjà générés</field>
+        <field name="res_model">rlq.survey.report.acces</field>
+        <field name="view_mode">list</field>
+        <field name="views" eval="[(ref('view_rlq_survey_report_acces_list'), 'list')]"/>
+    </record>
+
+    <menuitem id="menu_rlq_survey_report_acces"
+              name="Historique et fichiers déjà générés"
+              parent="menu_rlq_survey_report_in_survey_app"
+              action="action_rlq_survey_report_acces"
+              sequence="80"
+              groups="survey.group_survey_user"/>
+
+</odoo>

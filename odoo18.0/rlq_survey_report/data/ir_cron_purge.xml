@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Chaque téléchargement (HTML/PDF/Excel) ET, depuis v1.80.0, chaque
+         affichage à l'écran crée un ir.attachment permanent, qui ne
+         disparaît PAS automatiquement même une fois le wizard lui-même
+         nettoyé par Odoo (un TransientModel, mais dont le nettoyage
+         automatique ne supprime pas les pièces jointes qui le
+         référencent) - cette tâche purge quotidiennement celles de plus de
+         3 jours, en supposant que le fichier a déjà été téléchargé par la
+         personne qui l'a généré d'ici là. Ajustez le nombre de jours dans
+         "args" ci-dessous si un délai différent convient mieux.
+
+         EXCEPTION : les copies ANONYMISÉES sont exclues de cette purge -
+         conservées indéfiniment (sur demande, pour servir de bibliothèque
+         réutilisable) - voir _cron_purger_pieces_jointes() dans le
+         wizard. -->
+    <record id="ir_cron_purger_pieces_jointes" model="ir.cron">
+        <field name="name">RLQ Rapport de sondage : purge des pièces jointes (non anonymisées)</field>
+        <field name="model_id" ref="model_rlq_survey_report_wizard"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_purger_pieces_jointes(jours=3)</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+</odoo>

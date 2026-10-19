@@ -1,0 +1,28 @@
+# Archives générées
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+
+# Byte-compiled / Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.ruff_cache/
+.pytest_cache/
+
+# Environnements virtuels
+.venv/
+venv/
+env/
+
+# Fichiers temporaires et logs
+*.log
+*.tmp
+*.bak
+.DS_Store
+
+# Fichiers de configuration sensibles contenant des mots de passe réels
+# (Conserver uniquement les fichiers *.example ou *.template)
+*.conf.local
+*.secret

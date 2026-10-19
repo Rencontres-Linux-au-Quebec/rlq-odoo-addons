@@ -1,0 +1,236 @@
+# Translation of Odoo Server.
+# This file contains the French translation of the strings added in English to rlq_survey_report (v1.109.0 and later).
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_event_registration__rlq_email_issue
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_search
+msgid "E-mail issue"
+msgstr "Problème de courriel"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_event_registration__rlq_email_issue
+msgid "Invalid: the address cannot receive mail as written. Probable typo: a popular domain misspelled (gmial.com). Disposable: a throw-away mailbox."
+msgstr "Invalide : l'adresse ne peut pas recevoir de courriel telle qu'elle est écrite. Faute de frappe probable : un domaine courant mal écrit (gmial.com). Jetable : une boîte aux lettres temporaire."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__event_registration__rlq_email_issue__invalid
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_search
+msgid "Invalid address"
+msgstr "Adresse invalide"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__event_registration__rlq_email_issue__typo
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_search
+msgid "Probable typo"
+msgstr "Faute de frappe probable"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__event_registration__rlq_email_issue__disposable
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_search
+msgid "Disposable address"
+msgstr "Adresse jetable"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_event_registration__rlq_email_suggestion
+msgid "Suggested e-mail"
+msgstr "Courriel suggéré"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_event_registration__rlq_email_suggestion
+msgid "Corrected address when it can be guessed without asking the person."
+msgstr "Adresse corrigée, quand elle peut être devinée sans demander à la personne."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_event_registration__rlq_failed_mail_count
+#: model:ir.actions.act_window,name:rlq_survey_report.action_rlq_failed_mails
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_failed_mails
+msgid "Failed e-mails"
+msgstr "Courriels en échec"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_event_registration__rlq_failed_mail_count
+msgid "Outgoing e-mails of this registration (or to its address) in « Delivery failed »."
+msgstr "Courriels sortants de cette inscription (ou envoyés à son adresse) en « Échec d'envoi »."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_email_fix__line_ids
+msgid "Registrations"
+msgstr "Inscriptions"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_email_fix__update_partner
+msgid "Also fix the contact"
+msgstr "Corriger aussi le contact"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_registration_email_fix__update_partner
+msgid "Writes the corrected address on the registration's contact too, only when the contact holds the same wrong address."
+msgstr "Écrit aussi l'adresse corrigée sur le contact de l'inscription, seulement si le contact a la même adresse erronée."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_email_fix__resend
+msgid "Resend the e-mails"
+msgstr "Renvoyer les courriels"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_registration_email_fix__resend
+msgid "Failed e-mails of the registration re-addressed and put back in the queue, and the confirmation e-mail sent again."
+msgstr "Les courriels en échec de l'inscription sont réadressés et remis dans la file d'envoi, et le courriel de confirmation est renvoyé."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_email_fix_line__registration_id
+msgid "Registration"
+msgstr "Inscription"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_email_fix_line__event_id
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_search
+msgid "Event"
+msgstr "Événement"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_email_fix_line__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_email_fix_line__old_email
+msgid "Current e-mail"
+msgstr "Courriel actuel"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_email_fix_line__issue
+msgid "Issue"
+msgstr "Problème"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_email_fix_line__new_email
+msgid "Corrected e-mail"
+msgstr "Courriel corrigé"
+
+#. module: rlq_survey_report
+#: model:ir.model,name:rlq_survey_report.model_rlq_registration_email_fix
+msgid "Fix the e-mail address of registrations and resend"
+msgstr "Corriger l'adresse courriel d'inscriptions et renvoyer"
+
+#. module: rlq_survey_report
+#: model:ir.model,name:rlq_survey_report.model_rlq_registration_email_fix_line
+msgid "Registration whose e-mail address is fixed"
+msgstr "Inscription dont l'adresse courriel est corrigée"
+
+#. module: rlq_survey_report
+#: model:ir.actions.act_window,name:rlq_survey_report.action_rlq_registration_email
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_registration_email_survey
+msgid "Invalid e-mails (registrations)"
+msgstr "Courriels invalides (inscriptions)"
+
+#. module: rlq_survey_report
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_registration_email_events
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_list
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_search
+#: code:addons/rlq_survey_report/models/event_registration_email.py:0
+msgid "Invalid e-mails"
+msgstr "Courriels invalides"
+
+#. module: rlq_survey_report
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_registration_email_list
+msgid "Registrations with an invalid e-mail"
+msgstr "Inscriptions avec un courriel invalide"
+
+#. module: rlq_survey_report
+#: model_terms:ir.actions.act_window,help:rlq_survey_report.action_rlq_registration_email
+msgid "No registration with an invalid e-mail address."
+msgstr "Aucune inscription avec une adresse courriel invalide."
+
+#. module: rlq_survey_report
+#: model_terms:ir.actions.act_window,help:rlq_survey_report.action_rlq_registration_email
+msgid "Addresses that cannot receive mail (mariebc33@gmail'com), probable typos (gmial.com) and disposable mailboxes are listed here, with the suggested correction. « Fix and resend » corrects the registration and its contact, then sends the e-mails again."
+msgstr "Les adresses qui ne peuvent pas recevoir de courriel (mariebc33@gmail'com), les fautes de frappe probables (gmial.com) et les boîtes jetables sont listées ici, avec la correction suggérée. « Corriger et renvoyer » corrige l'inscription et son contact, puis renvoie les courriels."
+
+#. module: rlq_survey_report
+#: model_terms:ir.actions.act_window,help:rlq_survey_report.action_rlq_failed_mails
+msgid "No e-mail in « Delivery failed »."
+msgstr "Aucun courriel en « Échec d'envoi »."
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_list
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_event_registration_form_rlq_email
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_fix_form
+#: code:addons/rlq_survey_report/models/event_registration_email.py:0
+msgid "Fix and resend"
+msgstr "Corriger et renvoyer"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_list
+msgid "Registered on"
+msgstr "Inscrit le"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_search
+msgid "Not cancelled"
+msgstr "Non annulées"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_search
+msgid "Group By"
+msgstr "Regrouper par"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_event_registration_form_rlq_email
+msgid "E-mail address"
+msgstr "Adresse courriel"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_fix_form
+msgid "The corrected address replaces the wrong one on the registration (and on its contact if it holds the same address); the login of an Odoo account is never changed. Then the failed e-mails go back in the queue and the confirmation is sent again."
+msgstr "L'adresse corrigée remplace l'adresse erronée sur l'inscription (et sur son contact s'il a la même adresse) ; l'identifiant d'un compte Odoo n'est jamais modifié. Ensuite, les courriels en échec retournent dans la file d'envoi et la confirmation est renvoyée."
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_fix_form
+msgid "Fix"
+msgstr "Corriger"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_fix_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: rlq_survey_report
+#: code:addons/rlq_survey_report/models/event_registration_email.py:0
+#, python-format
+msgid "E-mail address corrected automatically: %(old)s → %(new)s"
+msgstr "Adresse courriel corrigée automatiquement : %(old)s → %(new)s"
+
+#. module: rlq_survey_report
+#: code:addons/rlq_survey_report/models/event_registration_email.py:0
+#, python-format
+msgid "« %(email)s » (registration of %(name)s) is not a valid address either: %(reason)s."
+msgstr "« %(email)s » (inscription de %(name)s) n'est pas non plus une adresse valide : %(reason)s."
+
+#. module: rlq_survey_report
+#: code:addons/rlq_survey_report/models/event_registration_email.py:0
+#, python-format
+msgid "Registration of %(name)s: address fixed, but the confirmation could not be resent (see the server log)."
+msgstr "Inscription de %(name)s : adresse corrigée, mais la confirmation n'a pas pu être renvoyée (voir le journal du serveur)."
+
+#. module: rlq_survey_report
+#: code:addons/rlq_survey_report/models/event_registration_email.py:0
+#, python-format
+msgid "E-mail address corrected: %(old)s → %(new)s (%(n)d e-mail(s) resent)."
+msgstr "Adresse courriel corrigée : %(old)s → %(new)s (%(n)d courriel(s) renvoyé(s))."
+
+#. module: rlq_survey_report
+#: code:addons/rlq_survey_report/models/event_registration_email.py:0
+#, python-format
+msgid "%(n)d registration(s) fixed."
+msgstr "%(n)d inscription(s) corrigée(s)."

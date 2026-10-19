@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_rlq_survey_report_wizard_survey_user,rlq.survey.report.wizard.survey.user,model_rlq_survey_report_wizard,survey.group_survey_user,1,1,1,1
+access_rlq_survey_report_acces_survey_user,rlq.survey.report.acces.survey.user,model_rlq_survey_report_acces,survey.group_survey_user,1,0,1,0
+access_rlq_survey_report_acces_system,rlq.survey.report.acces.system,model_rlq_survey_report_acces,base.group_system,1,1,1,1
+access_rlq_groupes_verification_manager,rlq.groupes.verification.manager,model_rlq_groupes_verification,survey.group_survey_manager,1,1,1,1
+access_rlq_groupes_verification_system,rlq.groupes.verification.system,model_rlq_groupes_verification,base.group_system,1,1,1,1
+access_rlq_synchro_sommaire_manager,rlq.synchro.sommaire.manager,model_rlq_synchro_sommaire,survey.group_survey_manager,1,1,1,1
+access_rlq_synchro_sommaire_system,rlq.synchro.sommaire.system,model_rlq_synchro_sommaire,base.group_system,1,1,1,1
+access_rlq_registration_email_fix_event_user,rlq.registration.email.fix.event.user,model_rlq_registration_email_fix,event.group_event_user,1,1,1,1
+access_rlq_registration_email_fix_line_event_user,rlq.registration.email.fix.line.event.user,model_rlq_registration_email_fix_line,event.group_event_user,1,1,1,1

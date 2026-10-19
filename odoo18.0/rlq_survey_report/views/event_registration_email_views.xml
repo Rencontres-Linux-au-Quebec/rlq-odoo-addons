@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- v1.109.0 — Invalid e-mail addresses of event registrations: list, correction wizard, failed e-mails (models/event_registration_email.py). -->
+
+    <!-- Registrations with an e-mail issue -->
+    <record id="view_rlq_registration_email_list" model="ir.ui.view">
+        <field name="name">event.registration.list.rlq.email</field>
+        <field name="model">event.registration</field>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <list string="Invalid e-mails" create="false" decoration-danger="rlq_email_issue == 'invalid'" decoration-warning="rlq_email_issue == 'typo'">
+                <header>
+                    <button name="action_rlq_fix_email" type="object" string="Fix and resend" class="btn-primary"/>
+                </header>
+                <field name="create_date" string="Registered on"/>
+                <field name="event_id"/>
+                <field name="name"/>
+                <field name="email"/>
+                <field name="rlq_email_issue"/>
+                <field name="rlq_email_suggestion"/>
+                <field name="partner_id" optional="show"/>
+                <field name="state" optional="show"/>
+                <field name="rlq_failed_mail_count" optional="show"/>
+                <button name="action_rlq_fix_email" type="object" string="Fix and resend" icon="fa-envelope"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rlq_registration_email_search" model="ir.ui.view">
+        <field name="name">event.registration.search.rlq.email</field>
+        <field name="model">event.registration</field>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <search string="Invalid e-mails">
+                <field name="email"/>
+                <field name="name"/>
+                <field name="event_id"/>
+                <filter name="filter_invalid" string="Invalid address" domain="[('rlq_email_issue', '=', 'invalid')]"/>
+                <filter name="filter_typo" string="Probable typo" domain="[('rlq_email_issue', '=', 'typo')]"/>
+                <filter name="filter_disposable" string="Disposable address" domain="[('rlq_email_issue', '=', 'disposable')]"/>
+                <separator/>
+                <filter name="filter_not_cancelled" string="Not cancelled" domain="[('state', '!=', 'cancel')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_event" string="Event" context="{'group_by': 'event_id'}"/>
+                    <filter name="group_issue" string="E-mail issue" context="{'group_by': 'rlq_email_issue'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_rlq_registration_email" model="ir.actions.act_window">
+        <field name="name">Invalid e-mails (registrations)</field>
+        <field name="res_model">event.registration</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('rlq_email_issue', '!=', False)]</field>
+        <field name="context">{'search_default_filter_not_cancelled': 1}</field>
+        <field name="view_id" ref="view_rlq_registration_email_list"/>
+        <field name="search_view_id" ref="view_rlq_registration_email_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No registration with an invalid e-mail address.</p>
+            <p>Addresses that cannot receive mail (mariebc33@gmail'com), probable typos (gmial.com) and disposable mailboxes are listed here, with the suggested correction. « Fix and resend » corrects the registration and its contact, then sends the e-mails again.</p>
+        </field>
+    </record>
+
+    <!-- Block on the registration form (xpath on //sheet: always present, see event_ticket_survey_views.xml) -->
+    <record id="view_event_registration_form_rlq_email" model="ir.ui.view">
+        <field name="name">event.registration.form.rlq.email</field>
+        <field name="model">event.registration</field>
+        <field name="inherit_id" ref="event.view_event_registration_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="E-mail address" name="rlq_email" invisible="not rlq_email_issue">
+                    <group>
+                        <field name="rlq_email_issue" readonly="1"/>
+                        <field name="rlq_email_suggestion" readonly="1"/>
+                        <field name="rlq_failed_mail_count"/>
+                    </group>
+                    <group>
+                        <button name="action_rlq_fix_email" type="object" string="Fix and resend" class="btn-primary"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Wizard -->
+    <record id="view_rlq_registration_email_fix_form" model="ir.ui.view">
+        <field name="name">rlq.registration.email.fix.form</field>
+        <field name="model">rlq.registration.email.fix</field>
+        <field name="arch" type="xml">
+            <form string="Fix and resend">
+                <p>The corrected address replaces the wrong one on the registration (and on its contact if it holds the same address); the login of an Odoo account is never changed. Then the failed e-mails go back in the queue and the confirmation is sent again.</p>
+                <field name="line_ids">
+                    <list editable="bottom" create="false">
+                        <field name="registration_id" column_invisible="1"/>
+                        <field name="event_id" readonly="1"/>
+                        <field name="name" readonly="1"/>
+                        <field name="old_email" readonly="1"/>
+                        <field name="issue" readonly="1"/>
+                        <field name="new_email"/>
+                    </list>
+                </field>
+                <group>
+                    <field name="update_partner"/>
+                    <field name="resend"/>
+                </group>
+                <footer>
+                    <button name="action_apply" type="object" string="Fix" class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Failed outgoing e-mails (mail.mail is readable by the administrators only) -->
+    <record id="action_rlq_failed_mails" model="ir.actions.act_window">
+        <field name="name">Failed e-mails</field>
+        <field name="res_model">mail.mail</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'exception')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No e-mail in « Delivery failed ».</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_rlq_registration_email_events"
+              name="Invalid e-mails"
+              parent="event.event_main_menu"
+              sequence="45"
+              groups="event.group_event_user"/>
+    <menuitem id="menu_rlq_registration_email_list"
+              name="Registrations with an invalid e-mail"
+              parent="menu_rlq_registration_email_events"
+              action="action_rlq_registration_email"
+              sequence="10"/>
+    <menuitem id="menu_rlq_failed_mails"
+              name="Failed e-mails"
+              parent="menu_rlq_registration_email_events"
+              action="action_rlq_failed_mails"
+              sequence="20"
+              groups="base.group_system"/>
+    <menuitem id="menu_rlq_registration_email_survey"
+              name="Invalid e-mails (registrations)"
+              parent="menu_rlq_survey_report_in_survey_app"
+              action="action_rlq_registration_email"
+              sequence="92"
+              groups="event.group_event_user"/>
+
+</odoo>
