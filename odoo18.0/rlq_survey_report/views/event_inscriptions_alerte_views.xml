@@ -19,7 +19,7 @@
                         <field name="rlq_alerte_seuil" invisible="not rlq_alerte_active"/>
                         <field name="rlq_alerte_repeter" invisible="not rlq_alerte_active"/>
                         <field name="rlq_alerte_sondage"/>
-                        <field name="rlq_alerte_courriel" invisible="not rlq_alerte_active and not rlq_alerte_sondage"
+                        <field name="rlq_alerte_courriel" invisible="not rlq_alerte_active and not rlq_alerte_sondage and not rlq_daily_report"
                                placeholder="vide : paramètre système, puis courriel de la société"/>
                     </group>
                     <group>

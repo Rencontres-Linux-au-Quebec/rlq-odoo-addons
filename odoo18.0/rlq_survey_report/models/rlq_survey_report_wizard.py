@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+# Copyright (C) 2026 Services-Conseils Linux  (contact@exemple.org)
+# Copyright (C) 2026 Rencontres Linux au Québec contributors
+#
+# This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at your option) any later version. (http://www.gnu.org/licenses/agpl)
 """
 rlq_survey_report_wizard.py
 ============================
@@ -37,9 +42,6 @@ ERPLibre) utilise des noms différents, ajustez les constantes ci-dessous
 et les quelques accès directs signalés par un commentaire "# CHAMP".
 Voir doc/NOTES_VALIDATION.md pour la procédure de
 vérification recommandée avant toute mise en production.
-
-© Services-Linux Conseils Inc — contact@exemple.org, contact@exemple.org
-Licence : AGPL-3
 """
 
 from collections import defaultdict
@@ -2855,7 +2857,7 @@ class RlqSurveyReportWizard(models.TransientModel):
         pied_de_page = (
             "<p style='text-align:center;color:var(--texte-attenue);font-size:.8rem;"
             f"margin-top:2rem;'>Généré par le module {self._default_debug_info()}"
-            "<br>© Services-Linux Conseils Inc — contact@exemple.org, contact@exemple.org"
+            "<br>© 2026 Services-Conseils Linux (contact@exemple.org) · Rencontres Linux au Québec contributors"
             "<br>rlq_survey_report est distribué sous licence "
             "<a href='https://www.gnu.org/licenses/why-affero-gpl.fr.html' target='_blank' "
             "style='color:inherit;'>AGPL-3</a>.</p>"
