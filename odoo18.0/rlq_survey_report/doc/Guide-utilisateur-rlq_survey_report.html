@@ -42,13 +42,13 @@
 <div class="page">
 
 <h1>Guide utilisateur — Rapport de sondage</h1>
-<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.111.0</strong> — mis à jour le 2026-10-16.<br>
+<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.114.0</strong> — mis à jour le 2026-10-19.<br>
 Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 
 <p>Ce module produit un compte-rendu détaillé — à l'écran, en fichier HTML, en PDF ou en Excel — des réponses à un ou plusieurs sondages Odoo, notamment les sondages de satisfaction envoyés après chaque rencontre. Il aide à repérer ce qui va bien, ce qui se dégrade, et à suivre les actions entreprises d'une rencontre à l'autre.</p>
 
 <div class="encadre">
-  <p><strong>Nouveautés depuis la version précédente de ce guide :</strong> les <em>adresses courriel invalides</em> des inscriptions, repérées, corrigées et renvoyées (§&nbsp;13) · les <em>groupes et étiquettes</em> des inscrits et des sondages, avec la mise à jour périodique par sondage (§&nbsp;12) · la <em>Note globale</em> et ses signaux de suivi (§&nbsp;6) · l'<em>anonymisation</em> des participants (§&nbsp;4) · un mot de passe demandé seulement quand c'est utile, avec un mot de passe par défaut (§&nbsp;5) · le filtre par présentateur et l'appréciation des présentateurs · les <em>actions de suivi</em> (§&nbsp;8) · l'<em>historique et les fichiers déjà générés</em> (§&nbsp;9) · une colonne par soumission dans la fiche d'un participant (§&nbsp;7) · un sondage différent par type de billet (§&nbsp;11).</p>
+  <p><strong>Nouveautés depuis la version précédente de ce guide :</strong> la liste des courriels des inscrits qui n'ont pas encore rempli le sondage de leur billet et le <em>rapport quotidien</em> par courriel (§&nbsp;14) · les <em>adresses courriel invalides</em> des inscriptions, repérées, corrigées et renvoyées (§&nbsp;13) · les <em>groupes et étiquettes</em> des inscrits et des sondages, avec la mise à jour périodique par sondage (§&nbsp;12) · la <em>Note globale</em> et ses signaux de suivi (§&nbsp;6) · l'<em>anonymisation</em> des participants (§&nbsp;4) · un mot de passe demandé seulement quand c'est utile, avec un mot de passe par défaut (§&nbsp;5) · le filtre par présentateur et l'appréciation des présentateurs · les <em>actions de suivi</em> (§&nbsp;8) · l'<em>historique et les fichiers déjà générés</em> (§&nbsp;9) · une colonne par soumission dans la fiche d'un participant (§&nbsp;7) · un sondage différent par type de billet (§&nbsp;11).</p>
 </div>
 
 <nav class="toc" aria-label="Table des matières">
@@ -67,6 +67,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
     <li><a href="#billets">Un sondage par type de billet</a></li>
     <li><a href="#groupes">Groupes et étiquettes des inscrits et des sondages</a></li>
     <li><a href="#courriels-invalides">Adresses courriel invalides des inscriptions</a></li>
+    <li><a href="#suivi-sondages">Sondages non complétés et rapport quotidien</a></li>
     <li><a href="#admin">Pour les administrateurs</a></li>
     <li><a href="#depannage">Dépannage</a></li>
     <li><a href="#limites">Limites et prudence</a></li>
@@ -145,7 +146,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
   <tr><td><strong>Options PDF</strong></td><td>Ouvre une petite fenêtre : « Tableaux de réponses par participant dans le PDF » (à décocher si un très gros PDF échoue), « Saut de page forcé par rencontre », « Saut de page forcé par participant » (à décocher s'il y a un très grand nombre de participants : le PDF peut devenir trop volumineux).</td></tr>
   <tr><td><strong>Exporter en Excel</strong></td><td>Voir §&nbsp;10. Toujours protégé par mot de passe.</td></tr>
   <tr><td><strong>Modifier les paramètres</strong></td><td>Revient au formulaire sans perdre vos choix.</td></tr>
-  <tr><td><strong>Aide</strong></td><td>Ouvre la page d'aide du module dans un nouvel onglet (son adresse est un réglage d'administrateur, §&nbsp;14).</td></tr>
+  <tr><td><strong>Aide</strong></td><td>Ouvre la page d'aide du module dans un nouvel onglet (son adresse est un réglage d'administrateur, §&nbsp;15).</td></tr>
   <tr><td><strong>Fermer</strong></td><td>Ferme la fenêtre sans rien enregistrer.</td></tr>
 </table>
 
@@ -183,7 +184,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 <h3>Le mot de passe par défaut</h3>
 <p>Les deux champs sont <strong>pré-remplis et masqués</strong> avec le mot de passe par défaut de votre organisation. Le bouton <strong>Afficher le mot de passe</strong> le montre dans un message à l'écran. Vous pouvez le remplacer pour un rapport précis : tapez-en un autre dans les deux champs.</p>
 <div class="encadre attention">
-  <p><strong>Un encadré jaune « Le mot de passe par défaut n'a pas été changé »</strong> apparaît tant que la valeur est encore <code>!CHANGE-MOI@</code>, le marqueur livré avec le module : il est <em>refusé</em>. Un administrateur doit définir le vrai mot de passe par défaut (§&nbsp;14) ; le bouton <strong>Ouvrir le paramètre</strong>, réservé aux administrateurs, y mène directement. En attendant, saisissez votre propre mot de passe dans les deux champs.</p>
+  <p><strong>Un encadré jaune « Le mot de passe par défaut n'a pas été changé »</strong> apparaît tant que la valeur est encore <code>!CHANGE-MOI@</code>, le marqueur livré avec le module : il est <em>refusé</em>. Un administrateur doit définir le vrai mot de passe par défaut (§&nbsp;15) ; le bouton <strong>Ouvrir le paramètre</strong>, réservé aux administrateurs, y mène directement. En attendant, saisissez votre propre mot de passe dans les deux champs.</p>
 </div>
 <figure class="capture"><b>Capture à ajouter — <code>15-avertissement-mot-de-passe.png</code></b><br>L'encadré jaune au-dessus des champs du mot de passe.</figure>
 
@@ -312,7 +313,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
   <li>Indiquez <strong>Nombre d'inscriptions (N)</strong>. Facultatif : <strong>Courriel à avertir</strong> pour cet événement (plusieurs adresses séparées par des virgules).</li>
 </ol>
 <p>Pour être aussi averti à chaque sondage complété, cochez <strong>Avertir aussi à chaque sondage complété</strong> (case indépendante de la précédente). Le courriel est envoyé quand une personne termine le sondage d'un type de billet de l'événement (ou le sondage de l'événement) ; il donne son nom, son billet et le nombre de sondages complétés sur les inscriptions confirmées, jamais ses réponses ni son courriel. Un seul courriel par participation ; rien pour un essai.</p>
-<p>Sans courriel propre à l'événement, le courriel part vers l'adresse du paramètre système <code>rlq_survey_report.courriel_inscriptions</code> (voir section 14) et, si ce paramètre est vide, vers le courriel par défaut d'Odoo (celui de la société). Seules les inscriptions confirmées ou présentes comptent. Le courriel part <strong>une seule fois</strong> ; changer N ou recocher la case réarme l'avertissement (si le seuil est déjà atteint, il part tout de suite). Il ne contient aucune donnée personnelle des inscrits ; une note « Avertissement envoyé à … » s'ajoute au fil de l'événement.</p>
+<p>Sans courriel propre à l'événement, le courriel part vers l'adresse du paramètre système <code>rlq_survey_report.courriel_inscriptions</code> (voir section 15) et, si ce paramètre est vide, vers le courriel par défaut d'Odoo (celui de la société). Seules les inscriptions confirmées ou présentes comptent. Le courriel part <strong>une seule fois</strong> ; changer N ou recocher la case réarme l'avertissement (si le seuil est déjà atteint, il part tout de suite). Il ne contient aucune donnée personnelle des inscrits ; une note « Avertissement envoyé à … » s'ajoute au fil de l'événement.</p>
 
 <!-- ============================================================ 12 -->
 <h2 id="groupes">12. Groupes et étiquettes des inscrits et des sondages</h2>
@@ -354,7 +355,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 </div>
 
 <!-- ============================================================ 13 -->
-<h2 id="courriels-invalides">13. Adresses courriel invalides des inscriptions <span class="pastille">nouveau, v1.109</span></h2>
+<h2 id="courriels-invalides">13. Adresses courriel invalides des inscriptions</h2>
 <p>Une personne qui écrit <code>marie@gmail'com</code> (apostrophe au lieu du point) ne reçoit jamais sa confirmation. Le module repère maintenant chaque inscription dont l'adresse est <strong>invalide</strong> (impossible à livrer telle quelle), contient une <strong>faute de frappe probable</strong> (<code>gmial.com</code>, <code>hotmal.com</code>) ou est <strong>jetable</strong>, et propose la correction quand elle se devine sans demander à la personne.</p>
 <ul>
   <li><strong>À l'inscription</strong> : une erreur de ponctuation ou d'espace qui ne change aucune lettre (<code>gmail'com</code>, <code>gmail..com</code>, <code>marie @gmail.com</code>) est corrigée automatiquement <em>avant</em> la création de l'inscription — le courriel de confirmation part donc à la bonne adresse ; une note est ajoutée à l'inscription. L'inscription n'est jamais refusée.</li>
@@ -379,7 +380,26 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 </div>
 
 <!-- ============================================================ 14 -->
-<h2 id="admin">14. Pour les administrateurs</h2>
+<h2 id="suivi-sondages">14. Sondages non complétés et rapport quotidien <span class="pastille">nouveau, v1.114</span></h2>
+<p>Quand un sondage est assigné à un type de billet (§&nbsp;11), remplir ce sondage confirme l'inscription. Le module montre maintenant qui ne l'a pas encore fait, et peut vous envoyer chaque matin un résumé des inscriptions et des sondages.</p>
+<h3>Liste des courriels à relancer</h3>
+<ol>
+  <li>Ouvrez <strong>Événements → Sondages non complétés</strong> (aussi dans Sondages → Rapports détaillés, ou le bouton <strong>Sondages non complétés</strong> du bloc « Suivi des sondages et rapport quotidien » du formulaire de l'événement).</li>
+  <li>Les événements en cours et à venir dont un billet a un sondage sont déjà choisis ; ajoutez-en ou retirez-en au besoin. La case <strong>Inclure les sondages commencés</strong> (cochée par défaut) ajoute les personnes qui ont commencé le sondage sans le terminer.</li>
+  <li>Le champ <strong>Adresses courriel</strong> contient les adresses, sans doublons, séparées par « ; » : le bouton de copie les met dans le presse-papiers, à coller dans le champ <em>Cci</em> d'un courriel. Le nombre d'inscriptions <em>sans</em> adresse est indiqué à part.</li>
+  <li><strong>Ouvrir en liste</strong> affiche les mêmes inscriptions dans une liste Odoo (filtres, regroupement par événement, export).</li>
+</ol>
+<p>Seules les inscriptions confirmées ou présentes comptent (ni brouillons, ni annulations). Un sondage est rattaché à une inscription quand il a été rempli par <strong>le même contact ou avec la même adresse courriel</strong> (majuscules ignorées) ; les essais (« Tester ») ne comptent pas. Si une personne a rempli le sondage avec une autre adresse que celle de son inscription, elle apparaît dans la liste : vérifiez avant une relance insistante.</p>
+<h3>Rapport quotidien par courriel</h3>
+<p>Cochez <strong>Rapport quotidien par courriel</strong> dans le bloc « Suivi des sondages et rapport quotidien » de l'événement. Chaque matin (tâche planifiée « RLQ Événements / Events : rapport quotidien / daily report », vers 7 h l'été et 6 h l'hiver à Montréal), jusqu'au lendemain de la fin de l'événement, un courriel bilingue (français et anglais) part au même destinataire que l'avertissement d'inscriptions (courriel de l'événement, puis paramètre système <code>rlq_survey_report.courriel_inscriptions</code>, puis courriel de la société). Il contient :</p>
+<ul>
+  <li><strong>Inscriptions</strong> : confirmées, nouvelles et annulées dans les dernières 24 heures, et la liste des nouvelles (heure, nom, billet, état du sondage) ;</li>
+  <li><strong>Sondages</strong> : complétés, commencés, non commencés, taux de complétion, complétés dans les 24 heures, et le même détail par billet.</li>
+</ul>
+<p>Aucune adresse courriel d'inscrit n'y figure (Loi 25) : la liste à relancer reste dans Odoo. Le bouton <strong>Envoyer le rapport quotidien maintenant</strong> l'envoie tout de suite (pour l'essayer). Pour changer l'heure : Paramètres → Technique → Tâches planifiées (l'heure choisie est conservée par les mises à jour du module).</p>
+
+<!-- ============================================================ 15 -->
+<h2 id="admin">15. Pour les administrateurs</h2>
 <h3>Paramètres système</h3>
 <p>Réglages modifiables sans toucher au code, dans <strong>Paramètres (ou Réglages) → Technique → Paramètres système</strong> (le menu Technique exige le mode développeur) :</p>
 <table>
@@ -399,13 +419,13 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 <h3>Vérifier le module avant une mise en production</h3>
 <p>Le dossier du module contient <code>run-all.sh</code> : il lance ruff, les contrôles de syntaxe, les tests autonomes et — si PostgreSQL et Odoo sont installés — crée une base de test dédiée pour exécuter les tests Odoo, puis la supprime. Voir <code>scripts/LISEZMOI.md</code>. Les notes de conception se trouvent dans <code>doc/</code> (<code>CONTEXTE.md</code>, <code>CHANGELOG.md</code>, <code>NOTES_VALIDATION.md</code>).</p>
 
-<!-- ============================================================ 15 -->
-<h2 id="depannage">15. Dépannage</h2>
+<!-- ============================================================ 16 -->
+<h2 id="depannage">16. Dépannage</h2>
 <table>
   <tr><th>Symptôme</th><th>Cause probable / solution</th></tr>
   <tr><td>Le bouton Générer ne fait rien</td><td>Vérifiez qu'au moins un sondage est sélectionné et que la case de confirmation est cochée.</td></tr>
-  <tr><td>Le mot de passe par défaut est redevenu « !CHANGE-MOI@ »</td><td>Avec une version antérieure à la 1.93, une réinstallation du module pouvait remplacer la valeur définie. Redéfinissez-la une fois (§&nbsp;14) : elle n'est plus jamais écrasée ensuite.</td></tr>
-  <tr><td>« Le mot de passe par défaut n'a pas encore été personnalisé »</td><td>Le mot de passe pré-rempli est encore le marqueur livré. Saisissez le vôtre dans les deux champs, ou demandez à un administrateur de définir le mot de passe par défaut (§&nbsp;14).</td></tr>
+  <tr><td>Le mot de passe par défaut est redevenu « !CHANGE-MOI@ »</td><td>Avec une version antérieure à la 1.93, une réinstallation du module pouvait remplacer la valeur définie. Redéfinissez-la une fois (§&nbsp;15) : elle n'est plus jamais écrasée ensuite.</td></tr>
+  <tr><td>« Le mot de passe par défaut n'a pas encore été personnalisé »</td><td>Le mot de passe pré-rempli est encore le marqueur livré. Saisissez le vôtre dans les deux champs, ou demandez à un administrateur de définir le mot de passe par défaut (§&nbsp;15).</td></tr>
   <tr><td>On me demande un mot de passe pour un rapport anonymisé</td><td>Vérifiez que « Anonymiser les participants » est bien coché : sans anonymisation, un mot de passe est requis, même à l'écran. L'export Excel en exige toujours un.</td></tr>
   <tr><td>Un sondage attendu manque dans une catégorie</td><td>Le critère de la catégorie (mot du titre, date) ne correspond peut-être pas à son titre exact : ajoutez-le à la main, ou vérifiez « Exclure les sondages dont le titre contient » et « Minimum ayant débuté ou terminé? ».</td></tr>
   <tr><td>La liste « Filtrer par présentateur » est vide ou incomplète</td><td>Un présentateur est reconnu seulement si le titre de sa présentation se termine par son nom entre crochets ou parenthèses : « Titre [Nom Prénom] ».</td></tr>
@@ -416,11 +436,11 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
   <tr><td>Un avertissement dit qu'une date n'a pas été reconnue</td><td>Le titre du sondage ne suit pas le format attendu (ex. « 4 août 2026 ») : le message cite le titre en cause.</td></tr>
   <tr><td>Le nom d'un fichier est coupé dans l'historique</td><td>Le nom complet passe à la ligne dans la colonne « Télécharger » ; si ce n'était pas le cas, faites actualiser la page (Ctrl+F5) après la mise à jour du module.</td></tr>
   <tr><td>Une personne inscrite n'a jamais reçu sa confirmation</td><td>Regardez <strong>Événements → Courriels invalides</strong> : si son adresse y figure, « Corriger et renvoyer » (§&nbsp;13). Sinon, un administrateur vérifie <strong>Courriels en échec</strong> (cause de l'échec) ; sur le serveur, <code>odoo-mail-retry.py</code> liste et renvoie les courriels en échec.</td></tr>
-  <tr><td>Une adresse a été corrigée toute seule à l'inscription</td><td>Normal : seule la ponctuation ou les espaces étaient en cause (<code>gmail'com</code> → <code>gmail.com</code>) ; une note dans le fil de l'inscription montre l'adresse d'origine. Pour désactiver : paramètre <code>rlq_survey_report.registration_email_autofix</code> = <code>off</code> (§&nbsp;14).</td></tr>
+  <tr><td>Une adresse a été corrigée toute seule à l'inscription</td><td>Normal : seule la ponctuation ou les espaces étaient en cause (<code>gmail'com</code> → <code>gmail.com</code>) ; une note dans le fil de l'inscription montre l'adresse d'origine. Pour désactiver : paramètre <code>rlq_survey_report.registration_email_autofix</code> = <code>off</code> (§&nbsp;15).</td></tr>
 </table>
 
-<!-- ============================================================ 16 -->
-<h2 id="limites">16. Limites et prudence</h2>
+<!-- ============================================================ 17 -->
+<h2 id="limites">17. Limites et prudence</h2>
 <ul>
   <li><strong>L'anonymisation réduit le risque, elle ne l'élimine pas</strong> : le contenu des réponses libres et un petit nombre de répondants peuvent permettre de reconnaître quelqu'un (§&nbsp;4).</li>
   <li><strong>Ni ce module ni ce guide ne donnent d'avis juridique.</strong> La conformité à la Loi 25 ou au RGPD, surtout pour une diffusion publique, relève d'une personne qualifiée.</li>
@@ -428,7 +448,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
   <li>Le module a été développé sans accès direct à une instance Odoo : après une mise à jour, vérifiez les écrans décrits ici et signalez tout écart.</li>
 </ul>
 
-<p class="meta" style="margin-top:3rem">© Services-Linux Conseils Inc (Martial@Bigras.ca, Martial.Bigras@Services-Conseils-Linux.com) — module <code>rlq_survey_report</code>, licence AGPL-3.</p>
+<p class="meta" style="margin-top:3rem">© 2026 Services-Conseils Linux (Martial@Bigras.ca) · Rencontres Linux au Québec contributors — module <code>rlq_survey_report</code>, licence AGPL-3.</p>
 </div>
 </body>
 </html>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v1.114.0 — daily report of the events whose box « Daily report by e-mail » is checked (models/event_survey_followup.py).
+     noupdate: the time chosen by the administrator (Settings > Technical > Scheduled Actions) is kept by a module update.
+     First run: tomorrow at 11:00 UTC (7:00 in Montréal in summer, 6:00 in winter). -->
+<odoo noupdate="1">
+    <record id="ir_cron_daily_report" model="ir.cron">
+        <field name="name">RLQ Événements / Events : rapport quotidien / daily report</field>
+        <field name="model_id" ref="event.model_event_event"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_rlq_daily_report()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d 11:00:00')"/>
+    </record>
+</odoo>

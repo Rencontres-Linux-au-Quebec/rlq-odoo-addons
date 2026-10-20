@@ -1,5 +1,64 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.114.0
+
+**Short title:** daily report by e-mail: registrations and survey statistics, event by event.
+
+**Reason for the request:** « [3] Rajouter une option afin de recevoir un rapport journalier avec les inscriptions, et des stats sur les sondages remplis »
+
+**Changes:**
+
+- `models/event_survey_followup.py`: `event.event` fields `rlq_daily_report` (box « Daily report by e-mail ») and `rlq_daily_report_sent`; `_rlq_daily_report_data` (confirmed registrations, new and cancelled in 24 h, new registrations with ticket and survey state, per ticket: survey, completed, started, not started); `_rlq_send_daily_report` (same recipient as the registration alert: `_rlq_destinataire_alerte`); `_cron_rlq_daily_report`; button `action_rlq_send_daily_report` (« Send the daily report now »).
+- `models/followup_report.py` (pure Python): `daily_report_subject`, `daily_report_html` (bilingual French / English: the recipient is an address, its language is unknown), `completion_rate`.
+- `data/ir_cron_daily_report.xml` (new, noupdate): scheduled action « RLQ Événements / Events : rapport quotidien / daily report », every day, first run tomorrow 11:00 UTC (7:00 in Montréal in summer).
+- `views/event_survey_followup_views.xml`: block « Survey follow-up and daily report » on the event form; `views/event_inscriptions_alerte_views.xml`: « Courriel à avertir » also visible when the daily report is checked.
+- `i18n/fr.po`, `tests/test_followup_report.py` (standalone), `tests/test_survey_followup.py` (Odoo, NOT run), guide § 14, `NOTES_VALIDATION.md` § -73, `CONTEXTE.md`.
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:** no e-mail address of a registered person in the report (Loi 25: names, tickets and counts only); every value escaped; sent until the day after the end of the event (an event without end date: as long as the box is checked); the scheduled action sends at most once per 20 hours per event (run twice by hand: no second e-mail), the button always sends; one event in error never stops the others (savepoint, logged); no valid recipient: logged by the scheduled action, clear error message for the button; the « new registrations » table is limited to 50 rows (« … N more »); « cancelled in 24 h » uses the last modification date of the cancelled registration (an approximation: Odoo keeps no cancellation date); times in the time zone of the event.
+
+**Checks:** ruff; run-all.sh --sans-odoo (syntax, manifest, standalone tests including test_followup_report); XML parsed; list view validated with Odoo 18's `list_view.rng`; field names of `event.registration` and `survey.user_input` (`event_ticket_id`, `email`, `state`, `end_datetime`, `test_entry`) and the widget `CopyClipboardChar` checked in the Odoo 18 sources; Odoo tests NOT run (no instance).
+
+**Action required:** update the module (`-u rlq_survey_report`) on DEV first; check an event's box « Daily report by e-mail » and click « Send the daily report now »; if needed, change the hour in Settings > Technical > Scheduled Actions.
+
+## 18.0.1.113.0
+
+**Short title:** surveys not completed: list of the e-mail addresses of the registered people who have not filled the survey of their ticket yet.
+
+**Reason for the request:** « [1] Pour les événements où il y a des sondages d'assignés à des billets (tickets), sortir une liste de courriel de tous ceux qui n'ont pas encore confirmé leur inscription en remplissant le sondage »
+
+**Changes:**
+
+- `models/event_survey_followup.py` (new, code in English): `event.registration` fields `rlq_survey_state` (none / not_started / in_progress / done) and `rlq_expected_survey_id` (computed, not stored), `_rlq_survey_status_map` (two queries for any number of registrations); `event.event.rlq_survey_pending_count`, `action_rlq_survey_pending`; wizard `rlq.survey.pending` (events, « Include started surveys », registrations, e-mail addresses separated by « ; » with a copy button, count without address, « Open as a list »).
+- `models/followup_report.py` (new, pure Python): `survey_status`, `unique_emails`.
+- `views/event_survey_followup_views.xml` (new): wizard, list of registrations, button on the event form, menus Events > Surveys not completed and Surveys > Detailed reports > Surveys not completed (registrations).
+- `security/ir.model.access.csv`: wizard for `event.group_event_user`. `i18n/fr.po`: French of every new label. `tests/__init__.py`.
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:** expected survey = survey of the ticket, otherwise survey of the event (same rule as the « Latest registrations » table of the survey alert); a participation belongs to a registration by contact OR e-mail address (case and spaces ignored), test entries excluded; only confirmed / attended registrations (no draft, no cancellation); a survey « new » (opened, nothing answered) counts as not started; addresses without duplicates (case ignored); registrations without address counted apart; default events: current and upcoming events with a ticket survey (or the events selected in the list).
+
+**Checks:** see 18.0.1.114.0 (delivered together).
+
+**Action required:** update the module; open Events > Surveys not completed.
+
+## 18.0.1.112.0
+
+**Short title:** copyright header of every Python and Bash program: Services-Conseils Linux and Rencontres Linux au Québec contributors, AGPL-3 or later.
+
+**Reason for the request:** « [2] Mettre à jour le copywrite dans tous les programmes Python et BASH, mais pas dans les fichiers de config »
+
+**Changes:** every `.py` (models, controllers, tests, `__init__.py`, `__manifest__.py`) and `run-all.sh` start with « Copyright (C) 2026 Services-Conseils Linux (Martial@Bigras.ca) / Copyright (C) 2026 Rencontres Linux au Québec contributors » and the AGPL-3-or-later notice; the former « © Services-Linux Conseils Inc … / Licence : AGPL-3 » lines of the docstrings are removed. Same holders in the manifest (author, description), the footer of the generated reports (`rlq_survey_report_wizard.py`), `static/description/index.html` and the footer of the user guide. `run-all.sh` 1.2.20261019.202050.
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:** configuration files (`scripts/run-all.conf.exemple`, `ruff.toml`, `data/*.xml`) had no copyright line: nothing to remove, nothing added; the address kept in clear in anonymised reports is still martial@bigras.ca (`COURRIELS_ATTRIBUTION`).
+
+**Checks:** run-all.sh --sans-odoo; no « Services-Linux » left outside this changelog.
+
+**Action required:** none (update the module to see the new author in Apps).
+
 ## 18.0.1.111.0
 
 **Short title:** copyright holder: Services-Linux Conseils Inc.

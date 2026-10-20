@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+# Copyright (C) 2026 Services-Conseils Linux  (Martial@Bigras.ca)
+# Copyright (C) 2026 Rencontres Linux au Québec contributors
+#
+# This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at your option) any later version. (http://www.gnu.org/licenses/agpl)
 """
 event_registration_email.py
 ===========================
@@ -19,9 +24,6 @@ Invalid e-mail addresses of event registrations (v1.109.0).
   - Menu « Failed e-mails »: the outgoing e-mails in « Delivery failed » (mail.mail, state exception), to see the bounces of wrong addresses.
 
 The login of an Odoo account (res.users) is never changed here: the person may log in with it.
-
-© Services-Linux Conseils Inc — Martial@Bigras.ca, Martial.Bigras@Services-Conseils-Linux.com
-License: AGPL-3
 """
 import logging
 

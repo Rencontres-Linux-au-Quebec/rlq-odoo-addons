@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+# Copyright (C) 2026 Services-Conseils Linux  (Martial@Bigras.ca)
+# Copyright (C) 2026 Rencontres Linux au Québec contributors
+#
+# This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at your option) any later version. (http://www.gnu.org/licenses/agpl)
 """
 rlq_survey_report_acces.py
 ===========================
@@ -66,9 +71,6 @@ abandonné) laisse désormais un fichier permanent sur le serveur (en double,
 voir ci-dessus). Si le volume devient un problème, le nettoyage se fait en
 supprimant l'entrée d'historique correspondante (ce qui libère aussi
 `fichier_telecharger`) via un accès administrateur.
-
-© Services-Linux Conseils Inc — Martial@Bigras.ca, Martial.Bigras@Services-Conseils-Linux.com
-Licence : AGPL-3
 """
 
 from odoo import fields, models

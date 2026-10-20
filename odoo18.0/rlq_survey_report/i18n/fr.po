@@ -64,6 +64,7 @@ msgstr "Courriels sortants de cette inscription (ou envoyés à son adresse) en 
 
 #. module: rlq_survey_report
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_email_fix__line_ids
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_pending__registration_ids
 msgid "Registrations"
 msgstr "Inscriptions"
 
@@ -172,6 +173,7 @@ msgstr "Corriger et renvoyer"
 
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_list
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_registration_list
 msgid "Registered on"
 msgstr "Inscrit le"
 
@@ -234,3 +236,175 @@ msgstr "Adresse courriel corrigée : %(old)s → %(new)s (%(n)d courriel(s) renv
 #, python-format
 msgid "%(n)d registration(s) fixed."
 msgstr "%(n)d inscription(s) corrigée(s)."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_event_registration__rlq_survey_state
+msgid "Survey"
+msgstr "Sondage"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_event_registration__rlq_survey_state
+msgid "State of the survey expected for this registration (the survey of its ticket, otherwise the survey of the event): completed, started, not started, or no survey."
+msgstr "État du sondage attendu pour cette inscription (le sondage de son billet, sinon celui de l'événement) : complété, commencé, non commencé, ou aucun sondage."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__event_registration__rlq_survey_state__none
+msgid "No survey"
+msgstr "Aucun sondage"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__event_registration__rlq_survey_state__not_started
+msgid "Not started"
+msgstr "Non commencé"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__event_registration__rlq_survey_state__in_progress
+msgid "Started"
+msgstr "Commencé"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__event_registration__rlq_survey_state__done
+msgid "Completed"
+msgstr "Complété"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_event_registration__rlq_expected_survey_id
+msgid "Expected survey"
+msgstr "Sondage attendu"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_event_registration__rlq_expected_survey_id
+msgid "The survey of the ticket of this registration, otherwise the survey of the event."
+msgstr "Le sondage du billet de cette inscription, sinon celui de l'événement."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_event_event__rlq_daily_report
+msgid "Daily report by e-mail"
+msgstr "Rapport quotidien par courriel"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_event_event__rlq_daily_report
+msgid "If checked, a report is sent every morning until the day after the event: registrations (confirmed, new and cancelled in the last 24 hours) and survey statistics per ticket. Same recipient as the registration alert."
+msgstr "Si cochée, un rapport est envoyé chaque matin jusqu'au lendemain de l'événement : inscriptions (confirmées, nouvelles et annulées dans les dernières 24 heures) et statistiques des sondages par billet. Même destinataire que l'avertissement d'inscriptions."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_event_event__rlq_daily_report_sent
+msgid "Last daily report"
+msgstr "Dernier rapport quotidien"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_event_event__rlq_daily_report_sent
+msgid "Date of the last daily report sent for this event."
+msgstr "Date du dernier rapport quotidien envoyé pour cet événement."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_event_event__rlq_survey_pending_count
+#: model:ir.actions.act_window,name:rlq_survey_report.action_rlq_survey_pending
+#: model:ir.model,name:rlq_survey_report.model_rlq_survey_pending
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_survey_pending_events
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_registration_list
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_event_form_rlq_survey_followup
+#: code:addons/rlq_survey_report/models/event_survey_followup.py:0
+#, python-format
+msgid "Surveys not completed"
+msgstr "Sondages non complétés"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_event_event__rlq_survey_pending_count
+msgid "Confirmed registrations whose survey (survey of the ticket, otherwise of the event) is not completed yet."
+msgstr "Inscriptions confirmées dont le sondage (celui du billet, sinon celui de l'événement) n'est pas encore complété."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_pending__event_ids
+msgid "Events"
+msgstr "Événements"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_survey_pending__event_ids
+msgid "Events to check. By default: the current and upcoming events whose tickets have a survey."
+msgstr "Événements à vérifier. Par défaut : les événements en cours et à venir dont les billets ont un sondage."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_pending__include_started
+msgid "Include started surveys"
+msgstr "Inclure les sondages commencés"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_survey_pending__include_started
+msgid "Also list the people who started the survey without finishing it (their registration is not confirmed either)."
+msgstr "Lister aussi les personnes qui ont commencé le sondage sans le terminer (leur inscription n'est pas confirmée non plus)."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_pending__emails
+msgid "E-mail addresses"
+msgstr "Adresses courriel"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_survey_pending__emails
+msgid "Addresses of the people to remind, without duplicates, separated by « ; » (to copy into the « To » or « Bcc » field of an e-mail)."
+msgstr "Adresses des personnes à relancer, sans doublons, séparées par « ; » (à copier dans le champ « À » ou « Cci » d'un courriel)."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_pending__email_count
+msgid "Addresses"
+msgstr "Adresses"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_pending__missing_email_count
+msgid "Without e-mail address"
+msgstr "Sans adresse courriel"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_form
+msgid "Confirmed registrations whose person has not completed the survey of their ticket (otherwise the survey of the event) yet. A survey belongs to a registration when it was answered by the same contact or with the same e-mail address."
+msgstr "Inscriptions confirmées dont la personne n'a pas encore complété le sondage de son billet (sinon celui de l'événement). Un sondage est rattaché à une inscription quand il a été rempli par le même contact ou avec la même adresse courriel."
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_form
+msgid "Open as a list"
+msgstr "Ouvrir en liste"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_form
+msgid "Close"
+msgstr "Fermer"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_event_form_rlq_survey_followup
+msgid "Survey follow-up and daily report"
+msgstr "Suivi des sondages et rapport quotidien"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_event_form_rlq_survey_followup
+msgid "Send the daily report now"
+msgstr "Envoyer le rapport quotidien maintenant"
+
+#. module: rlq_survey_report
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_survey_pending_survey
+msgid "Surveys not completed (registrations)"
+msgstr "Sondages non complétés (inscriptions)"
+
+#. module: rlq_survey_report
+#: code:addons/rlq_survey_report/models/event_survey_followup.py:0
+#, python-format
+msgid "No valid address to send the daily report of « %(event)s » to: e-mail of the event, system parameter %(param)s, then e-mail of the company."
+msgstr "Aucune adresse valide pour envoyer le rapport quotidien de « %(event)s » : courriel de l'événement, paramètre système %(param)s, puis courriel de la société."
+
+#. module: rlq_survey_report
+#: code:addons/rlq_survey_report/models/event_survey_followup.py:0
+#, python-format
+msgid "Daily report"
+msgstr "Rapport quotidien"
+
+#. module: rlq_survey_report
+#: code:addons/rlq_survey_report/models/event_survey_followup.py:0
+#, python-format
+msgid "Daily report sent to %(dest)s."
+msgstr "Rapport quotidien envoyé à %(dest)s."
+
+#. module: rlq_survey_report
+#: code:addons/rlq_survey_report/models/event_survey_followup.py:0
+#, python-format
+msgid "(no ticket)"
+msgstr "(sans billet)"

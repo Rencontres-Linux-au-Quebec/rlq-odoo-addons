@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+# Copyright (C) 2026 Services-Conseils Linux  (Martial@Bigras.ca)
+# Copyright (C) 2026 Rencontres Linux au Québec contributors
+#
+# This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at your option) any later version. (http://www.gnu.org/licenses/agpl)
 """
 event_groupes_inscrits.py
 ==========================
@@ -36,9 +41,6 @@ Fonctionnement :
   - Jamais de blocage : toute erreur est journalisée (sans courriel ni nom) et l'inscription continue.
 
 ATTENTION - NON VÉRIFIABLE SANS ACCÈS À UNE INSTANCE (voir NOTES_VALIDATION.md, section -67).
-
-© Services-Linux Conseils Inc — Martial@Bigras.ca, Martial.Bigras@Services-Conseils-Linux.com
-Licence : AGPL-3
 """
 import logging
 from datetime import timedelta

@@ -45,6 +45,8 @@ rlq_survey_report/
 │   ├── event_groupes_inscrits.py      (v1.106 : synchronisation périodique par sondage, tâche aux 5 min) Groupes Odoo des inscrits, un par type de billet (RLQ-JPOL26-Visiteur… depuis v1.104), refus, rattrapage à la création du compte (v1.98), retrait à l'annulation et groupe par réponse de sondage (v1.99)
 │   ├── verification_groupes.py        Assistant « Vérifier les groupes et étiquettes » : aperçu puis application après confirmation (v1.104)
 │   ├── groupes_etiquettes.py          Étiquettes de contact qui reflètent les groupes d'inscrits, synchronisées à chaque changement + tâche quotidienne (v1.102)
+│   ├── event_survey_followup.py       Sondages non complétés : courriels des inscrits à relancer (v1.113), rapport quotidien par courriel (v1.114)
+│   ├── followup_report.py             Fonctions pures du suivi des sondages et du rapport quotidien (testées sans Odoo)
 │   └── rlq_survey_report_acces.py     Historique d'accès aux rapports (qui, quand, quelle action)
 ├── controllers/aide.py                Page /rlq_survey_report/aide : sert le guide utilisateur dans Odoo (v1.106)
 ├── views/                             Formulaire de l'assistant, menus, gabarit PDF, billets
