@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- v1.113.0 — Surveys not completed; v1.114.0 — daily report (models/event_survey_followup.py). -->
+
+    <!-- Registrations whose survey is not completed (list opened by « Open as a list ») -->
+    <record id="view_rlq_survey_pending_registration_list" model="ir.ui.view">
+        <field name="name">event.registration.list.rlq.survey.pending</field>
+        <field name="model">event.registration</field>
+        <field name="priority">91</field>
+        <field name="arch" type="xml">
+            <list string="Surveys not completed" create="false" decoration-warning="rlq_survey_state == 'in_progress'">
+                <field name="event_id"/>
+                <field name="name"/>
+                <field name="email"/>
+                <field name="event_ticket_id" optional="show"/>
+                <field name="rlq_expected_survey_id" optional="show"/>
+                <field name="rlq_survey_state"/>
+                <field name="create_date" string="Registered on" optional="show"/>
+                <field name="state" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Wizard -->
+    <record id="view_rlq_survey_pending_form" model="ir.ui.view">
+        <field name="name">rlq.survey.pending.form</field>
+        <field name="model">rlq.survey.pending</field>
+        <field name="arch" type="xml">
+            <form string="Surveys not completed">
+                <p>Confirmed registrations whose person has not completed the survey of their ticket (otherwise the survey of the event) yet. A survey belongs to a registration when it was answered by the same contact or with the same e-mail address.</p>
+                <group>
+                    <field name="event_ids" widget="many2many_tags"/>
+                    <field name="include_started"/>
+                </group>
+                <group>
+                    <group>
+                        <field name="email_count"/>
+                    </group>
+                    <group>
+                        <field name="missing_email_count" invisible="not missing_email_count"/>
+                    </group>
+                </group>
+                <field name="emails" readonly="1" widget="CopyClipboardChar"/>
+                <field name="registration_ids" readonly="1">
+                    <list>
+                        <field name="event_id"/>
+                        <field name="name"/>
+                        <field name="email"/>
+                        <field name="event_ticket_id"/>
+                        <field name="rlq_survey_state"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_open_list" type="object" string="Open as a list" class="btn-primary"/>
+                    <button string="Close" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rlq_survey_pending" model="ir.actions.act_window">
+        <field name="name">Surveys not completed</field>
+        <field name="res_model">rlq.survey.pending</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Block on the event form (xpath on //sheet: always present, see event_inscriptions_alerte_views.xml) -->
+    <record id="view_event_form_rlq_survey_followup" model="ir.ui.view">
+        <field name="name">event.event.form.rlq.survey.followup</field>
+        <field name="model">event.event</field>
+        <field name="inherit_id" ref="event.view_event_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Survey follow-up and daily report" name="rlq_survey_followup">
+                    <group>
+                        <field name="rlq_survey_pending_count"/>
+                        <button name="action_rlq_survey_pending" type="object" string="Surveys not completed" icon="fa-envelope-o" colspan="2"/>
+                    </group>
+                    <group>
+                        <field name="rlq_daily_report"/>
+                        <field name="rlq_daily_report_sent" invisible="not rlq_daily_report_sent"/>
+                        <button name="action_rlq_send_daily_report" type="object" string="Send the daily report now" icon="fa-paper-plane"
+                                invisible="not rlq_daily_report" colspan="2"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <menuitem id="menu_rlq_survey_pending_events"
+              name="Surveys not completed"
+              parent="event.event_main_menu"
+              action="action_rlq_survey_pending"
+              sequence="44"
+              groups="event.group_event_user"/>
+    <menuitem id="menu_rlq_survey_pending_survey"
+              name="Surveys not completed (registrations)"
+              parent="menu_rlq_survey_report_in_survey_app"
+              action="action_rlq_survey_pending"
+              sequence="93"
+              groups="event.group_event_user"/>
+
+</odoo>

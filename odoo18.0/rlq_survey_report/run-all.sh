@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
+# Copyright (C) 2026 Services-Conseils Linux  (contact@exemple.org)
+# Copyright (C) 2026 Rencontres Linux au Québec contributors
+#
+# This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at your option) any later version. (http://www.gnu.org/licenses/agpl)
 # =============================================================================
 # run-all.sh - Lance TOUTES les vérifications du module rlq_survey_report
 # =============================================================================
 # Résumé des versions (détail complet : doc/run-all.changelog.txt) :
+#   1.2.20261019.202050 - copyright header (AGPL-3 or later); standalone tests: tests.test_followup_report added (module 1.113.0, 1.114.0)
 #   1.1.20261016.114848 - standalone tests: tests.test_email_check added (invalid e-mail addresses, module 1.109.0)
 #   1.0.20261002.131909 - version initiale : ruff, syntaxe et manifeste, tests autonomes,
 #                 base PostgreSQL de test et tests Odoo
@@ -13,7 +19,7 @@
 # la ligne de commande ont priorité. Voir scripts/LISEZMOI.md.
 # =============================================================================
 
-VERSION="1.1.20261016.114848"
+VERSION="1.2.20261019.202050"
 PROGRAMME="run-all"
 
 set -u
@@ -284,7 +290,7 @@ PYEOF
 
 etape_tests_autonomes() {
     etape "Tests autonomes"
-    if (cd "$RACINE" && "$PYTHON" -m unittest tests.test_report_builder tests.test_email_check) >> "$ETAPE_LOG" 2>&1; then
+    if (cd "$RACINE" && "$PYTHON" -m unittest tests.test_report_builder tests.test_email_check tests.test_followup_report) >> "$ETAPE_LOG" 2>&1; then
         fin_etape OK "$(grep -E '^Ran [0-9]+ tests?' "$ETAPE_LOG" | tail -n 1) - OK"
     else
         fin_etape ECHEC "des tests autonomes échouent"; return 1

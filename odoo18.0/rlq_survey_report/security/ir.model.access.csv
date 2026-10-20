@@ -8,3 +8,4 @@ access_rlq_synchro_sommaire_manager,rlq.synchro.sommaire.manager,model_rlq_synch
 access_rlq_synchro_sommaire_system,rlq.synchro.sommaire.system,model_rlq_synchro_sommaire,base.group_system,1,1,1,1
 access_rlq_registration_email_fix_event_user,rlq.registration.email.fix.event.user,model_rlq_registration_email_fix,event.group_event_user,1,1,1,1
 access_rlq_registration_email_fix_line_event_user,rlq.registration.email.fix.line.event.user,model_rlq_registration_email_fix_line,event.group_event_user,1,1,1,1
+access_rlq_survey_pending_event_user,rlq.survey.pending.event.user,model_rlq_survey_pending,event.group_event_user,1,1,1,1

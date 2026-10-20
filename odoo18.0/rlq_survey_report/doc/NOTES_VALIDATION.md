@@ -6,6 +6,15 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -73. Sondages non complétés et rapport quotidien (v1.113.0, v1.114.0)
+
+**Points non vérifiés sans accès à une instance, à confirmer en priorité :**
+1. Après `-u rlq_survey_report` : menus Événements > Sondages non complétés et Sondages > Rapports détaillés > Sondages non complétés (inscriptions) ; la fenêtre s'ouvre avec les événements à venir dont un billet a un sondage ; le champ « Adresses courriel » (widget `CopyClipboardChar`) affiche les adresses et son bouton les copie.
+2. Une personne qui a rempli le sondage de son billet n'est plus listée ; une personne qui l'a seulement commencé l'est (case « Inclure les sondages commencés »). Le rattachement passe par le contact OU l'adresse : si l'acheteur (contact de l'inscription) a rempli le sondage pour lui-même, les autres inscriptions de ce même contact paraîtront complétées.
+3. « Ouvrir en liste » : regroupement par événement, export.
+4. Rapport quotidien : la tâche planifiée « RLQ Événements / Events : rapport quotidien / daily report » existe (prochaine exécution demain 11:00 UTC) ; le bouton « Envoyer le rapport quotidien maintenant » envoie le courriel (bilingue, sans adresse d'inscrit) ; un deuxième lancement manuel de la tâche le même jour n'envoie rien.
+5. Les trois tests de `tests/test_survey_followup.py` n'ont pas été exécutés ; `tests/test_followup_report.py` (sans Odoo) passe (run-all.sh, étape 4).
+
 ## -72. Adresses courriel invalides des inscriptions (v1.109.0)
 
 **Points non vérifiés sans accès à une instance, à confirmer en priorité :**

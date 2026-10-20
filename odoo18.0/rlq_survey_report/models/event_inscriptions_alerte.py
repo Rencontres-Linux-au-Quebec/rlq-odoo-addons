@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+# Copyright (C) 2026 Services-Conseils Linux  (contact@exemple.org)
+# Copyright (C) 2026 Rencontres Linux au Québec contributors
+#
+# This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at your option) any later version. (http://www.gnu.org/licenses/agpl)
 """
 event_inscriptions_alerte.py
 =============================
@@ -37,9 +42,6 @@ Garde-fous : jamais d'erreur remontée à la personne qui s'inscrit (échec jour
 l'inscription n'est JAMAIS bloquée) ; verrou de ligne (`FOR UPDATE`) pour que deux inscriptions
 simultanées n'envoient pas deux courriels ; le courriel ne contient AUCUNE donnée personnelle
 (ni nom ni courriel des inscrits : Loi 25) et est supprimé des courriels sortants après envoi.
-
-© Services-Linux Conseils Inc — contact@exemple.org, contact@exemple.org
-Licence : AGPL-3
 """
 import logging
 from datetime import timedelta

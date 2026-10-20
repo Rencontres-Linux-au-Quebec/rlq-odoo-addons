@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+# Copyright (C) 2026 Services-Conseils Linux  (contact@exemple.org)
+# Copyright (C) 2026 Rencontres Linux au Québec contributors
+#
+# This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at your option) any later version. (http://www.gnu.org/licenses/agpl)
 """
 event_ticket_survey.py
 =======================
@@ -68,9 +73,6 @@ le rapport lui-même : le module continue de fonctionner même sur une
 instance qui n'aurait pas d'inscriptions à des événements). Cette
 extension-ci, elle, cible directement le modèle event.event.ticket : elle
 exige donc que le module Événements soit installé.
-
-© Services-Linux Conseils Inc — contact@exemple.org, contact@exemple.org
-Licence : AGPL-3
 """
 
 from odoo import api, fields, models

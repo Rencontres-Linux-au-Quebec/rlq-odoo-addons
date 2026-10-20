@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+# Copyright (C) 2026 Services-Conseils Linux  (contact@exemple.org)
+# Copyright (C) 2026 Rencontres Linux au Québec contributors
+#
+# This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at your option) any later version. (http://www.gnu.org/licenses/agpl)
 """
 verification_groupes.py
 =======================
@@ -17,9 +22,6 @@ aux participants » d'un sondage) : idempotent, relançable. L'aperçu des parti
 sont tranchés à l'application).
 
 ATTENTION - NON VÉRIFIABLE SANS ACCÈS À UNE INSTANCE (voir NOTES_VALIDATION.md).
-
-© Services-Linux Conseils Inc — contact@exemple.org, contact@exemple.org
-Licence : AGPL-3
 """
 import logging
 

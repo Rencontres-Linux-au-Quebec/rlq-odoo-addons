@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+# Copyright (C) 2026 Services-Conseils Linux  (contact@exemple.org)
+# Copyright (C) 2026 Rencontres Linux au Québec contributors
+#
+# This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at your option) any later version. (http://www.gnu.org/licenses/agpl)
 """Odoo tests (TransactionCase) of the invalid e-mail addresses of registrations (v1.109.0).
 
 ⚠️ NOT RUN while writing (no Odoo instance): see test_wizard.py (DISPOSABLE database, never production):

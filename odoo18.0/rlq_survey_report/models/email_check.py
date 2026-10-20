@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+# Copyright (C) 2026 Services-Conseils Linux  (contact@exemple.org)
+# Copyright (C) 2026 Rencontres Linux au Québec contributors
+#
+# This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at your option) any later version. (http://www.gnu.org/licenses/agpl)
 """
 email_check.py
 ==============
@@ -10,9 +15,6 @@ the same rules as apps/_email_check.py of nginx-tools (keep them identical), tes
   suggest(address) -> corrected address or None ("marieb.essai@gmail'com" -> "marieb.essai@gmail.com")
   syntax_fix(address) -> correction of a PUNCTUATION / SPACE mistake only (never a change of domain name), or None — the only correction applied
                          automatically at registration time (parameter rlq_survey_report.registration_email_autofix = "syntax").
-
-© Services-Linux Conseils Inc — contact@exemple.org, contact@exemple.org
-License: AGPL-3
 """
 import re
 

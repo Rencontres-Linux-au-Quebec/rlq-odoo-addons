@@ -1,6 +1,18 @@
 Journal des changements de run-all.sh (version la plus récente en premier)
 ==========================================================================
 
+Version 1.2.20261019.202050 — 2026-10-19
+  Short title: new copyright header; standalone tests also run tests/test_followup_report.py.
+  Reason: « Mettre à jour le copywrite dans tous les programmes Python et BASH » and module 1.113.0 / 1.114.0 (surveys not completed,
+    daily report), whose rules in models/followup_report.py are pure Python, testable without Odoo.
+  Changes: header block « Copyright (C) 2026 Services-Conseils Linux (contact@exemple.org) / Rencontres Linux au Québec contributors »
+    + AGPL-3-or-later notice after the shebang; etape_tests_autonomes() runs « unittest tests.test_report_builder tests.test_email_check
+    tests.test_followup_report ». No option changed.
+  Bugs fixed: none.
+  Safeguards and edge cases: the configuration files (scripts/run-all.conf.exemple) have no copyright line and get none.
+  Checks: bash -n run-all.sh; ./run-all.sh --sans-odoo (ruff, syntax and manifest, the three standalone test modules).
+  Action required: none.
+
 Version 1.1.20261016.114848 — 2026-10-16
   Short title: standalone tests also run tests/test_email_check.py.
   Reason: module 1.109.0 (invalid e-mail addresses of registrations): the rules of models/email_check.py are pure Python, testable without Odoo.
