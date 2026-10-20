@@ -1,5 +1,9 @@
 # Consignes pour Claude — rlq-odoo-addons
 
+## Pull requests
+
+Les créer et donner le lien, ne jamais les fusionner ni les approuver ; l'utilisateur les valide lui-même.
+
 ## Tests : le moins de jetons possible
 
 - Pour lancer ou vérifier les tests, déléguer à l'agent **`testeur`** (`.claude/agents/testeur.md` : Claude Haiku 5.5, effort low). Il lance
