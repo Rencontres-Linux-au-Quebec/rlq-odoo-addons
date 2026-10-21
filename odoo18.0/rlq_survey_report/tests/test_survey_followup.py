@@ -66,7 +66,7 @@ class TestRlqSurveyFollowup(TransactionCase):
         self.assertEqual(len(sent), 1)
         dest, subject, body = sent[0]
         self.assertEqual(dest, "org@example.com")
-        self.assertIn("Daily report", subject)
+        self.assertIn("Rapport quotidien", subject)
         self.assertIn("Marie", body)
         self.assertNotIn("marie@example.com", body)
         self.assertTrue(self.event.rlq_daily_report_sent)
