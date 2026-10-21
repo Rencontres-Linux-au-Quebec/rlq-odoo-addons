@@ -1,5 +1,24 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.117.0
+
+**Short title:** manifest: organisation address info@rencontres-linux.quebec instead of the test address.
+
+**Reason for the request:** « tu peux contact@exemple.org pour les tests mais sinon tu peux mettre cela dans le manifeste info@rencontres-linux.quebec ».
+
+**Changes:**
+
+- `__manifest__.py`: the four lines with the address (copyright header, copyright in the description, author, maintainer) now use `info@rencontres-linux.quebec`. Version `18.0.1.117.0`.
+- Other files keep `contact@exemple.org` (tests, headers of the other Python files, documentation examples).
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:** the address is the organisation's public address, not a personal one. The rule of the public repository (no personal data) still holds.
+
+**Checks:** manifest parsed as Python (syntax OK). Offline checks: see the verdict of the step.
+
+**Action required:** none.
+
 ## 18.0.1.116.0
 
 **Short title:** manifest: no real person's name in the public repository; maintainer address fixed.

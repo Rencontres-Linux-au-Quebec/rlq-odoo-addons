@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2026 Services-Conseils Linux Inc.  (contact@exemple.org)
+# Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
 # Copyright (C) 2026 Rencontres Linux au Québec contributors
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by
@@ -41,14 +41,14 @@ pour l'historique complet des versions, et doc/NOTES_VALIDATION.md pour
 les points à vérifier avant une mise en production (le module a été écrit sans accès direct à une
 instance Odoo pour le tester).
 
-Copyright (C) 2026 Services-Conseils Linux Inc. (contact@exemple.org)
+Copyright (C) 2026 Services-Conseils Linux Inc. (info@rencontres-linux.quebec)
 Copyright (C) 2026 Rencontres Linux au Québec contributors
 GNU Affero General Public License v3 or later (http://www.gnu.org/licenses/agpl)
 """,
-    "version": "18.0.1.116.0",
+    "version": "18.0.1.117.0",
     "category": "Marketing/Surveys",
-    "author": "Services-Conseils Linux Inc. (contact@exemple.org), Rencontres Linux au Québec contributors",
-    "maintainer": "Rencontres Linux au Québec <contact@exemple.org>",
+    "author": "Services-Conseils Linux Inc. (info@rencontres-linux.quebec), Rencontres Linux au Québec contributors",
+    "maintainer": "Rencontres Linux au Québec <info@rencontres-linux.quebec>",
     "website": "https://www.rencontres-linux.quebec",
     "license": "AGPL-3",
     "depends": ["survey", "mail", "event"],
