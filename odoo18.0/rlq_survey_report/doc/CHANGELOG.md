@@ -1,5 +1,36 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.116.0
+
+**Short title:** manifest: no real person's name in the public repository; maintainer address fixed.
+
+**Reason for the request:** « Dans le fichier __manifest__.py, il y a des erreurs avec les courriels et nom d'où vient » — the maintainer field named a real person and repeated the same address twice (`<contact@exemple.org>, <contact@exemple.org>`), which breaks the address format and breaks CLAUDE.md (« Jamais de vrai nom, courriel… dans le dépôt »).
+
+**Changes:**
+
+- `__manifest__.py`: `maintainer` is now « Rencontres Linux au Québec <contact@exemple.org> » (the real name removed, one address). Version `18.0.1.116.0`.
+- `tests/test_report_builder.py`: the presenter-name test examples use invented names (« Jeanne Exemplaire », « Anne-Lise Fictive ») instead of a real person's name. Same test logic.
+- `doc/Guide-utilisateur-rlq_survey_report.html`: version line updated to 18.0.1.116.0.
+
+**Bugs fixed:**
+
+- Symptom: maintainer field malformed and naming a real person in a public repository.
+- Diagnosis: the field was written by hand with a person's name and a duplicated address; the test suite also used that name as an example.
+- Correction: field rewritten as an organisation with one address; test examples replaced.
+
+**Safeguards and edge cases:**
+
+- The `author` field keeps the organisation names, which are not personal data.
+- The name still exists in the git history of `main` (merged PR #4). Removing it from history requires a history rewrite of a public branch; not done here.
+
+**Checks:**
+
+- `PYTHONPATH=models python3 -m unittest tests.test_report_builder`: OK.
+- Repository-wide search for the removed names in `.py`, `.md`, `.html`, `.txt`, `.po`, `.xml`: no match.
+- Full verdict of `run-all.sh --sans-odoo`: see the testing step of this session.
+
+**Action required:** decide whether the name in the git history of `main` must be removed (history rewrite, to be approved by you). Otherwise, none.
+
 ## 18.0.1.115.0
 
 **Short title:** daily report in one language, chosen by a system parameter (French by default).

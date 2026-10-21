@@ -45,10 +45,10 @@ Copyright (C) 2026 Services-Conseils Linux Inc. (contact@exemple.org)
 Copyright (C) 2026 Rencontres Linux au Québec contributors
 GNU Affero General Public License v3 or later (http://www.gnu.org/licenses/agpl)
 """,
-    "version": "18.0.1.115.0",
+    "version": "18.0.1.116.0",
     "category": "Marketing/Surveys",
     "author": "Services-Conseils Linux Inc. (contact@exemple.org), Rencontres Linux au Québec contributors",
-    "maintainer": "Étienne Bérubé <contact@exemple.org>, <contact@exemple.org>",
+    "maintainer": "Rencontres Linux au Québec <contact@exemple.org>",
     "website": "https://www.rencontres-linux.quebec",
     "license": "AGPL-3",
     "depends": ["survey", "mail", "event"],
