@@ -24,6 +24,11 @@ recipient as the registration alert (`_rlq_destinataire_alerte`): registrations 
 their ticket and survey state) and survey statistics per ticket (completed, started, not started, completion rate). No e-mail address of
 a registered person (Loi 25). Sent until the day after the end of the event; at most once per 20 hours by the scheduled action (the
 « Send the daily report now » button always sends). Never raises: a failure is logged and the next event is processed.
+
+Language of the daily report (v1.115.0): ONE language, no longer bilingual. System parameter `rlq_survey_report.langue_courriels`
+(created with « fr_CA » when absent, an existing value is never replaced): a French code (fr_CA, fr_FR…) -> French, an English code
+(en_US, en_CA…) -> English; empty -> fr_CA; any other code -> French, with a warning in the log. The labels come from
+followup_report.TEXTS (not from Odoo translations), so the chosen language does not need to be installed in Odoo.
 """
 import logging
 from collections import defaultdict
@@ -44,6 +49,7 @@ SURVEY_STATE_SELECTION = [
     ("done", "Completed"),
 ]
 DAILY_REPORT_MIN_HOURS = 20
+PARAM_REPORT_LANG = "rlq_survey_report.langue_courriels"
 
 
 class EventRegistrationSurveyFollowup(models.Model):
@@ -158,7 +164,28 @@ class EventEventSurveyFollowup(models.Model):
                        "type": "success", "sticky": False},
         }
 
-    def _rlq_daily_report_data(self, since):
+    @api.model
+    def _rlq_daily_report_lang(self):
+        """Language code of the daily report: system parameter PARAM_REPORT_LANG, fr_CA when empty or absent."""
+        code = (self.env["ir.config_parameter"].sudo().get_param(PARAM_REPORT_LANG, "") or "").strip() or fr.DEFAULT_REPORT_LANG
+        if not fr.report_lang(code)[1]:
+            _logger.warning("system parameter %s = %r: neither French nor English, the daily report is sent in French",
+                            PARAM_REPORT_LANG, code)
+        return code
+
+    @api.model
+    def _rlq_create_report_lang_param_if_missing(self):
+        """Creates the system parameter with fr_CA ONLY when it does not exist: an existing value is never replaced (an XML
+        <record> would be reloaded in « init » mode). Must never prevent the module from loading."""
+        try:
+            with self.env.cr.savepoint():
+                params = self.env["ir.config_parameter"].sudo()
+                if not params.search([("key", "=", PARAM_REPORT_LANG)], limit=1):
+                    params.create({"key": PARAM_REPORT_LANG, "value": fr.DEFAULT_REPORT_LANG})
+        except Exception:  # noqa: BLE001
+            _logger.warning("system parameter %s not created", PARAM_REPORT_LANG, exc_info=True)
+
+    def _rlq_daily_report_data(self, since, lang=fr.DEFAULT_REPORT_LANG):
         """(totals, tickets, new registrations) of the daily report; times in the time zone of the event."""
         self.ensure_one()
         context = self.with_context(tz=self.date_tz or "America/Toronto")
@@ -176,7 +203,7 @@ class EventEventSurveyFollowup(models.Model):
         for registration in registrations.sorted(lambda r: (r.create_date or fields.Datetime.now(), r.id), reverse=True):
             survey, state, done_at = status.get(registration.id, (False, "none", None))
             ticket = registration.event_ticket_id if "event_ticket_id" in registration._fields else False
-            ticket_name = ticket.name if ticket else _("(no ticket)")
+            ticket_name = ticket.name if ticket else fr.texts(lang)["no_ticket"]
             line = tickets.setdefault((ticket_name, survey.title if survey else ""), {
                 "name": ticket_name, "survey": survey.title if survey else "", "registered": 0,
                 "done": 0, "in_progress": 0, "not_started": 0})
@@ -203,12 +230,13 @@ class EventEventSurveyFollowup(models.Model):
                             event.id, CLE_PARAMETRE_COURRIEL_INSCRIPTIONS)
             return False
         now = fields.Datetime.now()
-        totals, tickets, new_registrations = event._rlq_daily_report_data(now - timedelta(hours=24))
+        lang = event._rlq_daily_report_lang()
+        totals, tickets, new_registrations = event._rlq_daily_report_data(now - timedelta(hours=24), lang)
         generated = fields.Datetime.context_timestamp(event.with_context(tz=event.date_tz or "America/Toronto"), now)
         event._rlq_envoyer_courriel(
-            recipient, fr.daily_report_subject(event.name, generated.strftime("%Y-%m-%d")),
+            recipient, fr.daily_report_subject(event.name, generated.strftime("%Y-%m-%d"), lang),
             fr.daily_report_html(event.name, event._rlq_debut_texte(), generated.strftime("%Y-%m-%d %H:%M %Z"),
-                                 totals, tickets, new_registrations, event._rlq_url()),
+                                 totals, tickets, new_registrations, event._rlq_url(), lang=lang),
         )
         event.rlq_daily_report_sent = now
         _logger.info("event %s: daily report sent (%d registrations, %d new)", event.id, totals["registered"], totals["new"])

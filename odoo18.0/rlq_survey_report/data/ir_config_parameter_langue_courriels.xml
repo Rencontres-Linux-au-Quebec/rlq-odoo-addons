@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- System parameter « rlq_survey_report.langue_courriels » (v1.115.0): language of the daily report
+         (fr_CA, fr_FR… -> French; en_US, en_CA… -> English; empty -> fr_CA). Created with « fr_CA » ONLY
+         when absent (<function> tag, outside noupdate, like the other parameters: a <record> would be
+         reloaded in « init » mode and overwrite the administrator's value).
+         Settings > Technical > System Parameters. -->
+    <function model="event.event" name="_rlq_create_report_lang_param_if_missing"/>
+</odoo>

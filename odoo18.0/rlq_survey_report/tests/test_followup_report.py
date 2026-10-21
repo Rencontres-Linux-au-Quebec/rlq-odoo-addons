@@ -4,7 +4,7 @@
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or (at your option) any later version. (http://www.gnu.org/licenses/agpl)
-"""Unit tests of models/followup_report.py (v1.113.0, v1.114.0) — NO DEPENDENCY ON ODOO (pure functions), run by run-all.sh (standalone tests):
+"""Unit tests of models/followup_report.py (v1.113.0, v1.114.0, v1.115.0) — NO DEPENDENCY ON ODOO (pure functions), run by run-all.sh (standalone tests):
 
     PYTHONPATH=models python3 -m unittest tests.test_followup_report -v
 """
@@ -39,7 +39,18 @@ class TestFollowupReport(unittest.TestCase):
         self.assertIsNone(fr.completion_rate("x", 3))
 
     def test_subject(self):
-        self.assertEqual(fr.daily_report_subject("  Open\n house ", "2026-10-20"), "Rapport quotidien / Daily report 2026-10-20 : Open house")
+        self.assertEqual(fr.daily_report_subject("  Open\n house ", "2026-10-20"), "Rapport quotidien 2026-10-20 : Open house")
+        self.assertEqual(fr.daily_report_subject("  Open\n house ", "2026-10-20", "en_US"), "Daily report 2026-10-20: Open house")
+
+    def test_report_lang_family_and_fallback(self):
+        self.assertEqual(fr.report_lang(""), ("fr", True))
+        self.assertEqual(fr.report_lang(None), ("fr", True))
+        self.assertEqual(fr.report_lang("fr_CA"), ("fr", True))
+        self.assertEqual(fr.report_lang("fr_FR"), ("fr", True))
+        self.assertEqual(fr.report_lang("en_US"), ("en", True))
+        self.assertEqual(fr.report_lang("en-ca"), ("en", True))
+        self.assertEqual(fr.report_lang("es_ES"), ("fr", False))
+        self.assertEqual(fr.report_lang("xx"), ("fr", False))
 
     def _html(self, **kw):
         args = dict(event_name="JPOL <26>", begin="2026-10-24", generated="2026-10-20 07:00 EDT",
@@ -51,31 +62,43 @@ class TestFollowupReport(unittest.TestCase):
         args.update(kw)
         return fr.daily_report_html(**args)
 
-    def test_html_is_bilingual_escaped_and_without_email(self):
+    def test_html_is_french_only_escaped_and_without_email(self):
         html = self._html()
-        self.assertIn("Inscriptions / Registrations", html)
-        self.assertIn("Sondages / Surveys", html)
+        self.assertIn("Inscriptions", html)
+        self.assertIn("Sondages", html)
         self.assertIn("JPOL &lt;26&gt;", html)
         self.assertIn("Marie &lt;b&gt;", html)
-        self.assertIn("Commencé / Started", html)
+        self.assertIn("Commencé", html)
         self.assertIn("(33 %)", html)
         self.assertIn('href="https://odoo.example/odoo/event.event/7"', html)
         self.assertNotIn("@", html)
-        self.assertIn("Sondages non complétés / Events > Surveys not completed", html)
+        self.assertIn("Événements > Sondages non complétés", html)
+        self.assertNotIn("Registrations", html)
+        self.assertNotIn("Started", html)
+
+    def test_html_english_only_when_english_is_chosen(self):
+        html = self._html(lang="en_CA")
+        self.assertIn("Registrations", html)
+        self.assertIn("Started", html)
+        self.assertIn("Open the event in Odoo", html)
+        self.assertNotIn("Inscriptions", html)
+        self.assertNotIn("Commencé", html)
+        self.assertNotIn("Bonjour", html)
 
     def test_html_without_survey_nor_new_registration(self):
         html = self._html(totals={"registered": 2}, tickets=[], new_registrations=[], url=None)
-        self.assertIn("aucun sondage associé aux billets / no survey assigned to the tickets", html)
+        self.assertIn("aucun sondage associé aux billets.", html)
         self.assertIn("Aucune nouvelle inscription depuis 24 h.", html)
         self.assertNotIn("<a ", html)
-        self.assertNotIn("Surveys not completed", html)
+        self.assertNotIn("Sondages non complétés", html)
 
     def test_html_limits_the_new_registrations(self):
         rows = [{"when": "", "name": "P%d" % i, "ticket": "", "survey_state": ""} for i in range(7)]
         html = self._html(new_registrations=rows, max_rows=5)
         self.assertIn("P4", html)
         self.assertNotIn("P5", html)
-        self.assertIn("… 2 de plus / more.", html)
+        self.assertIn("… 2 de plus.", html)
+        self.assertNotIn(" more.", html)
 
 
 if __name__ == "__main__":
