@@ -495,14 +495,14 @@ class TestAppreciationPresentateurs(unittest.TestCase):
         crochets, à la fin du titre - pas un tiret comme d'abord
         supposé en v1.54.0."""
         titre, nom = rb.extraire_presentateur(
-            "Organisation de la Journée Portes-Ouvertes sur Linux 2026 [Étienne Bérubé]"
+            "Organisation de la Journée Portes-Ouvertes sur Linux 2026 [Jeanne Exemplaire]"
         )
         self.assertEqual(titre, "Organisation de la Journée Portes-Ouvertes sur Linux 2026")
-        self.assertEqual(nom, "Étienne Bérubé")
+        self.assertEqual(nom, "Jeanne Exemplaire")
 
     def test_extrait_nom_avec_trait_union(self):
-        _titre, nom = rb.extraire_presentateur("Sécurité web [Marie-Ève St-Laurent]")
-        self.assertEqual(nom, "Marie-Ève St-Laurent")
+        _titre, nom = rb.extraire_presentateur("Sécurité web [Anne-Lise Fictive]")
+        self.assertEqual(nom, "Anne-Lise Fictive")
 
     def test_extrait_nom_entre_parentheses(self):
         """Nouveau en v1.66.0 : le nom peut aussi être entre parenthèses,
