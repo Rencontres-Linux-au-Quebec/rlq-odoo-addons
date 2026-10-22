@@ -1,10 +1,10 @@
-# Instructions for Claude — rlq-admin-tools
+# Instructions for Claude - rlq-admin-tools
  
 (English translation of `CLAUDE.md`. The French file is the reference.)
  
 ## Pull requests
  
-Create them and give the link; never merge or approve them — the user validates them.
+Create them and give the link; never merge or approve them - the user validates them.
  
 ## Tests: as few tokens as possible
  
