@@ -218,7 +218,23 @@ class EventEventSurveyFollowup(models.Model):
                 totals["new"] += 1
                 new_registrations.append({"when": local(registration.create_date), "name": registration.name or "",
                                           "ticket": ticket.name if ticket else "", "survey_state": state if survey else ""})
+        totals["subscribers_newsletter"], totals["subscribers_portal"] = self._rlq_website_subscribers(since)
         return totals, sorted(tickets.values(), key=lambda t: (t["name"].lower(), t["survey"].lower())), new_registrations
+
+    @api.model
+    def _rlq_website_subscribers(self, since):
+        """(newsletter contacts, portal accounts) created since `since`, counts only (no e-mail address: Loi 25).
+
+        Newsletter: mailing.contact records (website_mass_mailing). Portal: internal users excluded (res.users.share).
+        Each value is None when the related module is not installed, so the daily report omits the line.
+        """
+        newsletter = portal = None
+        if "mailing.contact" in self.env:
+            newsletter = self.env["mailing.contact"].sudo().search_count([("create_date", ">=", since)])
+        if "res.users" in self.env:
+            portal = self.env["res.users"].sudo().with_context(active_test=False).search_count([
+                ("create_date", ">=", since), ("share", "=", True)])
+        return newsletter, portal
 
     def _rlq_send_daily_report(self):
         """Sends the daily report of this event; returns the recipient, or False when there is no valid address."""

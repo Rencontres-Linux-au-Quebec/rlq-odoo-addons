@@ -1,5 +1,30 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.118.0
+
+**Short title:** daily report: new website subscribers of the last 24 hours (newsletter and portal accounts).
+
+**Reason for the request:** the daily e-mail of each event, which lists the latest registrations, should also say whether the website gained new subscribers.
+
+**Changes:**
+
+- `models/event_survey_followup.py`: `_rlq_daily_report_data()` adds `subscribers_newsletter` and `subscribers_portal` to the totals; new method `_rlq_website_subscribers(since)` counts `mailing.contact` records created in the last 24 hours and portal accounts (`res.users` with `share = True`) created in the same period. Counts only, no e-mail address (Loi 25).
+- `models/followup_report.py`: `daily_report_html()` shows one line « Nouveaux abonnés au site web » (French) or « New website subscribers » (English), following the language parameter `rlq_survey_report.langue_courriels`. The line is left out when the newsletter count is `None`, that is when `mailing.contact` is not installed.
+- `tests/test_followup_report.py`: two tests (French and English line, line omitted when the module is missing).
+- `__manifest__.py`: version `18.0.1.118.0`. `doc/Guide-utilisateur-rlq_survey_report.html`: version line updated.
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:**
+
+- The module does not depend on `website_mass_mailing` or `website`: the newsletter line is shown only when `mailing.contact` exists in the database.
+- The counts are the same in every event report of the day, because subscribers are not linked to an event. This is intended.
+- Subscribers are counted by creation date, so an unsubscribed contact still counts as new if it was created in the last 24 hours.
+
+**Checks:** `run-all.sh --sans-odoo` (ruff, syntax and manifest, 172 standalone tests) passed. The Odoo database step was NOT run: no PostgreSQL/Odoo on the test machine. The new Odoo code (`_rlq_website_subscribers`) is therefore untested until the DEV check below.
+
+**Action required:** update the module on DEV (`-u rlq_survey_report`), send a test daily report from an event with the box checked, and confirm that the subscriber line appears with the expected counts.
+
 ## 18.0.1.117.0
 
 **Short title:** manifest: organisation address info@rencontres-linux.quebec instead of the test address.

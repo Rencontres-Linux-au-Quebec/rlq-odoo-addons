@@ -68,6 +68,7 @@ TEXTS = {
         "hello": "Bonjour,",
         "intro": "Rapport quotidien de l'événement <strong>%s</strong>%s — %s.",
         "registrations": "<strong>Inscriptions</strong> : %d confirmée(s) — %d nouvelle(s) en 24 h — %d annulée(s) en 24 h.",
+        "subscribers": "<strong>Nouveaux abonnés au site web</strong> (24 h) : %d à l'infolettre — %d compte(s) portail.",
         "surveys": "<strong>Sondages</strong> : %d complété(s) sur %d (%s %%) — %d commencé(s) — %d non commencé(s) — %d complété(s) en 24 h.",
         "no_survey": "<strong>Sondages</strong> : aucun sondage associé aux billets.",
         "ticket_heads": ("Billet", "Inscriptions", "Sondage", "Complétés", "Commencés", "Non commencés", "%"),
@@ -85,6 +86,7 @@ TEXTS = {
         "hello": "Hello,",
         "intro": "Daily report of the event <strong>%s</strong>%s — %s.",
         "registrations": "<strong>Registrations</strong>: %d confirmed — %d new in 24 h — %d cancelled in 24 h.",
+        "subscribers": "<strong>New website subscribers</strong> (24 h): %d newsletter — %d portal account(s).",
         "surveys": "<strong>Surveys</strong>: %d completed out of %d (%s %%) — %d started — %d not started — %d completed in 24 h.",
         "no_survey": "<strong>Surveys</strong>: no survey assigned to the tickets.",
         "ticket_heads": ("Ticket", "Registrations", "Survey", "Completed", "Started", "Not started", "%"),
@@ -128,6 +130,9 @@ def daily_report_html(event_name, begin, generated, totals, tickets, new_registr
     """Body of the daily report, in the language `lang` only (French by default).
 
     totals            : {registered, new, cancelled, expected, done, in_progress, not_started, done_24h}
+                        plus optionally subscribers_newsletter / subscribers_portal (new website subscribers
+                        of the last 24 hours); the line is left out when subscribers_newsletter is None
+                        (module not installed).
     tickets           : [{name, registered, survey, done, in_progress, not_started}] — survey empty: no survey for this ticket.
     new_registrations : [{when, name, ticket, survey_state}] of the last 24 hours (survey_state: done / in_progress / not_started / "").
     """
@@ -146,6 +151,8 @@ def daily_report_html(event_name, begin, generated, totals, tickets, new_registr
         "<p>%s</p>" % (t["intro"] % (_clean(event_name), (" (" + _clean(begin) + ")") if begin else "", _clean(generated))),
         "<p>%s</p>" % (t["registrations"] % (n("registered"), n("new"), n("cancelled"))),
     ]
+    if (totals or {}).get("subscribers_newsletter") is not None:
+        out.append("<p>%s</p>" % (t["subscribers"] % (n("subscribers_newsletter"), n("subscribers_portal"))))
     if n("expected"):
         out.append("<p>%s</p>" % (t["surveys"] % (
             n("done"), n("expected"), rate if rate is not None else "-", n("in_progress"), n("not_started"), n("done_24h"))))
