@@ -6,6 +6,12 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -74. Langue du rapport quotidien (v1.115.0)
+
+**Points non vérifiés sans accès à une instance, à confirmer en priorité :**
+1. Après `-u rlq_survey_report` : le paramètre système `rlq_survey_report.langue_courriels` existe avec la valeur `fr_CA` (Réglages > Technique > Paramètres système), sauf s'il existait déjà ; une valeur déjà saisie n'est pas remplacée.
+2. « Envoyer le rapport quotidien maintenant » : le courriel est entièrement en français avec `fr_CA` ; avec `en_US`, entièrement en anglais, sans mélange.
+
 ## -73. Sondages non complétés et rapport quotidien (v1.113.0, v1.114.0)
 
 **Points non vérifiés sans accès à une instance, à confirmer en priorité :**

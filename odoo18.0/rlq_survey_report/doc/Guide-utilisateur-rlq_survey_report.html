@@ -42,7 +42,7 @@
 <div class="page">
 
 <h1>Guide utilisateur — Rapport de sondage</h1>
-<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.114.0</strong> — mis à jour le 2026-10-19.<br>
+<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.117.0</strong> — mis à jour le 2026-10-19.<br>
 Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 
 <p>Ce module produit un compte-rendu détaillé — à l'écran, en fichier HTML, en PDF ou en Excel — des réponses à un ou plusieurs sondages Odoo, notamment les sondages de satisfaction envoyés après chaque rencontre. Il aide à repérer ce qui va bien, ce qui se dégrade, et à suivre les actions entreprises d'une rencontre à l'autre.</p>
@@ -391,7 +391,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 </ol>
 <p>Seules les inscriptions confirmées ou présentes comptent (ni brouillons, ni annulations). Un sondage est rattaché à une inscription quand il a été rempli par <strong>le même contact ou avec la même adresse courriel</strong> (majuscules ignorées) ; les essais (« Tester ») ne comptent pas. Si une personne a rempli le sondage avec une autre adresse que celle de son inscription, elle apparaît dans la liste : vérifiez avant une relance insistante.</p>
 <h3>Rapport quotidien par courriel</h3>
-<p>Cochez <strong>Rapport quotidien par courriel</strong> dans le bloc « Suivi des sondages et rapport quotidien » de l'événement. Chaque matin (tâche planifiée « RLQ Événements / Events : rapport quotidien / daily report », vers 7 h l'été et 6 h l'hiver à Montréal), jusqu'au lendemain de la fin de l'événement, un courriel bilingue (français et anglais) part au même destinataire que l'avertissement d'inscriptions (courriel de l'événement, puis paramètre système <code>rlq_survey_report.courriel_inscriptions</code>, puis courriel de la société). Il contient :</p>
+<p>Cochez <strong>Rapport quotidien par courriel</strong> dans le bloc « Suivi des sondages et rapport quotidien » de l'événement. Chaque matin (tâche planifiée « RLQ Événements / Events : rapport quotidien / daily report », vers 7 h l'été et 6 h l'hiver à Montréal), jusqu'au lendemain de la fin de l'événement, un courriel part, dans la langue du paramètre système <code>rlq_survey_report.langue_courriels</code> (<code>fr_CA</code> par défaut ; <code>en_US</code> ou <code>en_CA</code> pour l'anglais), au même destinataire que l'avertissement d'inscriptions (courriel de l'événement, puis paramètre système <code>rlq_survey_report.courriel_inscriptions</code>, puis courriel de la société). Il contient :</p>
 <ul>
   <li><strong>Inscriptions</strong> : confirmées, nouvelles et annulées dans les dernières 24 heures, et la liste des nouvelles (heure, nom, billet, état du sondage) ;</li>
   <li><strong>Sondages</strong> : complétés, commencés, non commencés, taux de complétion, complétés dans les 24 heures, et le même détail par billet.</li>
@@ -448,7 +448,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
   <li>Le module a été développé sans accès direct à une instance Odoo : après une mise à jour, vérifiez les écrans décrits ici et signalez tout écart.</li>
 </ul>
 
-<p class="meta" style="margin-top:3rem">© 2026 Services-Conseils Linux (contact@exemple.org) · Rencontres Linux au Québec contributors — module <code>rlq_survey_report</code>, licence AGPL-3.</p>
+<p class="meta" style="margin-top:3rem">© 2026 Services-Conseils Linux Inc. (contact@exemple.org) · Rencontres Linux au Québec contributors — module <code>rlq_survey_report</code>, licence AGPL-3.</p>
 </div>
 </body>
 </html>

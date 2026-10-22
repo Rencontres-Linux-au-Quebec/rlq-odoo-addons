@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2026 Services-Conseils Linux  (contact@exemple.org)
+# Copyright (C) 2026 Services-Conseils Linux Inc.  (contact@exemple.org)
 # Copyright (C) 2026 Rencontres Linux au Québec contributors
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by
@@ -66,7 +66,7 @@ class TestRlqSurveyFollowup(TransactionCase):
         self.assertEqual(len(sent), 1)
         dest, subject, body = sent[0]
         self.assertEqual(dest, "org@example.com")
-        self.assertIn("Daily report", subject)
+        self.assertIn("Rapport quotidien", subject)
         self.assertIn("Marie", body)
         self.assertNotIn("marie@example.com", body)
         self.assertTrue(self.event.rlq_daily_report_sent)

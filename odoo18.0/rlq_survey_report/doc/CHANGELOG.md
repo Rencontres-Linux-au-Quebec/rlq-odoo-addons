@@ -1,5 +1,88 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.117.0
+
+**Short title:** manifest: organisation address info@rencontres-linux.quebec instead of the test address.
+
+**Reason for the request:** « tu peux contact@exemple.org pour les tests mais sinon tu peux mettre cela dans le manifeste info@rencontres-linux.quebec ».
+
+**Changes:**
+
+- `__manifest__.py`: the four lines with the address (copyright header, copyright in the description, author, maintainer) now use `info@rencontres-linux.quebec`. Version `18.0.1.117.0`.
+- Other files keep `contact@exemple.org` (tests, headers of the other Python files, documentation examples).
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:** the address is the organisation's public address, not a personal one. The rule of the public repository (no personal data) still holds.
+
+**Checks:** manifest parsed as Python (syntax OK). Offline checks: see the verdict of the step.
+
+**Action required:** none.
+
+## 18.0.1.116.0
+
+**Short title:** manifest: no real person's name in the public repository; maintainer address fixed.
+
+**Reason for the request:** « Dans le fichier __manifest__.py, il y a des erreurs avec les courriels et nom d'où vient » — the maintainer field named a real person and repeated the same address twice (`<contact@exemple.org>, <contact@exemple.org>`), which breaks the address format and breaks CLAUDE.md (« Jamais de vrai nom, courriel… dans le dépôt »).
+
+**Changes:**
+
+- `__manifest__.py`: `maintainer` is now « Rencontres Linux au Québec <contact@exemple.org> » (the real name removed, one address). Version `18.0.1.116.0`.
+- `tests/test_report_builder.py`: the presenter-name test examples use invented names (« Jeanne Exemplaire », « Anne-Lise Fictive ») instead of a real person's name. Same test logic.
+- `doc/Guide-utilisateur-rlq_survey_report.html`: version line updated to 18.0.1.116.0.
+
+**Bugs fixed:**
+
+- Symptom: maintainer field malformed and naming a real person in a public repository.
+- Diagnosis: the field was written by hand with a person's name and a duplicated address; the test suite also used that name as an example.
+- Correction: field rewritten as an organisation with one address; test examples replaced.
+
+**Safeguards and edge cases:**
+
+- The `author` field keeps the organisation names, which are not personal data.
+- The name still exists in the git history of `main` (merged PR #4). Removing it from history requires a history rewrite of a public branch; not done here.
+
+**Checks:**
+
+- `PYTHONPATH=models python3 -m unittest tests.test_report_builder`: OK.
+- Repository-wide search for the removed names in `.py`, `.md`, `.html`, `.txt`, `.po`, `.xml`: no match.
+- Full verdict of `run-all.sh --sans-odoo`: see the testing step of this session.
+
+**Action required:** decide whether the name in the git history of `main` must be removed (history rewrite, to be approved by you). Otherwise, none.
+
+## 18.0.1.115.0
+
+**Short title:** daily report in one language, chosen by a system parameter (French by default).
+
+**Reason for the request:** « Courriel B. Le rapport quotidien, paramètre explicite avec `fr_CA` par défaut (pas bilingue) » — the daily report sent in 18.0.1.114.0 was bilingual; the recipient's language is set by the organisation, not by an unknown reader.
+
+**Changes:**
+
+- `models/followup_report.py`: new `DEFAULT_REPORT_LANG` (`fr_CA`), `REPORT_LANGS`, `TEXTS` (all labels of the daily report, French and English, one language per call), `report_lang(code)` (family `fr` / `en` from an Odoo language code, `known` flag), `texts(lang)`. `daily_report_subject` and `daily_report_html` take `lang` (French by default) and return one language only.
+- `models/event_survey_followup.py`: new system parameter `rlq_survey_report.langue_courriels`; `_rlq_daily_report_lang()` (reads it, `fr_CA` when empty); `_rlq_create_report_lang_param_if_missing()` (creates it with `fr_CA` only when absent); `_rlq_daily_report_data(since, lang)` uses the language for the « (no ticket) » label; `_rlq_send_daily_report` passes the language to the subject and body.
+- `data/ir_config_parameter_langue_courriels.xml` (new, `<function>` tag outside `noupdate`, like the other parameters): creates the parameter when absent, never replaces an existing value.
+- `__manifest__.py`: version `18.0.1.115.0`, new data file.
+- `tests/test_followup_report.py`: tests of `report_lang` (fr_CA, fr_FR, en_US, en-ca, es_ES, xx, empty), of the French-only and English-only output, and of the subject in both languages.
+- `tests/test_survey_followup.py`: subject expectation changed to « Rapport quotidien ».
+- `doc/Guide-utilisateur-rlq_survey_report.html` § 14, `doc/CONTEXTE.md`, `doc/NOTES_VALIDATION.md` § -73: no longer bilingual; parameter described.
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:**
+
+- The parameter `rlq_survey_report.langue_courriels` is created with `fr_CA` only when absent: an administrator's value is never overwritten by a module update.
+- Empty value -> `fr_CA`. Unknown code (e.g. `es_ES`) -> French, with a warning in the server log (no failure, the report is still sent).
+- Labels come from `TEXTS`, not from Odoo translations: the report does not depend on the language being installed in Odoo, and `fr.po` is not involved.
+- Still no e-mail address of a registered person in the report (Loi 25).
+- Html escaping unchanged; the static reminder line (`Événements > Sondages non complétés`) is not escaped, by design.
+
+**Checks:**
+
+- `PYTHONPATH=models python3 -m unittest tests.test_followup_report`: OK.
+- `./run-all.sh --sans-odoo`: ruff OK, syntax and manifest OK (28 Python files, 17 XML files, version 18.0.1.115.0), 170 standalone tests OK. Odoo tests NOT run (no instance).
+
+**Action required:** update the module (`-u rlq_survey_report`) on DEV first. Then check Settings > Technical > System Parameters for `rlq_survey_report.langue_courriels` (must be `fr_CA`, or `en_US`/`en_CA` for English), and click « Send the daily report now » on an event.
+
 ## 18.0.1.114.0
 
 **Short title:** daily report by e-mail: registrations and survey statistics, event by event.
