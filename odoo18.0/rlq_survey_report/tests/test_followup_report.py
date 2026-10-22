@@ -92,6 +92,20 @@ class TestFollowupReport(unittest.TestCase):
         self.assertNotIn("<a ", html)
         self.assertNotIn("Sondages non complétés", html)
 
+    def test_html_shows_new_website_subscribers_in_french_and_english(self):
+        totals = {"registered": 1, "new": 0, "cancelled": 0, "subscribers_newsletter": 4, "subscribers_portal": 2}
+        html = self._html(totals=totals, new_registrations=[], tickets=[])
+        self.assertIn("Nouveaux abonnés au site web</strong> (24 h) : 4 à l'infolettre — 2 compte(s) portail.", html)
+        html_en = self._html(totals=totals, new_registrations=[], tickets=[], lang="en_CA")
+        self.assertIn("New website subscribers</strong> (24 h): 4 newsletter — 2 portal account(s).", html_en)
+        self.assertNotIn("abonnés", html_en)
+
+    def test_html_omits_the_subscriber_line_when_module_is_missing(self):
+        totals = {"registered": 1, "new": 0, "cancelled": 0, "subscribers_newsletter": None, "subscribers_portal": None}
+        html = self._html(totals=totals, new_registrations=[], tickets=[])
+        self.assertNotIn("abonnés au site web", html)
+        self.assertNotIn("subscribers", html)
+
     def test_html_limits_the_new_registrations(self):
         rows = [{"when": "", "name": "P%d" % i, "ticket": "", "survey_state": ""} for i in range(7)]
         html = self._html(new_registrations=rows, max_rows=5)
