@@ -4,9 +4,11 @@
 - Program code (comments, program names, options, arguments, messages, CHANGELOG file) follows the language rules of the repository:
   see the note below.
 - Everything visible to a user is multilingual, mainly French and English.
-- No characters typical of language models in the documentation: no em dash, en dash, ellipsis character, curly quotes,
-  arrow characters, check marks (ok/x symbols) or decorative symbols.
+- In the CHANGELOG.md file and in git commit messages (read with `git log`), avoid characters typical of language models:
+  no em dash, en dash, ellipsis character, curly quotes, arrow characters, check marks (ok/x symbols) or decorative symbols.
   Use `-`, `...`, `"`, `->`, `[OK]`, `[FAIL]`, `[ATTN]` instead. Accents and French guillemets are kept.
+- Program output and user documentation (man pages, README, `doc/`, help texts, translation catalogues) are not subject to
+  this rule: they may use any character that serves the reader. Accents and French guillemets are always allowed.
 
 ### Versions
 - Format: `MAJOR.MINOR.YYYYMMDD.HHMMSS`, local date and time.
@@ -16,7 +18,8 @@
 
 ### Files and publication
 - After each change, update the GitHub repository, then produce a `.zip` archive named without the date: `program.MAJOR.MINOR.zip`.
-- CHANGELOG.md: most recent version FIRST. For each version: short title, reason for the request,
+- CHANGELOG.md: most recent version FIRST. Version header: `### MAJOR.MINOR.YYYYMMDD.HHMMSS - Short title`
+  (the version number is always followed by the title). For each version: reason for the request,
   details of the changes (functions, options, files), bugs fixed (symptom, diagnosis, fix), safeguards and edge cases,
   checks performed, action required from the user (or "none").
 - `--changelog` option on every program: displays only the program's changes, read from CHANGELOG.md;
