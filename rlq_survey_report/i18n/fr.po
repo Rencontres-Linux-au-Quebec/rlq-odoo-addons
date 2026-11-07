@@ -408,3 +408,9 @@ msgstr "Rapport quotidien envoyé à %(dest)s."
 #, python-format
 msgid "(no ticket)"
 msgstr "(sans billet)"
+
+#. module: rlq_survey_report
+#, python-format
+#: code:addons/rlq_survey_report/models/survey_survey.py:0
+msgid "Pivot table: %s"
+msgstr "Tableau croisé : %s"

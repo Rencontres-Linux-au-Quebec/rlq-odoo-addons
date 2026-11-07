@@ -1,5 +1,37 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.119.0
+
+**Short title:** pivot table of a survey's answers, opened from the survey form.
+
+**Reason for the request:** be able to build a pivot table in Odoo from the results of one specific survey, from the survey menu.
+
+**Changes:**
+
+- `models/survey_survey.py`: new method `action_rlq_tableau_croise()` on `survey.survey`. It returns a window action on `survey.user_input.line` in pivot mode, filtered on this survey and on completed submissions (`user_input_id.state = 'done'`). `_` is now imported from `odoo`.
+- `views/rlq_survey_report_views.xml`: button « Tableau croisé dynamique » in a new « Analyse » group at the end of the survey form (same inherited view as the existing « Amélioration continue » block). New pivot view `view_survey_user_input_line_pivot_rlq`: rows are question, matrix row and chosen answer; measure is the numerical value (the count is always available in the pivot).
+- `tests/test_survey_pivot.py` (new, Odoo TransactionCase, imported from `tests/__init__.py` in a try/except like the others): checks the action, the pivot view, and that the domain is limited to this survey and to completed submissions.
+- `i18n/fr.po`: translation of « Pivot table: %s » (the action title, English in code).
+- `__manifest__.py`: version `18.0.1.119.0`.
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:**
+
+- Only completed submissions are counted, so partial answers do not skew the figures. Partially completed forms are therefore not in the pivot; this is a deliberate choice.
+- No participant field (name, e-mail, partner, user input) is a default grouping: the pivot does not identify people, in line with the Loi 25 concern of the module. Odoo's own pivot still allows a user with access to the survey to group by other fields manually.
+- Free-text answers are not grouped: `value_text_box` is a `Text` field, which Odoo cannot group on. They stay in the « Réponses libres » sheet of the Excel export.
+- The pivot is read with the normal Odoo access rights of the user (survey user rights on `survey.user_input.line`); the button adds no new access right.
+
+**Checks:**
+
+- `ruff check` with the module's `ruff.toml`: passed.
+- Python syntax (`py_compile`) of the modified and new files: OK.
+- XML of `rlq_survey_report_views.xml` parsed: OK.
+- The Odoo test (`test_survey_pivot.py`) and the pivot rendering were NOT run: no Odoo instance in this environment.
+
+**Action required:** update the module on DEV (`-u rlq_survey_report`), open a survey that has answers, click « Tableau croisé dynamique » in the « Analyse » group, and check that the rows and the counts match the answers. Then run the Odoo tests on a disposable database.
+
 ## 18.0.1.118.0
 
 **Short title:** daily report: new website subscribers of the last 24 hours (newsletter and portal accounts).

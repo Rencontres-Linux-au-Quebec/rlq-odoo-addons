@@ -58,7 +58,7 @@ instance pour survey.survey) mais PAS confirmé lui-même - voir
 NOTES_VALIDATION.md.
 """
 
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 
 # Durée moyenne plafonnée à cette valeur (secondes) pour l'affichage en
 # liste - une valeur aberrante (ex. une session laissée ouverte des jours)
@@ -175,6 +175,32 @@ class SurveySurvey(models.Model):
             ]
             moyenne = int(round(sum(durees) / len(durees))) if durees else 0
             survey.rlq_answer_duration_avg_seconds = min(moyenne, _DUREE_MAX_AFFICHEE)
+
+    def action_rlq_tableau_croise(self):
+        """Open a pivot table (tableau croise dynamique) of the answer lines of THIS survey.
+
+        Only completed submissions (user_input state 'done') are counted, so
+        partially filled forms do not skew the figures. The rows are the
+        question, then the matrix row and the chosen answer; the measures are
+        the number of lines (always available) and the numerical values.
+        Participant identities are deliberately not part of the default
+        grouping (Loi 25).
+        """
+        self.ensure_one()
+        vue_pivot = self.env.ref("rlq_survey_report.view_survey_user_input_line_pivot_rlq")
+        return {
+            "type": "ir.actions.act_window",
+            "name": _("Pivot table: %s") % (self.title or ""),
+            "res_model": "survey.user_input.line",
+            "view_mode": "pivot",
+            "views": [(vue_pivot.id, "pivot")],
+            "domain": [
+                ("user_input_id.survey_id", "=", self.id),
+                ("user_input_id.state", "=", "done"),
+            ],
+            "context": {"create": False, "edit": False},
+            "target": "current",
+        }
 
 
 class SurveyUserInput(models.Model):

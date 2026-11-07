@@ -41,3 +41,8 @@ try:
     from . import test_survey_followup
 except ImportError:
     pass
+
+try:
+    from . import test_survey_pivot
+except ImportError:
+    pass

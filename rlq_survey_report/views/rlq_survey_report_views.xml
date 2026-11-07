@@ -22,7 +22,31 @@
                     <field name="rlq_envoyer_reponses"/>
                     <field name="rlq_modele_courriel_reponses" invisible="not rlq_envoyer_reponses"/>
                 </group>
+                <group string="Analyse">
+                    <button name="action_rlq_tableau_croise" type="object"
+                            string="Tableau croisé dynamique" class="btn-secondary"/>
+                </group>
             </xpath>
+        </field>
+    </record>
+
+    <!-- Vue pivot (tableau croisé dynamique) des lignes de réponses. Ouverte
+         par le bouton « Tableau croisé dynamique » du formulaire d'un sondage
+         (action_rlq_tableau_croise), qui filtre sur CE sondage. Lignes :
+         question > ligne de matrice > réponse choisie. Mesure : valeur
+         numérique (la colonne Nombre est toujours disponible). Les réponses à
+         texte libre ne sont pas regroupées (champ Text non groupable) : voir
+         l'export Excel pour celles-ci. Aucun participant n'est regroupé ici. -->
+    <record id="view_survey_user_input_line_pivot_rlq" model="ir.ui.view">
+        <field name="name">survey.user_input.line.pivot.rlq</field>
+        <field name="model">survey.user_input.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Tableau croisé des réponses" disable_linking="true">
+                <field name="question_id" type="row"/>
+                <field name="matrix_row_id" type="row"/>
+                <field name="suggested_answer_id" type="row"/>
+                <field name="value_numerical_box" type="measure"/>
+            </pivot>
         </field>
     </record>
 
