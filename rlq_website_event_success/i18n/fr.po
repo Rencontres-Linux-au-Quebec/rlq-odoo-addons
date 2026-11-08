@@ -1,0 +1,47 @@
+# Translation of Odoo Server.
+# This file contains the French translation of the strings added in English to rlq_website_event_success.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: rlq_website_event_success
+#: model_terms:ir.ui.view,arch_db:rlq_website_event_success.registration_complete_tickets_in_email
+msgid "Your registration is recorded and a confirmation e-mail with your tickets has been sent to you."
+msgstr "Votre inscription est enregistrée et un courriel de confirmation contenant vos billets vous a été envoyé."
+
+#. module: rlq_website_event_success
+#: model_terms:ir.ui.view,arch_db:rlq_website_event_success.registration_complete_tickets_in_email
+msgid "No need to register again. If you cannot find the e-mail, also look in your spam folder."
+msgstr "Inutile de vous inscrire de nouveau. Si vous ne trouvez pas le courriel, regardez aussi dans vos courriels indésirables."
+
+#. module: rlq_website_event_success
+#: model_terms:ir.ui.view,arch_db:rlq_website_event_success.registration_not_found
+msgid "Registration"
+msgstr "Inscription"
+
+#. module: rlq_website_event_success
+#: model_terms:ir.ui.view,arch_db:rlq_website_event_success.registration_not_found
+msgid "We cannot show a registration at this address."
+msgstr "Nous ne pouvons pas afficher d'inscription à cette adresse."
+
+#. module: rlq_website_event_success
+#: model_terms:ir.ui.view,arch_db:rlq_website_event_success.registration_not_found
+msgid "If you have just registered, your registration is recorded: a confirmation e-mail with your tickets has been sent to you. Also look in your spam folder before registering again."
+msgstr "Si vous venez de vous inscrire, votre inscription est enregistrée : un courriel de confirmation contenant vos billets vous a été envoyé. Regardez aussi dans vos courriels indésirables avant de vous inscrire de nouveau."
+
+#. module: rlq_website_event_success
+#: model_terms:ir.ui.view,arch_db:rlq_website_event_success.registration_not_found
+msgid "Register for this event"
+msgstr "S'inscrire à cet événement"
+
+#. module: rlq_website_event_success
+#: model_terms:ir.ui.view,arch_db:rlq_website_event_success.registration_not_found
+msgid "Questions about your registration:"
+msgstr "Questions sur votre inscription :"

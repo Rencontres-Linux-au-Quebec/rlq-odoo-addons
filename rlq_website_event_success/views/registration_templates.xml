@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Texts in English (source), translated in i18n/fr.po. -->
+<odoo>
+    <!-- Registrations found, but not for this visitor: the tickets are replaced by a notice (they are in the e-mail). -->
+    <template id="registration_complete_tickets_in_email" inherit_id="website_event.registration_complete" name="Registration Completed: tickets in the e-mail">
+        <xpath expr="//t[@t-call='website_event.registration_ticket_access']" position="after">
+            <div t-if="rlq_tickets_in_email" class="alert alert-info o_rlq_tickets_in_email" role="status">
+                <p class="mb-1">Your registration is recorded and a confirmation e-mail with your tickets has been sent to you.</p>
+                <p class="mb-1">No need to register again. If you cannot find the e-mail, also look in your spam folder.</p>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- No registration found at this address. -->
+    <template id="registration_not_found" name="Registration: confirmation page without registration">
+        <t t-call="website_event.layout">
+            <div class="container my-5 o_rlq_registration_not_found">
+                <h3>Registration</h3>
+                <u><a class="h4 text-primary" t-out="event.name" t-att-href="event.website_url"/></u>
+                <div class="alert alert-info mt-4" role="status">
+                    <p class="mb-1">We cannot show a registration at this address.</p>
+                    <p class="mb-1">If you have just registered, your registration is recorded: a confirmation e-mail with your tickets has been sent to you. Also look in your spam folder before registering again.</p>
+                </div>
+                <a role="button" class="btn btn-primary" t-attf-href="#{event.website_url}/register">Register for this event</a>
+                <div t-if="event.organizer_id.email" class="mt-4">
+                    <small>Questions about your registration:</small>
+                    <a t-attf-href="mailto:#{event.organizer_id.email}" t-out="event.organizer_id.email"/>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
