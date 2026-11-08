@@ -1,0 +1,22 @@
+# Translation of Odoo Server.
+# This file contains the French translation of the strings added in English to rlq_document_page_guard.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: rlq_document_page_guard
+#. odoo-python
+#: code:addons/rlq_document_page_guard/models/document_page.py:0
+msgid ""
+"This wiki page is too large to be saved: %(size)s MB, the limit is %(limit)s MB.\n"
+"Large pages can no longer be opened. Insert images with the image button (upload) instead of pasting them, or split the page into several linked pages."
+msgstr ""
+"Cette page du wiki est trop lourde pour être enregistrée : %(size)s Mo, la limite est de %(limit)s Mo.\n"
+"Une page trop lourde ne peut plus être ouverte. Insérez les images avec le bouton image (téléversement) au lieu de les coller, ou découpez la page en plusieurs pages liées."
