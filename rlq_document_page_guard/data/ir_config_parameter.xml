@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings of rlq_document_page_guard, visible in Settings > Technical > System Parameters.
+     noupdate: a value changed by the administrator is kept when the module is updated. -->
+<odoo noupdate="1">
+    <!-- Number of step ids kept in data-last-history-steps (1 = the last one, the only one the editor reads; 0 = remove the attribute). -->
+    <record id="param_keep_history_steps" model="ir.config_parameter">
+        <field name="key">rlq_document_page_guard.keep_history_steps</field>
+        <field name="value">1</field>
+    </record>
+    <!-- Largest content accepted for a new version of a wiki page, in MB (0 = no limit). -->
+    <record id="param_max_content_mb" model="ir.config_parameter">
+        <field name="key">rlq_document_page_guard.max_content_mb</field>
+        <field name="value">5</field>
+    </record>
+</odoo>
