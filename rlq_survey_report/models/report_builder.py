@@ -211,6 +211,28 @@ def html_reponses_courriel(blocs):
     return "".join(morceaux)
 
 
+def html_resume_inscription(lignes):
+    """HTML du bloc « Résumé de votre inscription » (v1.120.0), en tête du courriel de
+    réponses. `lignes` = [(libellé, valeur)] ; une valeur vide est omise. Tout est échappé.
+    Retourne une chaîne vide s'il n'y a aucune ligne à montrer."""
+    morceaux = []
+    for libelle, valeur in lignes:
+        valeur = str(valeur or "").strip()
+        if not valeur:
+            continue
+        morceaux.append(
+            '<p style="margin:0 0 4px 0;"><strong>' + echapper(str(libelle or "").strip())
+            + " :</strong> " + echapper(valeur) + "</p>"
+        )
+    if not morceaux:
+        return ""
+    return (
+        '<h3 style="margin:0 0 8px 0; font-size:15px;">Résumé de votre inscription</h3>'
+        + "".join(morceaux)
+        + '<div style="margin:0 0 16px 0;"></div>'
+    )
+
+
 _COURRIEL_RE = re.compile(r"^[^@\s<>,;]+@[^@\s<>,;]+\.[^@\s<>,;]+$")
 
 
