@@ -110,10 +110,65 @@ class SurveyUserInputReponses(models.Model):
                 blocs.append((question.title, textes))
         return blocs
 
-    @api.depends("user_input_line_ids", "survey_id")
+    @api.depends("user_input_line_ids", "survey_id", "email", "partner_id")
     def _compute_rlq_reponses_html(self):
         for participation in self:
-            participation.rlq_reponses_html = rb.html_reponses_courriel(participation._rlq_blocs_reponses())
+            resume = participation._rlq_resume_inscription_html()
+            reponses = rb.html_reponses_courriel(participation._rlq_blocs_reponses())
+            participation.rlq_reponses_html = resume + reponses
+
+    def _rlq_inscription_associee(self):
+        """Inscription à l'événement correspondant à cette participation (même courriel,
+        et sondage du billet ou de l'événement), la plus récente, ou un recordset vide.
+        Ne lève jamais d'erreur : le courriel de réponses ne doit pas en dépendre."""
+        self.ensure_one()
+        inscriptions = self.env["event.registration"]
+        adresse = self._rlq_destinataire()
+        if not adresse or not self.survey_id:
+            return inscriptions
+        try:
+            return inscriptions.sudo().search([
+                ("email", "=ilike", adresse),
+                ("state", "!=", "cancel"),
+                "|",
+                ("event_ticket_id.rlq_survey_id", "=", self.survey_id.id),
+                ("event_id.survey_id", "=", self.survey_id.id),
+            ], order="id desc", limit=1)
+        except Exception:  # noqa: BLE001 - pas de résumé plutôt qu'une erreur
+            _logger.info("rlq_survey_report : inscription non trouvée pour la participation %s", self.id, exc_info=True)
+            return inscriptions
+
+    def _rlq_resume_inscription_html(self):
+        """HTML « Résumé de votre inscription » (nom, événement, date, lieu, billet, questions
+        d'inscription), en tête du courriel de réponses. Chaîne vide si aucune inscription
+        ne correspond. Tout est échappé ; chaque champ est lu avec getattr."""
+        self.ensure_one()
+        inscription = self._rlq_inscription_associee()
+        if not inscription:
+            return ""
+        evenement = inscription.event_id
+        lignes = [
+            ("Nom", inscription.name),
+            ("Courriel", inscription.email),
+            ("Événement", getattr(evenement, "name", "")),
+        ]
+        debut = getattr(evenement, "date_begin", None)
+        if debut:
+            locale = fields.Datetime.context_timestamp(inscription, debut)
+            lignes.append(("Date", locale.strftime("%Y-%m-%d %H:%M")))
+        lieu = getattr(evenement, "address_id", None)
+        if lieu:
+            lignes.append(("Lieu", lieu.display_name))
+        billet = getattr(inscription, "event_ticket_id", None)
+        if billet:
+            lignes.append(("Billet", billet.name))
+        for reponse in getattr(inscription, "registration_answer_ids", self.env["event.registration"]):
+            question = getattr(reponse, "question_id", None)
+            valeur = getattr(reponse, "value_answer_id", None)
+            texte = getattr(valeur, "name", False) or getattr(reponse, "value_text_box", False)
+            if question and texte:
+                lignes.append((question.title, texte))
+        return rb.html_resume_inscription(lignes)
 
     def _rlq_destinataire(self):
         """Adresse de courriel du participant, ou chaîne vide."""
