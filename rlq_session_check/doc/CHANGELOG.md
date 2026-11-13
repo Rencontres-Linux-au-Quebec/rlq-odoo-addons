@@ -1,5 +1,31 @@
 # Changelog - rlq_session_check
 
+## 18.0.1.1.0 - 2026-11-13 16:44
+
+**Short title:** route /rlq/session/me: first name to greet and profile of the signed-in person, for the link pages.
+
+**Reason for the request:** request of the administrator on 2026-11-13: when someone is signed in to Odoo, the link pages show "Bonjour Prénom" and a button at the bottom right with more information on the person (name, address, groups), the button only for the members of a given group.
+
+**Changes:**
+
+- `controllers/main.py`: new route `/rlq/session/me` (type http, auth public, GET, no CSRF, not in the sitemap, save_session=False) and `_json()` (Content-Type application/json, `Cache-Control: private, no-store`, `Vary: Cookie`, `X-Content-Type-Options: nosniff`, no CORS header).
+- `lib/session_check.py`: `first_name()` (field firstname when a module gives it, otherwise the first word of the name; 60 characters at most), `address_lines()`, `profile_answer()` (only the known fields; 50 groups at most), constants `PROFILE_GROUP_PARAM` and `PROFILE_GROUP_DEFAULT`.
+- System parameter `rlq_session_check.profile_group` (XML id; default `base.group_user`): the members of that group get `details` (name, address, e-mail, phone, groups without the technical ones: category hidden).
+- `tests/test_session_check.py`: 4 tests; `tests/test_session_route.py`: class TestSessionMe, 4 tests; `__manifest__.py`, `README.md`.
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:**
+
+- Not signed in: `{"signed_in": false}`, nothing else.
+- Only the data of the person who asks, never anyone else; same site only (no CORS header), so another site cannot read it.
+- Parameter not valid or group unknown: no details for anyone (one WARNING line).
+- The technical groups (hidden category) are not listed.
+
+**Checks performed:** `python3 -m py_compile`; `python3 rlq_session_check/tests/test_session_check.py -v` (9 tests without Odoo); ruff. The HttpCase tests were NOT run (no Odoo instance while writing).
+
+**Action required:** update the module (`-u rlq_session_check`); if needed, set the system parameter `rlq_session_check.profile_group` to the XML id of the group that sees its profile.
+
 ## 18.0.1.0.0 - 2026-11-13 14:44
 
 **Short title:** new module: route /rlq/session/check for nginx (auth_request).

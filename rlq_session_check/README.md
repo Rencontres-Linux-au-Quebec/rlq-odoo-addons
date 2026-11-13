@@ -17,6 +17,13 @@ Used by `nginx-link-page.sh` ([rlq-admin-tools](https://github.com/Rencontres-Li
 - `save_session=False`: a visitor who is not signed in gets no new session.
 - Any other answer (Odoo down, module not installed: 404) makes nginx refuse the access: never open by default.
 
+## /rlq/session/me (18.0.1.1.0)
+
+JSON read by the script of the link pages (`PAGE_n_GREETING=yes` of nginx-link-page): `{"signed_in": false}`, or
+`{"signed_in": true, "first_name": "Marie"}`, plus `details` (name, address, e-mail, phone, visible groups) for the members of
+the group set in the system parameter **`rlq_session_check.profile_group`** (XML id, default `base.group_user`; Settings >
+Technical > System Parameters). Only the data of the person who asks; no CORS header (same site only); never cached.
+
 Install: `odoo-bin -d DB -i rlq_session_check` (or Apps). Check: `curl -i https://SITE/rlq/session/check` answers `401`.
 
 ## Français
@@ -29,5 +36,8 @@ Route `/rlq/session/check` qui dit à **nginx** (`auth_request`) si le navigateu
   403 : pas dans le groupe, ou groupe inconnu.
 - Réponse vide, jamais mise en cache ; elle ne parle que de la session du navigateur qui demande.
 - Toute autre réponse (Odoo arrêté, module absent) : nginx refuse l'accès, jamais ouvert par défaut.
+
+`/rlq/session/me` (JSON) : le prénom à saluer et, pour les membres du groupe du paramètre système
+`rlq_session_check.profile_group` (défaut `base.group_user`), nom, adresse, courriel, téléphone et groupes visibles.
 
 Vérifier : `curl -i https://SITE/rlq/session/check` doit répondre `401`.

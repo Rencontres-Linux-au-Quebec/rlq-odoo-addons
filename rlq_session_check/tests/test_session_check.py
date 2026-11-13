@@ -54,5 +54,33 @@ class TestStatus(_Base):
         self.assertEqual(session_check.status(False, False), 403)
 
 
+class TestProfile(_Base):
+    """18.0.1.1.0: /rlq/session/me."""
+
+    def test_first_name(self):
+        self.assertEqual(session_check.first_name("Marie Tremblay"), "Marie")
+        self.assertEqual(session_check.first_name("Marie Tremblay", "Marie-Ève"), "Marie-Ève")
+        self.assertEqual(session_check.first_name("  ", None), "")
+        self.assertEqual(session_check.first_name(None, False), "")
+        self.assertEqual(len(session_check.first_name("x" * 200)), 60)
+
+    def test_address_lines(self):
+        self.assertEqual(session_check.address_lines("1 rue Principale", "", "G1A 1A1", "Québec", "QC", "Canada"),
+                         ["1 rue Principale", "G1A 1A1 Québec, QC", "Canada"])
+        self.assertEqual(session_check.address_lines(), [])
+
+    def test_not_signed_in_nothing(self):
+        self.assertEqual(session_check.profile_answer(False, "Marie", {"name": "Marie"}), {"signed_in": False})
+
+    def test_details_only_when_given(self):
+        self.assertEqual(session_check.profile_answer(True, "Marie"), {"signed_in": True, "first_name": "Marie"})
+        r = session_check.profile_answer(True, "Marie", {"name": "Marie T", "groups": ["B", "A", "A"] + [str(i) for i in range(60)],
+                                                         "password": "x"})
+        self.assertEqual(r["details"]["groups"][:2], ["0", "1"])
+        self.assertEqual(len(r["details"]["groups"]), session_check.MAX_GROUPS)
+        self.assertNotIn("password", r["details"])                       # only the known fields
+        self.assertEqual(set(r["details"]), {"name", "address", "email", "phone", "groups"})
+
+
 if __name__ == "__main__":
     unittest.main()

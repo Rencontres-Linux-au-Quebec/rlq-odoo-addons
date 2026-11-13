@@ -21,17 +21,23 @@ La route /rlq/session/check répond à nginx (auth_request) :
 La réponse est vide : rien sur l'utilisateur. Utilisée par nginx-link-page.sh (rlq-admin-tools, LINK_n_ACCESS=odoo)
 pour montrer des liens réservés aux membres connectés.
 
+La route /rlq/session/me (JSON) donne au script des pages de liens le prénom à saluer (« Bonjour Marie ») et, pour les
+membres du groupe du paramètre système rlq_session_check.profile_group (défaut : base.group_user), leur nom, adresse,
+courriel, téléphone et groupes. Seulement les données de la personne qui demande ; même site seulement.
+
 Session check for nginx
 =======================
 
 /rlq/session/check answers nginx (auth_request): 204 signed in (and in ?group=XMLID), 401 not signed in, 403 not in
 the group or unknown group. Empty answer. Used by nginx-link-page.sh (LINK_n_ACCESS=odoo).
+/rlq/session/me (JSON): first name to greet and, for the members of the group of the system parameter
+rlq_session_check.profile_group (default base.group_user), their name, address, e-mail, phone and groups.
 
 Copyright (C) 2026 Services-Conseils Linux Inc. (info@rencontres-linux.quebec)
 Copyright (C) 2026 Rencontres Linux au Québec contributors
 GNU Affero General Public License v3 or later (http://www.gnu.org/licenses/agpl)
 """,
-    "version": "18.0.1.0.0",
+    "version": "18.0.1.1.0",
     "category": "Hidden/Tools",
     "author": "Services-Conseils Linux Inc. (info@rencontres-linux.quebec), Rencontres Linux au Québec contributors",
     "maintainer": "Rencontres Linux au Québec <info@rencontres-linux.quebec>",

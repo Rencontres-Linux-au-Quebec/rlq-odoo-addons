@@ -35,3 +35,41 @@ def status(is_public, in_group):
     if in_group is False:
         return FORBIDDEN
     return ALLOWED
+
+
+# 18.0.1.1.0: /rlq/session/me (greeting "Bonjour Prénom" and profile of the signed-in person, read by the script of the link pages)
+PROFILE_GROUP_PARAM = "rlq_session_check.profile_group"   # ir.config_parameter: XML id of the group that sees its profile
+PROFILE_GROUP_DEFAULT = "base.group_user"
+MAX_GROUPS = 50
+
+
+def first_name(name, firstname=None):
+    """First name to greet: the field firstname when a module gives it (partner_firstname), otherwise the first word of the name."""
+    if isinstance(firstname, str) and firstname.strip():
+        return firstname.strip()[:60]
+    if isinstance(name, str) and name.strip():
+        return name.strip().split()[0][:60]
+    return ""
+
+
+def address_lines(street="", street2="", zip_code="", city="", state="", country=""):
+    """Lines of a postal address, without the empty parts."""
+    ville = " ".join(p for p in (zip_code, city) if p)
+    lignes = [street, street2, ", ".join(p for p in (ville, state) if p), country]
+    return [ligne.strip() for ligne in lignes if ligne and ligne.strip()]
+
+
+def profile_answer(signed_in, first="", details=None):
+    """JSON answer of /rlq/session/me: never anything when the browser is not signed in; details only for the profile group."""
+    if not signed_in:
+        return {"signed_in": False}
+    answer = {"signed_in": True, "first_name": first}
+    if details is not None:
+        answer["details"] = {
+            "name": details.get("name", ""),
+            "address": list(details.get("address", [])),
+            "email": details.get("email", ""),
+            "phone": details.get("phone", ""),
+            "groups": sorted(set(details.get("groups", [])))[:MAX_GROUPS],
+        }
+    return answer

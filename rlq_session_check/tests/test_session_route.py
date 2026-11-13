@@ -52,3 +52,44 @@ class TestSessionRoute(HttpCase):
     def test_post_refused(self):
         response = self.url_open(URL, data={"x": "1"}, allow_redirects=False)
         self.assertNotIn(response.status_code, (200, 204))
+
+
+@tagged("post_install", "-at_install")
+class TestSessionMe(HttpCase):
+    """18.0.1.1.0: /rlq/session/me."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.internal = new_test_user(cls.env, login="rlq_me_internal", name="Marie Tremblay", groups="base.group_user",
+                                     password="rlq-me-internal-42")
+        cls.internal.partner_id.write({"city": "Québec", "street": "1 rue Principale"})
+        cls.portal = new_test_user(cls.env, login="rlq_me_portal", name="Paul Gagnon", groups="base.group_portal", password="rlq-me-portal-42")
+
+    def me(self):
+        response = self.url_open("/rlq/session/me", allow_redirects=False)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("no-store", response.headers.get("Cache-Control", ""))
+        self.assertNotIn("Access-Control-Allow-Origin", response.headers)
+        return response.json()
+
+    def test_not_signed_in(self):
+        self.assertEqual(self.me(), {"signed_in": False})
+
+    def test_portal_greeting_without_details(self):
+        self.authenticate("rlq_me_portal", "rlq-me-portal-42")
+        self.assertEqual(self.me(), {"signed_in": True, "first_name": "Paul"})
+
+    def test_internal_details(self):
+        self.authenticate("rlq_me_internal", "rlq-me-internal-42")
+        data = self.me()
+        self.assertEqual(data["first_name"], "Marie")
+        self.assertEqual(data["details"]["name"], "Marie Tremblay")
+        self.assertIn("1 rue Principale", data["details"]["address"])
+
+    def test_profile_group_parameter(self):
+        self.env["ir.config_parameter"].sudo().set_param("rlq_session_check.profile_group", "base.group_system")
+        self.authenticate("rlq_me_internal", "rlq-me-internal-42")
+        self.assertNotIn("details", self.me())
+        self.env["ir.config_parameter"].sudo().set_param("rlq_session_check.profile_group", "not valid")
+        self.assertNotIn("details", self.me())
