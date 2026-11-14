@@ -1116,6 +1116,26 @@ class TestRemplacerNomComplet(unittest.TestCase):
         self.assertIn("mailto:[courriel masqué]", html)
 
 
+class TestHtmlResumeInscription(unittest.TestCase):
+    """v1.120.0 : bloc « Résumé de votre inscription » en tête du courriel de réponses."""
+
+    def test_lignes_dans_l_ordre_avec_titre(self):
+        html = rb.html_resume_inscription([("Nom", "Jeanne Exemplaire"), ("Événement", "Rencontre"), ("Lieu", "Salle A")])
+        self.assertIn("Résumé de votre inscription", html)
+        self.assertLess(html.index("Nom"), html.index("Lieu"))
+        self.assertIn("Jeanne Exemplaire", html)
+
+    def test_valeur_vide_omise_et_echappee(self):
+        html = rb.html_resume_inscription([("Nom", "<b>x</b>"), ("Lieu", ""), ("Billet", None)])
+        self.assertIn("&lt;b&gt;x&lt;/b&gt;", html)
+        self.assertNotIn("Lieu", html)
+        self.assertNotIn("Billet", html)
+
+    def test_vide_si_rien(self):
+        self.assertEqual(rb.html_resume_inscription([]), "")
+        self.assertEqual(rb.html_resume_inscription([("Nom", " ")]), "")
+
+
 class TestHtmlReponsesCourriel(unittest.TestCase):
     """v1.94.0 : corps du courriel qui rappelle ses réponses au participant."""
 

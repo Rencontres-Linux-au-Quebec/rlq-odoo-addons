@@ -1,5 +1,42 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.120.0
+
+**Short title:** participant's e-mail with a registration summary, at the end of the survey.
+
+**Reason for the request:** when the option to receive an e-mail is selected, the participant should get a summary of their registration to the event (name, event, date, place, ticket, registration questions such as in-person attendance), together with their survey answers.
+
+**Choices made with the requester:**
+
+- Trigger: the existing option « Envoyer ses réponses au participant » of the survey (`rlq_envoyer_reponses`). No new checkbox.
+- E-mail: the existing « Vos réponses au sondage » e-mail, sent when the survey is completed. No new template, no change to Odoo's registration confirmation.
+- Timing: the survey is filled in after registration, so the summary is sent with the answers at the end of the survey.
+
+**Changes:**
+
+- `models/survey_reponses_courriel.py`: `_compute_rlq_reponses_html()` now puts the registration summary before the answers. New methods `_rlq_inscription_associee()` (the most recent non-cancelled `event.registration` with the same e-mail and whose ticket or event uses this survey; never raises) and `_rlq_resume_inscription_html()` (builds the summary; each field is read with `getattr`). The compute now depends on `email` and `partner_id`.
+- `models/report_builder.py`: new pure function `html_resume_inscription(lignes)`: escaped HTML block « Résumé de votre inscription », empty values omitted.
+- `tests/test_report_builder.py`: class `TestHtmlResumeInscription` (3 tests, standalone).
+- `__manifest__.py`: version `18.0.1.120.0`.
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:**
+
+- No registration matches: the summary is empty and the answers e-mail is unchanged.
+- Registration matched on the e-mail address only, case-insensitive (`=ilike`). A participant who answers with another address gets no summary.
+- A cancelled registration is ignored.
+- Registration questions use `registration_answer_ids` (`question_id`, `value_answer_id`, `value_text_box`), read with `getattr`: a missing field is skipped, it does not break the e-mail.
+- The summary is escaped like the answers (no raw HTML from a free-text answer).
+
+**Checks:**
+
+- `ruff check` with the module's `ruff.toml`: passed.
+- Standalone tests (`tests/test_report_builder.py`): 159 tests, OK.
+- The Odoo code (`_rlq_inscription_associee`, field names `registration_answer_ids`, `event_id.survey_id`, `address_id`) was NOT run: no Odoo instance here. These names are standard for Odoo 18 but were not checked against this instance.
+
+**Action required:** update the module on DEV (`-u rlq_survey_report`). Complete a survey linked to a registration, with the survey option checked, and confirm that the e-mail starts with the summary (name, event, date, place, ticket, registration answers). Check that the registration questions appear, since their field names were not verified.
+
 ## 18.0.1.119.0
 
 **Short title:** pivot table of a survey's answers, opened from the survey form.
