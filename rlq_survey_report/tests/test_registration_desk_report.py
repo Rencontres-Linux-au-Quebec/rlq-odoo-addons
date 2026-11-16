@@ -112,6 +112,43 @@ class TestRegistrationDeskReport(unittest.TestCase):
         self.assertNotIn("<b>T</b>", html)
         self.assertIn("&lt;script&gt;", html)
 
+    def test_sort_key_ignores_case_and_accents(self):
+        names = ["Éric", "eve", "Ève", "Zoé", "adam", "Émile", "éléonore", "Ésope"]
+        ordered = sorted(names, key=rd.sort_key)
+        self.assertEqual(ordered, ["adam", "éléonore", "Émile", "Éric", "Ésope", "eve", "Ève", "Zoé"])
+        self.assertEqual(rd.sort_key("  Élise "), "elise")
+        self.assertEqual(rd.sort_key(None), "")
+
+    def test_is_volunteer_ticket(self):
+        self.assertTrue(rd.is_volunteer_ticket("Bénévole"))
+        self.assertTrue(rd.is_volunteer_ticket("BENEVOLE VIP"))
+        self.assertTrue(rd.is_volunteer_ticket("Bénévoles - présentiel"))
+        self.assertFalse(rd.is_volunteer_ticket("Visiteur"))
+        self.assertFalse(rd.is_volunteer_ticket(""))
+        self.assertFalse(rd.is_volunteer_ticket(False))
+
+    def test_volunteer_table_columns_and_rows(self):
+        rows = [
+            {"name": "Zoé <b>Tremblay</b>", "partner_id": 7, "registered": "2026-10-01 09:00", "type": "Présentiel",
+             "languages": "FR, EN", "arrived": "2026-10-10 08:30", "departed": "", "roles": {"Accueil"}},
+            {"name": "Éric Roy", "partner_id": None, "registered": "2026-10-02 10:00", "type": "Virtuel",
+             "languages": "", "arrived": "", "departed": "2026-10-10 17:00", "roles": {"Accueil", "Salle 2"}},
+        ]
+        html = rd.volunteer_table_html(rows, ["Accueil", "Salle 2", "Vestiaire"], "fr_CA", "https://odoo.example")
+        for text in ("Bénévole", "Inscrit le", "Langues parlées", "Heure d&#x27;arrivée", "Heure de départ", "Accueil", "Salle 2", "Vestiaire"):
+            self.assertIn(text, html)
+        self.assertIn('href="https://odoo.example/chat/7"', html)
+        self.assertNotIn("<b>Tremblay</b>", html)
+        self.assertIn("Zoé &lt;b&gt;Tremblay&lt;/b&gt;", html)
+        self.assertIn("Bénévoles listés: 2", html)
+        self.assertEqual(html.count("<td>X</td>"), 3)                  # Accueil x2, Salle 2 x1
+        english = rd.volunteer_table_html(rows, ["Accueil"], "en_US")
+        self.assertIn("Volunteer", english)
+        self.assertIn("Arrived at", english)
+        self.assertIn("Languages", english)
+        self.assertNotIn("Bénévole", english)
+        self.assertIn("No volunteer is registered", rd.volunteer_table_html([], [], "en"))
+
 
 if __name__ == "__main__":
     unittest.main()

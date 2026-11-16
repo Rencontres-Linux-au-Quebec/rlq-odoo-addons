@@ -549,3 +549,48 @@ msgstr "Présent depuis"
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
 msgid "« Present » records the hour of arrival. The questions listed under « Answers » are the survey questions checked « Show at the registration desk ». A survey belongs to a registration when it was answered by the same contact or with the same e-mail address."
 msgstr "« Présent » enregistre l'heure d'arrivée. Les questions listées sous « Réponses » sont les questions du sondage cochées « Afficher au bureau d'inscription ». Un sondage est rattaché à une inscription quand il a été rempli par le même contact ou avec la même adresse courriel."
+
+#. module: rlq_survey_report
+msgid "Arrived at"
+msgstr "Arrivée à"
+
+#. module: rlq_survey_report
+msgid "Left"
+msgstr "Départ"
+
+#. module: rlq_survey_report
+msgid "Left at"
+msgstr "Heure de départ"
+
+#. module: rlq_survey_report
+msgid "Undo the departure"
+msgstr "Annuler le départ"
+
+#. module: rlq_survey_report
+msgid "Clear the departure time of this person?"
+msgstr "Effacer l'heure de départ de cette personne ?"
+
+#. module: rlq_survey_report
+msgid "Time when the person left the event, recorded with the « Left » button of the RLQ registration desk."
+msgstr "Heure à laquelle la personne a quitté l'événement, enregistrée avec le bouton « Départ » du bureau d'inscription RLQ."
+
+#. module: rlq_survey_report
+msgid "Volunteers"
+msgstr "Bénévoles"
+
+#. module: rlq_survey_report
+msgid "Type question not found in the survey"
+msgstr "Question sur le type introuvable dans le sondage"
+
+#. module: rlq_survey_report
+msgid "Languages question not found in the survey"
+msgstr "Question sur les langues introuvable dans le sondage"
+
+#. module: rlq_survey_report
+msgid "Roles question not found in the survey"
+msgstr "Question sur les rôles introuvable dans le sondage"
+
+#. module: rlq_survey_report
+msgid "Volunteer tickets without survey: their volunteers are not listed."
+msgstr "Billets bénévoles sans sondage : leurs bénévoles ne sont pas listés."
+

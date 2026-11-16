@@ -8,12 +8,16 @@
         <field name="model">event.registration</field>
         <field name="priority">92</field>
         <field name="arch" type="xml">
-            <list string="Registration desk" create="false" decoration-success="state == 'done'" decoration-muted="state == 'draft'">
+            <list string="Registration desk" create="false" default_order="event_id desc, event_ticket_id, name"
+                  decoration-success="state == 'done'" decoration-muted="state == 'draft'">
+                <field name="event_id" optional="show"/>
                 <field name="name"/>
                 <field name="event_ticket_id"/>
                 <field name="email" optional="hide"/>
+                <field name="create_date" string="Registered on" optional="show"/>
                 <field name="state"/>
-                <field name="date_closed" string="Present since" optional="show"/>
+                <field name="date_closed" string="Arrived at" optional="show"/>
+                <field name="rlq_departure" string="Left at" optional="show"/>
                 <field name="rlq_survey_state"/>
                 <field name="rlq_desk_progress"/>
                 <field name="rlq_desk_answers"/>
@@ -21,6 +25,10 @@
                         invisible="state == 'done'"/>
                 <button name="action_rlq_desk_undo" type="object" string="Undo" icon="fa-undo"
                         invisible="state != 'done'" confirm="Undo the presence of this person?"/>
+                <button name="action_rlq_desk_depart" type="object" string="Left" icon="fa-sign-out"
+                        invisible="state != 'done' or rlq_departure"/>
+                <button name="action_rlq_desk_depart_undo" type="object" string="Undo the departure" icon="fa-undo"
+                        invisible="not rlq_departure" confirm="Clear the departure time of this person?"/>
             </list>
         </field>
     </record>
@@ -50,9 +58,13 @@
                     <p class="text-muted">« Present » records the hour of arrival. The questions listed under « Answers » are the survey questions checked « Show at the registration desk ». A survey belongs to a registration when it was answered by the same contact or with the same e-mail address.</p>
                     <field name="registration_ids" readonly="1" nolabel="1">
                         <list limit="200" create="false" delete="false" decoration-success="state == 'done'" decoration-muted="state == 'draft'">
+                            <field name="event_id"/>
                             <field name="event_ticket_id"/>
                             <field name="name"/>
+                            <field name="create_date" string="Registered on"/>
                             <field name="state"/>
+                            <field name="date_closed" string="Arrived at"/>
+                            <field name="rlq_departure" string="Left at"/>
                             <field name="rlq_survey_state"/>
                             <field name="rlq_desk_progress"/>
                             <field name="rlq_desk_answers"/>
@@ -60,6 +72,10 @@
                                     invisible="state == 'done'"/>
                             <button name="action_rlq_desk_undo" type="object" string="Undo" icon="fa-undo"
                                     invisible="state != 'done'" confirm="Undo the presence of this person?"/>
+                            <button name="action_rlq_desk_depart" type="object" string="Left" icon="fa-sign-out"
+                                    invisible="state != 'done' or rlq_departure"/>
+                            <button name="action_rlq_desk_depart_undo" type="object" string="Undo the departure" icon="fa-undo"
+                                    invisible="not rlq_departure" confirm="Clear the departure time of this person?"/>
                         </list>
                     </field>
                 </sheet>
@@ -109,6 +125,39 @@
               parent="event.event_main_menu"
               action="action_rlq_registration_desk"
               sequence="43"
+              groups="event.group_event_user"/>
+
+    <!-- v1.122.0 - Volunteers' coordinator (models/volunteer_coordinator.py): only the volunteer tickets. -->
+    <record id="view_rlq_volunteer_coordinator_form" model="ir.ui.view">
+        <field name="name">rlq.volunteer.coordinator.form</field>
+        <field name="model">rlq.volunteer.coordinator</field>
+        <field name="arch" type="xml">
+            <form string="Volunteers" create="false" delete="false">
+                <header>
+                    <button name="action_refresh" type="object" string="Refresh" icon="fa-refresh" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="event_id" options="{'no_create': True}"/>
+                    </group>
+                    <field name="table_html" readonly="1" nolabel="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rlq_volunteer_coordinator" model="ir.actions.act_window">
+        <field name="name">Volunteers</field>
+        <field name="res_model">rlq.volunteer.coordinator</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+    <menuitem id="menu_rlq_volunteer_coordinator_events"
+              name="Volunteers"
+              parent="event.event_main_menu"
+              action="action_rlq_volunteer_coordinator"
+              sequence="45"
               groups="event.group_event_user"/>
 
 </odoo>

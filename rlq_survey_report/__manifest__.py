@@ -27,6 +27,9 @@ Génère, depuis le backend Odoo, un rapport HTML combinant :
   sondage de leur billet (Événements > Sondages non complétés) et un
   rapport quotidien par courriel (inscriptions, statistiques des
   sondages), activable événement par événement.
+* Une coordination des bénévoles (Événements > Bénévoles) : nom avec lien
+  vers le clavardage, inscription, type, langues, arrivée, départ et une
+  colonne par rôle, à partir du sondage du billet bénévole seulement.
 * Un bureau d'inscription (Événements > Bureau d'inscription RLQ) : par
   type de billet, inscrits, présents, sondages et questions complétés ou
   non, présences par heure, réponses aux questions choisies (en ligne ou
@@ -49,7 +52,7 @@ Copyright (C) 2026 Services-Conseils Linux Inc. (info@rencontres-linux.quebec)
 Copyright (C) 2026 Rencontres Linux au Québec contributors
 GNU Affero General Public License v3 or later (http://www.gnu.org/licenses/agpl)
 """,
-    "version": "18.0.1.121.0",
+    "version": "18.0.1.122.0",
     "category": "Marketing/Surveys",
     "author": "Services-Conseils Linux Inc. (info@rencontres-linux.quebec), Rencontres Linux au Québec contributors",
     "maintainer": "Rencontres Linux au Québec <info@rencontres-linux.quebec>",

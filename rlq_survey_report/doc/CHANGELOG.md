@@ -1,5 +1,55 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.122.0
+
+**Short title:** registration desk: sorting, default order, registration date and departure; volunteers' coordinator.
+
+**Reason for the request:** feedback on the registration desk (18.0.1.121.0): the screen must be in ONE language (French and English both supported), events must be listed most recent first, the columns must be sortable (case and accents ignored), the registration date and time must be shown, and the volunteers' coordinator needs its own table built from the volunteer ticket survey only.
+
+**Choices made with the requester:**
+
+- Volunteers: only the registrations whose ticket name contains "bénévole" (any case, with or without accents); their answers come only from the survey of that ticket.
+- Type and languages: found by the title of the survey question ("virtuel" for the type, "langue" for the languages). Roles: the question whose title contains "rôle", one column per choice.
+- Name link: a link to the chat with the volunteer on Odoo (`<web.base.url>/chat/<partner id>`), see the action required below.
+- Arrival: the time of "Present" on the desk. Departure: a new "Left" button on the desk, recorded once.
+
+**Changes:**
+
+- `models/registration_desk_report.py`: `sort_key()` (casefold, accents removed), `is_volunteer_ticket()`, `volunteer_table_html()` (table of the volunteers, one column per role, escaped, name linked to the chat).
+- `models/event_registration_desk.py`: field `event.registration.rlq_departure` (readonly, not copied); methods `action_rlq_desk_depart()` and `action_rlq_desk_depart_undo()`; function `local_time()` (time in the time zone of the event); the rows of the desk carry the registration date, arrival, departure and event date. The desk list is sorted by ticket then name (accent-insensitive), then most recent event first (stable sort).
+- `models/volunteer_coordinator.py` (new): transient model `rlq.volunteer.coordinator` (event, table, Refresh). It reads the questions by title, the most advanced participation of each volunteer (same contact or e-mail address), and the answer lines.
+- `views/event_registration_desk_views.xml`: full list with `default_order="event_id desc, event_ticket_id, name"`, columns event, registration date, arrival, departure; buttons "Left" and "Undo the departure"; the desk list gets the same columns and buttons; form and menu "Volunteers" (Events, sequence 45).
+- `security/ir.model.access.csv`: access for `rlq.volunteer.coordinator` (event users).
+- `i18n/fr.po`: French strings of the new labels, menu, buttons and messages.
+- `tests/test_registration_desk_report.py`: 3 new standalone tests (accent-insensitive sort, volunteer tickets, volunteer table). `tests/test_registration_desk.py`: 2 new Odoo tests (departure, volunteer coordinator).
+- `__manifest__.py`: version `18.0.1.122.0`, description.
+- `doc/Guide-utilisateur-rlq_survey_report.html`, `doc/CONTEXTE.md`, `doc/NOTES_VALIDATION.md` (section -76).
+
+**Bugs fixed:** some labels of the registration desk were not translated (the French interface showed English labels such as "Registered", "Present since", "Questions answered"). Every label of the desk and of the volunteers' screen is now in `i18n/fr.po`. The word "Deck" does not appear anywhere in the code: if it is still seen on screen, the exact screen is needed to find where it comes from.
+
+**Safeguards and edge cases:**
+
+- Volunteer registrations of a ticket without survey are not listed; a note says so above the table.
+- A question not found (title without "virtuel", "langue" or "rôle") leaves its column empty, and a note is shown above the table.
+- The departure can only be recorded for a person present, once; "Undo the departure" clears it. A cancelled registration is never marked present.
+- Dates are shown in the time zone of the event (otherwise of the user, otherwise America/Toronto).
+- The volunteers' table is HTML and every value is escaped.
+
+**Sorting: what works and what does not (important):**
+
+- Clicking a column header sorts ONLY on the full list ("Ouvrir en liste") and only for stored columns: name, ticket, state, email, registration date, arrival, departure, event. Computed columns (survey state, questions answered, answers) cannot be sorted by Odoo.
+- The embedded list of the desk and the volunteers' table are NOT sortable by header. The desk list is sorted by event (most recent first), then ticket, then name; the volunteers' table is sorted by name. The role columns come from the survey (one per role), which an Odoo list cannot generate.
+- The sort key `sort_key()` ignores case and accents for the desk's Python sort. The header sorting of the full list is done by PostgreSQL, whose collation decides how accents sort. This has NOT been verified on DEV.
+
+**Checks:**
+
+- `ruff check` with the module's `ruff.toml`: passed.
+- Standalone tests (`tests.test_report_builder`, `tests.test_email_check`, `tests.test_followup_report`, `tests.test_registration_desk_report`): 188 tests, OK.
+- XML of the views and the manifest parsed.
+- The Odoo code was NOT run: no Odoo instance here (see `doc/NOTES_VALIDATION.md`, section -76).
+
+**Action required:** update the module on DEV (`-u rlq_survey_report`). Check: (1) Events > RLQ registration desk, labels in French; (2) "Ouvrir en liste" opens with the most recent event first, and clicking "Name" or "Registered on" sorts; (3) "Left", then "Undo the departure"; (4) Events > Volunteers: one row per volunteer, one column per role, and the name link opens the chat. If the link does not open a conversation, send me the URL that your Odoo version uses.
+
 ## 18.0.1.121.0
 
 **Short title:** RLQ registration desk: surveys per ticket type, attendance per hour, answers to chosen questions.

@@ -26,9 +26,11 @@ A row describes ONE registration (built by models/event_registration_desk.py):
    "questions": 12, "answered": 8,
    "answers": [("Lunch", ["Yes"]), ("On site or online", [])]}
 """
+import unicodedata
 from html import escape
 
 DEFAULT_LANG = "fr_CA"
+VOLUNTEER_WORD = "benevol"   # « Bénévole », « Bénévoles » ... once accents and case are ignored
 SURVEY_STATES = ("done", "in_progress", "not_started")
 
 TEXTS = {
@@ -261,4 +263,58 @@ def desk_summary_html(rows, lang=DEFAULT_LANG):
                 html.append(_row([question["label"] if not index else "", answer["value"]]
                                  + [answer["by_ticket"].get(t, 0) for t in tickets] + [answer["total"], answer["present"]]))
         html.append("</tbody></table>")
+    return "".join(html)
+
+
+# ----------------------------------------------------------------- v1.122.0: volunteers' coordinator
+
+def sort_key(text):
+    """Key for sorting that ignores case AND accents: « Élise » sorts with the « e » words, « éric » before « Éva »."""
+    decomposed = unicodedata.normalize("NFKD", str(text or ""))
+    return "".join(c for c in decomposed if not unicodedata.combining(c)).casefold().strip()
+
+
+def is_volunteer_ticket(ticket_name):
+    """True for a ticket whose name says « bénévole » (any case, with or without accents)."""
+    return VOLUNTEER_WORD in sort_key(ticket_name)
+
+
+def _volunteer_texts(lang):
+    if texts(lang) is TEXTS["en"]:
+        return {"name": "Volunteer", "registered": "Registered on", "type": "Type", "languages": "Languages",
+                "arrived": "Arrived at", "departed": "Left at", "no_volunteer": "No volunteer is registered for this event.",
+                "title": "Volunteers", "total": "Volunteers listed", "none": "not answered", "yes": "X",
+                "no_type": "Type question not found in the survey", "no_roles": "Roles question not found in the survey",
+                "no_languages": "Languages question not found in the survey"}
+    return {"name": "Bénévole", "registered": "Inscrit le", "type": "Type", "languages": "Langues parlées",
+            "arrived": "Heure d'arrivée", "departed": "Heure de départ", "no_volunteer": "Aucun bénévole inscrit à cet événement.",
+            "title": "Bénévoles", "total": "Bénévoles listés", "none": "sans réponse", "yes": "X",
+            "no_type": "Question sur le type introuvable dans le sondage", "no_roles": "Question sur les rôles introuvable dans le sondage",
+            "no_languages": "Question sur les langues introuvable dans le sondage"}
+
+
+def volunteer_table_html(rows, roles, lang=DEFAULT_LANG, base_url=""):
+    """Table of the volunteers for the coordinator. rows: dicts with keys name, partner_id, registered, type, languages, arrived,
+    departed, roles (set of role labels). roles: the choices of the roles question, one column each. Everything escaped.
+
+    Name: link to the chat of the volunteer (base_url + /chat/<partner_id>), so the coordinator can talk to them on Odoo.
+    """
+    labels = _volunteer_texts(lang)
+    rows = list(rows or ())
+    if not rows:
+        return "<p>%s</p>" % escape(labels["no_volunteer"])
+    head = [labels["name"], labels["registered"], labels["type"], labels["languages"], labels["arrived"], labels["departed"]]
+    html = ["<h4>%s</h4>" % escape(labels["title"]), _TABLE,
+            "<thead>%s</thead><tbody>" % _row(head + list(roles or ()), tag="th")]
+    for row in rows:
+        link = '<a href="%s">%s</a>' % (escape("%s/chat/%d" % (base_url, row["partner_id"]), quote=True),
+                                        escape(" ".join(str(row.get("name") or "").split()))) if row.get("partner_id") \
+            else escape(row.get("name") or "")
+        cells = [link, row.get("registered") or "", row.get("type") or "", row.get("languages") or "",
+                 row.get("arrived") or "", row.get("departed") or ""]
+        cells += [labels["yes"] if role in (row.get("roles") or ()) else "" for role in (roles or ())]
+        html.append("<tr>%s</tr>" % "".join(
+            "<td>%s</td>" % (cell if str(cell).startswith("<a ") else _clean(cell)) for cell in cells))
+    html.append("</tbody></table>")
+    html.append("<p>%s: %d</p>" % (escape(labels["total"]), len(rows)))
     return "".join(html)

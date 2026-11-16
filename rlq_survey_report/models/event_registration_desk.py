@@ -32,10 +32,12 @@ person counts as « not answered »: Odoo does not record why a question has no 
 """
 import logging
 from collections import defaultdict
+from datetime import datetime
 
 from odoo import _, api, fields, models
 
 from . import registration_desk_report as rd
+from .registration_desk_report import sort_key
 
 _logger = logging.getLogger(__name__)
 
@@ -58,9 +60,21 @@ class SurveyQuestionRegistrationDesk(models.Model):
     )
 
 
+def local_time(registration, value, pattern):
+    """Formats a UTC datetime in the time zone of the event (otherwise of the user, otherwise America/Toronto); « » when empty."""
+    if not value:
+        return ""
+    zone = registration.event_id.date_tz or registration.env.user.tz or "America/Toronto"
+    return fields.Datetime.context_timestamp(registration.with_context(tz=zone), value).strftime(pattern)
+
+
 class EventRegistrationDesk(models.Model):
     _inherit = "event.registration"
 
+    rlq_departure = fields.Datetime(
+        string="Left at", copy=False, readonly=True,
+        help="Time when the person left the event, recorded with the « Left » button of the RLQ registration desk.",
+    )
     rlq_desk_progress = fields.Char(
         string="Questions answered", compute="_compute_rlq_desk",
         help="Questions answered / questions of the survey expected for this registration (pages excluded). Empty: no survey.",
@@ -180,15 +194,16 @@ class EventRegistrationDesk(models.Model):
         for registration in self.sudo().filtered("id"):
             item = data.get(registration.id) or {}
             present = registration.state == "done"
-            hour = None
             closed = registration.date_closed if "date_closed" in registration._fields else False
-            if present and closed:
-                context = registration.with_context(tz=registration.event_id.date_tz or self.env.user.tz or "America/Toronto")
-                hour = fields.Datetime.context_timestamp(context, closed).strftime("%Y-%m-%d %H")
+            hour = local_time(registration, closed, "%Y-%m-%d %H") if present and closed else None
             ticket = registration.event_ticket_id if "event_ticket_id" in registration._fields else False
             rows.append({"ticket": ticket.name if ticket else "", "present": present, "hour": hour,
                          "survey_state": item.get("state", "none"), "questions": item.get("questions", 0),
-                         "answered": item.get("answered", 0), "answers": item.get("answers", [])})
+                         "answered": item.get("answered", 0), "answers": item.get("answers", []),
+                         "registered": local_time(registration, registration.create_date, "%Y-%m-%d %H:%M"),
+                         "arrived": local_time(registration, closed, "%Y-%m-%d %H:%M") if present else "",
+                         "departed": local_time(registration, registration.rlq_departure, "%Y-%m-%d %H:%M"),
+                         "event_date": registration.event_id.date_begin or False})
         return rows
 
     def action_rlq_desk_present(self):
@@ -200,6 +215,21 @@ class EventRegistrationDesk(models.Model):
             else:
                 registrations.write({"state": "done"})
             _logger.info("registration desk: %d registration(s) marked present by user %s", len(registrations), self.env.uid)
+        return True
+
+    def action_rlq_desk_depart(self):
+        """Button « Left »: records the time of departure (now). Only for people present, and only once."""
+        registrations = self.filtered(lambda r: r.state == "done" and not r.rlq_departure)
+        if registrations:
+            registrations.write({"rlq_departure": fields.Datetime.now()})
+            _logger.info("registration desk: %d departure(s) recorded by user %s", len(registrations), self.env.uid)
+        return True
+
+    def action_rlq_desk_depart_undo(self):
+        """Button « Undo the departure »: clears the time of departure."""
+        registrations = self.filtered("rlq_departure")
+        if registrations:
+            registrations.write({"rlq_departure": False})
         return True
 
     def action_rlq_desk_undo(self):
@@ -282,7 +312,9 @@ class RlqRegistrationDesk(models.TransientModel):
         if needle:
             listed = listed.filtered(lambda r: needle in self._rlq_haystack(r))
         has_ticket = "event_ticket_id" in listed._fields
-        return listed.sorted(lambda r: ((r.event_ticket_id.name or "").lower() if has_ticket else "", (r.name or "").lower(), r.id))
+        # Two passes: ticket then name (accent-insensitive), then the most recent event first (Python's sort is stable).
+        listed = listed.sorted(lambda r: (sort_key(r.event_ticket_id.name if has_ticket else ""), sort_key(r.name), r.id))
+        return listed.sorted(lambda r: r.event_id.date_begin or datetime.min, reverse=True)
 
     @api.depends("event_id", "search_text", "hide_present")
     def _compute_desk(self):

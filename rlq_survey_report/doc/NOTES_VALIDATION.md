@@ -6,6 +6,15 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -76. Tri, ordre par défaut, départs et coordination des bénévoles (v1.122.0)
+
+**Points non vérifiés sans accès à une instance, à confirmer en priorité :**
+1. Lien vers le clavardage : `<web.base.url>/chat/<id du contact>` sert pour le nom des bénévoles. Ce chemin n'a pas été vérifié sur votre version d'Odoo 18 : s'il n'ouvre pas la conversation, indiquer l'adresse qu'Odoo utilise.
+2. Tri par en-tête : seule la liste complète (« Ouvrir en liste ») trie, et seulement sur les colonnes stockées. Le tri sans accents ni majuscules dépend de la collation PostgreSQL de la base : vérifier avec des noms comme « Éric », « eve », « Ève », « Zoé ».
+3. Colonnes des rôles : la question est trouvée par son titre contenant « rôle » (sans accents ni majuscules). Si plusieurs questions correspondent, la première du sondage est utilisée.
+4. Tables HTML du bureau d'inscription et de la coordination : non triables par l'en-tête (limite connue, voir CHANGELOG).
+5. Les deux tests Odoo de `tests/test_registration_desk.py` (départ, coordination) n'ont pas été exécutés ; `tests/test_registration_desk_report.py` (sans Odoo) passe.
+
 ## -75. Bureau d'inscription RLQ (v1.121.0)
 
 **Points non vérifiés sans accès à une instance, à confirmer en priorité :**

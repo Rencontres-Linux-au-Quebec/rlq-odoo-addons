@@ -10,3 +10,4 @@ access_rlq_registration_email_fix_event_user,rlq.registration.email.fix.event.us
 access_rlq_registration_email_fix_line_event_user,rlq.registration.email.fix.line.event.user,model_rlq_registration_email_fix_line,event.group_event_user,1,1,1,1
 access_rlq_survey_pending_event_user,rlq.survey.pending.event.user,model_rlq_survey_pending,event.group_event_user,1,1,1,1
 access_rlq_registration_desk_event_user,rlq.registration.desk.event.user,model_rlq_registration_desk,event.group_event_user,1,1,1,1
+access_rlq_volunteer_coordinator_event_user,rlq.volunteer.coordinator.event.user,model_rlq_volunteer_coordinator,event.group_event_user,1,1,1,1

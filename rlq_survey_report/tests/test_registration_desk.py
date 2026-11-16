@@ -98,3 +98,40 @@ class TestRlqRegistrationDesk(TransactionCase):
         desk.hide_present = True
         self.assertEqual(desk.registration_ids, paul)
         self.assertEqual(desk.registration_count, 1)
+
+    def test_departure_recorded_once_and_cleared(self):
+        registration = self._registration("Julie", "julie@example.com")
+        registration.action_rlq_desk_present()
+        registration.action_rlq_desk_depart()
+        first = registration.rlq_departure
+        self.assertTrue(first)
+        registration.action_rlq_desk_depart()                            # already left: the time is kept
+        self.assertEqual(registration.rlq_departure, first)
+        registration.action_rlq_desk_depart_undo()
+        self.assertFalse(registration.rlq_departure)
+        absent = self._registration("Absent", "absent@example.com")
+        absent.action_rlq_desk_depart()                                  # not present: nothing recorded
+        self.assertFalse(absent.rlq_departure)
+
+    def test_volunteer_coordinator_lists_only_volunteer_tickets(self):
+        volunteer_survey = self.env["survey.survey"].create({"title": "Volunteer survey"})
+        self.env["survey.question"].create({"survey_id": volunteer_survey.id, "title": "En virtuel ou pas ?",
+                                            "question_type": "simple_choice",
+                                            "suggested_answer_ids": [(0, 0, {"value": "Virtuel"}), (0, 0, {"value": "Présentiel"})]})
+        roles = self.env["survey.question"].create({"survey_id": volunteer_survey.id,
+                                                    "title": "Rôles pendant l'événement (en présentiel) ?", "question_type": "multiple_choice",
+                                                    "suggested_answer_ids": [(0, 0, {"value": "Accueil"}), (0, 0, {"value": "Salle 2"})]})
+        volunteer = self.env["event.event.ticket"].create({"name": "Bénévole", "event_id": self.event.id,
+                                                           "rlq_survey_id": volunteer_survey.id})
+        helper = self.env["event.registration"].create({"event_id": self.event.id, "event_ticket_id": volunteer.id,
+                                                        "name": "Hélène Bénévole", "email": "helene@example.com", "state": "open"})
+        self.env["survey.user_input"].create({"survey_id": volunteer_survey.id, "email": "helene@example.com", "state": "done"})
+        self._registration("Visiteur", "visitor@example.com")           # the visitor ticket: never listed
+        coordinator = self.env["rlq.volunteer.coordinator"].create({"event_id": self.event.id})
+        html = coordinator.table_html
+        self.assertIn("Hélène Bénévole", html)
+        self.assertNotIn("Visiteur", html)
+        self.assertIn("Accueil", html)
+        self.assertIn("Salle 2", html)
+        self.assertTrue(roles)
+        self.assertTrue(helper)
