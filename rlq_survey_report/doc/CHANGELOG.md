@@ -1,5 +1,59 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.121.0
+
+**Short title:** RLQ registration desk: surveys per ticket type, attendance per hour, answers to chosen questions.
+
+**Reason for the request:** a new option in the survey module to have a registration desk for an event that shows whether people completed their survey (number of questions completed and not completed) per ticket type, a count of the people marked present per hour, per ticket and in total, and, for each ticket, the answers to some survey questions (online or not, present for lunch or dinner, etc.).
+
+**Choices made with the requester:**
+
+- Form: a new dedicated screen (Events > RLQ registration desk), not an extension of the native attendee list.
+- Check-in: a « Present » button on each registration (native Odoo state, hour recorded), with « Undo ».
+- Questions shown: a box « Show at the registration desk » on each survey question.
+- Counts of questions: per person (8/12) and per ticket type.
+
+**Changes:**
+
+- `models/registration_desk_report.py` (new, pure Python): `question_progress()`, `progress_text()`, `answers_text()`, `ticket_summary()`, `hourly_attendance()`, `answers_breakdown()`, `desk_summary_html()`; labels in French or English (`TEXTS`).
+- `models/event_registration_desk.py` (new):
+  - `survey.question`: fields `rlq_registration_desk` (box) and `rlq_desk_label` (short label, optional).
+  - `event.registration`: computed fields `rlq_desk_progress` (« 8/12 ») and `rlq_desk_answers` (« Lunch: Yes | Mode: On site »); methods `_rlq_desk_map()`, `_rlq_desk_rows()`, `_rlq_desk_value()`, `action_rlq_desk_present()`, `action_rlq_desk_undo()`.
+  - `event.event`: `action_rlq_registration_desk()`.
+  - New transient model `rlq.registration.desk`: event, search, « Hide the people already present », summary, list of registrations; `action_refresh()`, `action_open_list()`.
+- `views/event_registration_desk_views.xml` (new): form of the desk, full list, menu Events > RLQ registration desk (sequence 43), button on the event form, block « Registration desk » on the survey question form.
+- `security/ir.model.access.csv`: `rlq.registration.desk` for `event.group_event_user`.
+- `i18n/fr.po`: French translations of the new strings.
+- `tests/test_registration_desk_report.py` (new, 10 standalone tests), `tests/test_registration_desk.py` (new, 4 Odoo tests), `tests/__init__.py`.
+- `run-all.sh` 1.3: the standalone step also runs `tests.test_registration_desk_report` (see `doc/run-all.changelog.txt`).
+- `doc/Guide-utilisateur-rlq_survey_report.html`: new section 15 « Bureau d'inscription » (sections 15 to 17 become 16 to 18); `doc/CONTEXTE.md`; `doc/NOTES_VALIDATION.md` section -75.
+- `__manifest__.py`: version `18.0.1.121.0`, new view file, description.
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:**
+
+- « Present » uses the native state `done` (`action_set_done()`), so the native registration desk and statistics of Odoo stay consistent. A cancelled registration is never marked present. « Undo » only acts on a registration that is present, and clears `date_closed`.
+- Only the people currently present are counted per hour (a presence that was undone is not counted). Hours are in the time zone of the event (`date_tz`), otherwise of the user, otherwise America/Toronto.
+- Cancelled registrations are neither listed nor counted. Unconfirmed registrations (`draft`) are listed (greyed) so that a person who shows up can be marked present.
+- Several participations for the same person: the most advanced one is used (completed, then started), the most recent among equals. Test entries are ignored.
+- Questions are counted without the pages. A conditional question never shown counts as not answered (Odoo does not record why a question has no answer). A registration without survey has no question count.
+- A person who did not answer a question shown at the desk is counted under « (no answer) »; a multiple-choice answer counts once per chosen value.
+- The survey data is read with `sudo()` (a desk volunteer may not have the rights of the Surveys application), in a fixed number of queries whatever the number of registrations. The summary contains no e-mail address; the e-mail column of the full list is hidden by default.
+- The summary is escaped (ticket names, question labels, free-text answers).
+- Optional fields (`event_ticket_id`, `date_closed`, `is_page`, `company_name`, value fields of the answer lines) are tested before use.
+- Same limit as « Surveys not completed »: a survey is matched by contact OR e-mail address, so several registrations made with the same contact show the same answers.
+- The answers are in ONE text column (« Label: value | Label: value »), not one column per question: an Odoo list cannot have columns that depend on the data.
+
+**Checks:**
+
+- `ruff check` with the module's `ruff.toml`: passed.
+- Standalone tests (`tests.test_report_builder`, `tests.test_email_check`, `tests.test_followup_report`, `tests.test_registration_desk_report`): OK.
+- XML of the new view file and the manifest parsed; `bash -n run-all.sh`.
+- The Odoo code was NOT run: no Odoo instance here. In particular the xpath `//sheet` on `survey.survey_question_form`, the row buttons in the embedded list and the fields of `survey.user_input.line` were not checked against this instance (see `doc/NOTES_VALIDATION.md`, section -75).
+
+**Action required:** update the module on DEV (`-u rlq_survey_report`). Check « Show at the registration desk » on one or two questions of a ticket survey, open Events > RLQ registration desk, mark a person present and undo it, and confirm the three tables of the summary. Then deploy to production.
+
 ## 18.0.1.120.0
 
 **Short title:** participant's e-mail with a registration summary, at the end of the survey.

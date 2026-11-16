@@ -65,6 +65,7 @@ msgstr "Courriels sortants de cette inscription (ou envoyés à son adresse) en 
 #. module: rlq_survey_report
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_email_fix__line_ids
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_pending__registration_ids
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__registration_ids
 msgid "Registrations"
 msgstr "Inscriptions"
 
@@ -96,6 +97,7 @@ msgstr "Inscription"
 #. module: rlq_survey_report
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_email_fix_line__event_id
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_search
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__event_id
 msgid "Event"
 msgstr "Événement"
 
@@ -362,6 +364,7 @@ msgstr "Inscriptions confirmées dont la personne n'a pas encore complété le s
 
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
 msgid "Open as a list"
 msgstr "Ouvrir en liste"
 
@@ -414,3 +417,135 @@ msgstr "(sans billet)"
 #: code:addons/rlq_survey_report/models/survey_survey.py:0
 msgid "Pivot table: %s"
 msgstr "Tableau croisé : %s"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_survey_question__rlq_registration_desk
+msgid "Show at the registration desk"
+msgstr "Afficher au bureau d'inscription"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_survey_question__rlq_registration_desk
+msgid "If checked, the answer of each registered person to this question is shown in the RLQ registration desk of the event (Events > RLQ registration desk), and the answers are counted per ticket type. Useful for questions such as « On site or online? » or « Will you be there for lunch? »."
+msgstr "Si coché, la réponse de chaque inscrit à cette question est affichée dans le bureau d'inscription RLQ de l'événement (Événements > Bureau d'inscription RLQ), et les réponses sont comptées par type de billet. Utile pour des questions comme « Sur place ou en ligne ? » ou « Serez-vous présent pour le dîner ? »."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_survey_question__rlq_desk_label
+msgid "Short label at the registration desk"
+msgstr "Libellé court au bureau d'inscription"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_survey_question__rlq_desk_label
+msgid "Short name of this question in the registration desk (for example « Lunch »). Empty: the title of the question."
+msgstr "Nom court de cette question dans le bureau d'inscription (par exemple « Dîner »). Vide : le titre de la question."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_event_registration__rlq_desk_progress
+msgid "Questions answered"
+msgstr "Questions répondues"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_event_registration__rlq_desk_progress
+msgid "Questions answered / questions of the survey expected for this registration (pages excluded). Empty: no survey."
+msgstr "Questions répondues / questions du sondage attendu pour cette inscription (pages exclues). Vide : aucun sondage."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_event_registration__rlq_desk_answers
+msgid "Answers"
+msgstr "Réponses"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_event_registration__rlq_desk_answers
+msgid "Answers of this person to the survey questions checked « Show at the registration desk »."
+msgstr "Réponses de cette personne aux questions du sondage cochées « Afficher au bureau d'inscription »."
+
+#. module: rlq_survey_report
+#: model:ir.actions.act_window,name:rlq_survey_report.action_rlq_registration_desk
+#: model:ir.model,name:rlq_survey_report.model_rlq_registration_desk
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_registration_desk_events
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_event_form_rlq_registration_desk
+#, python-format
+#: code:addons/rlq_survey_report/models/event_registration_desk.py:0
+msgid "RLQ registration desk"
+msgstr "Bureau d'inscription RLQ"
+
+#. module: rlq_survey_report
+#, python-format
+#: code:addons/rlq_survey_report/models/event_registration_desk.py:0
+msgid "Registration desk: %(event)s"
+msgstr "Bureau d'inscription : %(event)s"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_event_form_rlq_registration_desk
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_survey_question_form_rlq_registration_desk
+msgid "Registration desk"
+msgstr "Bureau d'inscription"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_registration_desk__event_id
+msgid "By default: the event in progress, otherwise the next one."
+msgstr "Par défaut : l'événement en cours, sinon le prochain."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__search_text
+msgid "Search"
+msgstr "Recherche"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_registration_desk__search_text
+msgid "Part of a name, an e-mail address or a company: only the matching registrations are listed. The summary always counts the whole event."
+msgstr "Partie d'un nom, d'une adresse courriel ou d'une entreprise : seules les inscriptions correspondantes sont listées. Le sommaire compte toujours tout l'événement."
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+msgid "Name, e-mail address or company"
+msgstr "Nom, adresse courriel ou entreprise"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__hide_present
+msgid "Hide the people already present"
+msgstr "Masquer les personnes déjà présentes"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__summary_html
+msgid "Summary"
+msgstr "Sommaire"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__registration_count
+msgid "Registrations listed"
+msgstr "Inscriptions listées"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+msgid "Refresh"
+msgstr "Actualiser"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
+msgid "Present"
+msgstr "Présent"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
+msgid "Undo"
+msgstr "Annuler la présence"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
+msgid "Undo the presence of this person?"
+msgstr "Annuler la présence de cette personne ?"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
+msgid "Present since"
+msgstr "Présent depuis"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+msgid "« Present » records the hour of arrival. The questions listed under « Answers » are the survey questions checked « Show at the registration desk ». A survey belongs to a registration when it was answered by the same contact or with the same e-mail address."
+msgstr "« Présent » enregistre l'heure d'arrivée. Les questions listées sous « Réponses » sont les questions du sondage cochées « Afficher au bureau d'inscription ». Un sondage est rattaché à une inscription quand il a été rempli par le même contact ou avec la même adresse courriel."

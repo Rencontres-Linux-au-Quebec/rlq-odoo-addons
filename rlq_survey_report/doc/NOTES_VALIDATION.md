@@ -6,6 +6,18 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -75. Bureau d'inscription RLQ (v1.121.0)
+
+**Points non vérifiés sans accès à une instance, à confirmer en priorité :**
+1. Après `-u rlq_survey_report` : le menu Événements > Bureau d'inscription RLQ et le bouton « Bureau d'inscription RLQ » du formulaire de l'événement ouvrent l'écran (formulaire d'un modèle transitoire en pleine page) avec l'événement en cours ou le prochain.
+2. Formulaire d'une question de sondage : le bloc « Bureau d'inscription » (case « Afficher au bureau d'inscription », libellé court) apparaît. La vue hérite de `survey.survey_question_form` par `//sheet` : si ce formulaire n'a pas de `<sheet>` sur cette instance, la mise à jour du module échoue à cette vue (rien n'est modifié, Odoo annule la mise à jour) ; le signaler pour changer le xpath.
+3. Boutons « Présent » et « Annuler la présence » dans la liste intégrée (boutons de ligne d'un champ many2many calculé) : l'inscription passe à « Présent » (`action_set_done()`), `date_closed` est rempli ; après l'annulation, l'état revient à « Confirmé » et `date_closed` est vide. Le sommaire et la liste se recalculent après chaque clic.
+4. Sommaire : le HTML s'affiche sans échappement parasite (champ `Html`, `sanitize=False`) ; les heures sont dans le fuseau de l'événement (`date_tz`).
+5. « Questions répondues » (ex. 8/12) : lignes `survey.user_input.line` non sautées (`skipped`) de la participation la plus avancée, sur les questions du sondage hors pages (`is_page`). Une question conditionnelle jamais affichée compte comme non répondue.
+6. Champs lus sur `survey.user_input.line` : `answer_type`, `suggested_answer_id`, `matrix_row_id`, `value_char_box`, `value_text_box`, `value_numerical_box`, `value_date`, `value_datetime` (un champ absent est ignoré).
+7. Même limite que -73 : le rattachement passe par le contact OU l'adresse ; plusieurs inscriptions du même contact montrent les mêmes réponses.
+8. Les quatre tests de `tests/test_registration_desk.py` n'ont pas été exécutés ; `tests/test_registration_desk_report.py` (sans Odoo) passe (run-all.sh, étape 4).
+
 ## -74. Langue du rapport quotidien (v1.115.0)
 
 **Points non vérifiés sans accès à une instance, à confirmer en priorité :**

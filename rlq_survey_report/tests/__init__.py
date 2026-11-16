@@ -46,3 +46,10 @@ try:
     from . import test_survey_pivot
 except ImportError:
     pass
+
+from . import test_registration_desk_report
+
+try:
+    from . import test_registration_desk
+except ImportError:
+    pass

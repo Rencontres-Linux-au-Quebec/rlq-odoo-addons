@@ -47,6 +47,8 @@ rlq_survey_report/
 │   ├── groupes_etiquettes.py          Étiquettes de contact qui reflètent les groupes d'inscrits, synchronisées à chaque changement + tâche quotidienne (v1.102)
 │   ├── event_survey_followup.py       Sondages non complétés : courriels des inscrits à relancer (v1.113), rapport quotidien par courriel (v1.114), langue du rapport par paramètre (v1.115)
 │   ├── followup_report.py             Fonctions pures du suivi des sondages et du rapport quotidien, une langue par envoi (v1.115), testées sans Odoo
+│   ├── event_registration_desk.py     Bureau d'inscription RLQ (v1.121) : sommaire par billet, présences par heure, réponses aux questions cochées, boutons « Présent »
+│   ├── registration_desk_report.py    Fonctions pures du bureau d'inscription (décomptes, sommaire HTML français ou anglais), testées sans Odoo
 │   └── rlq_survey_report_acces.py     Historique d'accès aux rapports (qui, quand, quelle action)
 ├── controllers/aide.py                Page /rlq_survey_report/aide : sert le guide utilisateur dans Odoo (v1.106)
 ├── views/                             Formulaire de l'assistant, menus, gabarit PDF, billets

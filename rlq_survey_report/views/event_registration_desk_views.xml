@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- v1.121.0 - RLQ registration desk (models/event_registration_desk.py). -->
+
+    <!-- Full list of the registrations of the event (opened by « Open as a list »): native search and grouping, same buttons. -->
+    <record id="view_rlq_registration_desk_registration_list" model="ir.ui.view">
+        <field name="name">event.registration.list.rlq.registration.desk</field>
+        <field name="model">event.registration</field>
+        <field name="priority">92</field>
+        <field name="arch" type="xml">
+            <list string="Registration desk" create="false" decoration-success="state == 'done'" decoration-muted="state == 'draft'">
+                <field name="name"/>
+                <field name="event_ticket_id"/>
+                <field name="email" optional="hide"/>
+                <field name="state"/>
+                <field name="date_closed" string="Present since" optional="show"/>
+                <field name="rlq_survey_state"/>
+                <field name="rlq_desk_progress"/>
+                <field name="rlq_desk_answers"/>
+                <button name="action_rlq_desk_present" type="object" string="Present" icon="fa-check" class="btn-primary"
+                        invisible="state == 'done'"/>
+                <button name="action_rlq_desk_undo" type="object" string="Undo" icon="fa-undo"
+                        invisible="state != 'done'" confirm="Undo the presence of this person?"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- The desk: event, summary, search, list of the registrations with the buttons. -->
+    <record id="view_rlq_registration_desk_form" model="ir.ui.view">
+        <field name="name">rlq.registration.desk.form</field>
+        <field name="model">rlq.registration.desk</field>
+        <field name="arch" type="xml">
+            <form string="RLQ registration desk">
+                <header>
+                    <button name="action_refresh" type="object" string="Refresh" icon="fa-refresh" class="btn-primary"/>
+                    <button name="action_open_list" type="object" string="Open as a list" icon="fa-list"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="event_id" options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="search_text" placeholder="Name, e-mail address or company"/>
+                            <field name="hide_present"/>
+                            <field name="registration_count"/>
+                        </group>
+                    </group>
+                    <field name="summary_html" readonly="1" nolabel="1"/>
+                    <p class="text-muted">« Present » records the hour of arrival. The questions listed under « Answers » are the survey questions checked « Show at the registration desk ». A survey belongs to a registration when it was answered by the same contact or with the same e-mail address.</p>
+                    <field name="registration_ids" readonly="1" nolabel="1">
+                        <list limit="200" create="false" delete="false" decoration-success="state == 'done'" decoration-muted="state == 'draft'">
+                            <field name="event_ticket_id"/>
+                            <field name="name"/>
+                            <field name="state"/>
+                            <field name="rlq_survey_state"/>
+                            <field name="rlq_desk_progress"/>
+                            <field name="rlq_desk_answers"/>
+                            <button name="action_rlq_desk_present" type="object" string="Present" icon="fa-check" class="btn-primary"
+                                    invisible="state == 'done'"/>
+                            <button name="action_rlq_desk_undo" type="object" string="Undo" icon="fa-undo"
+                                    invisible="state != 'done'" confirm="Undo the presence of this person?"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rlq_registration_desk" model="ir.actions.act_window">
+        <field name="name">RLQ registration desk</field>
+        <field name="res_model">rlq.registration.desk</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+    <!-- Button on the event form (xpath on //sheet: always present, see event_inscriptions_alerte_views.xml) -->
+    <record id="view_event_form_rlq_registration_desk" model="ir.ui.view">
+        <field name="name">event.event.form.rlq.registration.desk</field>
+        <field name="model">event.event</field>
+        <field name="inherit_id" ref="event.view_event_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Registration desk" name="rlq_registration_desk">
+                    <button name="action_rlq_registration_desk" type="object" string="RLQ registration desk" icon="fa-id-badge" colspan="2"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Box and short label on the survey question (same prudent xpath //sheet). If the form has no sheet, the fields still
+         exist on survey.question and can be set from a list or by import. -->
+    <record id="view_survey_question_form_rlq_registration_desk" model="ir.ui.view">
+        <field name="name">survey.question.form.rlq.registration.desk</field>
+        <field name="model">survey.question</field>
+        <field name="inherit_id" ref="survey.survey_question_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Registration desk" name="rlq_registration_desk">
+                    <field name="rlq_registration_desk"/>
+                    <field name="rlq_desk_label" invisible="not rlq_registration_desk"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <menuitem id="menu_rlq_registration_desk_events"
+              name="RLQ registration desk"
+              parent="event.event_main_menu"
+              action="action_rlq_registration_desk"
+              sequence="43"
+              groups="event.group_event_user"/>
+
+</odoo>

@@ -18,3 +18,5 @@ from . import synchro_sommaire
 from . import event_registration_email
 from . import followup_report
 from . import event_survey_followup
+from . import registration_desk_report
+from . import event_registration_desk
