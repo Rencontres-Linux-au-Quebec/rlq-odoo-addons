@@ -38,6 +38,7 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 from . import followup_report as fr
+from . import registration_desk_report as rd
 from .event_inscriptions_alerte import CLE_PARAMETRE_COURRIEL_INSCRIPTIONS, ETATS_COMPTES
 
 _logger = logging.getLogger(__name__)
@@ -65,12 +66,22 @@ class EventRegistrationSurveyFollowup(models.Model):
         help="The survey of the ticket of this registration, otherwise the survey of the event.",
     )
 
+    rlq_survey_done_date = fields.Datetime(
+        string="Survey submitted on", compute="_compute_rlq_survey_state",
+        help="Date and time when the expected survey was completed (the most recent completed participation). Empty: not "
+             "completed.",
+    )
+
     def _compute_rlq_survey_state(self):
-        status = self._rlq_survey_status_map()
+        """v1.133.0: read through _origin. In a form that is not saved yet (the registration desk, opened from the menu), the
+        registrations of its list are « new » copies whose id is a NewId, and a NewId is false: _rlq_survey_status_map()
+        dropped them and the column « Survey » said « No survey » for everybody until the form was saved by another click."""
+        status = self._origin._rlq_survey_status_map()
         for registration in self:
-            survey, state, _done_at = status.get(registration.id, (False, "none", None))
+            survey, state, done_at = status.get(registration._origin.id, (False, "none", None))
             registration.rlq_survey_state = state
             registration.rlq_expected_survey_id = survey or False
+            registration.rlq_survey_done_date = done_at or False
 
     @api.model
     def _search_rlq_survey_state(self, operator, value):
@@ -268,7 +279,7 @@ class EventEventSurveyFollowup(models.Model):
         generated = fields.Datetime.context_timestamp(event.with_context(tz=event.date_tz or "America/Toronto"), now)
         event._rlq_envoyer_courriel(
             recipient, fr.daily_report_subject(event.name, generated.strftime("%Y-%m-%d"), lang),
-            fr.daily_report_html(event.name, event._rlq_debut_texte(), generated.strftime("%Y-%m-%d %H:%M %Z"),
+            fr.daily_report_html(event.name, event._rlq_debut_texte(), rd.local_stamp(generated, "%Y-%m-%d %H:%M", lang),
                                  totals, tickets, new_registrations, event._rlq_url(), lang=lang),
         )
         event.rlq_daily_report_sent = now

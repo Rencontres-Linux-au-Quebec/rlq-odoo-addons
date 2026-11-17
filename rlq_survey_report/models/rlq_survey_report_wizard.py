@@ -107,6 +107,7 @@ except ImportError:  # pragma: no cover - selon la version installée sur l'inst
         "(pip install openpyxl)."
     )
 
+from . import registration_desk_report as rd  # noqa: E402 - pure functions (zone_label, local_stamp)
 from . import report_builder as rb  # noqa: E402 - placé après le bloc try/except des bibliothèques optionnelles
 
 CLE_CACHE_NOMS = "rlq_survey_report.noms_repondants"   # cache par transaction de _respondent_nom() (v1.125.0)
@@ -700,7 +701,7 @@ class RlqSurveyReportWizard(models.TransientModel):
         version = module.installed_version or module.latest_version or "?"
         if module.write_date:
             date_locale = fields.Datetime.context_timestamp(self, module.write_date)
-            date_install = f"{date_locale.strftime('%Y-%m-%d %H:%M')} {date_locale.strftime('%Z')}"
+            date_install = rd.local_stamp(date_locale, "%Y-%m-%d %H:%M", self.env.lang or rd.DEFAULT_LANG)
         else:
             date_install = "?"
         return f"rlq_survey_report v{version} ({date_install})"
@@ -2935,7 +2936,7 @@ class RlqSurveyReportWizard(models.TransientModel):
         bandeau_generation = (
             f"<p class='titre-sondage' style='text-align:right;'>Rapport généré le "
             f"<strong>{date_generation_locale.strftime('%Y-%m-%d %H:%M')}</strong> "
-            f"{date_generation_locale.strftime('%Z')} (heure locale)</p>"
+            f"{rd.zone_label(date_generation_locale.strftime('%Z'), self.env.lang or rd.DEFAULT_LANG)} (heure locale)</p>"
         )
         pied_de_page = (
             "<p style='text-align:center;color:var(--texte-attenue);font-size:.8rem;"

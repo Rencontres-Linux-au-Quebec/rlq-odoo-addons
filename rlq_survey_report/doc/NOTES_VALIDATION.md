@@ -6,6 +6,27 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -87. Bureau d'inscription : % de sondages complétés, % inscrits et % présents, date de soumission, heures de présence (v1.133.0)
+
+**À confirmer après `-u rlq_survey_report --i18n-overwrite` :**
+1. Tableau par billet : plus de colonnes « Questions répondues (%) » ni « Questions non répondues (%) » ; dernière colonne « Sondages complétés (%) ».
+2. « Réponses aux questions affichées au bureau d'inscription » : colonnes « % inscrits » et « % présents » ; les questions sont en gras.
+3. Liste du bas : colonne « Sondage soumis le » après « Sondage », en heure locale ; vide si le sondage n'est pas complété.
+4. La colonne « Heure de départ » est cachée (menu des colonnes pour l'afficher) ; les boutons « Départ » fonctionnent toujours.
+5. Ouvrir le bureau par le menu : la colonne « Sondage » montre tout de suite le bon état (plus de « Aucun sondage » partout).
+6. « Présent », puis « Annuler la présence » : l'heure d'arrivée disparaît. « Présent » de nouveau : nouvelle heure. Même chose en annulant depuis la fiche de l'inscription ou le bureau d'inscription d'Odoo.
+
+## -86. HNE/HAE, lien de message et date au bureau d'inscription, totaux des bénévoles (v1.132.0)
+
+**À confirmer après `-u rlq_survey_report --i18n-overwrite` :**
+1. En-tête du rapport de sondage, pied du bureau d'inscription, rapport quotidien par courriel : « HNE » (hiver) ou « HAE » (été) au lieu de « EST » / « EDT » ; en anglais, EST / EDT.
+2. Bureau d'inscription : le nom du participant est un lien ; il ouvre la conversation Discussion (contact avec un compte) ou la fiche du contact.
+3. Clic sur l'en-tête « Nom du participant » : « éric » et « Élise » sont classés avec les « e », dans les deux sens. Même chose dans « Ouvrir en liste ».
+4. La date de l'événement est affichée sous l'événement et dans le titre du bureau.
+5. Tableau des bénévoles : ligne « Total » en haut et en bas ; « À quelle heure pensez-vous arriver ? » et « Heure de départ prévue? » remplissent les colonnes d'heures.
+6. Tableau « Pourquoi les nombres du sondage diffèrent... » : comparer avec la liste des sondages (colonne « Terminé »).
+7. Fenêtre « Modifier les réponses » : le nom de la question n'est plus un lien ; la fenêtre « Oups ! » (OwlError) ne revient plus. Si elle revient ailleurs, noter l'écran.
+
 ## -85. Fichiers HTML/PDF plus rapides, confirmation dans une fenêtre (v1.131.0)
 
 **Non vérifié sans instance, à confirmer :**
