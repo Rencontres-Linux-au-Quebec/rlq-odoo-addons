@@ -121,8 +121,17 @@
         <field name="name">rlq.survey.report.wizard.form.password</field>
         <field name="model">rlq.survey.report.wizard</field>
         <field name="arch" type="xml">
-            <form string="Mot de passe requis">
+            <form string="Confirmation">
                 <sheet>
+                    <div class="alert alert-info" role="alert"
+                         style="display:flex;align-items:flex-start;gap:.6rem;">
+                        <span style="background:#fff;border:2px solid #000;border-radius:4px;
+                                     padding:1px 3px;display:inline-flex;flex-shrink:0;margin-top:2px;">
+                            <field name="confirmation_renseignements_personnels" nolabel="1"/>
+                        </span>
+                        <label for="confirmation_renseignements_personnels" style="margin:0;"
+                               string="Ce rapport contient des renseignements personnels sur les participants (noms, coordonnées). Je confirme être responsable de leur confidentialité et m'engage à ne le partager qu'avec les personnes autorisées."/>
+                    </div>
                     <div class="alert alert-warning" role="alert">
                         Ce rapport contient des renseignements personnels : un mot de passe est
                         requis pour le télécharger en HTML ou en PDF, ou pour l'afficher à
@@ -138,6 +147,34 @@
                         Critères minimaux (niveau PCI DSS v4.0) : au moins 12 caractères, une
                         minuscule, une majuscule, un chiffre et un caractère spécial
                         (ex. ! @ # $ %).
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_continuer_apres_mot_de_passe" type="object" string="Continuer" class="btn-primary"/>
+                    <button name="action_annuler_mot_de_passe" type="object" string="Annuler" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- v1.131.0 : window opened by "Générer", "Télécharger en HTML/PDF" or "Exporter en Excel" when no password is
+         needed (anonymised report) but the confirmation about personal information is not given yet. Same buttons as
+         the password window: "Continuer" runs again the action that opened it. -->
+    <record id="view_rlq_survey_report_wizard_form_confirmation" model="ir.ui.view">
+        <field name="name">rlq.survey.report.wizard.form.confirmation</field>
+        <field name="model">rlq.survey.report.wizard</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <form string="Confirmation">
+                <sheet>
+                    <div class="alert alert-info" role="alert"
+                         style="display:flex;align-items:flex-start;gap:.6rem;">
+                        <span style="background:#fff;border:2px solid #000;border-radius:4px;
+                                     padding:1px 3px;display:inline-flex;flex-shrink:0;margin-top:2px;">
+                            <field name="confirmation_renseignements_personnels" nolabel="1"/>
+                        </span>
+                        <label for="confirmation_renseignements_personnels" style="margin:0;"
+                               string="Ce rapport contient des renseignements personnels sur les participants (noms, coordonnées). Je confirme être responsable de leur confidentialité et m'engage à ne le partager qu'avec les personnes autorisées."/>
                     </div>
                 </sheet>
                 <footer>
@@ -180,15 +217,9 @@
         <field name="arch" type="xml">
             <form string="Rapport de sondage">
                 <sheet>
-                    <div class="alert alert-info" role="alert" invisible="state != 'draft'"
-                         style="display:flex;align-items:flex-start;gap:.6rem;">
-                        <span style="background:#fff;border:2px solid #000;border-radius:4px;
-                                     padding:1px 3px;display:inline-flex;flex-shrink:0;margin-top:2px;">
-                            <field name="confirmation_renseignements_personnels" nolabel="1"/>
-                        </span>
-                        <label for="confirmation_renseignements_personnels" style="margin:0;"
-                               string="Ce rapport contient des renseignements personnels sur les participants (noms, coordonnées). Je confirme être responsable de leur confidentialité et m'engage à ne le partager qu'avec les personnes autorisées."/>
-                    </div>
+                    <!-- v1.131.0 : the box "Je confirme être responsable..." is no longer here; it is in the window that
+                         opens on "Générer", "Télécharger en HTML/PDF" or "Exporter en Excel" (views ..._form_confirmation
+                         and ..._form_password above). -->
                     <div class="oe_title" style="display:flex;align-items:baseline;justify-content:space-between;gap:.8rem;width:100%;">
                         <h1 style="margin-bottom:0;">Rapport de sondage</h1>
                         <field name="debug_info" readonly="1" nolabel="1" class="text-muted"

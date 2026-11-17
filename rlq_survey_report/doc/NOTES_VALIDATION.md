@@ -6,6 +6,18 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -85. Fichiers HTML/PDF plus rapides, confirmation dans une fenêtre (v1.131.0)
+
+**Non vérifié sans instance, à confirmer :**
+1. Formulaire principal : la case « Ce rapport contient des renseignements personnels… » n'y est plus.
+2. « Générer » (écran, anonymisé) : une fenêtre « Confirmation » s'ouvre avec la case ; « Continuer » sans la cocher affiche un message ; cochée, le rapport est généré.
+3. « Générer » en HTML ou PDF non anonymisé : la même fenêtre montre la case et le mot de passe pré-rempli ; « Continuer » télécharge le fichier.
+4. Après une première confirmation, « Télécharger en HTML/PDF » et « Exporter en Excel » ne la redemandent pas dans la même fenêtre.
+5. « Durée de génération » : après un fichier HTML ou PDF, la ligne se termine par « Fichier HTML : … » ou « Fichier PDF : … (moteur PDF …, chiffrement …, enregistrement …) ». Comparer le temps total avec la 1.130.
+6. Contenu du rapport identique à la 1.130 (mêmes sondages, mêmes réponses, mêmes « N'ont pas répondu »).
+7. « Générer » en HTML ou PDF : dans l'historique d'accès, une seule nouvelle ligne (HTML ou PDF), plus de ligne « écran » en double ; le fichier est dans « Fichiers déjà générés ».
+8. Si « moteur PDF » domine : définir le paramètre système `report.url` (ex. `http://127.0.0.1:8069`) et mesurer de nouveau.
+
 ## -84. Correctif urgent : base non chargée avec la 1.129 (v1.130.0)
 
 **À confirmer :**

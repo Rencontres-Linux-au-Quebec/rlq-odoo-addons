@@ -1,5 +1,53 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.131.0
+
+**Short title:** faster production of HTML and PDF files (one reading of the answers for all the surveys, no second copy of the report, time of each file step shown); personal information confirmation moved to a window opened by "Générer", "Télécharger en HTML/PDF" and "Exporter en Excel".
+
+**Reason for the request:** (1) "optimiser le temps pour générer un fichier HTML ou PDF, c'est encore trop long"; (2) "déplacer la case confirmation (concernant les renseignements personnels) dans une fenêtre qui va apparaître en appuyant sur : générer HTML ou PDF etc".
+
+**Diagnosis (what was measured, and what was not):**
+
+- No Odoo instance here, and the line "Durée de génération" of the slow report was not available: the real report could not be profiled.
+- Measured here on a fictitious report (300 participants, 40 meetings, 5.2 MB of HTML): building the HTML in Python takes 0.3 s; wkhtmltopdf 0.12.6 takes 5.8 s for 501 pages (about 1 s per MB), and removing the shadows or the rounded corners changes nothing; the encryption of the PDF by pypdf takes 0.15 s for 400 pages. So, outside the queries to Odoo, the PDF engine is the main cost of a PDF, and it was not touched.
+- Read in the code, and removed:
+  - `_compute_report()` searched the participations of each survey separately, then read their answer lines, contacts and answers survey by survey; with "Voir les personnes n'ayant pas répondu" (checked by default since 1.127.0) a second search per survey was added. Now one search for all the surveys, so Odoo reads the lines, contacts and answers in batches for the whole report.
+  - "Générer" with the HTML or PDF format saved, in addition to the file, an encrypted "screen copy" of the report, and the access history copied each file again after reading it back from disk: for a report of several MB, one more encryption and two more copies. The screen copy is now made only for a display on screen (the file itself is in "Fichiers déjà générés" and in the history), and the history takes the content already in memory.
+  - Excel export: the answer lines of each question were found by filtering every line of the survey once per question; now grouped in one pass.
+
+**Changes:**
+
+- `models/rlq_survey_report_wizard.py`:
+  - New `_user_inputs_par_sondage(surveys)` and `_domaine_user_inputs(survey_ids)`; `_user_inputs()` uses the same domain. Used by `_compute_report()` and `action_export_excel()`.
+  - `_compute_report()`: people who did not answer read with one search for all the surveys; screen copy and "ecran" history entry only when the format is "screen".
+  - `_sauvegarder_copie_ecran()` returns `(attachment, content)`; `_journaliser_acces(..., contenu_b64=None)`.
+  - `action_download_html()`, `action_download_pdf()`: time of each step (HTML: encryption, saving; PDF: PDF engine, encryption, saving) added to "Durée de génération" by the new `_ajouter_duree_fichier()` and written in the server log. When the system parameter `report.url` is empty, the log line says which address wkhtmltopdf uses.
+  - Success notification of "Générer" in HTML or PDF: shows the time.
+  - Confirmation: `action_generate()` no longer refuses with an error when the box is not checked; `_verifier_mot_de_passe_ou_demander()` opens the confirmation window first, for every action (also "screen" with anonymisation, which needs no password). `_action_demander_mot_de_passe()` opens `..._form_password` when a password is required, otherwise the new `..._form_confirmation`. `action_continuer_apres_mot_de_passe()` refuses with a message while the box is not checked.
+- `views/rlq_survey_report_views.xml`: the box is removed from the main form; added at the top of the password window (renamed "Confirmation"); new view `view_rlq_survey_report_wizard_form_confirmation` (priority 20, so that it is never the default form).
+- `tests/test_wizard.py`: 7 Odoo tests (confirmation window with and without password, "Continuer" without the box, "Continuer" with the box, box absent from the main form, HTML file without screen copy and with its time, grouped search identical to the search per survey). The test `test_mot_de_passe_manquant_rouvre_la_demande` compared "password" with the text "form" and could not pass: it now compares the view.
+- `__manifest__.py`: version `18.0.1.131.0`. Guide (header, section 2, troubleshooting), `doc/NOTES_VALIDATION.md` (section -85).
+
+**Bugs fixed:**
+
+- Symptom: none seen on screen. Diagnosis: `test_mot_de_passe_manquant_rouvre_la_demande` looked for "password" in the view type ("form"). Fix: it compares the id of the password view.
+
+**Safeguards and edge cases:**
+
+- The confirmation is asked once per report window: after "Continuer", the downloads and the Excel export of the same window do not ask again ("Modifier les paramètres" keeps it).
+- Two separate views rather than one view with the password fields hidden by a condition (a field hidden by a condition already disappeared from a form of this module).
+- A survey without any retained participation is still reported in the warnings, as before.
+- The order of the participations inside a survey is the same as before (same default order of the search).
+- A screen display still saves its encrypted copy and its history entry, as before.
+
+**Checks:**
+
+- `./run-all.sh --sans-odoo`: ruff, syntax and manifest, standalone tests: OK.
+- Measurements above made here with wkhtmltopdf 0.12.6 and pypdf 6.17.0 on a fictitious report.
+- The Odoo code was NOT run: no Odoo instance here; the gain on the real report is not measured.
+
+**Action required:** update the module on DEV (`-u rlq_survey_report`), generate the same HTML or PDF file as before, then send me the line "Durée de génération" shown under the title of the form (it now also has the steps of the file). If "moteur PDF" is most of the time, set the system parameter `report.url` to the local address of Odoo (for example `http://127.0.0.1:8069`) and try again.
+
 ## 18.0.1.130.0
 
 **Short title:** urgent fix: Odoo could not load the database with 18.0.1.129.0.
