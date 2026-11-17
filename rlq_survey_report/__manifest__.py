@@ -30,11 +30,15 @@ Génère, depuis le backend Odoo, un rapport HTML combinant :
 * Un tableau des bénévoles (Événements > Bénévoles) pour leur coordonnateur :
   nom avec lien pour lui écrire sur Odoo, inscription, sondage, type,
   langues, arrivée, départ et une colonne par rôle, à partir du sondage du
-  billet bénévole seulement.
+  billet bénévole seulement ; export dans un chiffrier .xlsx (tableaux
+  croisés dynamiques).
 * Un bureau d'inscription (Événements > Bureau d'inscription RLQ) : par
   type de billet, inscrits, présents, sondages et questions complétés ou
   non, présences par heure, réponses aux questions choisies (en ligne ou
   sur place, dîner…) et bouton « Présent » pour chaque inscrit.
+* La modification manuelle des réponses d'un sondage (administrateurs des
+  sondages), avec un historique dans un menu et l'envoi au participant d'une
+  mise à jour par courriel.
 * Des exports HTML, PDF et Excel protégés par mot de passe (Loi 25,
   RGPD), une section "À surveiller" pour repérer rapidement les pistes
   d'amélioration, et une anonymisation optionnelle des participants.
@@ -53,7 +57,7 @@ Copyright (C) 2026 Services-Conseils Linux Inc. (info@rencontres-linux.quebec)
 Copyright (C) 2026 Rencontres Linux au Québec contributors
 GNU Affero General Public License v3 or later (http://www.gnu.org/licenses/agpl)
 """,
-    "version": "18.0.1.125.0",
+    "version": "18.0.1.130.0",
     "category": "Marketing/Surveys",
     "author": "Services-Conseils Linux Inc. (info@rencontres-linux.quebec), Rencontres Linux au Québec contributors",
     "maintainer": "Rencontres Linux au Québec <info@rencontres-linux.quebec>",
@@ -69,6 +73,7 @@ GNU Affero General Public License v3 or later (http://www.gnu.org/licenses/agpl)
         "data/ir_config_parameter_aide.xml",
         "data/ir_config_parameter_mot_de_passe.xml",
         "data/mail_template_reponses.xml",
+        "data/mail_template_mise_a_jour.xml",
         "data/ir_config_parameter_courriel_inscriptions.xml",
         "data/ir_config_parameter_registration_email.xml",
         "data/ir_config_parameter_langue_courriels.xml",
@@ -80,6 +85,7 @@ GNU Affero General Public License v3 or later (http://www.gnu.org/licenses/agpl)
         "views/event_registration_email_views.xml",
         "views/event_survey_followup_views.xml",
         "views/event_registration_desk_views.xml",
+        "views/survey_answer_edit_views.xml",
     ],
     "assets": {
         "web.assets_backend": [

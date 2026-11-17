@@ -183,6 +183,7 @@ msgstr "Corriger et renvoyer"
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_registration_list
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_form
 msgid "Registered on"
 msgstr "Inscrit le"
 
@@ -194,11 +195,14 @@ msgstr "Non annulées"
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_search
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_change_search
 msgid "Group By"
 msgstr "Regrouper par"
 
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_event_registration_form_rlq_email
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_change__email
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit__recipient
 msgid "E-mail address"
 msgstr "Adresse courriel"
 
@@ -214,6 +218,7 @@ msgstr "Corriger"
 
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_fix_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_edit_form
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -254,10 +259,13 @@ msgstr "%(n)d inscription(s) corrigée(s)."
 
 #. module: rlq_survey_report
 #: model:ir.model.fields,field_description:rlq_survey_report.field_event_registration__rlq_survey_state
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_change_search
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__survey_filter
 #: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__sort_by__rlq_survey_state
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_coordinator__survey_filter
 #: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__sort_by__survey
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_change__survey_id
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit__survey_id
 msgid "Survey"
 msgstr "Sondage"
 
@@ -454,6 +462,7 @@ msgstr "Bureau d'inscription"
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_registration_list
 msgid "Arrived at"
 msgstr "Heure d'arrivée"
 
@@ -503,6 +512,9 @@ msgstr "Effacer l'heure de départ de cette personne ?"
 
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_change_search
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_change__respondent
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit__respondent
 msgid "Person"
 msgstr "Personne"
 
@@ -583,10 +595,124 @@ msgid "Volunteers"
 msgstr "Bénévoles"
 
 #. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_form
+msgid "Export to a spreadsheet"
+msgstr "Exporter dans un chiffrier"
+
+#. module: rlq_survey_report
 #: model:ir.actions.act_url,name:rlq_survey_report.action_rlq_guide_events
 #: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_guide_events
 msgid "User guide"
 msgstr "Guide d'utilisation"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_edit_line_form
+#: model:ir.model,name:rlq_survey_report.model_rlq_survey_answer_edit_line
+msgid "Answer to edit"
+msgstr "Réponse à modifier"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_edit_line_form
+msgid "This type of question (matrix) cannot be changed here."
+msgstr "Ce type de question (matrice) ne peut pas être modifié ici."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_edit_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.survey_user_input_view_form_rlq_answer_edit
+#: code:addons/rlq_survey_report/models/survey_answer_edit.py:0
+msgid "Edit the answers"
+msgstr "Modifier les réponses"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_edit_form
+msgid "Example: correction asked by the person on the phone"
+msgstr "Exemple : correction demandée par la personne au téléphone"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_edit_form
+msgid "Click a question to change its answer. The questions changed are shown in bold; each one is written in the history (Surveys &gt; Detailed reports &gt; Manual changes of answers)."
+msgstr "Cliquez sur une question pour changer sa réponse. Les questions modifiées sont en gras ; chacune est inscrite dans l'historique (Sondages &gt; Rapports détaillés &gt; Modifications manuelles des réponses)."
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_edit_form
+msgid "Save the changes"
+msgstr "Enregistrer les changements"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_change_list
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_change_search
+#: model:ir.actions.act_window,name:rlq_survey_report.action_rlq_survey_answer_change
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_survey_answer_change
+#: code:addons/rlq_survey_report/models/survey_answer_edit.py:0
+msgid "Manual changes of answers"
+msgstr "Modifications manuelles des réponses"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_change_list
+msgid "Send the update by e-mail"
+msgstr "Envoyer la mise à jour par courriel"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_change_form
+#: model:ir.model,name:rlq_survey_report.model_rlq_survey_answer_change
+msgid "Manual change of a survey answer"
+msgstr "Modification manuelle d'une réponse de sondage"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_change_search
+msgid "Not sent yet"
+msgstr "Pas encore envoyées"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_change_search
+msgid "Sent"
+msgstr "Envoyées"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_change_search
+msgid "Date of the change"
+msgstr "Date de la modification"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_change_search
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_change__user_id
+msgid "Changed by"
+msgstr "Modifié par"
+
+#. module: rlq_survey_report
+#: model:ir.actions.act_window,help:rlq_survey_report.action_rlq_survey_answer_change
+msgid "No manual change yet."
+msgstr "Aucune modification manuelle pour l'instant."
+
+#. module: rlq_survey_report
+#: model:ir.actions.act_window,help:rlq_survey_report.action_rlq_survey_answer_change
+msgid "To change an answer: Surveys &gt; Detailed reports &gt; Edit answers, open the participation, then « Edit the answers »."
+msgstr "Pour changer une réponse : Sondages &gt; Rapports détaillés &gt; Modifier des réponses, ouvrez la participation, puis « Modifier les réponses »."
+
+#. module: rlq_survey_report
+#: model:ir.actions.act_window,name:rlq_survey_report.action_rlq_survey_answer_edit_participations
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_survey_answer_edit
+msgid "Edit answers"
+msgstr "Modifier des réponses"
+
+#. module: rlq_survey_report
+#: model:ir.actions.act_window,help:rlq_survey_report.action_rlq_survey_answer_edit_participations
+msgid "Open a participation, then click « Edit the answers »."
+msgstr "Ouvrez une participation, puis cliquez « Modifier les réponses »."
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.survey_user_input_view_form_rlq_answer_edit
+#: model:ir.model.fields,field_description:rlq_survey_report.field_survey_user_input__rlq_change_ids
+msgid "Manual changes"
+msgstr "Modifications manuelles"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_registration_list
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_form
+msgid "Event date"
+msgstr "Date de l'événement"
 
 #. module: rlq_survey_report
 #. odoo-python
@@ -613,6 +739,16 @@ msgstr "Libellé court au bureau d'inscription"
 #: model:ir.model.fields,help:rlq_survey_report.field_survey_question__rlq_desk_label
 msgid "Short name of this question in the registration desk (for example « Lunch »). Empty: the title of the question."
 msgstr "Nom court de cette question dans le bureau d'inscription (par exemple « Dîner »). Vide : le titre de la question."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_event_registration__rlq_present_by
+msgid "Marked present by"
+msgstr "Marqué présent par"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_event_registration__rlq_present_by
+msgid "User who marked this person present (button « Present » of the RLQ registration desk, or the registration desk of Odoo). Cleared when the presence is undone."
+msgstr "Utilisateur qui a marqué cette personne présente (bouton « Présent » du bureau d'inscription RLQ, ou bureau d'inscription d'Odoo). Effacé quand la présence est annulée."
 
 #. module: rlq_survey_report
 #: model:ir.model.fields,help:rlq_survey_report.field_event_registration__rlq_departure
@@ -738,6 +874,18 @@ msgstr "Certains billets bénévoles n'ont pas de sondage : leurs bénévoles so
 #. module: rlq_survey_report
 #. odoo-python
 #: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
+msgid "The spreadsheet export needs the Python library « openpyxl », which is not installed on this server (pip install openpyxl)."
+msgstr "L'export dans un chiffrier nécessite la bibliothèque Python « openpyxl », qui n'est pas installée sur ce serveur (pip install openpyxl)."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
+msgid "No volunteer to export for this event."
+msgstr "Aucun bénévole à exporter pour cet événement."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
 msgid "No question about the roles (title containing « rôle ») in the survey « %(survey)s »."
 msgstr "Aucune question sur les rôles (titre contenant « rôle ») dans le sondage « %(survey)s »."
 
@@ -746,6 +894,12 @@ msgstr "Aucune question sur les rôles (titre contenant « rôle ») dans le son
 #: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
 msgid "No question about the languages (title containing « langue ») in the survey « %(survey)s »."
 msgstr "Aucune question sur les langues (titre contenant « langue ») dans le sondage « %(survey)s »."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
+msgid "The survey « %(survey)s » has no question about the hour of arrival or of departure: the hours shown are those recorded at the registration desk (« Present », « Left »)."
+msgstr "Le sondage « %(survey)s » n'a pas de question sur l'heure d'arrivée ou de départ : les heures affichées sont celles enregistrées au bureau d'inscription (« Présent », « Départ »)."
 
 #. module: rlq_survey_report
 #. odoo-python
@@ -788,3 +942,299 @@ msgstr "Nombre de rôles"
 #: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_coordinator__sort_desc
 msgid "Reverses the order of the table."
 msgstr "Inverse l'ordre du tableau."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/survey_answer_edit.py:0
+msgid "Update sent to %(count)s person(s)."
+msgstr "Mise à jour envoyée à %(count)s personne(s)."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/survey_answer_edit.py:0
+msgid "%(count)s answer(s) changed; the changes are in the history."
+msgstr "%(count)s réponse(s) modifiée(s) ; les changements sont dans l'historique."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/survey_answer_edit.py:0
+msgid "The history of the manual changes cannot be modified."
+msgstr "L'historique des modifications manuelles ne peut pas être modifié."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/survey_answer_edit.py:0
+msgid "Only a survey administrator can send the update of the answers."
+msgstr "Seul un administrateur des sondages peut envoyer la mise à jour des réponses."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/survey_answer_edit.py:0
+msgid "The selected changes have already been sent."
+msgstr "Les modifications sélectionnées ont déjà été envoyées."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/survey_answer_edit.py:0
+msgid "Not sent (no e-mail address): %(names)s."
+msgstr "Non envoyée (aucune adresse courriel) : %(names)s."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/survey_answer_edit.py:0
+msgid "Update of the answers"
+msgstr "Mise à jour des réponses"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/survey_answer_edit.py:0
+msgid "Only a survey administrator can change the answers of a participation."
+msgstr "Seul un administrateur des sondages peut modifier les réponses d'une participation."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/survey_answer_edit.py:0
+msgid "No answer was changed."
+msgstr "Aucune réponse n'a été modifiée."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/survey_answer_edit.py:0
+msgid "Answers saved"
+msgstr "Réponses enregistrées"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/survey_answer_edit.py:0
+msgid "The update was sent to %(email)s."
+msgstr "La mise à jour a été envoyée à %(email)s."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/survey_answer_edit.py:0
+msgid "No e-mail sent: the person has no e-mail address."
+msgstr "Aucun courriel envoyé : la personne n'a pas d'adresse courriel."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_change__change_date
+msgid "Changed on"
+msgstr "Modifié le"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_change__user_input_id
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit__user_input_id
+msgid "Participation"
+msgstr "Participation"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_survey_answer_change__user_input_id
+msgid "Deleting the participation deletes its history too (personal data)."
+msgstr "Supprimer la participation supprime aussi son historique (renseignements personnels)."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_survey_answer_change__respondent
+msgid "Name (or e-mail address) of the person, at the time of the change."
+msgstr "Nom (ou adresse courriel) de la personne, au moment de la modification."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_change__question_id
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__question_id
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__question_text
+msgid "Question"
+msgstr "Question"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_change__question_title
+msgid "Question title"
+msgstr "Titre de la question"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_survey_answer_change__question_title
+msgid "Title of the question at the time of the change, kept if the question is deleted."
+msgstr "Titre de la question au moment de la modification, conservé si la question est supprimée."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_change__old_value
+msgid "Answer before"
+msgstr "Réponse avant"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_change__new_value
+msgid "Answer after"
+msgstr "Réponse après"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_change__reason
+msgid "Reason"
+msgstr "Motif"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_change__sent_date
+msgid "Sent to the person on"
+msgstr "Envoyé à la personne le"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_change__sent_by
+msgid "Sent by"
+msgstr "Envoyé par"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_survey_user_input__rlq_change_count
+msgid "Number of manual changes"
+msgstr "Nombre de modifications manuelles"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_survey_user_input__rlq_changes_html
+msgid "Changes (e-mail)"
+msgstr "Changements (courriel)"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_survey_user_input__rlq_changes_html
+msgid "The manual changes put in the update e-mail sent to the person (question, answer before, answer after)."
+msgstr "Les modifications manuelles mises dans le courriel de mise à jour envoyé à la personne (question, réponse avant, réponse après)."
+
+#. module: rlq_survey_report
+#: model:ir.model,name:rlq_survey_report.model_rlq_survey_answer_edit
+msgid "Edit the answers of a participation"
+msgstr "Modifier les réponses d'une participation"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit__line_ids
+msgid "Questions"
+msgstr "Questions"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit__reason
+msgid "Reason of the change"
+msgstr "Motif de la modification"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_survey_answer_edit__reason
+msgid "Written in the history with each question changed (optional)."
+msgstr "Inscrit dans l'historique avec chaque question modifiée (facultatif)."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit__send_email
+msgid "Send the update by e-mail to the person"
+msgstr "Envoyer la mise à jour par courriel à la personne"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_survey_answer_edit__send_email
+msgid "After saving, the person receives the list of the changes, then all their answers as they are now."
+msgstr "Après l'enregistrement, la personne reçoit la liste des changements, puis toutes ses réponses telles qu'elles sont maintenant."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__wizard_id
+msgid "Edit"
+msgstr "Modification"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__sequence
+msgid "Sequence"
+msgstr "Séquence"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__question_type
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__question_type_label
+msgid "Type of question"
+msgstr "Type de question"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_survey_answer_edit_line__question_text
+msgid "Title of the question, on several lines when it is long."
+msgstr "Titre de la question, sur plusieurs lignes quand il est long."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_survey_answer_edit_line__question_type_label
+msgid "Label of the type, as translated by the Surveys application."
+msgstr "Libellé du type, tel que traduit par l'application Sondages."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__comments_allowed
+msgid "Comment allowed"
+msgstr "Commentaire permis"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__editable
+msgid "Can be changed"
+msgstr "Modifiable"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__current_text
+msgid "Current answer"
+msgstr "Réponse actuelle"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__readonly_text
+msgid "Answer (cannot be changed here)"
+msgstr "Réponse (non modifiable ici)"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__new_text
+msgid "New answer"
+msgstr "Nouvelle réponse"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__new_number
+msgid "New number"
+msgstr "Nouveau nombre"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__new_scale
+msgid "New value of the scale"
+msgstr "Nouvelle valeur de l'échelle"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__new_date
+msgid "New date"
+msgstr "Nouvelle date"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__new_datetime
+msgid "New date and time"
+msgstr "Nouvelles date et heure"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__new_choice_id
+msgid "New choice"
+msgstr "Nouveau choix"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__new_choice_ids
+msgid "New choices"
+msgstr "Nouveaux choix"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__new_comment
+msgid "Comment or « Other » answer"
+msgstr "Commentaire ou réponse « Autre »"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__erase
+msgid "No answer"
+msgstr "Aucune réponse"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_survey_answer_edit_line__erase
+msgid "Removes the answer to this question: the question becomes « skipped »."
+msgstr "Retire la réponse à cette question : la question devient « sautée »."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__new_display
+msgid "Answer after the change"
+msgstr "Réponse après la modification"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__change_display
+msgid "New answer (text)"
+msgstr "Nouvelle réponse (texte)"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_survey_answer_edit_line__change_display
+msgid "The new answer, only for the questions changed; empty when the answer is unchanged."
+msgstr "La nouvelle réponse, seulement pour les questions modifiées ; vide quand la réponse n'a pas changé."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__changed
+msgid "Changed"
+msgstr "Modifiée"

@@ -6,6 +6,56 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -84. Correctif urgent : base non chargée avec la 1.129 (v1.130.0)
+
+**À confirmer :**
+1. Avec les fichiers de la 1.130.0 en place, Odoo démarre et charge la base (plus de « Type of related field ... question_text is inconsistent »).
+2. Fenêtre « Modifier les réponses » : la colonne Question affiche le titre, sur plusieurs lignes s'il est long.
+3. **Ne jamais installer la 1.129.0** : elle empêche Odoo de charger toute base où le module est installé.
+
+## -83. Fenêtre « Modifier les réponses » en français (v1.129.0)
+
+**À confirmer après `-u rlq_survey_report --i18n-overwrite` :**
+1. La phrase sous l'en-tête de la fenêtre « Modifier les réponses » est en français (« Cliquez sur une question pour changer sa réponse... »).
+2. Les questions longues s'affichent sur plusieurs lignes, plus coupées par « ... ».
+3. Liste vide du menu « Modifications manuelles des réponses » : texte d'aide en français.
+4. Sans `--i18n-overwrite` (ou la mise à jour de la langue dans Paramètres > Traductions > Langues), Odoo garde l'ancienne traduction chargée : la phrase reste en anglais.
+
+## -82. Libellés, en-têtes de colonnes, liens du courriel de réponses, marqué présent par, chiffrier direct (v1.128.0)
+
+**Non vérifié sans instance, à confirmer :**
+1. Fenêtre « Modifier les réponses » : tout en français (type de question compris) ; « Nouvelle réponse (texte) » vide pour les questions non modifiées ; en-tête « Modifiée » lisible.
+2. En-têtes des colonnes des listes du module : au moins le premier mot visible (largeurs fixes, voir CHANGELOG).
+3. Sondages non complétés : icône à droite des en-têtes, colonnes « Date de l'événement », « Inscrit le », etc. à cocher.
+4. Erreur `Invalid field event.event.survey_id` : plus dans le journal à la fin d'un sondage ; le courriel de réponses a de nouveau le « Résumé de votre inscription ».
+5. Courriel de réponses (sondage d'un billet, case « Envoyer ses réponses au participant » cochée) : boutons « Modifier mes réponses » et « Je ne peux plus venir ». Ouvrir chacun (page de confirmation, rien ne change), puis confirmer : le sondage se rouvre avec les réponses affichées ; l'inscription passe à « Annulée » avec une note. Vérifier qu'aucun antivirus de courriel ne soumet le formulaire.
+6. Bureau d'inscription : colonne « Marqué présent par », remplie par « Présent » et par le bureau d'inscription d'Odoo ; effacée par « Annuler la présence ».
+7. Bénévoles > « Exporter dans un chiffrier » : un fichier .xlsx se télécharge directement, avec trois onglets.
+
+## -81. Pourcentages, « (sans réponse) », modification manuelle des réponses (v1.127.0)
+
+**Non vérifié sans instance, à confirmer :**
+1. Bureau d'inscription : colonnes « Questions répondues (%) » et « Questions non répondues (%) » ; note sous le tableau des réponses ; « Végétarien » et « végétarien » sur une seule ligne.
+2. Nouveau rapport de sondage : « Voir les personnes n'ayant pas répondu » est coché.
+3. Fiche d'une participation (administrateur des sondages) : bouton « Modifier les réponses » dans l'en-tête. La vue hérite de `survey.survey_user_input_view_form` par `//header` et `//div[@name='button_box']` (vérifiés dans le code d'Odoo 18.0).
+4. Fenêtre « Modifier les réponses » : un clic sur une question ouvre le bon champ ; « Enregistrer les changements » modifie la réponse (vérifier dans la fiche de la participation et dans un rapport) ; une ligne par question modifiée dans Sondage > Rapports détaillés > Modifications manuelles des réponses.
+5. Nombre 0 : enregistré comme réponse, pas comme question sautée.
+6. Courriel de mise à jour : reçu par la personne, avec le tableau avant / après et toutes les réponses ; la ligne de l'historique montre « Envoyé à la personne le ». Un deuxième envoi des mêmes lignes est refusé.
+7. Utilisateur des sondages qui n'est pas administrateur : voit l'historique, pas le bouton ni le menu « Modifier des réponses ».
+8. Questions « échelle » : maintenant présentes dans le courriel de réponses, le bureau d'inscription et le tableau des bénévoles.
+9. Les 4 tests Odoo de `tests/test_survey_answer_edit.py` n'ont pas été exécutés.
+
+## -80. Export des bénévoles dans un chiffrier, heures prévues, durée de génération à l'écran (v1.126.0)
+
+**Non vérifié sans instance, à confirmer :**
+1. Événements > Bénévoles > « Exporter dans un chiffrier » : une archive ZIP est téléchargée ; elle s'ouvre avec le mot de passe ; le fichier .xlsx a les feuilles « Bénévoles », « Rôles » et « Langues ». Le chiffrement (pyzipper) n'a pas été exécuté ici.
+2. Un tableau croisé dynamique se crée sur la feuille « Rôles » (Rôle en lignes, Type en colonnes, nombre de Bénévole), dans Excel et dans LibreOffice Calc.
+3. Sans mot de passe, avec « !CHANGE-MOI@ » ou avec un mot de passe faible : message d'erreur, aucun fichier.
+4. L'export apparaît dans l'historique d'accès des rapports (action « Exporté (Excel) », « Bénévoles : <événement> »).
+5. Colonnes « Heure d'arrivée » et « Heure de départ » du tableau des bénévoles : réponses du sondage si une question a « arrivée » / « départ » dans son titre ; sinon heures du bureau d'inscription et note au-dessus du tableau. Les titres réels des questions n'ont pas pu être vérifiés.
+6. La ligne « rlq_survey_report <version> - affiché le ... » est en haut du bureau d'inscription et du tableau des bénévoles.
+7. Rapport de sondage : après une génération, « Durée de génération : X s (...) » sous le titre du formulaire, dans la notification de succès et au bas du rapport.
+
 ## -79. Génération du rapport HTML plus rapide (v1.125.0)
 
 **Non vérifié sans instance, à confirmer :**

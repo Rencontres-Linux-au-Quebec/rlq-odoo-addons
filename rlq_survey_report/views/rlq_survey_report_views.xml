@@ -97,14 +97,14 @@
         <field name="arch" type="xml">
             <list create="false">
                 <field name="title"/>
-                <field name="rlq_date_titre" string="Date (titre)"/>
+                <field name="rlq_date_titre" string="Date (titre)" width="124px"/>
                 <field name="rlq_jour_semaine" string="Jour de la semaine" optional="hide"/>
-                <field name="create_date" string="Date de création" optional="hide"/>
-                <field name="rlq_answer_count" string="Inscrit"/>
-                <field name="rlq_answer_done_count" string="Terminé"/>
-                <field name="rlq_answer_in_progress_count" string="Débuté sans terminer"/>
-                <field name="rlq_answer_duration_avg_seconds" string="Durée moyenne (s)" optional="hide"/>
-                <field name="rlq_question_count" string="Nb. questions" optional="hide"/>
+                <field name="create_date" string="Date de création" optional="hide" width="154px"/>
+                <field name="rlq_answer_count" string="Inscrit" width="86px"/>
+                <field name="rlq_answer_done_count" string="Terminé" width="86px"/>
+                <field name="rlq_answer_in_progress_count" string="Débuté sans terminer" width="184px"/>
+                <field name="rlq_answer_duration_avg_seconds" string="Durée moyenne (s)" optional="hide" width="161px"/>
+                <field name="rlq_question_count" string="Nb. questions" optional="hide" width="131px"/>
                 <field name="user_id" string="Responsable" optional="hide"/>
             </list>
         </field>
@@ -194,6 +194,10 @@
                         <field name="debug_info" readonly="1" nolabel="1" class="text-muted"
                                style="font-weight:normal;font-size:.85rem;"/>
                     </div>
+                    <!-- v1.126.0 : durée de la dernière génération, au total et par étape (aussi au bas du rapport et dans le journal). -->
+                    <div class="text-muted" style="font-size:.85rem;" invisible="not duree_generation">
+                        Durée de génération : <field name="duree_generation" readonly="1" nolabel="1" class="oe_inline"/>
+                    </div>
                     <group invisible="state != 'draft'">
                         <!-- Colonnes détaillées dans view_survey_survey_list_rlq ci-dessus
                              (référencée via le contexte pour aussi gouverner la fenêtre
@@ -208,14 +212,14 @@
                                          'tree_view_ref': 'rlq_survey_report.view_survey_survey_list_rlq'}">
                             <list create="false">
                                 <field name="title"/>
-                                <field name="rlq_date_titre" string="Date (titre)"/>
+                                <field name="rlq_date_titre" string="Date (titre)" width="124px"/>
                                 <field name="rlq_jour_semaine" string="Jour de la semaine" optional="hide"/>
-                                <field name="create_date" string="Date de création" optional="hide"/>
-                                <field name="rlq_answer_count" string="Inscrit"/>
-                                <field name="rlq_answer_done_count" string="Terminé"/>
-                                <field name="rlq_answer_in_progress_count" string="Débuté sans terminer"/>
-                                <field name="rlq_answer_duration_avg_seconds" string="Durée moyenne (s)" optional="hide"/>
-                                <field name="rlq_question_count" string="Nb. questions" optional="hide"/>
+                                <field name="create_date" string="Date de création" optional="hide" width="154px"/>
+                                <field name="rlq_answer_count" string="Inscrit" width="86px"/>
+                                <field name="rlq_answer_done_count" string="Terminé" width="86px"/>
+                                <field name="rlq_answer_in_progress_count" string="Débuté sans terminer" width="184px"/>
+                                <field name="rlq_answer_duration_avg_seconds" string="Durée moyenne (s)" optional="hide" width="161px"/>
+                                <field name="rlq_question_count" string="Nb. questions" optional="hide" width="131px"/>
                                 <field name="user_id" string="Responsable" optional="hide"/>
                             </list>
                         </field>
@@ -425,7 +429,7 @@
         <field name="arch" type="xml">
             <list editable="bottom" create="false">
                 <field name="title"/>
-                <field name="rlq_date_titre" string="Date (titre)"/>
+                <field name="rlq_date_titre" string="Date (titre)" width="124px"/>
                 <field name="rlq_actions_suivi" string="Actions de suivi (amélioration continue)"/>
             </list>
         </field>
@@ -473,7 +477,7 @@
         <field name="model">rlq.survey.report.acces</field>
         <field name="arch" type="xml">
             <list create="false" edit="false" delete="false" default_order="date_acces desc">
-                <field name="date_acces"/>
+                <field name="date_acces" width="150px"/>
                 <field name="user_id"/>
                 <field name="action"/>
                 <!-- v1.92.0 : le nom du fichier n'est plus une colonne à part (il doublait la
@@ -482,8 +486,8 @@
                      de « Télécharger » est réglée par static/src/css/historique_fichiers.css. -->
                 <field name="nom_fichier" column_invisible="1"/>
                 <field name="fichier_telecharger" widget="binary" filename="nom_fichier" string="Télécharger"/>
-                <field name="anonymise"/>
-                <field name="nb_sondages"/>
+                <field name="anonymise" width="101px"/>
+                <field name="nb_sondages" width="221px"/>
                 <field name="resume_sondages" widget="text"/>
             </list>
         </field>

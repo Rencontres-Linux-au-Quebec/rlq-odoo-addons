@@ -12,7 +12,7 @@
                 <header>
                     <button name="action_rlq_fix_email" type="object" string="Fix and resend" class="btn-primary"/>
                 </header>
-                <field name="create_date" string="Registered on"/>
+                <field name="create_date" string="Registered on" width="150px"/>
                 <field name="event_id"/>
                 <field name="name"/>
                 <field name="email"/>
@@ -20,7 +20,7 @@
                 <field name="rlq_email_suggestion"/>
                 <field name="partner_id" optional="show"/>
                 <field name="state" optional="show"/>
-                <field name="rlq_failed_mail_count" optional="show"/>
+                <field name="rlq_failed_mail_count" optional="show" width="169px"/>
                 <button name="action_rlq_fix_email" type="object" string="Fix and resend" icon="fa-envelope"/>
             </list>
         </field>

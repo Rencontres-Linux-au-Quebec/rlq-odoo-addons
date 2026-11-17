@@ -23,6 +23,9 @@ Fonctionnement :
   - `rlq_reponses_html` (calculé, non stocké) est le corps « questions et réponses »
     que le modèle insère avec <t t-out="object.rlq_reponses_html"/>.
 
+Liens (v1.128.0) : au bas des réponses, « Modifier mes réponses » et « Je ne peux plus venir » (controllers/reponses.py),
+chacun seulement s'il s'applique (sondage encore ouvert ; inscription ni annulée, ni présente, événement pas terminé).
+
 Garde-fous : jamais d'erreur remontée au participant (échec journalisé, la soumission
 du sondage n'est JAMAIS bloquée) ; jamais pour une entrée de test ; jamais deux fois
 pour la même réponse ; rien si aucune adresse de courriel n'est connue (sondage
@@ -89,6 +92,9 @@ class SurveyUserInputReponses(models.Model):
         if numerique or numerique == 0:
             if getattr(ligne, "answer_type", None) == "numerical_box":
                 return prefixe + f"{numerique:g}"
+        # v1.127.0 : les questions « échelle » (scale) étaient omises du courriel de réponses.
+        if getattr(ligne, "answer_type", None) == "scale":
+            return prefixe + str(getattr(ligne, "value_scale", "") or 0)
         for champ in ("value_date", "value_datetime"):
             valeur = getattr(ligne, champ, None)
             if valeur:
@@ -115,7 +121,50 @@ class SurveyUserInputReponses(models.Model):
         for participation in self:
             resume = participation._rlq_resume_inscription_html()
             reponses = rb.html_reponses_courriel(participation._rlq_blocs_reponses())
-            participation.rlq_reponses_html = resume + reponses
+            participation.rlq_reponses_html = resume + reponses + participation._rlq_liens_html()
+
+    # ------------------------------------------------------------ liens « Modifier mes réponses » / « Je ne peux plus venir »
+
+    def _rlq_peut_modifier(self):
+        """La personne peut-elle rouvrir ses réponses ? Sondage actif, pas une certification ni une session en direct, pas
+        d'échéance dépassée, pas une entrée de test, participation déjà soumise (v1.128.0)."""
+        self.ensure_one()
+        sondage = self.survey_id
+        if self.test_entry or self.state != "done" or not self.access_token or not sondage.active:
+            return False
+        if getattr(sondage, "certification", False) or getattr(self, "is_session_answer", False):
+            return False
+        echeance = getattr(self, "deadline", False)
+        return not (echeance and echeance < fields.Datetime.now())
+
+    def _rlq_inscription_annulable(self):
+        """L'inscription que la personne peut annuler elle-même : celle de cette participation, ni annulée, ni déjà
+        marquée présente, et l'événement pas encore terminé ; sinon None (v1.128.0)."""
+        self.ensure_one()
+        if self.test_entry or not self.access_token:
+            return None
+        inscription = self._rlq_inscription_associee()
+        if not inscription or inscription.state in ("cancel", "done"):
+            return None
+        fin = getattr(inscription.event_id, "date_end", False)
+        if fin and fin < fields.Datetime.now():
+            return None
+        return inscription
+
+    def _rlq_liens_html(self):
+        """Liens du bas du courriel de réponses ; chaîne vide si aucun ne s'applique ou en cas d'erreur (le courriel ne doit
+        jamais en dépendre)."""
+        self.ensure_one()
+        try:
+            base = self.survey_id.get_base_url().rstrip("/")
+            racine = "%s/rlq_survey_report/reponses/%s" % (base, self.access_token)
+            return rb.html_liens_courriel(
+                racine + "/modifier" if self._rlq_peut_modifier() else None,
+                racine + "/annuler" if self._rlq_inscription_annulable() else None,
+            )
+        except Exception:  # noqa: BLE001
+            _logger.info("rlq_survey_report : liens du courriel non calculés pour la participation %s", self.id, exc_info=True)
+            return ""
 
     def _rlq_inscription_associee(self):
         """Inscription à l'événement correspondant à cette participation (même courriel,
@@ -126,14 +175,17 @@ class SurveyUserInputReponses(models.Model):
         adresse = self._rlq_destinataire()
         if not adresse or not self.survey_id:
             return inscriptions
+        # v1.128.0 : event.event.survey_id n'existe que si un module l'ajoute (absent sur l'instance de production :
+        # « ValueError: Invalid field event.event.survey_id » à chaque fin de sondage, et le résumé de l'inscription
+        # manquait dans le courriel). Le critère n'est ajouté que si le champ existe.
+        critere_sondage = [("event_ticket_id.rlq_survey_id", "=", self.survey_id.id)]
+        if "survey_id" in self.env["event.event"]._fields:
+            critere_sondage = ["|"] + critere_sondage + [("event_id.survey_id", "=", self.survey_id.id)]
         try:
             return inscriptions.sudo().search([
                 ("email", "=ilike", adresse),
                 ("state", "!=", "cancel"),
-                "|",
-                ("event_ticket_id.rlq_survey_id", "=", self.survey_id.id),
-                ("event_id.survey_id", "=", self.survey_id.id),
-            ], order="id desc", limit=1)
+            ] + critere_sondage, order="id desc", limit=1)
         except Exception:  # noqa: BLE001 - pas de résumé plutôt qu'une erreur
             _logger.info("rlq_survey_report : inscription non trouvée pour la participation %s", self.id, exc_info=True)
             return inscriptions

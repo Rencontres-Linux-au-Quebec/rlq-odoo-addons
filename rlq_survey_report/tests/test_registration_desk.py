@@ -224,3 +224,44 @@ class TestRlqRegistrationDesk(TransactionCase):
         coordinator.survey_filter = "not_started"
         self.assertIn("Paul Sans Sondage", coordinator.table_html)
         self.assertNotIn("Hélène Sur Place", coordinator.table_html)
+
+    def test_volunteers_hours_come_from_the_survey(self):
+        """v1.126.0: the planned hours answered in the survey replace the hours of the registration desk."""
+        self._volunteer_setup()
+        arrival = self.env["survey.question"].create({"survey_id": self.v_survey.id, "title": "Heure d'arrivée prévue",
+                                                      "question_type": "char_box", "sequence": 4})
+        registration = self._volunteer("Nadia Horaire", "nadia@example.com", "done")
+        user_input = self.env["survey.user_input"].search([("email", "=", "nadia@example.com")], limit=1)
+        self.env["survey.user_input.line"].create({"user_input_id": user_input.id, "question_id": arrival.id,
+                                                   "answer_type": "char_box", "value_char_box": "8 h 30"})
+        registration.action_rlq_desk_present()
+        rows, _groups, _extra, notes = self.env["rlq.volunteer.coordinator"].create({"event_id": self.event.id})._rlq_table_data()
+        row = next(r for r in rows if r["name"] == "Nadia Horaire")
+        self.assertEqual(row["arrived"], "8 h 30")                       # survey answer, not the time of « Present »
+        self.assertTrue(any("départ" in note or "departure" in note for note in notes))   # no departure question: a note
+
+    def test_volunteers_export_is_a_spreadsheet(self):
+        """v1.128.0: an .xlsx file downloaded directly (no ZIP archive), logged in the access history."""
+        self._volunteer_setup()
+        self._volunteer("Nadia Export", "nadia@example.com")
+        coordinator = self.env["rlq.volunteer.coordinator"].create({"event_id": self.event.id})
+        action = coordinator.action_export_excel()
+        self.assertIn(".xlsx", action["url"])
+        attachment = self.env["ir.attachment"].search([("res_model", "=", "rlq.volunteer.coordinator"), ("res_id", "=", coordinator.id)])
+        self.assertTrue(attachment.name.endswith(".xlsx"))
+        self.assertEqual(attachment.mimetype, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        sheets = rd.volunteer_export_sheets(*coordinator._rlq_table_data()[:2], self.env.lang)
+        self.assertIn("Nadia Export", [line[0] for line in sheets[0][2]])
+
+    def test_who_marked_present_is_recorded_and_cleared(self):
+        registration = self._registration("Paul Présent", "paul@example.com")
+        volunteer_user = self.env["res.users"].create({"name": "Bénévole accueil", "login": "rlq_desk_volunteer",
+                                                       "groups_id": [(6, 0, [self.env.ref("event.group_event_user").id])]})
+        registration.with_user(volunteer_user).action_rlq_desk_present()
+        self.assertEqual(registration.rlq_present_by, volunteer_user)
+        registration.write({"state": "done"})                              # already present: the first person is kept
+        self.assertEqual(registration.rlq_present_by, volunteer_user)
+        registration.action_rlq_desk_undo()
+        self.assertFalse(registration.rlq_present_by)
+        registration.write({"state": "done"})                              # native desk of Odoo: recorded too
+        self.assertEqual(registration.rlq_present_by, self.env.user)

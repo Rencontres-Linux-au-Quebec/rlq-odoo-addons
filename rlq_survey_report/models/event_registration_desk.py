@@ -104,6 +104,11 @@ def program_stamp(env, event=None):
 class EventRegistrationDesk(models.Model):
     _inherit = "event.registration"
 
+    rlq_present_by = fields.Many2one(
+        "res.users", string="Marked present by", copy=False, readonly=True, ondelete="set null",
+        help="User who marked this person present (button « Present » of the RLQ registration desk, or the registration "
+             "desk of Odoo). Cleared when the presence is undone.",
+    )
     rlq_departure = fields.Datetime(
         string="Left at", copy=False, readonly=True,
         help="Time when the person left the event, recorded with the « Left » button of the RLQ registration desk.",
@@ -175,7 +180,7 @@ class EventRegistrationDesk(models.Model):
 
         lines = self.env["survey.user_input.line"].sudo()
         wanted = ["user_input_id", "question_id", "skipped", "answer_type", "suggested_answer_id", "matrix_row_id",
-                  "value_char_box", "value_text_box", "value_numerical_box", "value_date", "value_datetime"]
+                  "value_char_box", "value_text_box", "value_numerical_box", "value_scale", "value_date", "value_datetime"]
         read = [name for name in wanted if name in lines._fields]
         inputs = set(chosen.values())
         rows = lines.search_read([("user_input_id", "in", sorted(inputs))], read, order="id") if inputs else []
@@ -313,6 +318,28 @@ class EventRegistrationDesk(models.Model):
                 ids = self._rlq_desk_sorted_ids(event_id, field_name)
                 return SQL("array_position(%s::integer[], %s) %s %s", ids, SQL.identifier(alias, "id"), direction, nulls)
         return super()._order_field_to_sql(alias, field_name, direction, nulls, query)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        """A registration created already present (« done ») records who created it as the person who marked it present."""
+        for vals in vals_list:
+            if vals.get("state") == "done" and not vals.get("rlq_present_by"):
+                vals["rlq_present_by"] = self.env.user.id
+        return super().create(vals_list)
+
+    def write(self, vals):
+        """v1.128.0: whatever the screen (RLQ desk, desk of Odoo, form), passing to « done » records who did it, and leaving
+        « done » clears it. Done here rather than in the button, so that every way of marking present is covered."""
+        if "state" in vals and "rlq_present_by" not in vals:
+            if vals["state"] == "done":
+                to_mark = self.filtered(lambda r: r.state != "done")
+                others = self - to_mark
+                result = super(EventRegistrationDesk, to_mark).write(dict(vals, rlq_present_by=self.env.user.id)) if to_mark else True
+                if others:
+                    result = super(EventRegistrationDesk, others).write(vals) and result
+                return result
+            vals = dict(vals, rlq_present_by=False)
+        return super().write(vals)
 
     def action_rlq_desk_present(self):
         """Button « Present »: native state « done » (the hour is recorded by Odoo in date_closed). Cancelled: left alone."""
@@ -452,8 +479,9 @@ class RlqRegistrationDesk(models.TransientModel):
     def _compute_desk(self):
         for wizard in self:
             registrations = wizard._rlq_all_registrations()
-            wizard.summary_html = (rd.desk_summary_html(registrations._rlq_desk_rows(), self.env.lang or rd.DEFAULT_LANG)
-                                   + program_stamp(self.env, wizard.event_id))
+            # v1.126.0: the program name, version, local date and time come FIRST, above the summary.
+            wizard.summary_html = (program_stamp(self.env, wizard.event_id)
+                                   + rd.desk_summary_html(registrations._rlq_desk_rows(), self.env.lang or rd.DEFAULT_LANG))
             listed = wizard._rlq_listed(registrations)
             wizard.registration_ids = listed
             wizard.registration_count = len(listed)

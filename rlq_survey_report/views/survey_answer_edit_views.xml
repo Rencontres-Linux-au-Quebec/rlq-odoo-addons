@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- v1.127.0 - Manual changes of survey answers (models/survey_answer_edit.py). -->
+
+    <!-- One question of the edit window: the field that fits its type. -->
+    <record id="view_rlq_survey_answer_edit_line_form" model="ir.ui.view">
+        <field name="name">rlq.survey.answer.edit.line.form</field>
+        <field name="model">rlq.survey.answer.edit.line</field>
+        <field name="arch" type="xml">
+            <form string="Answer to edit">
+                <sheet>
+                    <group>
+                        <field name="question_id" readonly="1"/>
+                        <field name="question_type" invisible="1"/>
+                        <field name="question_type_label" readonly="1"/>
+                        <field name="current_text" readonly="1"/>
+                        <field name="editable" invisible="1"/>
+                        <field name="readonly_text" invisible="editable"/>
+                    </group>
+                    <p class="text-muted" invisible="editable">This type of question (matrix) cannot be changed here.</p>
+                    <group invisible="not editable">
+                        <field name="new_text" invisible="question_type not in ('char_box', 'text_box')"/>
+                        <field name="erase" invisible="question_type not in ('numerical_box', 'scale')"/>
+                        <field name="new_number" invisible="question_type != 'numerical_box' or erase"/>
+                        <field name="new_scale" invisible="question_type != 'scale' or erase"/>
+                        <field name="new_date" invisible="question_type != 'date'"/>
+                        <field name="new_datetime" invisible="question_type != 'datetime'"/>
+                        <field name="new_choice_id" invisible="question_type != 'simple_choice'" options="{'no_create': True, 'no_open': True}"/>
+                        <field name="new_choice_ids" widget="many2many_checkboxes" invisible="question_type != 'multiple_choice'"/>
+                        <field name="comments_allowed" invisible="1"/>
+                        <field name="new_comment" invisible="question_type not in ('simple_choice', 'multiple_choice')"/>
+                        <field name="new_display" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- The edit window of a participation. -->
+    <record id="view_rlq_survey_answer_edit_form" model="ir.ui.view">
+        <field name="name">rlq.survey.answer.edit.form</field>
+        <field name="model">rlq.survey.answer.edit</field>
+        <field name="arch" type="xml">
+            <form string="Edit the answers">
+                <group>
+                    <group>
+                        <field name="survey_id" readonly="1"/>
+                        <field name="respondent" readonly="1"/>
+                        <field name="recipient" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="reason" placeholder="Example: correction asked by the person on the phone"/>
+                        <field name="send_email"/>
+                    </group>
+                </group>
+                <p class="text-muted">Click a question to change its answer. The questions changed are shown in bold; each one is written in the history (Surveys > Detailed reports > Manual changes of answers).</p>
+                <field name="line_ids" nolabel="1">
+                    <list create="false" delete="false" decoration-bf="changed" decoration-muted="not editable">
+                        <field name="question_text"/>
+                        <field name="current_text"/>
+                        <field name="change_display"/>
+                        <field name="changed" widget="boolean" width="94px"/>
+                        <field name="editable" column_invisible="1"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_apply" type="object" string="Save the changes" class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- History of the manual changes. -->
+    <record id="view_rlq_survey_answer_change_list" model="ir.ui.view">
+        <field name="name">rlq.survey.answer.change.list</field>
+        <field name="model">rlq.survey.answer.change</field>
+        <field name="arch" type="xml">
+            <list string="Manual changes of answers" create="false" edit="false" decoration-muted="sent_date">
+                <header>
+                    <button name="action_send_update" type="object" string="Send the update by e-mail"
+                            groups="survey.group_survey_manager"/>
+                </header>
+                <field name="change_date" width="150px"/>
+                <field name="user_id"/>
+                <field name="survey_id"/>
+                <field name="respondent"/>
+                <field name="email" optional="hide"/>
+                <field name="question_title"/>
+                <field name="old_value"/>
+                <field name="new_value"/>
+                <field name="reason" optional="show"/>
+                <field name="sent_date" optional="show" width="206px"/>
+                <field name="sent_by" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rlq_survey_answer_change_form" model="ir.ui.view">
+        <field name="name">rlq.survey.answer.change.form</field>
+        <field name="model">rlq.survey.answer.change</field>
+        <field name="arch" type="xml">
+            <form string="Manual change of a survey answer" create="false" edit="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="change_date"/>
+                            <field name="user_id"/>
+                            <field name="reason"/>
+                            <field name="sent_date"/>
+                            <field name="sent_by"/>
+                        </group>
+                        <group>
+                            <field name="survey_id"/>
+                            <field name="user_input_id"/>
+                            <field name="respondent"/>
+                            <field name="email"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="question_title"/>
+                        <field name="old_value"/>
+                        <field name="new_value"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_rlq_survey_answer_change_search" model="ir.ui.view">
+        <field name="name">rlq.survey.answer.change.search</field>
+        <field name="model">rlq.survey.answer.change</field>
+        <field name="arch" type="xml">
+            <search string="Manual changes of answers">
+                <field name="respondent" filter_domain="['|', ('respondent', 'ilike', self), ('email', 'ilike', self)]"/>
+                <field name="survey_id"/>
+                <field name="question_title"/>
+                <field name="user_id"/>
+                <filter name="not_sent" string="Not sent yet" domain="[('sent_date', '=', False)]"/>
+                <filter name="sent" string="Sent" domain="[('sent_date', '!=', False)]"/>
+                <separator/>
+                <filter name="change_date" string="Date of the change" date="change_date"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_person" string="Person" context="{'group_by': 'user_input_id'}"/>
+                    <filter name="group_survey" string="Survey" context="{'group_by': 'survey_id'}"/>
+                    <filter name="group_user" string="Changed by" context="{'group_by': 'user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_rlq_survey_answer_change" model="ir.actions.act_window">
+        <field name="name">Manual changes of answers</field>
+        <field name="res_model">rlq.survey.answer.change</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_rlq_survey_answer_change_search"/>
+        <field name="context">{'create': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No manual change yet.</p>
+            <p>To change an answer: Surveys > Detailed reports > Edit answers, open the participation, then « Edit the answers ».</p>
+        </field>
+    </record>
+
+    <!-- Participations, to choose the one to edit. -->
+    <record id="action_rlq_survey_answer_edit_participations" model="ir.actions.act_window">
+        <field name="name">Edit answers</field>
+        <field name="res_model">survey.user_input</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('test_entry', '=', False)]</field>
+        <field name="context">{'create': False}</field>
+        <field name="help" type="html">
+            <p>Open a participation, then click « Edit the answers ».</p>
+        </field>
+    </record>
+
+    <!-- Button and smart button on the participation form of Odoo. -->
+    <record id="survey_user_input_view_form_rlq_answer_edit" model="ir.ui.view">
+        <field name="name">survey.user_input.form.rlq.answer.edit</field>
+        <field name="model">survey.user_input</field>
+        <field name="inherit_id" ref="survey.survey_user_input_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_rlq_edit_answers" type="object" string="Edit the answers" icon="fa-pencil"
+                        groups="survey.group_survey_manager"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_rlq_open_changes" type="object" class="oe_stat_button" icon="fa-history"
+                        invisible="not rlq_change_count">
+                    <field name="rlq_change_count" widget="statinfo" string="Manual changes"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <menuitem id="menu_rlq_survey_answer_edit"
+              name="Edit answers"
+              parent="menu_rlq_survey_report_in_survey_app"
+              action="action_rlq_survey_answer_edit_participations"
+              sequence="75"
+              groups="survey.group_survey_manager"/>
+
+    <menuitem id="menu_rlq_survey_answer_change"
+              name="Manual changes of answers"
+              parent="menu_rlq_survey_report_in_survey_app"
+              action="action_rlq_survey_answer_change"
+              sequence="76"
+              groups="survey.group_survey_user"/>
+</odoo>

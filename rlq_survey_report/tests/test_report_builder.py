@@ -1216,6 +1216,53 @@ class TestRemplacerNomsComplets(TestRemplacerNomComplet):
         self.assertEqual(rb.texte_chrono([("début", 1.0)]), "")
 
 
+class TestHtmlChangementsCourriel(unittest.TestCase):
+    """v1.127.0 - tableau des changements du courriel « Mise à jour de vos réponses »."""
+
+    def test_tableau_avant_apres(self):
+        html = rb.html_changements_courriel([("Dîner ?", "Non", "Oui"), ("Commentaire", "", "Ligne 1\nLigne 2")])
+        self.assertIn("<th", html)
+        self.assertIn("<strong>Dîner ?</strong>", html)
+        self.assertIn(">Non</td>", html)
+        self.assertIn(">Oui</td>", html)
+        self.assertIn("(aucune réponse)", html)                                      # réponse vide avant
+        self.assertIn("Ligne 1<br/>Ligne 2", html)
+
+    def test_tout_est_echappe(self):
+        html = rb.html_changements_courriel([("<b>Q</b>", "<script>x</script>", "a & b")])
+        self.assertNotIn("<script>", html)
+        self.assertNotIn("<b>Q</b>", html)
+        self.assertIn("a &amp; b", html)
+
+    def test_aucun_changement(self):
+        self.assertEqual(rb.html_changements_courriel([]), "")
+        self.assertEqual(rb.html_changements_courriel(None), "")
+
+
+class TestLiensCourriel(unittest.TestCase):
+    """v1.128.0 - liens « Modifier mes réponses » et « Je ne peux plus venir », pages de confirmation."""
+
+    def test_liens(self):
+        html = rb.html_liens_courriel("https://x.org/a?b=1&c=2", "https://x.org/annuler")
+        self.assertIn('href="https://x.org/a?b=1&amp;c=2"', html)
+        self.assertIn("Modifier mes réponses", html)
+        self.assertIn("Je ne peux plus venir", html)
+        self.assertNotIn("Je ne peux plus venir", rb.html_liens_courriel("https://x.org/m", None))
+        self.assertEqual(rb.html_liens_courriel(None, None), "")
+
+    def test_page_avec_formulaire_post(self):
+        html = rb.page_lien_courriel("Titre <b>", "Ligne 1\nLigne 2", "Confirmer", "/rlq/x", "jeton\"1")
+        self.assertTrue(html.startswith("<!DOCTYPE html>"))
+        self.assertIn('<form method="post" action="/rlq/x">', html)
+        self.assertIn('name="csrf_token" value="jeton&quot;1"', html)
+        self.assertIn("<p>Ligne 1</p><p>Ligne 2</p>", html)
+        self.assertNotIn("<b>", html)
+        self.assertIn('name="robots" content="noindex, nofollow"', html)
+
+    def test_page_sans_formulaire(self):
+        self.assertNotIn("<form", rb.page_lien_courriel("Fini", "Merci"))
+
+
 class TestHtmlReponsesCourriel(unittest.TestCase):
     """v1.94.0 : corps du courriel qui rappelle ses réponses au participant."""
 

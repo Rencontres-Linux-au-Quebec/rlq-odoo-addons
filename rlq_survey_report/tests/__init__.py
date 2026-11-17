@@ -53,3 +53,8 @@ try:
     from . import test_registration_desk
 except ImportError:
     pass
+
+try:
+    from . import test_survey_answer_edit
+except ImportError:
+    pass

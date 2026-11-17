@@ -6,3 +6,4 @@
 # the Free Software Foundation, either version 3 of the License, or (at your option) any later version. (http://www.gnu.org/licenses/agpl)
 from . import aide
 from . import chat
+from . import reponses

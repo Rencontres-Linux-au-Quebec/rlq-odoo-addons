@@ -42,7 +42,7 @@
 <div class="page">
 
 <h1>Guide utilisateur — Rapport de sondage</h1>
-<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.125.0</strong> — mis à jour le 2026-11-16.<br>
+<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.130.0</strong> — mis à jour le 2026-11-16.<br>
 Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 
 <p>Ce module produit un compte-rendu détaillé — à l'écran, en fichier HTML, en PDF ou en Excel — des réponses à un ou plusieurs sondages Odoo, notamment les sondages de satisfaction envoyés après chaque rencontre. Il aide à repérer ce qui va bien, ce qui se dégrade, et à suivre les actions entreprises d'une rencontre à l'autre.</p>
@@ -69,6 +69,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
     <li><a href="#courriels-invalides">Adresses courriel invalides des inscriptions</a></li>
     <li><a href="#suivi-sondages">Sondages non complétés et rapport quotidien</a></li>
     <li><a href="#bureau-inscription">Bureau d'inscription</a></li>
+    <li><a href="#modifier-reponses">Modifier les réponses d'un sondage</a></li>
     <li><a href="#admin">Pour les administrateurs</a></li>
     <li><a href="#depannage">Dépannage</a></li>
     <li><a href="#limites">Limites et prudence</a></li>
@@ -129,7 +130,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
   <tr><th>Option</th><th>Défaut</th><th>Effet</th></tr>
   <tr><td><strong>Format de sortie</strong></td><td>À l'écran</td><td>« À l'écran, dans Odoo », « Fichier HTML » ou « Fichier PDF ». Une fois le rapport affiché, les boutons de téléchargement restent disponibles.</td></tr>
   <tr><td><strong>Inclure les réponses partielles (non terminées)</strong></td><td>coché</td><td>Compte aussi les réponses commencées mais non terminées.</td></tr>
-  <tr><td><strong>Voir les personnes n'ayant pas répondu</strong></td><td>décoché</td><td>Ajoute, par rencontre, les invités qui n'ont jamais commencé. Suppose que ces invitations existent dans Odoo, ce qui dépend de la façon dont vos sondages sont envoyés.</td></tr>
+  <tr><td><strong>Voir les personnes n'ayant pas répondu</strong></td><td>coché (depuis la v1.127)</td><td>Ajoute, par rencontre, les invités qui n'ont jamais commencé. Suppose que ces invitations existent dans Odoo, ce qui dépend de la façon dont vos sondages sont envoyés.</td></tr>
   <tr><td><strong>Ventiler les notes (liste dépliable détaillée)</strong></td><td>coché</td><td>Sous chaque note moyenne, une liste dépliable indique qui a donné quelle note.</td></tr>
   <tr><td><strong>Combiner les réponses d'un utilisateur à un même sondage</strong></td><td>décoché</td><td>Voir §&nbsp;7.</td></tr>
   <tr><td><strong>Dédoublonner les réponses libres avec compteur</strong></td><td>coché</td><td>Regroupe les réponses libres identiques avec un compteur (×2, ×3…).</td></tr>
@@ -307,6 +308,13 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 </ol>
 <p>Le courriel part vers l'adresse connue du participant (invitation par courriel, utilisateur connecté, ou courriel de sa participation). Rien n'est envoyé pour un essai (bouton « Tester »), pour une personne sans adresse, ni deux fois pour la même participation. Le courriel est supprimé des courriels sortants après son envoi, et un échec d'envoi ne bloque jamais la soumission du sondage (il est inscrit dans les journaux du serveur). Le serveur de courriel sortant d'Odoo doit être configuré.</p>
 
+<p><strong>Liens du courriel de réponses</strong> (v1.128) : au bas des réponses, deux boutons s'affichent quand ils s'appliquent.</p>
+<ul>
+  <li><strong>Modifier mes réponses</strong> : si le sondage est encore actif. La personne confirme sur une page, puis retrouve le sondage avec ses réponses déjà remplies ; elle change ce qu'elle veut et le soumet de nouveau. Elle reçoit alors une nouvelle copie de ses réponses.</li>
+  <li><strong>Je ne peux plus venir</strong> : si son inscription n'est ni annulée ni marquée présente et que l'événement n'est pas terminé. Après confirmation, l'inscription est annulée et une note l'indique dans son historique. Pour revenir, la personne doit se réinscrire.</li>
+</ul>
+<p>Ouvrir un lien ne change rien tant que la personne n'a pas cliqué le bouton de la page de confirmation : un antivirus de courriel qui ouvre les liens automatiquement ne peut ni rouvrir un sondage ni annuler une inscription. Un lien qui ne s'applique plus affiche « Lien expiré ».</p>
+
 <h3 id="alerte-inscriptions">Être averti quand un événement atteint N inscriptions</h3>
 <p>Pour recevoir un courriel quand un événement atteint un certain nombre d'inscriptions :</p>
 <ol>
@@ -389,6 +397,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
   <li>Les événements en cours et à venir dont un billet a un sondage sont déjà choisis ; ajoutez-en ou retirez-en au besoin. La case <strong>Inclure les sondages commencés</strong> (cochée par défaut) ajoute les personnes qui ont commencé le sondage sans le terminer.</li>
   <li>Le champ <strong>Adresses courriel</strong> contient les adresses, sans doublons, séparées par « ; » : le bouton de copie les met dans le presse-papiers, à coller dans le champ <em>Cci</em> d'un courriel. Le nombre d'inscriptions <em>sans</em> adresse est indiqué à part.</li>
   <li><strong>Ouvrir en liste</strong> affiche les mêmes inscriptions dans une liste Odoo (filtres, regroupement par événement, export).</li>
+  <li><strong>Ajouter des colonnes</strong> (v1.128) : dans la fenêtre comme dans la liste, cliquez sur l'icône à droite des en-têtes de colonnes et cochez celles à afficher : date de l'événement, téléphone, entreprise, sondage attendu, questions répondues, date et heure d'inscription, statut, heure d'arrivée, marqué présent par.</li>
 </ol>
 <p>Seules les inscriptions confirmées ou présentes comptent (ni brouillons, ni annulations). Un sondage est rattaché à une inscription quand il a été rempli par <strong>le même contact ou avec la même adresse courriel</strong> (majuscules ignorées) ; les essais (« Tester ») ne comptent pas. Si une personne a rempli le sondage avec une autre adresse que celle de son inscription, elle apparaît dans la liste : vérifiez avant une relance insistante.</p>
 <h3>Rapport quotidien par courriel</h3>
@@ -412,15 +421,17 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 <ol>
   <li>Ouvrez <strong>Événements → Bureau d'inscription RLQ</strong> (ou le bouton <strong>Bureau d'inscription RLQ</strong> du formulaire de l'événement). L'événement en cours, sinon le prochain, est déjà choisi.</li>
   <li>Tapez une partie du nom, du courriel ou de l'entreprise dans <strong>Recherche</strong> pour trouver la personne. <strong>Masquer les personnes déjà présentes</strong> raccourcit la liste.</li>
-  <li>Cliquez <strong>Présent</strong> sur sa ligne : l'heure d'arrivée est enregistrée. <strong>Annuler la présence</strong> corrige une erreur.</li>
+  <li>Cliquez <strong>Présent</strong> sur sa ligne : l'heure d'arrivée et la personne qui l'a marquée présente (colonne <strong>Marqué présent par</strong>, v1.128) sont enregistrées, aussi quand la présence est pointée dans le bureau d'inscription d'Odoo. <strong>Annuler la présence</strong> corrige une erreur et efface les deux.</li>
   <li><strong>Actualiser</strong> recalcule le sommaire (utile quand plusieurs bénévoles pointent en même temps). <strong>Ouvrir en liste</strong> affiche les mêmes inscriptions dans une liste Odoo complète, regroupée par billet (recherche native, filtres, export).</li>
 </ol>
 <p>Chaque ligne montre le billet, l'état de l'inscription, l'état du sondage, les <strong>questions répondues</strong> (par exemple 8/12) et les <strong>réponses</strong> aux questions cochées.</p>
 <h3>Le sommaire</h3>
 <ul>
-  <li><strong>Par type de billet et au total</strong> : inscrits, présents, sondages complétés, commencés et non commencés, questions répondues et non répondues.</li>
+  <li><strong>Par type de billet et au total</strong> : inscrits, présents, sondages complétés, commencés et non commencés, puis le <strong>pourcentage</strong> des questions répondues et non répondues (v1.127) : parmi toutes les questions attendues des inscrits qui ont un sondage, la part qui a une réponse.</li>
   <li><strong>Personnes marquées présentes, par heure</strong> : une ligne par heure, en <strong>heure locale</strong>, une colonne par billet, et le total.</li>
   <li><strong>Réponses aux questions affichées</strong> : pour chaque réponse, le nombre de personnes par billet, le total et « dont présents » (par exemple, combien de dîners prévoir).</li>
+  <li><strong>« (sans réponse) »</strong> : les personnes inscrites qui n'ont pas de réponse à cette question, parce qu'elles n'ont pas commencé le sondage, ont sauté la question, ou ne l'ont pas vue (question qui dépend d'une autre réponse). Une note sous le tableau le rappelle.</li>
+  <li>Les réponses écrites qui ne diffèrent que par les majuscules ou les accents (« Végétarien », « végétarien ») sont comptées ensemble, sous l'orthographe la plus fréquente (v1.127).</li>
 </ul>
 <p>« Présent » est l'état natif d'Odoo : le bureau d'inscription d'Odoo et ses statistiques voient la même chose. Les inscriptions annulées ne sont ni listées ni comptées. Une question conditionnelle que la personne n'a jamais vue compte comme non répondue. Un sondage est rattaché à une inscription par le même contact ou la même adresse courriel : si une personne a inscrit plusieurs participants avec son propre contact, ils montrent tous les mêmes réponses.</p>
 
@@ -435,7 +446,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 <h3>Dates, heures et version affichées <span class="pastille">nouveau, v1.124</span></h3>
 <ul>
   <li>Toutes les dates et heures du bureau d'inscription et du tableau des bénévoles (inscription, arrivée, départ, présences par heure) sont en <strong>heure locale</strong>, jamais en UTC : le fuseau horaire est celui de votre navigateur (ou de vos préférences Odoo), sinon celui de l'événement, sinon America/Toronto.</li>
-  <li>Sous le sommaire et sous le tableau des bénévoles, une ligne indique le nom du module, sa version, puis la date et l'heure locales de l'affichage avec le fuseau, par exemple : <code>rlq_survey_report 18.0.1.124.0 - affiché le 2026-11-16 21:15:02 EST (heure locale, America/Toronto)</code>. Une capture d'écran dit ainsi quelle version l'a produite et quand.</li>
+  <li><strong>En haut</strong> du bureau d'inscription et du tableau des bénévoles (au-dessus du sommaire et du tableau, depuis la v1.126), une ligne indique le nom du module, sa version, puis la date et l'heure locales de l'affichage avec le fuseau, par exemple : <code>rlq_survey_report 18.0.1.124.0 - affiché le 2026-11-16 21:15:02 EST (heure locale, America/Toronto)</code>. Une capture d'écran dit ainsi quelle version l'a produite et quand.</li>
 </ul>
 
 <h3>Bénévoles <span class="pastille">v1.122, revu en v1.123</span></h3>
@@ -447,11 +458,37 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
   <li>Les autres questions cochées « Afficher au bureau d'inscription » dans ce sondage ajoutent chacune une colonne.</li>
   <li><strong>Trier par</strong>, <strong>Ordre décroissant</strong> et <strong>Sondage</strong> classent et filtrent le tableau. Il ne se trie pas en cliquant sur ses en-têtes : ses colonnes dépendent du sondage, ce qu'une liste Odoo ne permet pas.</li>
   <li>Le lien sur le nom ouvre la discussion directe avec la personne dans l'application Discussion si elle a un compte sur Odoo (interne ou portail) ; sinon il ouvre sa fiche de contact, d'où l'on peut lui écrire par courriel (« Envoyer un message »).</li>
-  <li>L'heure d'arrivée est celle du bouton <strong>Présent</strong> du bureau d'inscription, l'heure de départ celle du bouton <strong>Départ</strong>.</li>
+  <li><strong>Heure d'arrivée et heure de départ</strong> (v1.126) : ce sont les heures <strong>prévues</strong> par le bénévole, lues dans le sondage (question dont le titre parle d'« arrivée » et de « départ »). Si le sondage n'a pas ces questions, ce sont les heures enregistrées au bureau d'inscription (boutons <strong>Présent</strong> et <strong>Départ</strong>), et une note le dit au-dessus du tableau.</li>
 </ul>
 
+<h3>Exporter les bénévoles dans un chiffrier <span class="pastille">nouveau, v1.126</span></h3>
+<ol>
+  <li>Dans <strong>Événements → Bénévoles</strong>, cliquez <strong>Exporter dans un chiffrier</strong> : le fichier <code>.xlsx</code> (Excel, LibreOffice Calc) se télécharge directement (depuis la v1.128 ; avant, il était dans une archive ZIP protégée par mot de passe). Le filtre « Sondage » et le tri de l'écran s'appliquent.</li>
+</ol>
+<p>Le fichier a trois feuilles, chacune prête pour un <strong>tableau croisé dynamique</strong> (une ligne d'en-têtes, noms de colonnes uniques, aucune cellule fusionnée) :</p>
+<ul>
+  <li><strong>Bénévoles</strong> : une ligne par bénévole, avec le courriel, le billet, une colonne par rôle et le nombre de rôles.</li>
+  <li><strong>Rôles</strong> : une ligne par bénévole et par rôle choisi. C'est la feuille à utiliser pour compter les rôles par type, par langue ou par état du sondage : sélectionnez la feuille, puis Insertion → Tableau croisé dynamique (Excel) ou Données → Table dynamique (LibreOffice), avec « Rôle » en lignes, « Type » en colonnes et « Bénévole » en nombre.</li>
+  <li><strong>Langues</strong> : une ligne par bénévole et par langue parlée.</li>
+</ul>
+<p>Le chiffrier contient des noms et des courriels, sans mot de passe : ne le transmettez qu'aux personnes autorisées. Chaque export est inscrit dans l'historique d'accès des rapports.</p>
+
 <!-- ============================================================ 16 -->
-<h2 id="admin">16. Pour les administrateurs</h2>
+<h2 id="modifier-reponses">16. Modifier les réponses d'un sondage <span class="pastille">nouveau, v1.127</span></h2>
+<p>Pour corriger une réponse à la demande d'une personne (mauvais choix, faute de frappe, changement de dernière minute), réservé aux <strong>administrateurs des sondages</strong>.</p>
+<ol>
+  <li><strong>Sondage → Rapports détaillés → Modifier des réponses</strong>, ouvrez la participation (recherche par nom, courriel ou sondage), puis cliquez <strong>Modifier les réponses</strong>.</li>
+  <li>La fenêtre liste chaque question avec la réponse actuelle ; la colonne <strong>Nouvelle réponse (texte)</strong> n'est remplie que pour les questions modifiées. Cliquez sur une question : le bon champ s'affiche selon son type (texte, nombre, échelle, date, choix unique, choix multiples, commentaire ou réponse « Autre »). La case <strong>Aucune réponse</strong> efface un nombre ou une valeur d'échelle. Les questions en matrice s'affichent mais ne se modifient pas ici.</li>
+  <li>Indiquez au besoin un <strong>motif</strong> (inscrit dans l'historique), cochez <strong>Envoyer la mise à jour par courriel à la personne</strong> si elle doit être prévenue, puis cliquez <strong>Enregistrer les changements</strong>.</li>
+</ol>
+<p>La réponse est enregistrée comme si la personne l'avait donnée elle-même : statistiques, rapports et bureau d'inscription en tiennent compte.</p>
+<h3>Historique des modifications</h3>
+<p><strong>Sondage → Rapports détaillés → Modifications manuelles des réponses</strong> : une ligne par question modifiée (date, auteur, personne, question, réponse avant, réponse après, motif, date d'envoi à la personne). Filtres « Pas encore envoyées » et « Envoyées », regroupement par personne, sondage ou auteur. L'historique ne peut pas être modifié. La fiche d'une participation affiche aussi le bouton <strong>Modifications manuelles</strong> quand elle en a.</p>
+<h3>Envoyer la mise à jour à la personne</h3>
+<p>Dans l'historique, sélectionnez les lignes puis cliquez <strong>Envoyer la mise à jour par courriel</strong>. La personne reçoit le tableau des changements (avant, après), puis toutes ses réponses telles qu'elles sont maintenant. Seules les modifications pas encore envoyées partent ; la date et l'auteur de l'envoi sont notés. Sans adresse courriel, rien n'est envoyé et un message le dit. Le texte du courriel se change dans Paramètres → Technique → Modèles de courriel (« Sondage : mise à jour de vos réponses »).</p>
+
+<!-- ============================================================ 17 -->
+<h2 id="admin">17. Pour les administrateurs</h2>
 <h3>Paramètres système</h3>
 <p>Réglages modifiables sans toucher au code, dans <strong>Paramètres (ou Réglages) → Technique → Paramètres système</strong> (le menu Technique exige le mode développeur) :</p>
 <table>
@@ -472,7 +509,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 <p>Le dossier du module contient <code>run-all.sh</code> : il lance ruff, les contrôles de syntaxe, les tests autonomes et — si PostgreSQL et Odoo sont installés — crée une base de test dédiée pour exécuter les tests Odoo, puis la supprime. Voir <code>scripts/LISEZMOI.md</code>. Les notes de conception se trouvent dans <code>doc/</code> (<code>CONTEXTE.md</code>, <code>CHANGELOG.md</code>, <code>NOTES_VALIDATION.md</code>).</p>
 
 <!-- ============================================================ 16 -->
-<h2 id="depannage">17. Dépannage</h2>
+<h2 id="depannage">18. Dépannage</h2>
 <table>
   <tr><th>Symptôme</th><th>Cause probable / solution</th></tr>
   <tr><td>Le bouton Générer ne fait rien</td><td>Vérifiez qu'au moins un sondage est sélectionné et que la case de confirmation est cochée.</td></tr>
@@ -484,7 +521,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
   <tr><td>Pas de Note globale pour une rencontre</td><td>Aucune des trois questions qui la composent n'a de réponse numérique pour cette rencontre.</td></tr>
   <tr><td>Un contour marqué ou un message de dérive</td><td>Ce sont des signaux à examiner (§&nbsp;6), pas forcément un problème confirmé.</td></tr>
   <tr><td>Un lien de date ouvre l'administration d'Odoo au lieu de défiler dans le rapport</td><td>Ce sondage ou événement n'est pas inclus dans ce rapport.</td></tr>
-  <tr><td>La génération du rapport est longue</td><td>Depuis la version 1.125, l'anonymisation ne relit plus tout le rapport pour chaque participant (c'était la cause principale pour un rapport de plusieurs centaines de participants). Si c'est encore long, réduisez le nombre de sondages ou la période, et demandez à l'administrateur la ligne du journal du serveur qui commence par « rlq_survey_report : rapport généré en » : elle donne la durée de chaque étape.</td></tr>
+  <tr><td>La génération du rapport est longue</td><td>Depuis la version 1.125, l'anonymisation ne relit plus tout le rapport pour chaque participant (c'était la cause principale pour un rapport de plusieurs centaines de participants). Si c'est encore long, réduisez le nombre de sondages ou la période, et regardez la ligne <strong>Durée de génération</strong> affichée sous le titre du formulaire après la génération (aussi au bas du rapport) : elle donne la durée de chaque étape (sondages, synthèse et participants, anonymisation, enregistrement). La même ligne est dans le journal du serveur, s'il est au niveau « info ».</td></tr>
   <tr><td>La génération d'un PDF échoue ou reste incomplète</td><td>Dans « Options PDF », décochez « Tableaux de réponses par participant » et/ou « Saut de page forcé par participant ».</td></tr>
   <tr><td>Un avertissement dit qu'une date n'a pas été reconnue</td><td>Le titre du sondage ne suit pas le format attendu (ex. « 4 août 2026 ») : le message cite le titre en cause.</td></tr>
   <tr><td>Le nom d'un fichier est coupé dans l'historique</td><td>Le nom complet passe à la ligne dans la colonne « Télécharger » ; si ce n'était pas le cas, faites actualiser la page (Ctrl+F5) après la mise à jour du module.</td></tr>
@@ -493,7 +530,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 </table>
 
 <!-- ============================================================ 17 -->
-<h2 id="limites">18. Limites et prudence</h2>
+<h2 id="limites">19. Limites et prudence</h2>
 <ul>
   <li><strong>L'anonymisation réduit le risque, elle ne l'élimine pas</strong> : le contenu des réponses libres et un petit nombre de répondants peuvent permettre de reconnaître quelqu'un (§&nbsp;4).</li>
   <li><strong>Ni ce module ni ce guide ne donnent d'avis juridique.</strong> La conformité à la Loi 25 ou au RGPD, surtout pour une diffusion publique, relève d'une personne qualifiée.</li>

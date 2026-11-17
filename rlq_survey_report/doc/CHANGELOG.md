@@ -1,5 +1,208 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.130.0
+
+**Short title:** urgent fix: Odoo could not load the database with 18.0.1.129.0.
+
+**Reason for the request:** after the installation of 18.0.1.129.0, Odoo refused to load the database (`Failed to initialize database`, site down): `TypeError: Type of related field rlq.survey.answer.edit.line.question_text is inconsistent with survey.question.title`.
+
+**Bugs fixed:**
+
+- Symptom: "Failed to load registry", "Failed to initialize database", errors 500 and the site down after the files of 18.0.1.129.0 were put in place, for every database whose module is loaded from that folder.
+- Diagnosis: 18.0.1.129.0 added `question_text = fields.Text(related="question_id.title")`; `survey.question.title` is a Char field, and Odoo refuses a related field whose type differs from its target, while building the registry, before any module update. Not caught before delivery: the Odoo code is not run here, and no test looked at the type of the related fields.
+- Fix: `question_text` is now a computed Text field (`_compute_question_text()`), same display (long questions on several lines).
+
+**Changes:**
+
+- `models/survey_answer_edit.py`: `question_text` computed.
+- `tests/test_related_fields.py` (new, run by `run-all.sh` 1.5): every related field of `models/*.py` must have the type of its target, declared in a table checked against the source of Odoo 18.0; a new related field without an entry fails the test. Checked: the test fails on 18.0.1.129.0 and passes on 18.0.1.130.0.
+- `__manifest__.py`: version `18.0.1.130.0`. `doc/NOTES_VALIDATION.md` (section -84), guide header.
+
+**Safeguards and edge cases:** the other related fields of the module (7) have the type of their target (checked in the source of Odoo 18.0).
+
+**Checks:**
+
+- `./run-all.sh --sans-odoo`: ruff, syntax and manifest, standalone tests: OK.
+- The Odoo code was NOT run: no Odoo instance here.
+
+**Action required:** install 18.0.1.130.0 at once in place of 18.0.1.129.0 (the files are enough for Odoo to load the database again), then update the module (`-u rlq_survey_report`, with `--i18n-overwrite` for the French translations of 18.0.1.129.0).
+
+## 18.0.1.129.0
+
+**Short title:** "Modifier les réponses" window: explanation text in French, question titles on several lines; translation check added to the tests.
+
+**Reason for the request:** screenshot of the window "Modifier les réponses" (version 18.0.1.127.0): the explanation text "Click a question to change its answer..." is in English, the header of the last column shows "M...", every answer is repeated in "Nouvelle réponse (texte)", and the questions are cut ("De quelle régio...").
+
+**Bugs fixed:**
+
+- Symptom: "Click a question to change its answer. The questions changed are shown in bold; each one is written in the history (Surveys > Detailed reports > Manual changes of answers)." shown in English although `i18n/fr.po` had its translation. The same for the help text of the menu "Manual changes of answers" (empty list).
+  - Diagnosis: Odoo stores the text of a view as XML (`odoo/tools/translate.py`, `serialize_xml`): "Surveys > Detailed" becomes "Surveys &gt; Detailed", and the translation is looked up with that exact text. `scripts/build_fr_po.py` wrote the msgid with the raw ">", so Odoo never found it. Only these two texts contain ">" or "&".
+  - Fix: `scripts/build_fr_po.py` escapes the msgid and the msgstr of view texts (`fr_for()`); `i18n/fr.po` rebuilt. New test `tests/test_translations.py`, run by `run-all.sh`, which fails if a view text is written with a raw "<", ">" or "&", if a msgid is duplicated or untranslated, or if a code string lacks the "odoo-python" comment.
+- The header "M..." and the repeated answers were already fixed in 18.0.1.128.0 (fixed width of the column "Modifiée"; "Nouvelle réponse (texte)" filled only for the questions changed). The screenshot was taken with 18.0.1.127.0.
+
+**Changes:**
+
+- `models/survey_answer_edit.py`: field `question_text` (title of the question, multi-line text); `views/survey_answer_edit_views.xml`: the list shows it instead of the question link, so a long question wraps instead of being cut.
+- `scripts/build_fr_po.py`: `fr_for()`, escaping of view texts. `i18n/fr.po` rebuilt.
+- `tests/test_translations.py` (new, 3 standalone tests); `run-all.sh` 1.4 (see `doc/run-all.changelog.txt`).
+- `__manifest__.py`: version `18.0.1.129.0`. Guide header, `doc/NOTES_VALIDATION.md` (section -83).
+
+**Safeguards and edge cases:** attribute values (string, placeholder, help, confirm) are NOT escaped by Odoo and are left as they are; only texts between tags are escaped.
+
+**Checks:**
+
+- `./run-all.sh --sans-odoo`: ruff, syntax and manifest, 227 standalone tests: OK.
+- Serialization checked in the source of Odoo 18.0 and with lxml: `<p>A (Surveys &gt; Detailed) &amp; x</p>`.
+- The Odoo code was NOT run: no Odoo instance here.
+
+**Action required:** update the module on DEV with the French translations reloaded: `-u rlq_survey_report --i18n-overwrite` (or Settings > Translations > Languages, update of French). Without the reload, the corrected translation is not taken. Then open "Modifier les réponses" again.
+
+## 18.0.1.128.0
+
+**Short title:** French labels and readable column headers; edit window shows only changed answers; more columns in "Surveys not completed"; links "Modifier mes réponses" and "Je ne peux plus venir" in the e-mail of answers; who marked a person present; volunteers' spreadsheet downloaded directly; error at the end of a survey fixed.
+
+**Reason for the request:** (1) English words in the window "Modifier les réponses", and column headers cut to their first letter ("M...") in the windows of the module; (2) in that window, show a new answer only for the questions changed; (3) be able to add columns (registration date and time, date of the event...) in "Sondages non complétés"; (4) in the e-mail of answers sent after the survey of an event, let people say they can no longer come and change their answers; (5) error in the server log at the end of a survey; (6) on the RLQ registration desk, a column with who marked a person present; (7) the volunteers' page must produce an .xlsx file with several sheets directly, not a ZIP archive.
+
+**Bugs fixed:**
+
+- (5) Symptom: `ValueError: Invalid field event.event.survey_id in leaf ('survey_id', '=', 82)` in the log each time a person submitted a survey that sends the answers; the e-mail left without the "Résumé de votre inscription".
+  - Diagnosis: `survey_reponses_courriel._rlq_inscription_associee()` searched the registration with `event_id.survey_id`, a field that only exists when another module adds it (absent on the production instance). The other files of the module already tested its presence; this one did not. The error was caught, so the e-mail still left, without the summary.
+  - Fix: the criterion on the survey of the event is added only if the field exists.
+- (1) Symptom: English labels in the window "Modifier les réponses".
+  - Diagnosis: the type of question was a related selection field: its values are not translated for a model of this module. Also, the explanation text of the window "Sondages non complétés" had changed in English without its translation, so it showed in English.
+  - Fix: new field `question_type_label` (label translated by the Surveys application); `views/event_survey_followup_views.xml` added to `scripts/build_fr_po.py`, which now stops if a term of that view has no translation.
+- (1) Symptom: column headers cut to "M...".
+  - Diagnosis: in Odoo 18, a checkbox column is at most 100 px wide, a number column 71 px and a date column the width of the date (`column_width_hook.js`): a longer header is cut.
+  - Fix: a fixed `width` on every checkbox, number and date column of the lists of the module, computed from the length of the French header (between 86 and 221 px).
+
+**Changes:**
+
+- `models/survey_answer_edit.py`: `change_display` (shown in the list: the new answer only for a question changed), `question_type_label`; `new_display` renamed "Answer after the change" (still written in the history).
+- `views/event_survey_followup_views.xml`: lists "Surveys not completed" (window and full list): optional columns (column menu at the right of the headers) "Event date", phone, company, survey expected, "Questions answered", "Registered on", status, "Arrived at", "Marked present by".
+- `models/survey_reponses_courriel.py`: links at the bottom of the answers (`_rlq_liens_html()`): "Modifier mes réponses" (`_rlq_peut_modifier()`: survey active, participation submitted, not a certification, live session or past deadline) and "Je ne peux plus venir" (`_rlq_inscription_annulable()`: registration neither cancelled nor present, event not ended). They appear in the e-mail of answers and in the update e-mail, without changing the e-mail templates (kept by `noupdate`).
+- `controllers/reponses.py` (new): `/rlq_survey_report/reponses/<token>/modifier` and `/annuler`. GET shows a confirmation page, POST (CSRF) acts: the participation goes back to "in progress" from the first page and the person is sent to the survey of Odoo with the answers already given; or the registration is cancelled with a note in its history. Pages in French and English, no Website application needed.
+- `models/report_builder.py`: `TEXTES_LIENS`, `html_liens_courriel()`, `page_lien_courriel()`.
+- `models/event_registration_desk.py`: field `rlq_present_by` ("Marked present by"), filled by `create()` / `write()` whenever a registration becomes "done" (button of the RLQ desk, registration desk of Odoo, form), cleared when it leaves "done". Column in both lists of the desk.
+- `models/volunteer_coordinator.py`: "Export to a spreadsheet" downloads the .xlsx file directly (three sheets); field `password` and the ZIP archive removed. Every export is still written in the access history.
+- `views/*.xml`: widths of the narrow columns (see above).
+- `scripts/build_fr_po.py`, `i18n/fr.po`; tests: 3 standalone tests (links, pages), Odoo tests updated and added (spreadsheet, who marked present, edit window, links); guide, `doc/CONTEXTE.md`, `doc/NOTES_VALIDATION.md` (section -82), `__manifest__.py` (version `18.0.1.128.0`).
+
+**Safeguards and edge cases:**
+
+- The links of the e-mail contain the secret token of the participation (the same as the link of the survey). Opening a link changes nothing: a mail scanner that opens every link cannot reopen a survey or cancel a registration. A link that no longer applies shows "Lien expiré".
+- A cancelled registration cannot be restored by the link: the person must register again (written on the confirmation page).
+- After "Modifier mes réponses", the copy of the answers is sent again when the person submits (if the survey sends the answers).
+- A registration already present keeps the first person who marked it present; undoing the presence clears it.
+- Personal data: the volunteers' spreadsheet is no longer protected by a password, at the request of the person responsible; it stays traced in the access history.
+
+**Checks:**
+
+- `./run-all.sh --sans-odoo`: ruff, syntax and manifest, 224 standalone tests: OK. XML of the view files parsed.
+- Checked in the source of Odoo 18.0: column widths (`column_width_hook.js`), `event_begin_date`, resuming an "in progress" participation (`survey/controllers/main.py`), `action_cancel()`, `certification`, `deadline`, `is_session_answer`.
+- The Odoo code was NOT run: no Odoo instance here.
+
+**Action required:** update the module on DEV (`-u rlq_survey_report`), then check the points of `doc/NOTES_VALIDATION.md`, section -82, in particular the two links of the e-mail of answers with a real participation.
+
+## 18.0.1.127.0
+
+**Short title:** registration desk: questions in percent, "(sans réponse)" explained, answers grouped; "Voir les personnes n'ayant pas répondu" checked by default; manual changes of survey answers with history and update e-mail.
+
+**Reason for the request:** feedback with a screenshot of the registration desk: (1) show the columns "Questions répondues" and "Questions non répondues" as percentages; (2) what is "(sans réponse)"?; (3) check "Voir les personnes n'ayant pas répondu" by default in the survey reports; (4) be able to change the answers of a survey by hand, see the history of the manual changes in a menu, and send an update by e-mail to the person with the latest changes.
+
+**Changes:**
+
+- `models/registration_desk_report.py`:
+  - `percent_text()` and `Number` (text right-aligned like a number); the ticket table shows "Questions répondues (%)" and "Questions non répondues (%)": share of the questions expected from the registrations that have a survey, one decimal ("40,5 %" in French, "40.5%" in English). `_ticket_cells()`.
+  - `answers_breakdown()`: answers that differ only by capitals or accents ("Végétarien", "végétarien") are counted as ONE answer, shown with their most frequent spelling.
+  - A note under the answers table explains "(sans réponse)": registered people with no answer to the question (survey not started, question skipped, or question not shown because it depends on another answer).
+- `models/rlq_survey_report_wizard.py`: `voir_non_repondants` checked by default.
+- `models/survey_answer_edit.py` (new):
+  - `rlq.survey.answer.change`: history (date, user, participation, survey, person and e-mail at the time, question, answer before, answer after, reason, sent on, sent by). Cannot be modified; deleted with the participation; an administrator can delete it (right to erasure). Button "Send the update by e-mail" (`action_send_update()`).
+  - `rlq.survey.answer.edit` and `rlq.survey.answer.edit.line`: window "Edit the answers": one line per question with the current answer; a click opens the field that fits the type (text, number, scale, date, date and time, one choice, several choices, comment or "Other"); "No answer" erases a number or a scale. `action_apply()` saves with `survey.user_input._save_lines()`, the method Odoo uses when the person answers, and writes the history.
+  - `survey.user_input`: `rlq_change_ids`, `rlq_change_count` (smart button), `rlq_changes_html`, `_rlq_send_answer_update()`, `action_rlq_edit_answers()`, `action_rlq_open_changes()`.
+- `views/survey_answer_edit_views.xml` (new): windows, history list (filters "Not sent yet" / "Sent", group by person, survey, user), button "Edit the answers" and smart button "Manual changes" on the participation form of Odoo, menus Surveys > Detailed reports > "Edit answers" (administrators) and "Manual changes of answers" (survey users).
+- `data/mail_template_mise_a_jour.xml` (new): e-mail "Mise à jour de vos réponses" (changes before / after, then all the answers as they are now). `noupdate="1"`: the text can be changed in Settings > Technical > E-mail templates.
+- `models/report_builder.py`: `html_changements_courriel()`.
+- `security/ir.model.access.csv`, `__manifest__.py` (version `18.0.1.127.0`, data files, description), `i18n/fr.po` (rebuilt; `scripts/build_fr_po.py` now also reads the new files).
+- Tests: 6 standalone tests (percentages, grouping, e-mail table); `tests/test_survey_answer_edit.py` (4 Odoo tests).
+- Guide (sections 15 and new 16), `doc/CONTEXTE.md`, `doc/NOTES_VALIDATION.md` (section -81).
+
+**Bugs fixed:**
+
+- Symptom: the answers to "scale" questions (for example a satisfaction from 0 to 10) were missing from the e-mail "Vos réponses au sondage", from the registration desk and from the volunteers' table.
+- Diagnosis: the text of an answer line was read from the char, text, number and date fields only; a scale answer is stored in `value_scale`.
+- Fix: `value_scale` read in `survey_reponses_courriel._rlq_texte_ligne()` and in `event_registration_desk._rlq_desk_participations()`.
+
+**Safeguards and edge cases:**
+
+- Rights: only "Surveys: Administrator" can change answers and send the update (Odoo gives the right to write answer lines to that group only); every survey user can read the history.
+- A number 0 is saved as an answer, not as "skipped" (`_save_lines()` treats a false value as skipped: numbers are given as text, as the web form of Odoo does).
+- Matrix questions are shown with their answer but cannot be changed in the window.
+- No e-mail address: the changes are saved, no e-mail is sent, the notification says so. The changes already sent are never sent again; the history shows when and by whom.
+- The update e-mail is deleted from the outgoing mails after sending (`auto_delete`), like the e-mail of answers.
+- The e-mail template is in French, like the existing e-mail of answers.
+
+**Checks:**
+
+- `./run-all.sh --sans-odoo`: ruff, syntax and manifest, 221 standalone tests: OK.
+- XML of the new view and data files parsed. `_save_lines()`, `_read_group()`, `value_scale`, `comments_allowed` and the participation form (`header`, `button_box`) checked in the source of Odoo 18.0.
+- The Odoo code was NOT run: no Odoo instance here. The 4 Odoo tests were not run.
+
+**Action required:** update the module on DEV (`-u rlq_survey_report`) and check the points of `doc/NOTES_VALIDATION.md`, section -81.
+
+## 18.0.1.126.0
+
+**Short title:** volunteers' table exported to a spreadsheet (pivot tables); planned hours of arrival and departure read from the survey; program line at the top; generation time shown on screen.
+
+**Reason for the request:** (1) an option to export the volunteers' table to a spreadsheet and build pivot tables; (2) "why the hour of departure?"; (3) show the line "rlq_survey_report <version> - affiché le <date> ..." at the top of the latest screens; (4) the line of the server log with the generation time of the report is not visible.
+
+**Answers and reading taken:**
+
+- (2) The original request listed "heure d'arrivée, heure de départ" among the columns of the volunteers' table and said that the information comes from the survey. Version 1.122.0 read it as hours recorded at the registration desk and added a "Left" button there. That reading was wrong for the table: the columns now show the hours the volunteer PLANS, answered in the survey. The "Left" button and the "Left at" column of the registration desk are kept as they are: they are only used as a fallback when the survey has no such question. They can be removed on request.
+- (4) The log line is written at level "info" in the Odoo server log: it is invisible when the log level of the server is "warn" or higher, or without access to the log file. The time is now also shown on screen.
+
+**Changes:**
+
+- `models/registration_desk_report.py`: `find_volunteer_questions()` also returns `arrival` and `departure` (question whose title speaks of "arrivée" / "départ", never "département"); new `volunteer_export_sheets()` (content of the three sheets, plain values) and `_unique_labels()`.
+- `models/volunteer_coordinator.py`:
+  - `_rlq_table_data()` (rows, role groups, extra columns, notes) shared by the screen and the export; rows carry e-mail, ticket, registration date as a real local date, list of languages.
+  - Columns "Heure d'arrivée" and "Heure de départ": answers of the survey when the survey has such questions; otherwise the hours of the registration desk, and a note says so.
+  - New field `password` (pre-filled with the default password of the survey reports) and button "Export to a spreadsheet" (`action_export_excel()`): an .xlsx file in a ZIP archive encrypted with the password, entry in the access history of the reports.
+  - The program line comes first, above the table.
+- `models/event_registration_desk.py`: the program line comes first, above the summary.
+- `models/rlq_survey_report_wizard.py`: new field `duree_generation`; the generation time (total and per step) is shown in the form after a generation, in the success notification and at the bottom of the report (`JETON_DUREE`), in addition to the server log.
+- `views/event_registration_desk_views.xml`: button and password field on the volunteers' screen. `views/rlq_survey_report_views.xml`: line "Durée de génération".
+- `scripts/build_fr_po.py` and `scripts/fr_base.po` (new): rebuild `i18n/fr.po` from the sources of the registration desk and volunteers screens, with the references and the "odoo-python" comment that Odoo needs. Development helper: no `--version` / `--changelog` option.
+- `i18n/fr.po`: 8 new terms.
+- Tests: 3 new standalone tests (hours questions, content of the sheets, file written and read back with openpyxl); 2 new Odoo tests.
+- `__manifest__.py`: version `18.0.1.126.0`, description. Guide, `doc/CONTEXTE.md`, `doc/NOTES_VALIDATION.md` (section -80), `scripts/LISEZMOI.md`.
+
+**The spreadsheet:**
+
+- Sheet "Bénévoles": one line per volunteer (name, e-mail, ticket, registration date, survey, type, languages, hours, extra questions, one column per role, number of roles).
+- Sheet "Rôles": one line per volunteer and per role chosen ("(aucun rôle)" when none): for a pivot table of the roles by type, language or survey state.
+- Sheet "Langues": one line per volunteer and per language spoken.
+- Every sheet is a flat table: one header line, unique column names, no merged cell, filter and frozen header. The registration date is a real date (local time), so the spreadsheet can group it by day.
+- Same volunteers as the screen: the "Survey" filter and the order apply.
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:**
+
+- Personal data: the export is refused without a password, with the shipped marker "!CHANGE-MOI@", or with a password that does not meet the rules of the survey reports (12 characters, lower case, capital, digit, special character). The file is never delivered unencrypted.
+- "openpyxl" or "pyzipper" missing on the server: clear message, nothing is produced.
+- Two roles with the same name in two questions ("Autre"): the second column is named "Autre (2)".
+- A free-text role is written in the "Autre" column and counted in the number of roles.
+- The entry in the access history never blocks the export.
+- A survey with only one of the two hour questions: that hour comes from the survey, the other one from the registration desk.
+
+**Checks:**
+
+- `./run-all.sh --sans-odoo`: ruff, syntax and manifest, standalone tests: OK. The .xlsx content was written with openpyxl 3.1.5 and read back.
+- The Odoo code was NOT run: no Odoo instance here. The encryption of the ZIP (pyzipper) was not run either (library not installed here); it is the function already used by the Excel export of the reports.
+
+**Action required:** update the module on DEV (`-u rlq_survey_report`) and check the points of `doc/NOTES_VALIDATION.md`, section -80. Tell me if the "Left" button of the registration desk must be removed.
+
 ## 18.0.1.125.0
 
 **Short title:** faster generation of the HTML report: anonymisation in one reading of the HTML, answer lines grouped without quadratic unions, timing of each step in the log.
