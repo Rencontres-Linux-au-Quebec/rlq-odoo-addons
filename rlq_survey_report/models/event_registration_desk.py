@@ -104,6 +104,11 @@ def program_stamp(env, event=None):
 class EventRegistrationDesk(models.Model):
     _inherit = "event.registration"
 
+    rlq_present_by = fields.Many2one(
+        "res.users", string="Marked present by", copy=False, readonly=True, ondelete="set null",
+        help="User who marked this person present (button « Present » of the RLQ registration desk, or the registration "
+             "desk of Odoo). Cleared when the presence is undone.",
+    )
     rlq_departure = fields.Datetime(
         string="Left at", copy=False, readonly=True,
         help="Time when the person left the event, recorded with the « Left » button of the RLQ registration desk.",
@@ -313,6 +318,28 @@ class EventRegistrationDesk(models.Model):
                 ids = self._rlq_desk_sorted_ids(event_id, field_name)
                 return SQL("array_position(%s::integer[], %s) %s %s", ids, SQL.identifier(alias, "id"), direction, nulls)
         return super()._order_field_to_sql(alias, field_name, direction, nulls, query)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        """A registration created already present (« done ») records who created it as the person who marked it present."""
+        for vals in vals_list:
+            if vals.get("state") == "done" and not vals.get("rlq_present_by"):
+                vals["rlq_present_by"] = self.env.user.id
+        return super().create(vals_list)
+
+    def write(self, vals):
+        """v1.128.0: whatever the screen (RLQ desk, desk of Odoo, form), passing to « done » records who did it, and leaving
+        « done » clears it. Done here rather than in the button, so that every way of marking present is covered."""
+        if "state" in vals and "rlq_present_by" not in vals:
+            if vals["state"] == "done":
+                to_mark = self.filtered(lambda r: r.state != "done")
+                others = self - to_mark
+                result = super(EventRegistrationDesk, to_mark).write(dict(vals, rlq_present_by=self.env.user.id)) if to_mark else True
+                if others:
+                    result = super(EventRegistrationDesk, others).write(vals) and result
+                return result
+            vals = dict(vals, rlq_present_by=False)
+        return super().write(vals)
 
     def action_rlq_desk_present(self):
         """Button « Present »: native state « done » (the hour is recorded by Odoo in date_closed). Cancelled: left alone."""

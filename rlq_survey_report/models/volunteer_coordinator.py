@@ -46,7 +46,6 @@ _logger = logging.getLogger(__name__)
 
 CHAT_URL = "/rlq_survey_report/chat/%d"
 CHOICE_TYPES = ("simple_choice", "multiple_choice")
-MARKER_PASSWORD = "!CHANGE-MOI@"          # the shipped marker of rlq_survey_report_wizard.py: never accepted as a password
 
 
 class RlqVolunteerCoordinator(models.TransientModel):
@@ -68,24 +67,12 @@ class RlqVolunteerCoordinator(models.TransientModel):
         string="Sort by", default="name", required=True,
         help="Order of the table. Case and accents are ignored (« Élise » sorts with the « e »); equal values are sorted by name.")
     sort_desc = fields.Boolean(string="Descending", default=False, help="Reverses the order of the table.")
-    password = fields.Char(
-        string="Password of the spreadsheet", default=lambda self: self._default_password(),
-        help="The spreadsheet contains names and e-mail addresses: it is delivered in a ZIP archive encrypted with this password "
-             "(same rules as the survey reports: at least 12 characters, with a lower-case letter, a capital letter, a digit "
-             "and a special character). Pre-filled with the default password of the survey reports.")
     table_html = fields.Html(string="Volunteers", compute="_compute_table", sanitize=False)
 
     @api.depends("event_id")
     def _compute_display_name(self):
         for wizard in self:
             wizard.display_name = _("Volunteers: %(event)s", event=wizard.event_id.name) if wizard.event_id else _("Volunteers")
-
-    @api.model
-    def _default_password(self):
-        """The default password of the survey reports (system parameter), or nothing while it is still the shipped marker."""
-        report = self.env["rlq.survey.report.wizard"].sudo()
-        password = report._mot_de_passe_par_defaut()
-        return password if password and password != MARKER_PASSWORD else False
 
     @api.depends("event_id", "survey_filter", "sort_by", "sort_desc")
     def _compute_table(self):
@@ -253,17 +240,13 @@ class RlqVolunteerCoordinator(models.TransientModel):
 
     def action_export_excel(self):
         """Button « Export to a spreadsheet »: the volunteers of the screen (same filter, same order) in an .xlsx file with
-        three flat sheets ready for pivot tables, delivered in a ZIP archive encrypted with the password (personal data)."""
+        three flat sheets ready for pivot tables, downloaded directly (v1.128.0: no ZIP archive any more, on request).
+
+        The file contains names and e-mail addresses: every export is written in the access history of the reports."""
         self.ensure_one()
         if openpyxl is None:
             raise UserError(_("The spreadsheet export needs the Python library « openpyxl », which is not installed on this server "
                               "(pip install openpyxl)."))
-        report = self.env["rlq.survey.report.wizard"].sudo().new({"mot_de_passe": self.password or ""})
-        if not self.password or self.password == MARKER_PASSWORD:
-            raise UserError(_("Enter the password of the spreadsheet first: it contains names and e-mail addresses."))
-        missing = report._criteres_manquants_mot_de_passe()
-        if missing:
-            raise UserError(_("The password is too weak, it lacks: %(criteria)s.", criteria=", ".join(missing)))
         rows, groups, extra_labels, _notes = self._rlq_table_data()
         if not rows:
             raise UserError(_("No volunteer to export for this event."))
@@ -271,20 +254,19 @@ class RlqVolunteerCoordinator(models.TransientModel):
         content = self._rlq_workbook(rd.volunteer_export_sheets(rows, groups, lang, extra_columns=extra_labels))
         zone = local_zone(self.env, self.event_id)
         stamp = fields.Datetime.context_timestamp(self.with_context(tz=zone), fields.Datetime.now()).strftime("%Y%m%d.%H%M%S")
-        name = "Benevoles-%s-%s" % (rb.slug(self.event_id.name)[:60], stamp)
-        archive = report._zipper_avec_mot_de_passe(name + ".xlsx", content)
+        name = "Benevoles-%s-%s.xlsx" % (rb.slug(self.event_id.name)[:60], stamp)
         attachment = self.env["ir.attachment"].create({
-            "name": name + ".zip", "type": "binary", "datas": base64.b64encode(archive),
-            "res_model": self._name, "res_id": self.id, "mimetype": "application/zip",
+            "name": name, "type": "binary", "datas": base64.b64encode(content), "res_model": self._name, "res_id": self.id,
+            "mimetype": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         })
         try:                                                    # traceability, like the survey reports; never blocks the export
             self.env["rlq.survey.report.acces"].sudo().create({
-                "user_id": self.env.user.id, "action": "excel", "nom_fichier": name + ".zip", "attachment_id": attachment.id,
+                "user_id": self.env.user.id, "action": "excel", "nom_fichier": name, "attachment_id": attachment.id,
                 "fichier_telecharger": attachment.sudo().datas, "anonymise": False, "nb_sondages": 0,
                 "resume_sondages": (_("Volunteers: %(event)s", event=self.event_id.name) or "")[:250],
             })
         except Exception:  # noqa: BLE001
             _logger.warning("rlq_survey_report: access log entry not written for %s", name, exc_info=True)
         _logger.info("rlq_survey_report: volunteers spreadsheet %s exported by user %s (%d volunteers)", name, self.env.uid, len(rows))
-        return {"type": "ir.actions.act_url", "url": "/web/content/%d?download=true&filename=%s.zip" % (attachment.id, name),
+        return {"type": "ir.actions.act_url", "url": "/web/content/%d?download=true&filename=%s" % (attachment.id, name),
                 "target": "self"}

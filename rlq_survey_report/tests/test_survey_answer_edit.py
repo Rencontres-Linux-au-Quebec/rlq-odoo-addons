@@ -87,3 +87,27 @@ class TestRlqSurveyAnswerEdit(TransactionCase):
         wizard.action_apply()
         change = self.env["rlq.survey.answer.change"].search([("user_input_id", "=", nobody.id)])
         self.assertFalse(change.sent_date)
+
+    def test_edit_window_shows_only_the_changed_answers_and_a_translated_type(self):
+        wizard = self._wizard()
+        name = self._line(wizard, self.q_name)
+        self.assertFalse(name.change_display)                              # unchanged: nothing in « New answer (text) »
+        name.new_text = "Arch"
+        self.assertEqual(name.change_display, "Arch")
+        self.assertFalse(self._line(wizard, self.q_lunch).change_display)
+        labels = dict(self.env["survey.question"]._fields["question_type"]._description_selection(self.env))
+        self.assertEqual(name.question_type_label, labels["char_box"])
+
+    def test_links_of_the_e_mail_of_answers(self):
+        """v1.128.0: « Modifier mes réponses » only for a submitted participation of an open survey."""
+        self.assertTrue(self.user_input._rlq_peut_modifier())
+        self.assertIn("/rlq_survey_report/reponses/%s/modifier" % self.user_input.access_token, self.user_input.rlq_reponses_html)
+        self.survey.active = False
+        self.assertFalse(self.user_input._rlq_peut_modifier())
+        self.survey.active = True
+        started = self.env["survey.user_input"].create({"survey_id": self.survey.id, "email": "x@example.com", "state": "in_progress"})
+        self.assertFalse(started._rlq_peut_modifier())
+        # No registration for this participation: no « Je ne peux plus venir » link, and no error even if event.event has
+        # no survey_id field (the production instance).
+        self.assertIsNone(self.user_input._rlq_inscription_annulable())
+

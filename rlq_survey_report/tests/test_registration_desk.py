@@ -240,15 +240,28 @@ class TestRlqRegistrationDesk(TransactionCase):
         self.assertEqual(row["arrived"], "8 h 30")                       # survey answer, not the time of « Present »
         self.assertTrue(any("départ" in note or "departure" in note for note in notes))   # no departure question: a note
 
-    def test_volunteers_export_refuses_a_missing_or_weak_password(self):
-        from odoo.exceptions import UserError
+    def test_volunteers_export_is_a_spreadsheet(self):
+        """v1.128.0: an .xlsx file downloaded directly (no ZIP archive), logged in the access history."""
         self._volunteer_setup()
         self._volunteer("Nadia Export", "nadia@example.com")
-        coordinator = self.env["rlq.volunteer.coordinator"].create({"event_id": self.event.id, "password": False})
-        for password in (False, "!CHANGE-MOI@", "trop-faible"):
-            coordinator.password = password
-            with self.assertRaises(UserError):
-                coordinator.action_export_excel()
+        coordinator = self.env["rlq.volunteer.coordinator"].create({"event_id": self.event.id})
+        action = coordinator.action_export_excel()
+        self.assertIn(".xlsx", action["url"])
+        attachment = self.env["ir.attachment"].search([("res_model", "=", "rlq.volunteer.coordinator"), ("res_id", "=", coordinator.id)])
+        self.assertTrue(attachment.name.endswith(".xlsx"))
+        self.assertEqual(attachment.mimetype, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         sheets = rd.volunteer_export_sheets(*coordinator._rlq_table_data()[:2], self.env.lang)
-        self.assertEqual(len(sheets), 3)
         self.assertIn("Nadia Export", [line[0] for line in sheets[0][2]])
+
+    def test_who_marked_present_is_recorded_and_cleared(self):
+        registration = self._registration("Paul Présent", "paul@example.com")
+        volunteer_user = self.env["res.users"].create({"name": "Bénévole accueil", "login": "rlq_desk_volunteer",
+                                                       "groups_id": [(6, 0, [self.env.ref("event.group_event_user").id])]})
+        registration.with_user(volunteer_user).action_rlq_desk_present()
+        self.assertEqual(registration.rlq_present_by, volunteer_user)
+        registration.write({"state": "done"})                              # already present: the first person is kept
+        self.assertEqual(registration.rlq_present_by, volunteer_user)
+        registration.action_rlq_desk_undo()
+        self.assertFalse(registration.rlq_present_by)
+        registration.write({"state": "done"})                              # native desk of Odoo: recorded too
+        self.assertEqual(registration.rlq_present_by, self.env.user)

@@ -276,6 +276,8 @@ class RlqSurveyAnswerEditLine(models.TransientModel):
     sequence = fields.Integer(string="Sequence")
     question_id = fields.Many2one("survey.question", string="Question", required=True, readonly=True)
     question_type = fields.Selection(related="question_id.question_type", string="Type of question")
+    question_type_label = fields.Char(string="Type of question", compute="_compute_question_type_label",
+                                      help="Label of the type, as translated by the Surveys application.")
     comments_allowed = fields.Boolean(related="question_id.comments_allowed", string="Comment allowed")
     editable = fields.Boolean(string="Can be changed", compute="_compute_editable")
     current_text = fields.Text(string="Current answer", readonly=True)
@@ -290,8 +292,18 @@ class RlqSurveyAnswerEditLine(models.TransientModel):
                                       string="New choices", domain="[('question_id', '=', question_id)]")
     new_comment = fields.Char(string="Comment or « Other » answer")
     erase = fields.Boolean(string="No answer", help="Removes the answer to this question: the question becomes « skipped ».")
-    new_display = fields.Text(string="New answer (text)", compute="_compute_new_display")
+    new_display = fields.Text(string="Answer after the change", compute="_compute_new_display")
+    change_display = fields.Text(string="New answer (text)", compute="_compute_new_display",
+                                 help="The new answer, only for the questions changed; empty when the answer is unchanged.")
     changed = fields.Boolean(string="Changed", compute="_compute_new_display")
+
+    @api.depends("question_id")
+    def _compute_question_type_label(self):
+        # v1.128.0: the related selection showed the English labels (its values are not translated for this model);
+        # the labels of survey.question are translated by the Surveys application.
+        labels = dict(self.env["survey.question"]._fields["question_type"]._description_selection(self.env))
+        for line in self:
+            line.question_type_label = labels.get(line.question_type, line.question_type or "")
 
     @api.depends("question_type")
     def _compute_editable(self):
@@ -304,6 +316,7 @@ class RlqSurveyAnswerEditLine(models.TransientModel):
         for line in self:
             line.new_display = line._rlq_display()
             line.changed = line.editable and (line.new_display or "") != (line.current_text or "")
+            line.change_display = line.new_display if line.changed else False
 
     def _rlq_display(self):
         """The answer of the line as one text (the same formatting for « before » and « after »)."""

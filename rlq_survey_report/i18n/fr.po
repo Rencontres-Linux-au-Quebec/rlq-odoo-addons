@@ -183,6 +183,7 @@ msgstr "Corriger et renvoyer"
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_registration_list
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_form
 msgid "Registered on"
 msgstr "Inscrit le"
 
@@ -461,6 +462,7 @@ msgstr "Bureau d'inscription"
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_registration_list
 msgid "Arrived at"
 msgstr "Heure d'arrivée"
 
@@ -707,6 +709,12 @@ msgid "Manual changes"
 msgstr "Modifications manuelles"
 
 #. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_registration_list
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_form
+msgid "Event date"
+msgstr "Date de l'événement"
+
+#. module: rlq_survey_report
 #. odoo-python
 #: code:addons/rlq_survey_report/models/event_registration_desk.py:0
 msgid "Registration desk: %(event)s"
@@ -731,6 +739,16 @@ msgstr "Libellé court au bureau d'inscription"
 #: model:ir.model.fields,help:rlq_survey_report.field_survey_question__rlq_desk_label
 msgid "Short name of this question in the registration desk (for example « Lunch »). Empty: the title of the question."
 msgstr "Nom court de cette question dans le bureau d'inscription (par exemple « Dîner »). Vide : le titre de la question."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_event_registration__rlq_present_by
+msgid "Marked present by"
+msgstr "Marqué présent par"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_event_registration__rlq_present_by
+msgid "User who marked this person present (button « Present » of the RLQ registration desk, or the registration desk of Odoo). Cleared when the presence is undone."
+msgstr "Utilisateur qui a marqué cette personne présente (bouton « Présent » du bureau d'inscription RLQ, ou bureau d'inscription d'Odoo). Effacé quand la présence est annulée."
 
 #. module: rlq_survey_report
 #: model:ir.model.fields,help:rlq_survey_report.field_event_registration__rlq_departure
@@ -862,18 +880,6 @@ msgstr "L'export dans un chiffrier nécessite la bibliothèque Python « openpyx
 #. module: rlq_survey_report
 #. odoo-python
 #: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
-msgid "Enter the password of the spreadsheet first: it contains names and e-mail addresses."
-msgstr "Saisissez d'abord le mot de passe du chiffrier : il contient des noms et des adresses courriel."
-
-#. module: rlq_survey_report
-#. odoo-python
-#: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
-msgid "The password is too weak, it lacks: %(criteria)s."
-msgstr "Le mot de passe est trop faible, il lui manque : %(criteria)s."
-
-#. module: rlq_survey_report
-#. odoo-python
-#: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
 msgid "No volunteer to export for this event."
 msgstr "Aucun bénévole à exporter pour cet événement."
 
@@ -936,16 +942,6 @@ msgstr "Nombre de rôles"
 #: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_coordinator__sort_desc
 msgid "Reverses the order of the table."
 msgstr "Inverse l'ordre du tableau."
-
-#. module: rlq_survey_report
-#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_coordinator__password
-msgid "Password of the spreadsheet"
-msgstr "Mot de passe du chiffrier"
-
-#. module: rlq_survey_report
-#: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_coordinator__password
-msgid "The spreadsheet contains names and e-mail addresses: it is delivered in a ZIP archive encrypted with this password (same rules as the survey reports: at least 12 characters, with a lower-case letter, a capital letter, a digit and a special character). Pre-filled with the default password of the survey reports."
-msgstr "Le chiffrier contient des noms et des adresses courriel : il est livré dans une archive ZIP chiffrée avec ce mot de passe (mêmes règles que les rapports de sondage : au moins 12 caractères, avec une minuscule, une majuscule, un chiffre et un caractère spécial). Pré-rempli avec le mot de passe par défaut des rapports de sondage."
 
 #. module: rlq_survey_report
 #. odoo-python
@@ -1138,8 +1134,14 @@ msgstr "Séquence"
 
 #. module: rlq_survey_report
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__question_type
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__question_type_label
 msgid "Type of question"
 msgstr "Type de question"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_survey_answer_edit_line__question_type_label
+msgid "Label of the type, as translated by the Surveys application."
+msgstr "Libellé du type, tel que traduit par l'application Sondages."
 
 #. module: rlq_survey_report
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__comments_allowed
@@ -1213,8 +1215,18 @@ msgstr "Retire la réponse à cette question : la question devient « sautée »
 
 #. module: rlq_survey_report
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__new_display
+msgid "Answer after the change"
+msgstr "Réponse après la modification"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__change_display
 msgid "New answer (text)"
 msgstr "Nouvelle réponse (texte)"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_survey_answer_edit_line__change_display
+msgid "The new answer, only for the questions changed; empty when the answer is unchanged."
+msgstr "La nouvelle réponse, seulement pour les questions modifiées ; vide quand la réponse n'a pas changé."
 
 #. module: rlq_survey_report
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__changed

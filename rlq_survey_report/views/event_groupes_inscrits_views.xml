@@ -138,9 +138,9 @@
         <field name="arch" type="xml">
             <list string="Synchronisation périodique des groupes et étiquettes" editable="bottom" create="0" delete="0">
                 <field name="title" readonly="1"/>
-                <field name="rlq_synchro_active"/>
-                <field name="rlq_synchro_minutes" readonly="not rlq_synchro_active"/>
-                <field name="rlq_synchro_derniere"/>
+                <field name="rlq_synchro_active" width="169px"/>
+                <field name="rlq_synchro_minutes" readonly="not rlq_synchro_active" width="184px"/>
+                <field name="rlq_synchro_derniere" width="214px"/>
                 <field name="rlq_synchro_resultat"/>
                 <button name="action_rlq_appliquer_groupes_participants" type="object" icon="fa-refresh" string="Synchroniser maintenant"
                         help="Applique tout de suite les groupes des réponses et met à jour les étiquettes de ce sondage."/>
@@ -195,11 +195,11 @@
         <field name="arch" type="xml">
             <list string="Synchronisation périodique des événements" editable="bottom" create="0" delete="0">
                 <field name="name" readonly="1"/>
-                <field name="date_end" readonly="1"/>
+                <field name="date_end" readonly="1" width="150px"/>
                 <field name="rlq_groupe_prefixe" readonly="1"/>
-                <field name="rlq_synchro_active" readonly="not rlq_groupe_prefixe"/>
-                <field name="rlq_synchro_minutes" readonly="not rlq_synchro_active"/>
-                <field name="rlq_synchro_derniere"/>
+                <field name="rlq_synchro_active" readonly="not rlq_groupe_prefixe" width="169px"/>
+                <field name="rlq_synchro_minutes" readonly="not rlq_synchro_active" width="184px"/>
+                <field name="rlq_synchro_derniere" width="214px"/>
                 <field name="rlq_synchro_resultat"/>
                 <button name="action_rlq_synchroniser_groupes" type="object" icon="fa-refresh" string="Synchroniser maintenant" invisible="not rlq_groupe_prefixe"
                         help="Crée les groupes manquants, y place les inscrits et met à jour les étiquettes de cet événement, tout de suite."/>

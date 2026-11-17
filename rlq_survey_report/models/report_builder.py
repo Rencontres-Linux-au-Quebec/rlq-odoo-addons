@@ -240,6 +240,68 @@ def html_changements_courriel(changements):
     )
 
 
+# Textes des liens du courriel de réponses et des pages qu'ils ouvrent (v1.128.0) : en français puis en anglais, car la
+# personne qui répond au sondage n'a pas de langue connue dans Odoo.
+TEXTES_LIENS = {
+    "titre_liens": "Un changement ? / A change?",
+    "lien_modifier": "Modifier mes réponses / Change my answers",
+    "lien_annuler": "Je ne peux plus venir / I can no longer come",
+    "modifier_titre": "Modifier mes réponses / Change my answers",
+    "modifier_texte": "Vous allez rouvrir vos réponses au sondage « %(sondage)s ». Vos réponses actuelles seront affichées : "
+                      "changez ce que vous voulez, puis soumettez le sondage de nouveau.\n"
+                      "You are about to reopen your answers. Your current answers will be shown: change what you want, then "
+                      "submit the survey again.",
+    "modifier_bouton": "Modifier mes réponses / Change my answers",
+    "annuler_titre": "Je ne peux plus venir / I can no longer come",
+    "annuler_texte": "Vous allez annuler votre inscription à « %(evenement)s ». Cette action ne peut pas être défaite par ce "
+                     "lien : pour vous réinscrire, il faudra vous inscrire de nouveau.\n"
+                     "You are about to cancel your registration. To come after all, you will have to register again.",
+    "annuler_bouton": "Confirmer l'annulation / Confirm the cancellation",
+    "annule_titre": "Inscription annulée / Registration cancelled",
+    "annule_texte": "Votre inscription à « %(evenement)s » est annulée. Merci de nous avoir prévenus.\n"
+                    "Your registration is cancelled. Thank you for letting us know.",
+    "introuvable_titre": "Lien expiré / Link expired",
+    "introuvable_texte": "Ce lien n'est plus valide : le sondage est fermé, l'inscription est déjà annulée ou l'événement est "
+                         "terminé. Écrivez-nous en répondant au courriel.\n"
+                         "This link is no longer valid. Please reply to the e-mail to contact us.",
+    "note_annulation": "Inscription annulée par la personne elle-même (lien « Je ne peux plus venir » du courriel de ses "
+                       "réponses), le %(date)s UTC.",
+}
+
+
+def html_liens_courriel(url_modifier=None, url_annuler=None):
+    """Bloc HTML des liens « Modifier mes réponses » et « Je ne peux plus venir » du courriel de réponses (v1.128.0).
+    Un lien absent (None) n'est pas affiché ; aucun lien : chaîne vide. Les adresses sont échappées."""
+    liens = []
+    for url, cle in ((url_modifier, "lien_modifier"), (url_annuler, "lien_annuler")):
+        if url:
+            liens.append('<a href="%s" style="display:inline-block; margin:0 12px 8px 0; padding:8px 14px; border:1px solid #875a7b; '
+                         'border-radius:4px; color:#875a7b; text-decoration:none;">%s</a>' % (echapper_attr(url), echapper(TEXTES_LIENS[cle])))
+    if not liens:
+        return ""
+    return ('<div style="margin:18px 0 8px 0;"><p style="margin:0 0 8px 0;"><strong>%s</strong></p>%s</div>'
+            % (echapper(TEXTES_LIENS["titre_liens"]), "".join(liens)))
+
+
+def page_lien_courriel(titre, texte, bouton=None, action=None, jeton_csrf=None):
+    """Page HTML complète, autonome (aucun module Site web), ouverte par un lien du courriel de réponses (v1.128.0).
+    Avec `bouton` et `action` : un formulaire POST avec le jeton CSRF (rien ne change avant le clic). Tout est échappé ;
+    chaque ligne de `texte` devient un paragraphe."""
+    paragraphes = "".join("<p>%s</p>" % echapper(ligne) for ligne in str(texte or "").split("\n") if ligne.strip())
+    formulaire = ""
+    if bouton and action:
+        formulaire = ('<form method="post" action="%s"><input type="hidden" name="csrf_token" value="%s"/>'
+                      '<button type="submit">%s</button></form>' % (echapper_attr(action), echapper_attr(jeton_csrf or ""), echapper(bouton)))
+    return (
+        '<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>'
+        '<meta name="robots" content="noindex, nofollow"/><title>%s</title><style>'
+        "body{font-family:system-ui,sans-serif;max-width:40rem;margin:3rem auto;padding:0 1rem;color:#222;line-height:1.5}"
+        "h1{font-size:1.4rem}button{font-size:1rem;padding:.6rem 1.2rem;border:0;border-radius:4px;background:#875a7b;color:#fff;cursor:pointer}"
+        "</style></head><body><h1>%s</h1>%s%s</body></html>"
+        % (echapper(titre), echapper(titre), paragraphes, formulaire)
+    )
+
+
 def html_resume_inscription(lignes):
     """HTML du bloc « Résumé de votre inscription » (v1.120.0), en tête du courriel de
     réponses. `lignes` = [(libellé, valeur)] ; une valeur vide est omise. Tout est échappé.

@@ -53,6 +53,7 @@ rlq_survey_report/
 │   ├── survey_answer_edit.py          Modification manuelle des réponses (v1.127) : fenêtre, historique rlq.survey.answer.change, courriel de mise à jour
 │   └── rlq_survey_report_acces.py     Historique d'accès aux rapports (qui, quand, quelle action)
 ├── controllers/aide.py                Page /rlq_survey_report/aide : sert le guide utilisateur dans Odoo (v1.106) ; menus Sondage > Rapports détaillés et Événements (v1.124) > Guide d'utilisation
+├── controllers/reponses.py            Liens « Modifier mes réponses » et « Je ne peux plus venir » du courriel de réponses : page de confirmation puis action (v1.128)
 ├── controllers/chat.py                Page /rlq_survey_report/chat/<contact> : ouvre la discussion directe avec un bénévole, sinon sa fiche de contact (v1.123)
 ├── views/                             Formulaire de l'assistant, menus, gabarit PDF, billets
 ├── data/                              URL d'aide, purge des pièces jointes, mot de passe par défaut, modèle du courriel de réponses

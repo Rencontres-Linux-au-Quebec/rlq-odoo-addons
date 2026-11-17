@@ -11,7 +11,8 @@
                 <sheet>
                     <group>
                         <field name="question_id" readonly="1"/>
-                        <field name="question_type" readonly="1"/>
+                        <field name="question_type" invisible="1"/>
+                        <field name="question_type_label" readonly="1"/>
                         <field name="current_text" readonly="1"/>
                         <field name="editable" invisible="1"/>
                         <field name="readonly_text" invisible="editable"/>
@@ -57,8 +58,8 @@
                     <list create="false" delete="false" decoration-bf="changed" decoration-muted="not editable">
                         <field name="question_id"/>
                         <field name="current_text"/>
-                        <field name="new_display"/>
-                        <field name="changed" widget="boolean"/>
+                        <field name="change_display"/>
+                        <field name="changed" widget="boolean" width="94px"/>
                         <field name="editable" column_invisible="1"/>
                     </list>
                 </field>
@@ -80,7 +81,7 @@
                     <button name="action_send_update" type="object" string="Send the update by e-mail"
                             groups="survey.group_survey_manager"/>
                 </header>
-                <field name="change_date"/>
+                <field name="change_date" width="150px"/>
                 <field name="user_id"/>
                 <field name="survey_id"/>
                 <field name="respondent"/>
@@ -89,7 +90,7 @@
                 <field name="old_value"/>
                 <field name="new_value"/>
                 <field name="reason" optional="show"/>
-                <field name="sent_date" optional="show"/>
+                <field name="sent_date" optional="show" width="206px"/>
                 <field name="sent_by" optional="hide"/>
             </list>
         </field>

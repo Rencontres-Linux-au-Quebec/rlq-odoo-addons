@@ -6,6 +6,17 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -82. Libellés, en-têtes de colonnes, liens du courriel de réponses, marqué présent par, chiffrier direct (v1.128.0)
+
+**Non vérifié sans instance, à confirmer :**
+1. Fenêtre « Modifier les réponses » : tout en français (type de question compris) ; « Nouvelle réponse (texte) » vide pour les questions non modifiées ; en-tête « Modifiée » lisible.
+2. En-têtes des colonnes des listes du module : au moins le premier mot visible (largeurs fixes, voir CHANGELOG).
+3. Sondages non complétés : icône à droite des en-têtes, colonnes « Date de l'événement », « Inscrit le », etc. à cocher.
+4. Erreur `Invalid field event.event.survey_id` : plus dans le journal à la fin d'un sondage ; le courriel de réponses a de nouveau le « Résumé de votre inscription ».
+5. Courriel de réponses (sondage d'un billet, case « Envoyer ses réponses au participant » cochée) : boutons « Modifier mes réponses » et « Je ne peux plus venir ». Ouvrir chacun (page de confirmation, rien ne change), puis confirmer : le sondage se rouvre avec les réponses affichées ; l'inscription passe à « Annulée » avec une note. Vérifier qu'aucun antivirus de courriel ne soumet le formulaire.
+6. Bureau d'inscription : colonne « Marqué présent par », remplie par « Présent » et par le bureau d'inscription d'Odoo ; effacée par « Annuler la présence ».
+7. Bénévoles > « Exporter dans un chiffrier » : un fichier .xlsx se télécharge directement, avec trois onglets.
+
 ## -81. Pourcentages, « (sans réponse) », modification manuelle des réponses (v1.127.0)
 
 **Non vérifié sans instance, à confirmer :**

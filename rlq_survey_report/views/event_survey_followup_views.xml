@@ -10,13 +10,19 @@
         <field name="arch" type="xml">
             <list string="Surveys not completed" create="false" default_order="event_id desc, name" decoration-warning="rlq_survey_state == 'in_progress'">
                 <field name="event_id"/>
+                <field name="event_begin_date" string="Event date" optional="show" width="150px"/>
                 <field name="name"/>
                 <field name="email"/>
+                <field name="phone" optional="hide"/>
+                <field name="company_name" optional="hide"/>
                 <field name="event_ticket_id" optional="show"/>
                 <field name="rlq_expected_survey_id" optional="show"/>
                 <field name="rlq_survey_state"/>
-                <field name="create_date" string="Registered on" optional="show"/>
+                <field name="rlq_desk_progress" optional="hide"/>
+                <field name="create_date" string="Registered on" optional="show" width="150px"/>
                 <field name="state" optional="hide"/>
+                <field name="date_closed" string="Arrived at" optional="hide" width="150px"/>
+                <field name="rlq_present_by" optional="hide"/>
             </list>
         </field>
     </record>
@@ -42,12 +48,20 @@
                 </group>
                 <field name="emails" readonly="1" widget="CopyClipboardChar"/>
                 <field name="registration_ids" readonly="1">
+                    <!-- v1.128.0: more columns, chosen with the column menu at the right of the headers. -->
                     <list>
                         <field name="event_id"/>
+                        <field name="event_begin_date" string="Event date" optional="hide" width="150px"/>
                         <field name="name"/>
                         <field name="email"/>
+                        <field name="phone" optional="hide"/>
+                        <field name="company_name" optional="hide"/>
                         <field name="event_ticket_id"/>
+                        <field name="rlq_expected_survey_id" optional="hide"/>
                         <field name="rlq_survey_state"/>
+                        <field name="rlq_desk_progress" optional="hide"/>
+                        <field name="create_date" string="Registered on" optional="show" width="150px"/>
+                        <field name="state" optional="hide"/>
                     </list>
                 </field>
                 <footer>

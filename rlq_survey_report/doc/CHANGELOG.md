@@ -1,5 +1,51 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.128.0
+
+**Short title:** French labels and readable column headers; edit window shows only changed answers; more columns in "Surveys not completed"; links "Modifier mes réponses" and "Je ne peux plus venir" in the e-mail of answers; who marked a person present; volunteers' spreadsheet downloaded directly; error at the end of a survey fixed.
+
+**Reason for the request:** (1) English words in the window "Modifier les réponses", and column headers cut to their first letter ("M...") in the windows of the module; (2) in that window, show a new answer only for the questions changed; (3) be able to add columns (registration date and time, date of the event...) in "Sondages non complétés"; (4) in the e-mail of answers sent after the survey of an event, let people say they can no longer come and change their answers; (5) error in the server log at the end of a survey; (6) on the RLQ registration desk, a column with who marked a person present; (7) the volunteers' page must produce an .xlsx file with several sheets directly, not a ZIP archive.
+
+**Bugs fixed:**
+
+- (5) Symptom: `ValueError: Invalid field event.event.survey_id in leaf ('survey_id', '=', 82)` in the log each time a person submitted a survey that sends the answers; the e-mail left without the "Résumé de votre inscription".
+  - Diagnosis: `survey_reponses_courriel._rlq_inscription_associee()` searched the registration with `event_id.survey_id`, a field that only exists when another module adds it (absent on the production instance). The other files of the module already tested its presence; this one did not. The error was caught, so the e-mail still left, without the summary.
+  - Fix: the criterion on the survey of the event is added only if the field exists.
+- (1) Symptom: English labels in the window "Modifier les réponses".
+  - Diagnosis: the type of question was a related selection field: its values are not translated for a model of this module. Also, the explanation text of the window "Sondages non complétés" had changed in English without its translation, so it showed in English.
+  - Fix: new field `question_type_label` (label translated by the Surveys application); `views/event_survey_followup_views.xml` added to `scripts/build_fr_po.py`, which now stops if a term of that view has no translation.
+- (1) Symptom: column headers cut to "M...".
+  - Diagnosis: in Odoo 18, a checkbox column is at most 100 px wide, a number column 71 px and a date column the width of the date (`column_width_hook.js`): a longer header is cut.
+  - Fix: a fixed `width` on every checkbox, number and date column of the lists of the module, computed from the length of the French header (between 86 and 221 px).
+
+**Changes:**
+
+- `models/survey_answer_edit.py`: `change_display` (shown in the list: the new answer only for a question changed), `question_type_label`; `new_display` renamed "Answer after the change" (still written in the history).
+- `views/event_survey_followup_views.xml`: lists "Surveys not completed" (window and full list): optional columns (column menu at the right of the headers) "Event date", phone, company, survey expected, "Questions answered", "Registered on", status, "Arrived at", "Marked present by".
+- `models/survey_reponses_courriel.py`: links at the bottom of the answers (`_rlq_liens_html()`): "Modifier mes réponses" (`_rlq_peut_modifier()`: survey active, participation submitted, not a certification, live session or past deadline) and "Je ne peux plus venir" (`_rlq_inscription_annulable()`: registration neither cancelled nor present, event not ended). They appear in the e-mail of answers and in the update e-mail, without changing the e-mail templates (kept by `noupdate`).
+- `controllers/reponses.py` (new): `/rlq_survey_report/reponses/<token>/modifier` and `/annuler`. GET shows a confirmation page, POST (CSRF) acts: the participation goes back to "in progress" from the first page and the person is sent to the survey of Odoo with the answers already given; or the registration is cancelled with a note in its history. Pages in French and English, no Website application needed.
+- `models/report_builder.py`: `TEXTES_LIENS`, `html_liens_courriel()`, `page_lien_courriel()`.
+- `models/event_registration_desk.py`: field `rlq_present_by` ("Marked present by"), filled by `create()` / `write()` whenever a registration becomes "done" (button of the RLQ desk, registration desk of Odoo, form), cleared when it leaves "done". Column in both lists of the desk.
+- `models/volunteer_coordinator.py`: "Export to a spreadsheet" downloads the .xlsx file directly (three sheets); field `password` and the ZIP archive removed. Every export is still written in the access history.
+- `views/*.xml`: widths of the narrow columns (see above).
+- `scripts/build_fr_po.py`, `i18n/fr.po`; tests: 3 standalone tests (links, pages), Odoo tests updated and added (spreadsheet, who marked present, edit window, links); guide, `doc/CONTEXTE.md`, `doc/NOTES_VALIDATION.md` (section -82), `__manifest__.py` (version `18.0.1.128.0`).
+
+**Safeguards and edge cases:**
+
+- The links of the e-mail contain the secret token of the participation (the same as the link of the survey). Opening a link changes nothing: a mail scanner that opens every link cannot reopen a survey or cancel a registration. A link that no longer applies shows "Lien expiré".
+- A cancelled registration cannot be restored by the link: the person must register again (written on the confirmation page).
+- After "Modifier mes réponses", the copy of the answers is sent again when the person submits (if the survey sends the answers).
+- A registration already present keeps the first person who marked it present; undoing the presence clears it.
+- Personal data: the volunteers' spreadsheet is no longer protected by a password, at the request of the person responsible; it stays traced in the access history.
+
+**Checks:**
+
+- `./run-all.sh --sans-odoo`: ruff, syntax and manifest, 224 standalone tests: OK. XML of the view files parsed.
+- Checked in the source of Odoo 18.0: column widths (`column_width_hook.js`), `event_begin_date`, resuming an "in progress" participation (`survey/controllers/main.py`), `action_cancel()`, `certification`, `deadline`, `is_session_answer`.
+- The Odoo code was NOT run: no Odoo instance here.
+
+**Action required:** update the module on DEV (`-u rlq_survey_report`), then check the points of `doc/NOTES_VALIDATION.md`, section -82, in particular the two links of the e-mail of answers with a real participation.
+
 ## 18.0.1.127.0
 
 **Short title:** registration desk: questions in percent, "(sans réponse)" explained, answers grouped; "Voir les personnes n'ayant pas répondu" checked by default; manual changes of survey answers with history and update e-mail.

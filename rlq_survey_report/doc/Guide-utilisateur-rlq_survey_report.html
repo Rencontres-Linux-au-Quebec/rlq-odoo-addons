@@ -42,7 +42,7 @@
 <div class="page">
 
 <h1>Guide utilisateur — Rapport de sondage</h1>
-<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.127.0</strong> — mis à jour le 2026-11-16.<br>
+<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.128.0</strong> — mis à jour le 2026-11-16.<br>
 Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 
 <p>Ce module produit un compte-rendu détaillé — à l'écran, en fichier HTML, en PDF ou en Excel — des réponses à un ou plusieurs sondages Odoo, notamment les sondages de satisfaction envoyés après chaque rencontre. Il aide à repérer ce qui va bien, ce qui se dégrade, et à suivre les actions entreprises d'une rencontre à l'autre.</p>
@@ -308,6 +308,13 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 </ol>
 <p>Le courriel part vers l'adresse connue du participant (invitation par courriel, utilisateur connecté, ou courriel de sa participation). Rien n'est envoyé pour un essai (bouton « Tester »), pour une personne sans adresse, ni deux fois pour la même participation. Le courriel est supprimé des courriels sortants après son envoi, et un échec d'envoi ne bloque jamais la soumission du sondage (il est inscrit dans les journaux du serveur). Le serveur de courriel sortant d'Odoo doit être configuré.</p>
 
+<p><strong>Liens du courriel de réponses</strong> (v1.128) : au bas des réponses, deux boutons s'affichent quand ils s'appliquent.</p>
+<ul>
+  <li><strong>Modifier mes réponses</strong> : si le sondage est encore actif. La personne confirme sur une page, puis retrouve le sondage avec ses réponses déjà remplies ; elle change ce qu'elle veut et le soumet de nouveau. Elle reçoit alors une nouvelle copie de ses réponses.</li>
+  <li><strong>Je ne peux plus venir</strong> : si son inscription n'est ni annulée ni marquée présente et que l'événement n'est pas terminé. Après confirmation, l'inscription est annulée et une note l'indique dans son historique. Pour revenir, la personne doit se réinscrire.</li>
+</ul>
+<p>Ouvrir un lien ne change rien tant que la personne n'a pas cliqué le bouton de la page de confirmation : un antivirus de courriel qui ouvre les liens automatiquement ne peut ni rouvrir un sondage ni annuler une inscription. Un lien qui ne s'applique plus affiche « Lien expiré ».</p>
+
 <h3 id="alerte-inscriptions">Être averti quand un événement atteint N inscriptions</h3>
 <p>Pour recevoir un courriel quand un événement atteint un certain nombre d'inscriptions :</p>
 <ol>
@@ -390,6 +397,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
   <li>Les événements en cours et à venir dont un billet a un sondage sont déjà choisis ; ajoutez-en ou retirez-en au besoin. La case <strong>Inclure les sondages commencés</strong> (cochée par défaut) ajoute les personnes qui ont commencé le sondage sans le terminer.</li>
   <li>Le champ <strong>Adresses courriel</strong> contient les adresses, sans doublons, séparées par « ; » : le bouton de copie les met dans le presse-papiers, à coller dans le champ <em>Cci</em> d'un courriel. Le nombre d'inscriptions <em>sans</em> adresse est indiqué à part.</li>
   <li><strong>Ouvrir en liste</strong> affiche les mêmes inscriptions dans une liste Odoo (filtres, regroupement par événement, export).</li>
+  <li><strong>Ajouter des colonnes</strong> (v1.128) : dans la fenêtre comme dans la liste, cliquez sur l'icône à droite des en-têtes de colonnes et cochez celles à afficher : date de l'événement, téléphone, entreprise, sondage attendu, questions répondues, date et heure d'inscription, statut, heure d'arrivée, marqué présent par.</li>
 </ol>
 <p>Seules les inscriptions confirmées ou présentes comptent (ni brouillons, ni annulations). Un sondage est rattaché à une inscription quand il a été rempli par <strong>le même contact ou avec la même adresse courriel</strong> (majuscules ignorées) ; les essais (« Tester ») ne comptent pas. Si une personne a rempli le sondage avec une autre adresse que celle de son inscription, elle apparaît dans la liste : vérifiez avant une relance insistante.</p>
 <h3>Rapport quotidien par courriel</h3>
@@ -413,7 +421,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 <ol>
   <li>Ouvrez <strong>Événements → Bureau d'inscription RLQ</strong> (ou le bouton <strong>Bureau d'inscription RLQ</strong> du formulaire de l'événement). L'événement en cours, sinon le prochain, est déjà choisi.</li>
   <li>Tapez une partie du nom, du courriel ou de l'entreprise dans <strong>Recherche</strong> pour trouver la personne. <strong>Masquer les personnes déjà présentes</strong> raccourcit la liste.</li>
-  <li>Cliquez <strong>Présent</strong> sur sa ligne : l'heure d'arrivée est enregistrée. <strong>Annuler la présence</strong> corrige une erreur.</li>
+  <li>Cliquez <strong>Présent</strong> sur sa ligne : l'heure d'arrivée et la personne qui l'a marquée présente (colonne <strong>Marqué présent par</strong>, v1.128) sont enregistrées, aussi quand la présence est pointée dans le bureau d'inscription d'Odoo. <strong>Annuler la présence</strong> corrige une erreur et efface les deux.</li>
   <li><strong>Actualiser</strong> recalcule le sommaire (utile quand plusieurs bénévoles pointent en même temps). <strong>Ouvrir en liste</strong> affiche les mêmes inscriptions dans une liste Odoo complète, regroupée par billet (recherche native, filtres, export).</li>
 </ol>
 <p>Chaque ligne montre le billet, l'état de l'inscription, l'état du sondage, les <strong>questions répondues</strong> (par exemple 8/12) et les <strong>réponses</strong> aux questions cochées.</p>
@@ -455,8 +463,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 
 <h3>Exporter les bénévoles dans un chiffrier <span class="pastille">nouveau, v1.126</span></h3>
 <ol>
-  <li>Dans <strong>Événements → Bénévoles</strong>, vérifiez le <strong>mot de passe du chiffrier</strong> (pré-rempli avec le mot de passe par défaut des rapports de sondage ; mêmes règles : 12 caractères, minuscule, majuscule, chiffre, caractère spécial).</li>
-  <li>Cliquez <strong>Exporter dans un chiffrier</strong>. Vous recevez une archive ZIP chiffrée qui contient un fichier <code>.xlsx</code> (Excel, LibreOffice Calc). Le filtre « Sondage » et le tri de l'écran s'appliquent.</li>
+  <li>Dans <strong>Événements → Bénévoles</strong>, cliquez <strong>Exporter dans un chiffrier</strong> : le fichier <code>.xlsx</code> (Excel, LibreOffice Calc) se télécharge directement (depuis la v1.128 ; avant, il était dans une archive ZIP protégée par mot de passe). Le filtre « Sondage » et le tri de l'écran s'appliquent.</li>
 </ol>
 <p>Le fichier a trois feuilles, chacune prête pour un <strong>tableau croisé dynamique</strong> (une ligne d'en-têtes, noms de colonnes uniques, aucune cellule fusionnée) :</p>
 <ul>
@@ -464,14 +471,14 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
   <li><strong>Rôles</strong> : une ligne par bénévole et par rôle choisi. C'est la feuille à utiliser pour compter les rôles par type, par langue ou par état du sondage : sélectionnez la feuille, puis Insertion → Tableau croisé dynamique (Excel) ou Données → Table dynamique (LibreOffice), avec « Rôle » en lignes, « Type » en colonnes et « Bénévole » en nombre.</li>
   <li><strong>Langues</strong> : une ligne par bénévole et par langue parlée.</li>
 </ul>
-<p>Le chiffrier contient des noms et des courriels : il n'est jamais livré sans mot de passe, et chaque export est inscrit dans l'historique d'accès des rapports.</p>
+<p>Le chiffrier contient des noms et des courriels, sans mot de passe : ne le transmettez qu'aux personnes autorisées. Chaque export est inscrit dans l'historique d'accès des rapports.</p>
 
 <!-- ============================================================ 16 -->
 <h2 id="modifier-reponses">16. Modifier les réponses d'un sondage <span class="pastille">nouveau, v1.127</span></h2>
 <p>Pour corriger une réponse à la demande d'une personne (mauvais choix, faute de frappe, changement de dernière minute), réservé aux <strong>administrateurs des sondages</strong>.</p>
 <ol>
   <li><strong>Sondage → Rapports détaillés → Modifier des réponses</strong>, ouvrez la participation (recherche par nom, courriel ou sondage), puis cliquez <strong>Modifier les réponses</strong>.</li>
-  <li>La fenêtre liste chaque question avec la réponse actuelle. Cliquez sur une question : le bon champ s'affiche selon son type (texte, nombre, échelle, date, choix unique, choix multiples, commentaire ou réponse « Autre »). La case <strong>Aucune réponse</strong> efface un nombre ou une valeur d'échelle. Les questions en matrice s'affichent mais ne se modifient pas ici.</li>
+  <li>La fenêtre liste chaque question avec la réponse actuelle ; la colonne <strong>Nouvelle réponse (texte)</strong> n'est remplie que pour les questions modifiées. Cliquez sur une question : le bon champ s'affiche selon son type (texte, nombre, échelle, date, choix unique, choix multiples, commentaire ou réponse « Autre »). La case <strong>Aucune réponse</strong> efface un nombre ou une valeur d'échelle. Les questions en matrice s'affichent mais ne se modifient pas ici.</li>
   <li>Indiquez au besoin un <strong>motif</strong> (inscrit dans l'historique), cochez <strong>Envoyer la mise à jour par courriel à la personne</strong> si elle doit être prévenue, puis cliquez <strong>Enregistrer les changements</strong>.</li>
 </ol>
 <p>La réponse est enregistrée comme si la personne l'avait donnée elle-même : statistiques, rapports et bureau d'inscription en tiennent compte.</p>

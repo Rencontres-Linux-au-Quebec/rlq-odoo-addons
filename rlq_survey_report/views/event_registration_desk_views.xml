@@ -16,10 +16,11 @@
                 <field name="event_ticket_id"/>
                 <field name="name"/>
                 <field name="email" optional="hide"/>
-                <field name="create_date" string="Registered on" optional="show"/>
+                <field name="create_date" string="Registered on" optional="show" width="150px"/>
                 <field name="state"/>
-                <field name="date_closed" string="Arrived at" optional="show"/>
-                <field name="rlq_departure" string="Left at" optional="show"/>
+                <field name="date_closed" string="Arrived at" optional="show" width="150px"/>
+                <field name="rlq_present_by" optional="show"/>
+                <field name="rlq_departure" string="Left at" optional="show" width="150px"/>
                 <field name="rlq_survey_state" options="{'allow_order': True}"/>
                 <field name="rlq_desk_progress" options="{'allow_order': True}"/>
                 <field name="rlq_desk_answers" options="{'allow_order': True}"/>
@@ -89,10 +90,11 @@
                         <list limit="200" create="false" delete="false" decoration-success="state == 'done'" decoration-muted="state == 'draft'">
                             <field name="event_ticket_id"/>
                             <field name="name"/>
-                            <field name="create_date" string="Registered on"/>
+                            <field name="create_date" string="Registered on" width="150px"/>
                             <field name="state"/>
-                            <field name="date_closed" string="Arrived at"/>
-                            <field name="rlq_departure" string="Left at"/>
+                            <field name="date_closed" string="Arrived at" width="150px"/>
+                            <field name="rlq_present_by" optional="show"/>
+                            <field name="rlq_departure" string="Left at" width="150px"/>
                             <field name="rlq_survey_state" options="{'allow_order': True}"/>
                             <field name="rlq_desk_progress" options="{'allow_order': True}"/>
                             <field name="rlq_desk_answers" options="{'allow_order': True}"/>
@@ -174,7 +176,6 @@
                         <group>
                             <field name="sort_by"/>
                             <field name="sort_desc"/>
-                            <field name="password" password="True"/>
                         </group>
                     </group>
                     <field name="table_html" readonly="1" nolabel="1"/>

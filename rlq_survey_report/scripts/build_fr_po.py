@@ -95,15 +95,9 @@ FR = {
     "Export to a spreadsheet": "Exporter dans un chiffrier",
     "The spreadsheet export needs the Python library « openpyxl », which is not installed on this server (pip install openpyxl).":
         "L'export dans un chiffrier nécessite la bibliothèque Python « openpyxl », qui n'est pas installée sur ce serveur (pip install openpyxl).",
-    "Enter the password of the spreadsheet first: it contains names and e-mail addresses.":
-        "Saisissez d'abord le mot de passe du chiffrier : il contient des noms et des adresses courriel.",
-    "The password is too weak, it lacks: %(criteria)s.": "Le mot de passe est trop faible, il lui manque : %(criteria)s.",
     "No volunteer to export for this event.": "Aucun bénévole à exporter pour cet événement.",
     "The survey « %(survey)s » has no question about the hour of arrival or of departure: the hours shown are those recorded at the registration desk (« Present », « Left »).":
         "Le sondage « %(survey)s » n'a pas de question sur l'heure d'arrivée ou de départ : les heures affichées sont celles enregistrées au bureau d'inscription (« Présent », « Départ »).",
-    "Password of the spreadsheet": "Mot de passe du chiffrier",
-    "The spreadsheet contains names and e-mail addresses: it is delivered in a ZIP archive encrypted with this password (same rules as the survey reports: at least 12 characters, with a lower-case letter, a capital letter, a digit and a special character). Pre-filled with the default password of the survey reports.":
-        "Le chiffrier contient des noms et des adresses courriel : il est livré dans une archive ZIP chiffrée avec ce mot de passe (mêmes règles que les rapports de sondage : au moins 12 caractères, avec une minuscule, une majuscule, un chiffre et un caractère spécial). Pré-rempli avec le mot de passe par défaut des rapports de sondage.",
     # rlq.survey.answer.change / rlq.survey.answer.edit (v1.127.0)
     'Answer to edit':
         'Réponse à modifier',
@@ -249,6 +243,32 @@ FR = {
         'Nouvelle réponse (texte)',
     'Changed':
         'Modifiée',
+    # views/event_survey_followup_views.xml (v1.128.0)
+    'Surveys not completed':
+        'Sondages non complétés',
+    'Event date':
+        "Date de l'événement",
+    'Confirmed registrations whose person has not completed the survey of their ticket (otherwise the survey of the event) yet. A survey belongs to a registration when it was answered by the same contact or with the same e-mail address.':
+        "Inscriptions confirmées dont la personne n'a pas encore complété le sondage de son billet (sinon celui de l'événement). Un sondage est rattaché à une inscription quand il a été rempli par le même contact ou avec la même adresse courriel.",
+    'Close':
+        'Fermer',
+    'Survey follow-up and daily report':
+        'Suivi des sondages et rapport quotidien',
+    'Send the daily report now':
+        'Envoyer le rapport quotidien maintenant',
+    'Surveys not completed (registrations)':
+        'Sondages non complétés (inscriptions)',
+    # v1.128.0
+    'Marked present by':
+        'Marqué présent par',
+    'User who marked this person present (button « Present » of the RLQ registration desk, or the registration desk of Odoo). Cleared when the presence is undone.':
+        "Utilisateur qui a marqué cette personne présente (bouton « Présent » du bureau d'inscription RLQ, ou bureau d'inscription d'Odoo). Effacé quand la présence est annulée.",
+    'Label of the type, as translated by the Surveys application.':
+        "Libellé du type, tel que traduit par l'application Sondages.",
+    'Answer after the change':
+        'Réponse après la modification',
+    'The new answer, only for the questions changed; empty when the answer is unchanged.':
+        "La nouvelle réponse, seulement pour les questions modifiées ; vide quand la réponse n'a pas changé.",
     # rlq.volunteer.coordinator
     "Volunteers": "Bénévoles",
     "Volunteers: %(event)s": "Bénévoles : %(event)s",
@@ -285,7 +305,7 @@ def add(msgid, ref, python=False):
 
 
 # 1. views
-VIEW_FILES = ("views/event_registration_desk_views.xml", "views/survey_answer_edit_views.xml")
+VIEW_FILES = ("views/event_registration_desk_views.xml", "views/survey_answer_edit_views.xml", "views/event_survey_followup_views.xml")
 MODEL_FILES = ("event_registration_desk.py", "volunteer_coordinator.py", "survey_answer_edit.py")
 records = [record for view_file in VIEW_FILES for record in ET.parse("%s/%s" % (root_dir, view_file)).getroot()]
 for record in records:
