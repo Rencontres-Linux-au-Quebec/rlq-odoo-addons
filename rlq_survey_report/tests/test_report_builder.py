@@ -1136,6 +1136,86 @@ class TestHtmlResumeInscription(unittest.TestCase):
         self.assertEqual(rb.html_resume_inscription([("Nom", " ")]), "")
 
 
+class TestRemplacerNomsComplets(TestRemplacerNomComplet):
+    """v1.125.0 - tous les remplacements en UNE lecture du HTML. Hérite de TOUS les tests de remplacer_nom_complet() : la
+    nouvelle fonction doit donner exactement les mêmes résultats pour un seul nom, puis les tests propres à plusieurs noms."""
+
+    @staticmethod
+    def _anon(html, nom, pseudo="Participant 1"):
+        import unicodedata
+        return rb.remplacer_noms_complets(unicodedata.normalize("NFC", html), [(nom, pseudo)])
+
+    @staticmethod
+    def _un_par_un(html, remplacements):
+        for original, remplacement in remplacements:
+            html = rb.remplacer_nom_complet(html, original, remplacement)
+        return html
+
+    def test_plusieurs_noms_le_plus_long_d_abord(self):
+        remplacements = [("Jean Dupont", "Participant 1"), ("Jean", "Participant 2"), ("F", "Participant 3")]
+        html = "<td>Jean Dupont</td><td>Jean</td><td>Jeanne Filtre F</td>"
+        self.assertEqual(rb.remplacer_noms_complets(html, remplacements),
+                         "<td>Participant 1</td><td>Participant 2</td><td>Jeanne Filtre Participant 3</td>")
+
+    def test_nom_ancre_et_courriel(self):
+        remplacements = [("personne-marie-tremblay", "personne-1"), ("marie@exemple.org", "[courriel masqué]"), ("Marie Tremblay", "Participant 1")]
+        html = "<section id='personne-marie-tremblay'><a href='mailto:marie@exemple.org'>Marie Tremblay</a></section>"
+        self.assertEqual(rb.remplacer_noms_complets(html, remplacements),
+                         "<section id='personne-1'><a href='mailto:[courriel masqué]'>Participant 1</a></section>")
+
+    def test_meme_resultat_que_un_nom_a_la_fois(self):
+        """Rapport fictif de 60 personnes : la lecture unique donne exactement le résultat de l'ancienne méthode."""
+        import random
+        import unicodedata
+        hasard = random.Random(125)
+        prenoms = ["Jean", "Marie", "André", "Élise", "José", "Zoé", "François", "Hélène", "Luc", "Anne", "Anne-Marie", "Gia Hung"]
+        noms = ["Tremblay", "Roy", "Côté", "Gagné", "Bélanger", "O'Brien", "Parent-Ruest", "Cyr (exemple.com)", "Dufour Jr."]
+        personnes = sorted({"%s %s" % (hasard.choice(prenoms), hasard.choice(noms)) for _i in range(60)})
+        remplacements = []
+        for i, nom in enumerate(personnes, 1):
+            remplacements += [(nom, "Participant %d" % i), ("personne-%s" % rb.slug(nom), "personne-%d" % i),
+                              ("%s@exemple.org" % rb.slug(nom), "[courriel masqué]")]
+        remplacements.sort(key=lambda t: len(t[0]), reverse=True)
+        morceaux = []
+        for _i in range(400):
+            nom = hasard.choice(personnes)
+            morceaux.append("<tr id='personne-%s'><td><a href=\"mailto:%s@exemple.org\" title=\"%s\">%s</a></td><td>très bien, merci "
+                            "à %s &amp; aux autres 𝟒</td></tr>" % (rb.slug(nom), rb.slug(nom), rb.echapper_attr(nom), rb.echapper(nom),
+                                                                     rb.echapper(hasard.choice(personnes))))
+        html = unicodedata.normalize("NFC", "".join(morceaux))
+        sortie = rb.remplacer_noms_complets(html, remplacements)
+        self.assertEqual(sortie, self._un_par_un(html, remplacements))
+        for nom in personnes:
+            self.assertNotIn(rb.echapper(nom), sortie)
+        self.assertNotIn("@exemple.org", sortie)
+
+    def test_nom_colle_au_remplacement_precedent_n_est_plus_oublie(self):
+        """L'ancienne méthode oubliait un nom placé juste après un autre déjà remplacé : « Participant 2 » finit par un
+        chiffre, donc le nom suivant paraissait « collé à un caractère de mot ». La lecture unique voit le texte d'origine."""
+        remplacements = [("a (acme.com)", "Participant 2"), ("<Max> Anne", "Participant 4")]
+        html = "Jr. a (acme.com)&lt;Max&gt; Anne, "
+        self.assertEqual(self._un_par_un(html, remplacements), "Jr. Participant 2&lt;Max&gt; Anne, ")       # ancien : fuite
+        self.assertEqual(rb.remplacer_noms_complets(html, remplacements), "Jr. Participant 2Participant 4, ")
+
+    def test_rien_a_remplacer_et_entrees_vides(self):
+        self.assertEqual(rb.remplacer_noms_complets("<p>texte</p>", []), "<p>texte</p>")
+        self.assertEqual(rb.remplacer_noms_complets("<p>texte</p>", [("", "x"), (None, "y")]), "<p>texte</p>")
+        self.assertEqual(rb.remplacer_noms_complets("", [("Jean", "P")]), "")
+        self.assertEqual(rb.remplacer_noms_complets("<p>Jean</p>", [("Marie", "P")]), "<p>Jean</p>")
+
+    def test_meme_texte_deux_fois_le_premier_l_emporte(self):
+        self.assertEqual(rb.remplacer_noms_complets("a@b.org", [("a@b.org", "[courriel masqué]"), ("a@b.org", "autre")]), "[courriel masqué]")
+
+    def test_texte_tres_long_repli_sur_l_ancienne_methode(self):
+        long_nom = "Nom " + "x" * (rb.LONGUEUR_MAX_TRIE + 10)
+        self.assertEqual(rb.remplacer_noms_complets("<p>%s</p> Jean" % long_nom, [(long_nom, "P1"), ("Jean", "P2")]), "<p>P1</p> P2")
+
+    def test_texte_chrono(self):
+        self.assertEqual(rb.texte_chrono([("début", 10.0), ("sondages", 13.25), ("anonymisation", 13.65)]),
+                         "sondages 3.2 s, anonymisation 0.4 s")
+        self.assertEqual(rb.texte_chrono([("début", 1.0)]), "")
+
+
 class TestHtmlReponsesCourriel(unittest.TestCase):
     """v1.94.0 : corps du courriel qui rappelle ses réponses au participant."""
 

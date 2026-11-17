@@ -42,7 +42,7 @@
 <div class="page">
 
 <h1>Guide utilisateur — Rapport de sondage</h1>
-<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.124.0</strong> — mis à jour le 2026-11-16.<br>
+<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.125.0</strong> — mis à jour le 2026-11-16.<br>
 Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 
 <p>Ce module produit un compte-rendu détaillé — à l'écran, en fichier HTML, en PDF ou en Excel — des réponses à un ou plusieurs sondages Odoo, notamment les sondages de satisfaction envoyés après chaque rencontre. Il aide à repérer ce qui va bien, ce qui se dégrade, et à suivre les actions entreprises d'une rencontre à l'autre.</p>
@@ -484,6 +484,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
   <tr><td>Pas de Note globale pour une rencontre</td><td>Aucune des trois questions qui la composent n'a de réponse numérique pour cette rencontre.</td></tr>
   <tr><td>Un contour marqué ou un message de dérive</td><td>Ce sont des signaux à examiner (§&nbsp;6), pas forcément un problème confirmé.</td></tr>
   <tr><td>Un lien de date ouvre l'administration d'Odoo au lieu de défiler dans le rapport</td><td>Ce sondage ou événement n'est pas inclus dans ce rapport.</td></tr>
+  <tr><td>La génération du rapport est longue</td><td>Depuis la version 1.125, l'anonymisation ne relit plus tout le rapport pour chaque participant (c'était la cause principale pour un rapport de plusieurs centaines de participants). Si c'est encore long, réduisez le nombre de sondages ou la période, et demandez à l'administrateur la ligne du journal du serveur qui commence par « rlq_survey_report : rapport généré en » : elle donne la durée de chaque étape.</td></tr>
   <tr><td>La génération d'un PDF échoue ou reste incomplète</td><td>Dans « Options PDF », décochez « Tableaux de réponses par participant » et/ou « Saut de page forcé par participant ».</td></tr>
   <tr><td>Un avertissement dit qu'une date n'a pas été reconnue</td><td>Le titre du sondage ne suit pas le format attendu (ex. « 4 août 2026 ») : le message cite le titre en cause.</td></tr>
   <tr><td>Le nom d'un fichier est coupé dans l'historique</td><td>Le nom complet passe à la ligne dans la colonne « Télécharger » ; si ce n'était pas le cas, faites actualiser la page (Ctrl+F5) après la mise à jour du module.</td></tr>

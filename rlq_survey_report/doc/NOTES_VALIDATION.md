@@ -6,6 +6,15 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -79. Génération du rapport HTML plus rapide (v1.125.0)
+
+**Non vérifié sans instance, à confirmer :**
+1. Générer le même rapport qu'avant (mêmes sondages, anonymisation cochée) : le temps doit baisser nettement s'il y a beaucoup de participants. Le gain réel n'a pas été mesuré : seule l'anonymisation a été chronométrée, sur des rapports fictifs (28,7 s -> 0,2 s pour 300 participants et 3 Mo).
+2. Comparer un rapport anonymisé avant / après : mêmes pseudonymes « Participant N », aucun nom ni courriel visible.
+3. Journal du serveur : une ligne « rlq_survey_report : rapport généré en X s (sondages ..., synthèse et participants ..., anonymisation ..., enregistrement ...) » après chaque génération. Si « sondages » domine, la suite est côté requêtes Odoo ; si c'est « synthèse et participants », côté construction du HTML ; si c'est « enregistrement », côté pièce jointe et chiffrement.
+4. Regroupement des lignes par question (`browse().with_prefetch()`) et cache des noms (`cr.cache`) : vérifiés dans le code source d'Odoo 18.0, pas exécutés. Le contenu du rapport doit être identique à celui de la 1.124.
+5. Ce qui n'est PAS touché et peut rester long : l'affichage par le navigateur d'un rapport de plusieurs Mo, et la génération PDF.
+
 ## -78. Heure locale, date et heure sous les écrans, guide dans le menu Événements (v1.124.0)
 
 **Non vérifié sans instance, à confirmer :**

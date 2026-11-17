@@ -617,6 +617,87 @@ def remplacer_nom_complet(html, original, remplacement):
     return html
 
 
+def texte_chrono(chrono):
+    """[("début", t0), ("sondages", t1), ("anonymisation", t2)] -> « sondages 3.2 s, anonymisation 0.4 s » (journal, v1.125.0)."""
+    return ", ".join("%s %.1f s" % (nom, t - chrono[i][1]) for i, (nom, t) in enumerate(chrono[1:]))
+
+
+def _motif_trie(textes):
+    """UNE regex qui trouve n'importe lequel des `textes` (arbre de préfixes : « Jean » et « Jean Dupont » partagent leur
+    début), le plus long d'abord à une position donnée, et seulement s'il n'est pas suivi d'un caractère de mot. La limite
+    de gauche (pas précédé d'un caractère de mot) est vérifiée par l'appelant : placée en tête du motif, elle empêcherait le
+    moteur de sauter directement aux positions qui commencent par une première lettre possible."""
+    arbre = {}
+    for texte in textes:
+        noeud = arbre
+        for caractere in texte:
+            noeud = noeud.setdefault(caractere, {})
+        noeud[""] = True
+
+    def motif(noeud):
+        choix = [re.escape(c) + motif(enfant) for c, enfant in sorted(noeud.items()) if c != ""]
+        if "" in noeud:
+            choix.append(r"(?!\w)")                      # fin d'un texte : après les suites plus longues
+        return choix[0] if len(choix) == 1 else "(?:" + "|".join(choix) + ")"
+
+    return re.compile(motif(arbre))
+
+
+LONGUEUR_MAX_TRIE = 300          # au-delà (jamais vu pour un nom ou un courriel), repli sur la méthode un nom à la fois
+
+
+def remplacer_noms_complets(html, remplacements, passes_max=5):
+    """Applique TOUS les `remplacements` [(original, remplacement), ...] en UNE lecture du HTML (v1.125.0).
+
+    Même règle que remplacer_nom_complet() appelé pour chaque original dans l'ordre de la liste (les trois formes de
+    chaque original, jamais collé à un caractère de mot, le plus long d'abord), mais le coût ne dépend plus du nombre de
+    participants : l'ancienne méthode relisait tout le HTML jusqu'à neuf fois PAR participant (28 s pour 300 participants
+    et 3 Mo ; moins d'une seconde ici).
+
+    `remplacements` doit être trié du plus long original au plus court, comme avant. Si le même texte apparaît deux fois,
+    le premier remplacement l'emporte (comme avant : il ne restait rien à remplacer pour le second). Le HTML doit déjà être
+    en NFC. Après la lecture, une lecture de contrôle recommence tant qu'elle trouve encore quelque chose (un remplacement
+    peut, rarement, en révéler un autre) : à la fin, AUCUN des textes n'est plus trouvable dans le résultat.
+
+    Seule différence possible avec l'ancienne méthode : deux textes qui se chevauchent sans commencer au même endroit
+    (« Jean Dupont » et « Dupont Martin » dans « Jean Dupont Martin »). L'ancienne remplaçait le plus long, celle-ci le
+    premier rencontré ; dans les deux cas un seul des deux peut l'être.
+    """
+    table = {}
+    for original, remplacement in remplacements:
+        original_nfc = unicodedata.normalize("NFC", str(original or ""))
+        if not original_nfc:
+            continue
+        for variante in (echapper_attr(original_nfc), echapper(original_nfc), original_nfc):
+            table.setdefault(variante, remplacement)
+    if not table:
+        return html
+    if max(len(variante) for variante in table) > LONGUEUR_MAX_TRIE:
+        for original, remplacement in remplacements:
+            if original:
+                html = remplacer_nom_complet(html, original, remplacement)
+        return html
+    chercher = _motif_trie(table).search
+    for _passe in range(passes_max):
+        morceaux, position, fin_precedente = [], 0, 0
+        while True:
+            trouve = chercher(html, position)
+            if not trouve:
+                break
+            debut = trouve.start()
+            if debut and (html[debut - 1].isalnum() or html[debut - 1] == "_"):     # collé à gauche : pas un nom complet
+                position = debut + 1
+                continue
+            morceaux.append(html[fin_precedente:debut])
+            morceaux.append(table[trouve.group()])
+            fin_precedente = position = trouve.end()
+        if not morceaux:
+            break
+        morceaux.append(html[fin_precedente:])
+        html = "".join(morceaux)
+    return html
+
+
 def construire_detail_personnes(entries, resume_html, emails=None):
     """entries : liste de (nom_affiche, date_str). Regroupe par personne
     (une ligne par personne, toutes ses dates réunies), avec lien mailto et

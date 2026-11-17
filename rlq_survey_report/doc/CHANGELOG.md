@@ -1,5 +1,52 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.125.0
+
+**Short title:** faster generation of the HTML report: anonymisation in one reading of the HTML, answer lines grouped without quadratic unions, timing of each step in the log.
+
+**Reason for the request:** the generation of the HTML report is long; see how to optimise it.
+
+**Diagnosis (what was measured, and what was not):**
+
+- No Odoo instance here: the real report could not be profiled. The code of `_compute_report()` was read, and the pure Python part was measured on fictitious reports.
+- Anonymisation (checked by default): `_anonymiser_html()` called `rb.remplacer_nom_complet()` for the name, the anchor and the e-mail address of EVERY participant, each one reading the whole HTML up to three times (three escaped forms). The time grew with participants x size of the report. Measured: 3.1 s for 100 participants and 1 MB; 28.7 s for 300 participants and 3 MB.
+- Answer lines of a survey were grouped per question with `recordset |= line` for each line: each union copies the recordset, so the time was quadratic for a matrix question with many answers. Not measured (needs Odoo).
+- `_respondent_nom()` was called for every answer line and read the contact with `sudo()` each time. Not measured (needs Odoo).
+
+**Changes:**
+
+- `models/report_builder.py`: new `remplacer_noms_complets(html, remplacements)`: every replacement in ONE reading of the HTML, with one regular expression built as a prefix tree (`_motif_trie()`); a control reading repeats while something is still found. Measured on the same fictitious reports: 0.08 s (100 participants, 1 MB), 0.22 s (300 participants, 3 MB), 0.59 s (600 participants, 8 MB); output identical to the old method on those reports. New `texte_chrono()`.
+- `models/rlq_survey_report_wizard.py`:
+  - `_anonymiser_html()` uses `rb.remplacer_noms_complets()`.
+  - `_compute_report()`: the answer lines are grouped per question as lists of ids, then `browse().with_prefetch()` (no union per line; the fields are still read in batch for the whole survey).
+  - `_respondent_nom()`: the name of a participation is read once and kept in the cache of the transaction (`CLE_CACHE_NOMS`), emptied at the start and at the end of each generation.
+  - One line in the server log at the end of each generation: total time, time of each step (surveys, synthesis and participants, anonymisation, saving), number of surveys, answers and participants, size of the HTML.
+- `tests/test_report_builder.py`: class `TestRemplacerNomsComplets` (inherits every test of the old function, plus 9 tests: several names, name + anchor + e-mail, same result as the old method on a fictitious report of 60 people, empty entries, duplicates, very long text, timing text).
+- `__manifest__.py`: version `18.0.1.125.0`. Guide (header, troubleshooting), `doc/NOTES_VALIDATION.md` (section -79).
+
+**Bugs fixed:**
+
+- Symptom: in an anonymised report, a name placed immediately after another replaced name could stay visible.
+- Diagnosis: the old method replaced one name at a time; "Participant 2" ends with a digit, so the next name looked "glued to a word character" and was skipped. Found by comparing the two methods on 4000 random texts (4 differences, all of this kind).
+- Fix: the single reading looks at the original text, so both names are replaced. Test `test_nom_colle_au_remplacement_precedent_n_est_plus_oublie`.
+
+**Safeguards and edge cases:**
+
+- Same rule as before: a name is replaced only when it is not glued to a letter, a digit or "_", in its three forms (attribute, text, raw), the longest first at a given position.
+- Only possible difference with the old method: two texts that overlap without starting at the same place ("Jean Dupont" and "Dupont Martin" in "Jean Dupont Martin"): the old method replaced the longest, the new one the first met; in both cases only one of the two can be replaced.
+- A text longer than 300 characters (never seen for a name or an address): the old method is used for the whole report.
+- The safety net that masks anything shaped like an e-mail address is unchanged.
+- The cache of names lives only during one transaction (one click), and is emptied at the start of each generation.
+
+**Checks:**
+
+- `./run-all.sh --sans-odoo`: ruff, syntax and manifest, standalone tests: OK.
+- Comparison old method / new method: identical output on fictitious reports of 1 MB and 3 MB; 4000 random adversarial texts: 4 differences, all in favour of the new method (see "Bugs fixed"), and nothing the old method could still replace remained in the new output.
+- Checked in the source of Odoo 18.0: `cr.cache`, `with_prefetch()`, `_prefetch_ids`.
+- The Odoo code was NOT run: the gain on the real report is not measured.
+
+**Action required:** update the module on DEV (`-u rlq_survey_report`), generate the same report as before and compare the time. Then send me the line of the server log that starts with "rlq_survey_report : rapport généré en": it tells which step takes the remaining time, so that the next optimisation is aimed at the right place.
+
 ## 18.0.1.124.0
 
 **Short title:** local date and time (never UTC) on the registration desk and volunteers screens; user guide updated and added to the Events menu.
