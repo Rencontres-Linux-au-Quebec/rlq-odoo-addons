@@ -6,6 +6,24 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -77. Traductions, tri par en-tête, filtre par sondage, tableau des bénévoles revu (v1.123.0)
+
+**Vérifié dans le code source d'Odoo 18.0 (dépôt odoo/odoo, branche 18.0), sans exécution :**
+- Les traductions du code Python (`_()`) ne sont chargées d'un `.po` que si l'entrée porte le commentaire `#. odoo-python` (`odoo/tools/translate.py`, `CodeTranslations`). Les termes des vues, champs, menus et actions sont rattachés par leur ligne `#:`. Les entrées ajoutées en 1.121 et 1.122 n'avaient pas toutes ces lignes : c'est la cause des libellés restés en anglais.
+- `list_renderer.js` : une colonne est triable si le champ est stocké OU si `options="{'allow_order': True}"`. `static_list.js` : la liste intégrée d'un formulaire trie côté navigateur avec une comparaison brute (`v1 < v2`), donc sensible à la casse et aux accents.
+- `models.py` : `_order_to_sql()` appelle `_order_field_to_sql()` pour chaque champ, y compris un champ calculé ; `name_search()` appelle `search_fetch()` sans ordre ; la base est créée avec `LC_COLLATE 'C'` (`odoo/service/db.py`), d'où « É » après « z » en SQL.
+- `discuss.channel.channel_get(partners_to)` retourne le canal ; adresse du canal : `/odoo/action-mail.action_discuss?active_id=<id>` ; la route `/chat/<id>` utilisée en 1.122 n'existe pas pour un contact (lien corrigé).
+- `survey.survey_question_form` a bien un `<sheet>` ; `event.registration` a `date_closed`, `company_name`, `action_set_done()`.
+
+**Non vérifié sans instance, à confirmer en priorité :**
+1. Après `-u rlq_survey_report`, les écrans sont en français (titre « Bureau d'inscription : ... », menu « Bénévoles », colonnes « Inscrit le », « Heure d'arrivée », « Heure de départ »). Si un libellé reste en anglais : Paramètres > Traductions > Langues, bouton de mise à jour des traductions du français, ou `-u rlq_survey_report --i18n-overwrite -l fr_CA` (la langue de l'utilisateur doit être installée).
+2. « Ouvrir en liste » : un clic sur « Nom du participant », « Sondage », « Questions répondues » ou « Réponses » trie ; l'ordre des noms ignore la casse et les accents. Le tri passe par `array_position(<ids triés en Python>, id)` : vérifier qu'aucune erreur SQL n'apparaît dans le journal, y compris liste regroupée par billet.
+3. Filtres de la liste : « Sondage complété », « commencé », « non commencé », « Aucun sondage » (méthode `_search_rlq_survey_state`).
+4. Sélecteur d'événement des trois écrans (bureau d'inscription, bénévoles, sondages non complétés) : le plus récent en premier, aussi dans « Recherche avancée ».
+5. Tableau des bénévoles : les deux questions sur les rôles apparaissent (présentiel d'abord) ; la colonne Type est remplie (question reconnue, sinon déduite des rôles) ; la colonne Sondage explique les lignes vides.
+6. Lien du nom d'un bénévole : discussion directe s'il a un compte, sinon fiche de contact.
+7. Les tests Odoo de `tests/test_registration_desk.py` (11) n'ont pas été exécutés ; les tests sans Odoo passent.
+
 ## -76. Tri, ordre par défaut, départs et coordination des bénévoles (v1.122.0)
 
 **Points non vérifiés sans accès à une instance, à confirmer en priorité :**

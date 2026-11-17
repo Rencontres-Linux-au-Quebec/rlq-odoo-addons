@@ -10,6 +10,7 @@
 
     odoo-bin -d TEST_DB -i rlq_survey_report --test-enable --test-tags rlq_survey_report --stop-after-init
 """
+from odoo.addons.rlq_survey_report.models import registration_desk_report as rd
 from odoo.tests.common import TransactionCase
 
 
@@ -113,25 +114,100 @@ class TestRlqRegistrationDesk(TransactionCase):
         absent.action_rlq_desk_depart()                                  # not present: nothing recorded
         self.assertFalse(absent.rlq_departure)
 
-    def test_volunteer_coordinator_lists_only_volunteer_tickets(self):
-        volunteer_survey = self.env["survey.survey"].create({"title": "Volunteer survey"})
-        self.env["survey.question"].create({"survey_id": volunteer_survey.id, "title": "En virtuel ou pas ?",
-                                            "question_type": "simple_choice",
-                                            "suggested_answer_ids": [(0, 0, {"value": "Virtuel"}), (0, 0, {"value": "Présentiel"})]})
-        roles = self.env["survey.question"].create({"survey_id": volunteer_survey.id,
-                                                    "title": "Rôles pendant l'événement (en présentiel) ?", "question_type": "multiple_choice",
-                                                    "suggested_answer_ids": [(0, 0, {"value": "Accueil"}), (0, 0, {"value": "Salle 2"})]})
-        volunteer = self.env["event.event.ticket"].create({"name": "Bénévole", "event_id": self.event.id,
-                                                           "rlq_survey_id": volunteer_survey.id})
-        helper = self.env["event.registration"].create({"event_id": self.event.id, "event_ticket_id": volunteer.id,
-                                                        "name": "Hélène Bénévole", "email": "helene@example.com", "state": "open"})
-        self.env["survey.user_input"].create({"survey_id": volunteer_survey.id, "email": "helene@example.com", "state": "done"})
-        self._registration("Visiteur", "visitor@example.com")           # the visitor ticket: never listed
+    def test_desk_sort_ignores_case_and_accents_and_sorts_computed_columns(self):
+        eric = self._registration("Éric Roy", "eric@example.com")
+        zoe = self._registration("zoé Tremblay", "zoe@example.com")
+        adam = self._registration("adam Côté", "adam@example.com")
+        self._participation("zoe@example.com", "done", lunch="Yes")
+        self._participation("adam@example.com", "in_progress")
+        everyone = eric | zoe | adam
+        self.assertEqual(everyone._rlq_desk_sorted("name").mapped("name"), ["adam Côté", "Éric Roy", "zoé Tremblay"])
+        self.assertEqual(everyone._rlq_desk_sorted("name", descending=True).mapped("name"), ["zoé Tremblay", "Éric Roy", "adam Côté"])
+        self.assertEqual(everyone._rlq_desk_sorted("rlq_survey_state"), zoe | adam | eric)      # completed, started, not started
+        desk = self.env["rlq.registration.desk"].create({"event_id": self.event.id, "sort_by": "name", "sort_desc": True})
+        self.assertEqual(desk.registration_ids.mapped("name"), ["zoé Tremblay", "Éric Roy", "adam Côté"])
+        desk.write({"sort_by": "event_ticket_id", "sort_desc": False, "survey_filter": "done"})
+        self.assertEqual(desk.registration_ids, zoe)
+        desk.survey_filter = "not_started"
+        self.assertEqual(desk.registration_ids, eric)
+        self.assertIn("rlq_survey_report", desk.summary_html)                                    # program name and version
+
+    def test_full_list_orders_by_header_in_sql(self):
+        """The full list sorts through SQL: text without case or accents, computed columns, only with the context key."""
+        eric = self._registration("Éric Roy", "eric@example.com")
+        zoe = self._registration("zoé Tremblay", "zoe@example.com")
+        adam = self._registration("adam Côté", "adam@example.com")
+        self._participation("zoe@example.com", "done", lunch="Yes")
+        registrations = self.env["event.registration"].with_context(rlq_desk_event_id=self.event.id)
+        domain = [("event_id", "=", self.event.id)]
+        self.assertEqual(registrations.search(domain, order="name").mapped("name"), ["adam Côté", "Éric Roy", "zoé Tremblay"])
+        self.assertEqual(registrations.search(domain, order="name desc").mapped("name"), ["zoé Tremblay", "Éric Roy", "adam Côté"])
+        self.assertEqual(registrations.search(domain, order="rlq_survey_state, name")[0], zoe)
+        self.assertEqual(registrations.search(domain, order="rlq_desk_answers")[0], zoe)
+        self.assertEqual(registrations.search(domain, order="rlq_desk_progress desc")[0], zoe)
+        self.assertEqual(set(registrations.search(domain, order="create_date desc, event_ticket_id").ids), set((eric | zoe | adam).ids))
+
+    def test_survey_state_is_searchable(self):
+        done = self._registration("Done", "done@example.com")
+        waiting = self._registration("Waiting", "waiting@example.com")
+        self._participation("done@example.com", "done", lunch="Yes")
+        registrations = self.env["event.registration"]
+        domain = [("event_id", "=", self.event.id)]
+        self.assertEqual(registrations.search(domain + [("rlq_survey_state", "=", "done")]), done)
+        self.assertEqual(registrations.search(domain + [("rlq_survey_state", "in", ["not_started", "in_progress"])]), waiting)
+        self.assertEqual(registrations.search(domain + [("rlq_survey_state", "!=", "done")]), waiting)
+
+    def test_event_selector_lists_the_most_recent_event_first(self):
+        events = self.env["event.event"]
+        old = events.create({"name": "RLQ selector 2029", "date_begin": "2029-01-10 13:00:00", "date_end": "2029-01-10 21:00:00"})
+        new = events.create({"name": "RLQ selector 2031", "date_begin": "2031-01-10 13:00:00", "date_end": "2031-01-10 21:00:00"})
+        found = events.with_context(rlq_recent_first=True).name_search("RLQ selector")
+        self.assertEqual([item[0] for item in found], [new.id, old.id])
+        self.assertEqual([item[0] for item in events.name_search("RLQ selector")], [old.id, new.id])   # elsewhere: unchanged
+
+    def _volunteer_setup(self):
+        survey = self.env["survey.survey"].create({"title": "Volunteer survey"})
+        question = self.env["survey.question"]
+
+        def choice(title, kind, answers, sequence):
+            return question.create({"survey_id": survey.id, "title": title, "question_type": kind, "sequence": sequence,
+                                    "suggested_answer_ids": [(0, 0, {"value": value}) for value in answers]})
+        self.v_languages = choice("Langues parlées", "multiple_choice", ["Français", "Anglais"], 1)
+        self.v_online = choice("Rôles pendant l'événement (en virtuel) ?", "multiple_choice", ["Modérateur en virtuel"], 2)
+        self.v_on_site = choice("Rôles pendant l'événement (en présentiel) ?", "multiple_choice", ["Accueil", "Salle 2"], 3)
+        self.v_survey = survey
+        self.v_ticket = self.env["event.event.ticket"].create({"name": "Bénévole", "event_id": self.event.id, "rlq_survey_id": survey.id})
+
+    def _volunteer(self, name, email, state=None, answers=()):
+        registration = self.env["event.registration"].create({"event_id": self.event.id, "event_ticket_id": self.v_ticket.id,
+                                                              "name": name, "email": email, "state": "open"})
+        if state:
+            user_input = self.env["survey.user_input"].create({"survey_id": self.v_survey.id, "email": email, "state": state})
+            for question, value in answers:
+                answer = question.suggested_answer_ids.filtered(lambda a, value=value: a.value == value)
+                self.env["survey.user_input.line"].create({"user_input_id": user_input.id, "question_id": question.id,
+                                                           "answer_type": "suggestion", "suggested_answer_id": answer.id})
+        return registration
+
+    def test_volunteers_table(self):
+        self._volunteer_setup()
+        self._volunteer("Hélène Sur Place", "helene@example.com", "done",
+                        [(self.v_languages, "Français"), (self.v_languages, "Anglais"), (self.v_on_site, "Accueil")])
+        self._volunteer("Omar En Ligne", "omar@example.com", "done", [(self.v_online, "Modérateur en virtuel")])
+        self._volunteer("Paul Sans Sondage", "paul@example.com")
+        self._registration("Visiteur Ordinaire", "visitor@example.com")       # the visitor ticket: never listed
         coordinator = self.env["rlq.volunteer.coordinator"].create({"event_id": self.event.id})
         html = coordinator.table_html
-        self.assertIn("Hélène Bénévole", html)
-        self.assertNotIn("Visiteur", html)
-        self.assertIn("Accueil", html)
-        self.assertIn("Salle 2", html)
-        self.assertTrue(roles)
-        self.assertTrue(helper)
+        for text in ("Hélène Sur Place", "Omar En Ligne", "Paul Sans Sondage", "Français, Anglais", "Accueil", "Salle 2",
+                     "Modérateur en virtuel", "rlq_survey_report"):
+            self.assertIn(text, html)
+        self.assertNotIn("Visiteur Ordinaire", html)
+        # Both roles questions are shown, the on-site one first.
+        self.assertLess(html.index("(en présentiel)"), html.index("(en virtuel)"))
+        # No type question in this survey: the type is deduced from the roles questions answered (labels of the user's language).
+        labels = rd.volunteer_texts(self.env.lang)
+        self.assertIn("<td>%s</td>" % labels["on_site"], html)
+        self.assertIn("<td>%s</td>" % labels["online"], html)
+        coordinator.survey_filter = "not_started"
+        self.assertIn("Paul Sans Sondage", coordinator.table_html)
+        self.assertNotIn("Hélène Sur Place", coordinator.table_html)

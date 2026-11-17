@@ -8,7 +8,7 @@
         <field name="model">event.registration</field>
         <field name="priority">91</field>
         <field name="arch" type="xml">
-            <list string="Surveys not completed" create="false" decoration-warning="rlq_survey_state == 'in_progress'">
+            <list string="Surveys not completed" create="false" default_order="event_id desc, name" decoration-warning="rlq_survey_state == 'in_progress'">
                 <field name="event_id"/>
                 <field name="name"/>
                 <field name="email"/>
@@ -29,7 +29,7 @@
             <form string="Surveys not completed">
                 <p>Confirmed registrations whose person has not completed the survey of their ticket (otherwise the survey of the event) yet. A survey belongs to a registration when it was answered by the same contact or with the same e-mail address.</p>
                 <group>
-                    <field name="event_ids" widget="many2many_tags"/>
+                    <field name="event_ids" widget="many2many_tags" context="{'rlq_recent_first': True}"/>
                     <field name="include_started"/>
                 </group>
                 <group>

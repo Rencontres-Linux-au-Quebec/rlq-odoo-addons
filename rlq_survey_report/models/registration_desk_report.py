@@ -18,6 +18,10 @@ run by run-all.sh):
   hourly_attendance(rows)             -> (hours, tickets, counts, totals per hour, totals per ticket, total) of the people present.
   answers_breakdown(rows)             -> per question shown at the desk, per answer: count per ticket, total, of which present.
   desk_summary_html(rows, lang)       -> the three tables above, in ONE language (French or English), everything escaped.
+  sort_key(text)                      -> sort key that ignores case and accents (« Élise » with the « e »).
+  find_volunteer_questions(questions) -> the roles, languages and type questions of a volunteer survey, found by their wording.
+  volunteer_table_html(rows, ...)     -> the table of the volunteers' coordinator (one column per role), everything escaped.
+  program_footer(program, version)    -> « rlq_survey_report 18.0.1.123.0 » shown under the screens.
 
 A row describes ONE registration (built by models/event_registration_desk.py):
 
@@ -266,7 +270,38 @@ def desk_summary_html(rows, lang=DEFAULT_LANG):
     return "".join(html)
 
 
-# ----------------------------------------------------------------- v1.122.0: volunteers' coordinator
+# ----------------------------------------------------------------- volunteers' coordinator (v1.122.0, reworked in v1.123.0)
+
+ROLE_WORDS = ("role",)
+LANGUAGE_WORDS = ("langue", "language")
+ON_SITE_WORDS = ("presentiel", "sur place", "en personne", "on site", "in person")
+ONLINE_WORDS = ("virtuel", "en ligne", "a distance", "online", "remote")
+TYPE_WORDS = ON_SITE_WORDS + ONLINE_WORDS + ("hybride", "hybrid")
+OTHER_WORDS = ("autre", "other")
+SURVEY_RANK = {"done": 0, "in_progress": 1, "not_started": 2, "none": 3}
+VOLUNTEER_SORTS = ("name", "registered", "survey", "type", "languages", "arrived", "departed", "roles")
+
+VOLUNTEER_TEXTS = {
+    "fr": {
+        "name": "Bénévole", "registered": "Inscrit le", "survey": "Sondage", "type": "Type", "languages": "Langues parlées",
+        "arrived": "Heure d'arrivée", "departed": "Heure de départ", "title": "Bénévoles", "total": "Bénévoles listés",
+        "no_volunteer": "Aucun bénévole à afficher pour cet événement.",
+        "done": "Complété", "in_progress": "Commencé", "not_started": "Non commencé", "none": "Aucun sondage",
+        "on_site": "Présentiel", "online": "Virtuel", "yes": "X",
+    },
+    "en": {
+        "name": "Volunteer", "registered": "Registered on", "survey": "Survey", "type": "Type", "languages": "Languages spoken",
+        "arrived": "Arrived at", "departed": "Left at", "title": "Volunteers", "total": "Volunteers listed",
+        "no_volunteer": "No volunteer to show for this event.",
+        "done": "Completed", "in_progress": "Started", "not_started": "Not started", "none": "No survey",
+        "on_site": "On site", "online": "Online", "yes": "X",
+    },
+}
+
+
+def volunteer_texts(lang=DEFAULT_LANG):
+    return VOLUNTEER_TEXTS["en" if texts(lang) is TEXTS["en"] else "fr"]
+
 
 def sort_key(text):
     """Key for sorting that ignores case AND accents: « Élise » sorts with the « e » words, « éric » before « Éva »."""
@@ -274,47 +309,137 @@ def sort_key(text):
     return "".join(c for c in decomposed if not unicodedata.combining(c)).casefold().strip()
 
 
+def _has_word(text, words):
+    key = sort_key(text)
+    return any(word in key for word in words)
+
+
 def is_volunteer_ticket(ticket_name):
     """True for a ticket whose name says « bénévole » (any case, with or without accents)."""
     return VOLUNTEER_WORD in sort_key(ticket_name)
 
 
-def _volunteer_texts(lang):
-    if texts(lang) is TEXTS["en"]:
-        return {"name": "Volunteer", "registered": "Registered on", "type": "Type", "languages": "Languages",
-                "arrived": "Arrived at", "departed": "Left at", "no_volunteer": "No volunteer is registered for this event.",
-                "title": "Volunteers", "total": "Volunteers listed", "none": "not answered", "yes": "X",
-                "no_type": "Type question not found in the survey", "no_roles": "Roles question not found in the survey",
-                "no_languages": "Languages question not found in the survey"}
-    return {"name": "Bénévole", "registered": "Inscrit le", "type": "Type", "languages": "Langues parlées",
-            "arrived": "Heure d'arrivée", "departed": "Heure de départ", "no_volunteer": "Aucun bénévole inscrit à cet événement.",
-            "title": "Bénévoles", "total": "Bénévoles listés", "none": "sans réponse", "yes": "X",
-            "no_type": "Question sur le type introuvable dans le sondage", "no_roles": "Question sur les rôles introuvable dans le sondage",
-            "no_languages": "Question sur les langues introuvable dans le sondage"}
+def role_kind(title):
+    """« on_site » / « online » when the title of a roles question says so (« ... (en présentiel) ? »), otherwise None."""
+    on_site, online = _has_word(title, ON_SITE_WORDS), _has_word(title, ONLINE_WORDS)
+    if on_site == online:
+        return None
+    return "on_site" if on_site else "online"
 
 
-def volunteer_table_html(rows, roles, lang=DEFAULT_LANG, base_url=""):
-    """Table of the volunteers for the coordinator. rows: dicts with keys name, partner_id, registered, type, languages, arrived,
-    departed, roles (set of role labels). roles: the choices of the roles question, one column each. Everything escaped.
+def find_volunteer_questions(questions):
+    """Finds the questions of the volunteers' table in a survey.
 
-    Name: link to the chat of the volunteer (base_url + /chat/<partner_id>), so the coordinator can talk to them on Odoo.
+    questions: [{"id": ..., "title": ..., "choices": [labels], "is_choice": bool}] in the order of the survey.
+    Returns {"roles": [ids], "languages": id or None, "type": id or None}:
+      - roles: EVERY choice question whose title contains « rôle », the on-site one(s) first, then the order of the survey;
+      - languages: the first other question whose title contains « langue »;
+      - type: the first other choice question whose title or choices speak of on site / online (« virtuel », « présentiel »,
+        « en ligne », « sur place »...). None when the survey has no such question (see deduced_type()).
     """
-    labels = _volunteer_texts(lang)
+    roles, languages, type_id = [], None, None
+    for question in questions or ():
+        title = question.get("title")
+        if question.get("is_choice") and _has_word(title, ROLE_WORDS):
+            roles.append(question)
+        elif languages is None and _has_word(title, LANGUAGE_WORDS):
+            languages = question["id"]
+        elif type_id is None and question.get("is_choice") and (
+                _has_word(title, TYPE_WORDS) or any(_has_word(choice, TYPE_WORDS) for choice in question.get("choices") or ())):
+            type_id = question["id"]
+    roles.sort(key=lambda q: 0 if role_kind(q.get("title")) == "on_site" else 1)          # stable: keeps the survey order
+    return {"roles": [q["id"] for q in roles], "languages": languages, "type": type_id}
+
+
+def deduced_type(kinds, lang=DEFAULT_LANG):
+    """Type of a volunteer when the survey has no type question: from the roles questions that were answered.
+
+    kinds: the role_kind() of each roles question the volunteer answered. -> « Présentiel », « Virtuel », both, or « ».
+    """
+    labels = volunteer_texts(lang)
+    kinds = set(kinds or ())
+    return ", ".join(labels[kind] for kind in ("on_site", "online") if kind in kinds)
+
+
+def role_cells(choices, values, yes="X"):
+    """One cell per choice of a roles question: « X » when chosen. A free-text answer (the comment of an « Autre » choice) is
+    shown in the « Autre » column instead of « X »; without such a column it is added to the last column."""
+    chosen = {sort_key(value): value for value in values or ()}
+    known = {sort_key(choice) for choice in choices}
+    free = [value for key, value in chosen.items() if key not in known]
+    cells = [yes if sort_key(choice) in chosen else "" for choice in choices]
+    if free and cells:
+        text = ", ".join(free)
+        other = next((i for i, choice in enumerate(choices) if _has_word(choice, OTHER_WORDS)), None)
+        if other is None:
+            other = len(cells) - 1
+            text = ("%s %s" % (cells[other], text)).strip()
+        cells[other] = text
+    return cells
+
+
+def volunteer_sort_value(row, sort_by):
+    """Sort value of one row of the volunteers' table (case and accents ignored for the texts)."""
+    if sort_by == "survey":
+        return (SURVEY_RANK.get(row.get("survey"), 9),)
+    if sort_by == "roles":
+        return (-sum(len(values or ()) for values in (row.get("roles") or ())),)
+    if sort_by in ("registered", "arrived", "departed"):
+        return (not row.get(sort_by), row.get(sort_by) or "")                              # empty dates last
+    if sort_by in ("type", "languages"):
+        return (not row.get(sort_by), sort_key(row.get(sort_by)))                           # empty answers last
+    return (sort_key(row.get("name")),)
+
+
+def sort_volunteer_rows(rows, sort_by="name", descending=False):
+    """Rows sorted by one column, then by name, then by registration date. Unknown column: by name."""
+    sort_by = sort_by if sort_by in VOLUNTEER_SORTS else "name"
+    rows = sorted(rows or (), key=lambda row: (sort_key(row.get("name")), row.get("registered") or ""))
+    return sorted(rows, key=lambda row: volunteer_sort_value(row, sort_by), reverse=bool(descending))      # stable
+
+
+def program_footer(program, version):
+    """« rlq_survey_report 18.0.1.123.0 » under a screen, so that a screenshot says which version produced it."""
+    return '<p class="text-muted small">%s %s</p>' % (_clean(program), _clean(version or "?"))
+
+
+def volunteer_table_html(rows, role_groups=(), lang=DEFAULT_LANG, extra_columns=(), notes=()):
+    """Table of the volunteers for the coordinator, in the language `lang`. Everything is escaped.
+
+    rows: [{"name", "chat_url" (or None), "registered", "survey" (done / in_progress / not_started / none), "type", "languages",
+            "arrived", "departed", "roles": [values of group 0, values of group 1...], "extra": [text per extra column]}]
+    role_groups: [{"title": title of the roles question, "choices": [labels]}]: one column per choice, under the title.
+    extra_columns: labels of the other survey questions checked « Show at the registration desk ».
+    notes: sentences shown above the table (question not found, type deduced...).
+    """
+    labels = volunteer_texts(lang)
     rows = list(rows or ())
+    html = ["<p><em>%s</em></p>" % _clean(note) for note in notes or ()]
     if not rows:
-        return "<p>%s</p>" % escape(labels["no_volunteer"])
-    head = [labels["name"], labels["registered"], labels["type"], labels["languages"], labels["arrived"], labels["departed"]]
-    html = ["<h4>%s</h4>" % escape(labels["title"]), _TABLE,
-            "<thead>%s</thead><tbody>" % _row(head + list(roles or ()), tag="th")]
+        return "".join(html) + "<p>%s</p>" % _clean(labels["no_volunteer"])
+    fixed = [labels[k] for k in ("name", "registered", "survey", "type", "languages", "arrived", "departed")] + list(extra_columns)
+    groups = [(index, group) for index, group in enumerate(role_groups or ()) if group.get("choices")]
+    span = ' rowspan="2"' if groups else ""
+    head = "".join("<th%s>%s</th>" % (span, _clean(label)) for label in fixed)
+    head += "".join('<th colspan="%d" style="text-align:center;">%s</th>' % (len(g["choices"]), _clean(g["title"])) for _i, g in groups)
+    html += ["<h4>%s</h4>" % _clean(labels["title"]), _TABLE, "<thead><tr>%s</tr>" % head]
+    if groups:
+        html.append("<tr>%s</tr>" % "".join("<th>%s</th>" % _clean(choice) for _i, g in groups for choice in g["choices"]))
+    html.append("</thead><tbody>")
     for row in rows:
-        link = '<a href="%s">%s</a>' % (escape("%s/chat/%d" % (base_url, row["partner_id"]), quote=True),
-                                        escape(" ".join(str(row.get("name") or "").split()))) if row.get("partner_id") \
-            else escape(row.get("name") or "")
-        cells = [link, row.get("registered") or "", row.get("type") or "", row.get("languages") or "",
-                 row.get("arrived") or "", row.get("departed") or ""]
-        cells += [labels["yes"] if role in (row.get("roles") or ()) else "" for role in (roles or ())]
-        html.append("<tr>%s</tr>" % "".join(
-            "<td>%s</td>" % (cell if str(cell).startswith("<a ") else _clean(cell)) for cell in cells))
-    html.append("</tbody></table>")
-    html.append("<p>%s: %d</p>" % (escape(labels["total"]), len(rows)))
+        name = _clean(row.get("name"))
+        if row.get("chat_url"):
+            name = '<a href="%s" target="_blank">%s</a>' % (escape(str(row["chat_url"]), quote=True), name)
+        cells = [name] + [_clean(text) for text in (
+            row.get("registered"), labels.get(row.get("survey"), ""), row.get("type"), row.get("languages"),
+            row.get("arrived"), row.get("departed"))]
+        extra = list(row.get("extra") or ())
+        cells += [_clean(extra[i] if i < len(extra) else "") for i in range(len(extra_columns))]
+        role_values = list(row.get("roles") or ())
+        for index, group in groups:
+            values = role_values[index] if index < len(role_values) else ()
+            cells += ['<span style="display:block;text-align:center;">%s</span>' % _clean(cell) if cell else ""
+                      for cell in role_cells(group["choices"], values, labels["yes"])]
+        html.append("<tr>%s</tr>" % "".join("<td>%s</td>" % cell for cell in cells))
+    html.append("</tbody></table><p>%s: %d</p>" % (_clean(labels["total"]), len(rows)))
     return "".join(html)

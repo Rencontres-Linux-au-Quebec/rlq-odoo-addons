@@ -1,5 +1,63 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.123.0
+
+**Short title:** registration desk and volunteers: French labels, sorting by any column, survey filter, most recent event first, version shown, volunteers' table fixed.
+
+**Reason for the request:** feedback with two screenshots of 18.0.1.122.0: (1) English words remain ("Registration desk", "Volunteers", "Registered on"...); (2) the event selector must list the events in reverse chronological order; (3) show the name of the program and its version; (4) everything must be sorted by the start date of the event; (5) it is not possible to sort or filter by survey completed or not; (6) survey values are missing in the volunteers' table.
+
+**Bugs fixed:**
+
+- English labels in a French session.
+  - Symptom: title "Registration desk: ...", menu "Volunteers", columns "Registered on", "Arrived at", "Left at", button "Refresh" and field "Event" of the volunteers' screen, note "Type question not found in the survey".
+  - Diagnosis: Odoo attaches a translation to a view, field, menu or action through the `#:` reference line of the entry, and loads the translation of a Python string (`_()`) only when the entry carries the comment `#. odoo-python`. Several entries added in 1.121 and 1.122 had no reference, and no code entry of the module had the comment (so the older messages of `event_registration_email.py`, `event_survey_followup.py` and `survey_survey.py` were not translated either).
+  - Fix: `i18n/fr.po` rebuilt from the sources (views, fields, selections, `_()` calls), every entry with its references; `#. odoo-python` added to every code entry, old ones included. The volunteers' screen gets a title ("Bénévoles : <event>") instead of "Nouveau".
+- Missing survey values in the volunteers' table.
+  - Symptom: no role for most volunteers, empty "Type" column, note "Type question not found".
+  - Diagnosis: only the FIRST question whose title contains "rôle" was used. The survey has two ("... (en virtuel) ?" and "... (en présentiel) ?"): the on-site roles were ignored. The type was searched only as a title containing "virtuel", which the roles question matched first.
+  - Fix: every roles question gets its columns, under its title, the on-site one first; the type question is recognized by its title or by its choices (présentiel, virtuel, en ligne, sur place...), never a roles question; without such a question the type is deduced from the roles questions the volunteer answered, and a note says so. A "Survey" column (completed, started, not started) explains the rows without answers.
+- Link on the name of a volunteer: `/chat/<id>` is not a route of Odoo for a contact. New route `/rlq_survey_report/chat/<contact>`: direct chat in Discuss when the contact has a user account, otherwise the contact form.
+- An answer starting with `<a ` was written without escaping in the volunteers' table (1.122.0). Every answer is now escaped.
+
+**Changes:**
+
+- `models/registration_desk_report.py`: `find_volunteer_questions()`, `role_kind()`, `deduced_type()`, `role_cells()`, `sort_volunteer_rows()`, `volunteer_sort_value()`, `program_footer()`, `volunteer_texts()`; `volunteer_table_html()` rewritten (two header rows, survey column, extra columns, notes).
+- `models/event_registration_desk.py`:
+  - `event.registration`: `_rlq_desk_participations()` (answers reader shared with the volunteers' table), `_rlq_desk_sort_keys()`, `_rlq_desk_sorted()`, `_rlq_desk_sorted_ids()`, and `_order_field_to_sql()` overridden ONLY with the context key `rlq_desk_event_id` (full list of the desk): text columns sorted without case or accents, computed columns (survey, questions answered, answers) sortable.
+  - `event.event`: `search_fetch()` lists the most recent event first when the context has `rlq_recent_first` and the caller gives no order (event selectors of this module and their "Search more" window).
+  - `rlq.registration.desk`: new fields `survey_filter`, `sort_by`, `sort_desc`; the search ignores accents; program name and version under the summary (`program_version()`).
+- `models/volunteer_coordinator.py` rewritten: fields `survey_filter`, `sort_by`, `sort_desc`, title, `_rlq_survey_layout()`, columns of the questions checked "Show at the registration desk", program name and version under the table.
+- `models/event_survey_followup.py`: `rlq_survey_state` gets a search method (`_search_rlq_survey_state`), so it can be used in filters.
+- `controllers/chat.py` (new): route `/rlq_survey_report/chat/<int:partner_id>` (internal users of Events only).
+- `views/event_registration_desk_views.xml`: `allow_order` on the computed columns; search view of the full list (person, present, not present yet, survey completed / started / not started / no survey, group by ticket or status); sort and filter fields on both screens; event selectors with `rlq_recent_first`.
+- `views/event_survey_followup_views.xml`, `views/event_registration_email_views.xml`: lists "Surveys not completed" and "Invalid e-mails" sorted by default with the most recent event first; event selector of "Surveys not completed" most recent first.
+- `tests/test_registration_desk_report.py` (19 standalone tests), `tests/test_registration_desk.py` (11 Odoo tests).
+- `__manifest__.py`: version `18.0.1.123.0`, description. Guide (section 15), `doc/CONTEXTE.md`, `doc/NOTES_VALIDATION.md` (section -77).
+
+**Sorting: what each screen does:**
+
+- Registration desk (the list under the summary): "Sort by" + "Descending", on every column, case and accents ignored. Clicking a header of this list also sorts, but with the raw comparison of the Odoo web client (capitals first, accented letters last): this cannot be changed without JavaScript.
+- "Open as a list": click any column header; case and accents ignored, computed columns included. No default grouping any more (group by ticket or status from the search bar).
+- Volunteers: "Sort by" + "Descending" + "Survey" filter. Not sortable by its headers (HTML table: its role columns depend on the survey).
+
+**Safeguards and edge cases:**
+
+- `_order_field_to_sql()` and `search_fetch()` behave as before without their context key: no other screen of Odoo is affected. Grouped queries and many2one or date columns go to the standard code.
+- The filter on the survey state computes the matching registrations in Python (not cancelled; only the event of the desk when opened from it).
+- Two roles questions with the same title in two volunteer surveys share their columns; choices are merged.
+- A free-text role ("Autre") is written in the "Autre" column; without such a column, in the last one.
+- A volunteer ticket without survey: its volunteers are listed without answers, and a note says so.
+- The chat route never fails: any error falls back to the contact form. A contact without account cannot receive a chat.
+
+**Checks:**
+
+- `./run-all.sh --sans-odoo`: ruff, syntax and manifest, standalone tests: OK.
+- XML of the three view files parsed; `i18n/fr.po` rebuilt by a script that stops if a term of the two screens has no translation.
+- Behaviour of Odoo read in the source of Odoo 18.0 (translation loading, `allow_order`, client-side sort, `_order_field_to_sql`, `name_search`, `channel_get`): see `doc/NOTES_VALIDATION.md`, section -77.
+- The Odoo code was NOT run: no Odoo instance here. The 11 Odoo tests were not run.
+
+**Action required:** update the module on DEV (`-u rlq_survey_report`), then check the 7 points of `doc/NOTES_VALIDATION.md`, section -77. If a label stays in English after the update, reload the French translations (Settings > Translations > Languages, update button of the language) or run the update with `--i18n-overwrite`.
+
 ## 18.0.1.122.0
 
 **Short title:** registration desk: sorting, default order, registration date and departure; volunteers' coordinator.

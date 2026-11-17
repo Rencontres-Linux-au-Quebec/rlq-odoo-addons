@@ -127,27 +127,95 @@ class TestRegistrationDeskReport(unittest.TestCase):
         self.assertFalse(rd.is_volunteer_ticket(""))
         self.assertFalse(rd.is_volunteer_ticket(False))
 
-    def test_volunteer_table_columns_and_rows(self):
-        rows = [
-            {"name": "Zoé <b>Tremblay</b>", "partner_id": 7, "registered": "2026-10-01 09:00", "type": "Présentiel",
-             "languages": "FR, EN", "arrived": "2026-10-10 08:30", "departed": "", "roles": {"Accueil"}},
-            {"name": "Éric Roy", "partner_id": None, "registered": "2026-10-02 10:00", "type": "Virtuel",
-             "languages": "", "arrived": "", "departed": "2026-10-10 17:00", "roles": {"Accueil", "Salle 2"}},
+    def test_find_volunteer_questions(self):
+        questions = [
+            {"id": 1, "title": "Votre nom", "choices": [], "is_choice": False},
+            {"id": 2, "title": "Langues parlées", "choices": ["Français", "Anglais", "Autre"], "is_choice": True},
+            {"id": 3, "title": "Rôles pendant l'événement (en virtuel) ?", "choices": ["Modérateur en virtuel", "Autre"], "is_choice": True},
+            {"id": 4, "title": "RÔLES pendant l'événement (en présentiel) ?", "choices": ["Accueil", "Salle 2"], "is_choice": True},
+            {"id": 5, "title": "Comment participerez-vous ?", "choices": ["Sur place", "En ligne"], "is_choice": True},
         ]
-        html = rd.volunteer_table_html(rows, ["Accueil", "Salle 2", "Vestiaire"], "fr_CA", "https://odoo.example")
-        for text in ("Bénévole", "Inscrit le", "Langues parlées", "Heure d&#x27;arrivée", "Heure de départ", "Accueil", "Salle 2", "Vestiaire"):
+        found = rd.find_volunteer_questions(questions)
+        self.assertEqual(found, {"roles": [4, 3], "languages": 2, "type": 5})                # the on-site roles first
+        # A roles question that speaks of « virtuel » is never taken for the type question.
+        self.assertEqual(rd.find_volunteer_questions(questions[:4]), {"roles": [4, 3], "languages": 2, "type": None})
+        # The type question can also be recognized by its title alone.
+        by_title = rd.find_volunteer_questions([{"id": 9, "title": "En virtuel ou pas ?", "choices": ["Oui", "Non"], "is_choice": True}])
+        self.assertEqual(by_title, {"roles": [], "languages": None, "type": 9})
+        self.assertEqual(rd.find_volunteer_questions([]), {"roles": [], "languages": None, "type": None})
+
+    def test_role_kind_and_deduced_type(self):
+        self.assertEqual(rd.role_kind("Rôles pendant l'événement (en présentiel) ?"), "on_site")
+        self.assertEqual(rd.role_kind("Rôles pendant l'événement (en virtuel) ?"), "online")
+        self.assertIsNone(rd.role_kind("Rôles"))
+        self.assertIsNone(rd.role_kind("Rôles en présentiel ou en virtuel"))
+        self.assertEqual(rd.deduced_type(["online", "on_site", "online"]), "Présentiel, Virtuel")
+        self.assertEqual(rd.deduced_type(["online"], "en"), "Online")
+        self.assertEqual(rd.deduced_type([]), "")
+
+    def test_role_cells(self):
+        self.assertEqual(rd.role_cells(["Accueil", "Salle 2", "Autre"], ["accueil"]), ["X", "", ""])
+        self.assertEqual(rd.role_cells(["Accueil", "Autre"], ["Autre", "Photographe"]), ["", "Photographe"])   # free text replaces X
+        self.assertEqual(rd.role_cells(["A", "B"], ["B", "libre"]), ["", "X libre"])                         # no « Autre » column
+        self.assertEqual(rd.role_cells(["A", "B"], []), ["", ""])
+        self.assertEqual(rd.role_cells([], ["x"]), [])
+
+    def _volunteers(self):
+        return [
+            {"name": "Zoé <b>Tremblay</b>", "chat_url": "/rlq_survey_report/chat/7", "registered": "2026-10-01 09:00", "survey": "done",
+             "type": "Présentiel", "languages": "Français, Anglais", "arrived": "2026-10-10 08:30", "departed": "",
+             "roles": [["Accueil"], []], "extra": ["Oui"]},
+            {"name": "éric Roy", "chat_url": None, "registered": "2026-10-02 10:00", "survey": "not_started",
+             "type": "", "languages": "", "arrived": "", "departed": "2026-10-10 17:00", "roles": [[], []], "extra": [""]},
+            {"name": "Eve Côté", "chat_url": None, "registered": "2026-09-30 10:00", "survey": "in_progress",
+             "type": "Virtuel", "languages": "anglais", "arrived": "", "departed": "",
+             "roles": [["Accueil", "Salle 2"], ["Modérateur"]], "extra": [""]},
+        ]
+
+    def test_sort_volunteer_rows(self):
+        rows = self._volunteers()
+
+        def names(sort_by, descending=False):
+            return [row["name"].split()[0] for row in rd.sort_volunteer_rows(rows, sort_by, descending)]
+        self.assertEqual(names("name"), ["éric", "Eve", "Zoé"])                                # case and accents ignored
+        self.assertEqual(names("name", True), ["Zoé", "Eve", "éric"])
+        self.assertEqual(names("registered"), ["Eve", "Zoé", "éric"])
+        self.assertEqual(names("survey"), ["Zoé", "Eve", "éric"])                              # completed, started, not started
+        self.assertEqual(names("languages"), ["Eve", "Zoé", "éric"])                           # « anglais » before « Français »; empty last
+        self.assertEqual(names("arrived"), ["Zoé", "éric", "Eve"])                             # empty dates last, then by name
+        self.assertEqual(names("roles"), ["Eve", "Zoé", "éric"])                               # most roles first
+        self.assertEqual(names("unknown"), ["éric", "Eve", "Zoé"])
+
+    def test_volunteer_table(self):
+        groups = [{"title": "Rôles (en présentiel)", "choices": ["Accueil", "Salle 2"]}, {"title": "Rôles (en virtuel)", "choices": ["Modérateur"]}]
+        html = rd.volunteer_table_html(self._volunteers(), groups, "fr_CA", extra_columns=["Dîner"], notes=["Une <note>"])
+        for text in ("Bénévole", "Inscrit le", "Sondage", "Langues parlées", "Heure d&#x27;arrivée", "Heure de départ", "Dîner",
+                     "Rôles (en présentiel)", "Rôles (en virtuel)", "Accueil", "Salle 2", "Modérateur",
+                     "Complété", "Commencé", "Non commencé", "Bénévoles listés: 3", "Une &lt;note&gt;"):
             self.assertIn(text, html)
-        self.assertIn('href="https://odoo.example/chat/7"', html)
+        self.assertIn('<a href="/rlq_survey_report/chat/7" target="_blank">Zoé &lt;b&gt;Tremblay&lt;/b&gt;</a>', html)
         self.assertNotIn("<b>Tremblay</b>", html)
-        self.assertIn("Zoé &lt;b&gt;Tremblay&lt;/b&gt;", html)
-        self.assertIn("Bénévoles listés: 2", html)
-        self.assertEqual(html.count("<td>X</td>"), 3)                  # Accueil x2, Salle 2 x1
-        english = rd.volunteer_table_html(rows, ["Accueil"], "en_US")
-        self.assertIn("Volunteer", english)
-        self.assertIn("Arrived at", english)
-        self.assertIn("Languages", english)
+        self.assertIn('colspan="2"', html)
+        self.assertIn('rowspan="2"', html)
+        self.assertEqual(html.count(">X</span>"), 4)                                           # Accueil x2, Salle 2, Modérateur
+        english = rd.volunteer_table_html(self._volunteers(), groups, "en_US")
+        for text in ("Volunteer", "Registered on", "Survey", "Languages spoken", "Arrived at", "Left at", "Completed", "Not started"):
+            self.assertIn(text, english)
         self.assertNotIn("Bénévole", english)
-        self.assertIn("No volunteer is registered", rd.volunteer_table_html([], [], "en"))
+        self.assertIn("No volunteer to show", rd.volunteer_table_html([], lang="en"))
+        self.assertIn("Aucun bénévole", rd.volunteer_table_html([], notes=["n"]))
+
+    def test_volunteer_table_escapes_answers_that_look_like_links(self):
+        row = dict(self._volunteers()[0], type='<a href="https://evil.example">x</a>', languages="<script>x</script>")
+        html = rd.volunteer_table_html([row], [], "fr")
+        self.assertNotIn("evil.example\">x</a>", html)
+        self.assertNotIn("<script>", html)
+        self.assertIn("&lt;a href=", html)
+
+    def test_program_footer(self):
+        self.assertEqual(rd.program_footer("rlq_survey_report", "18.0.1.123.0"),
+                         '<p class="text-muted small">rlq_survey_report 18.0.1.123.0</p>')
+        self.assertIn("rlq_survey_report ?", rd.program_footer("rlq_survey_report", None))
 
 
 if __name__ == "__main__":
