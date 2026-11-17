@@ -276,6 +276,8 @@ class RlqSurveyAnswerEditLine(models.TransientModel):
     sequence = fields.Integer(string="Sequence")
     question_id = fields.Many2one("survey.question", string="Question", required=True, readonly=True)
     question_type = fields.Selection(related="question_id.question_type", string="Type of question")
+    question_text = fields.Text(string="Question", related="question_id.title",
+                                help="Title of the question, on several lines when it is long.")
     question_type_label = fields.Char(string="Type of question", compute="_compute_question_type_label",
                                       help="Label of the type, as translated by the Surveys application.")
     comments_allowed = fields.Boolean(related="question_id.comments_allowed", string="Comment allowed")

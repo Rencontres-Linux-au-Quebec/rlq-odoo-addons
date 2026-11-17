@@ -1,6 +1,16 @@
 Journal des changements de run-all.sh (version la plus récente en premier)
 ==========================================================================
 
+Version 1.4.20261117.091527 - 2026-11-17
+  Short title: standalone tests also run tests/test_translations.py.
+  Reason: module 1.129.0: a French translation of a view text written with a raw « > » was never found by Odoo; the new test
+    checks i18n/fr.po (escaped view texts, no duplicate, every code entry marked « odoo-python »).
+  Changes: etape_tests_autonomes() adds « tests.test_translations ». No option changed.
+  Bugs fixed: none.
+  Safeguards and edge cases: none.
+  Checks: bash -n run-all.sh; ./run-all.sh --sans-odoo.
+  Action required: none.
+
 Version 1.3.20261116.145015 - 2026-11-16
   Short title: standalone tests also run tests/test_registration_desk_report.py.
   Reason: module 1.121.0 (RLQ registration desk): the counts and the summary of models/registration_desk_report.py are pure Python,

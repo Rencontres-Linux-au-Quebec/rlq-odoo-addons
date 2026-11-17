@@ -6,6 +6,14 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -83. Fenêtre « Modifier les réponses » en français (v1.129.0)
+
+**À confirmer après `-u rlq_survey_report --i18n-overwrite` :**
+1. La phrase sous l'en-tête de la fenêtre « Modifier les réponses » est en français (« Cliquez sur une question pour changer sa réponse... »).
+2. Les questions longues s'affichent sur plusieurs lignes, plus coupées par « ... ».
+3. Liste vide du menu « Modifications manuelles des réponses » : texte d'aide en français.
+4. Sans `--i18n-overwrite` (ou la mise à jour de la langue dans Paramètres > Traductions > Langues), Odoo garde l'ancienne traduction chargée : la phrase reste en anglais.
+
 ## -82. Libellés, en-têtes de colonnes, liens du courriel de réponses, marqué présent par, chiffrier direct (v1.128.0)
 
 **Non vérifié sans instance, à confirmer :**

@@ -56,7 +56,7 @@
                 <p class="text-muted">Click a question to change its answer. The questions changed are shown in bold; each one is written in the history (Surveys > Detailed reports > Manual changes of answers).</p>
                 <field name="line_ids" nolabel="1">
                     <list create="false" delete="false" decoration-bf="changed" decoration-muted="not editable">
-                        <field name="question_id"/>
+                        <field name="question_text"/>
                         <field name="current_text"/>
                         <field name="change_display"/>
                         <field name="changed" widget="boolean" width="94px"/>

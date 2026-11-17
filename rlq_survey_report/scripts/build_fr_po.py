@@ -21,6 +21,8 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 from collections import OrderedDict
+from xml.sax.saxutils import escape as xml_escape
+from xml.sax.saxutils import unescape as xml_unescape
 
 MODULE = "rlq_survey_report"
 root_dir = sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -269,6 +271,9 @@ FR = {
         'Réponse après la modification',
     'The new answer, only for the questions changed; empty when the answer is unchanged.':
         "La nouvelle réponse, seulement pour les questions modifiées ; vide quand la réponse n'a pas changé.",
+    # v1.129.0
+    "Title of the question, on several lines when it is long.":
+        "Titre de la question, sur plusieurs lignes quand il est long.",
     # rlq.volunteer.coordinator
     "Volunteers": "Bénévoles",
     "Volunteers: %(event)s": "Bénévoles : %(event)s",
@@ -324,14 +329,14 @@ for record in records:
                 if node.get(attribute):
                     add(node.get(attribute), ref)
             if node.tag in ("p", "span", "div", "label", "h1", "h2", "h3") and (node.text or "").strip():
-                add(node.text, ref)
+                add(xml_escape(node.text), ref)          # text of a view: Odoo keeps it XML-escaped (see FR_FOR)
         continue
     for field_name in ("help",):
         node = record.find("field[@name='%s']" % field_name)
         if node is not None and model == "ir.actions.act_window":
             for paragraph in node.iter("p"):
                 if (paragraph.text or "").strip():
-                    add(paragraph.text, "model:ir.actions.act_window,help:%s.%s" % (MODULE, xmlid))
+                    add(xml_escape(paragraph.text), "model:ir.actions.act_window,help:%s.%s" % (MODULE, xmlid))
 
 
 # 2. model fields and 3. _() calls
@@ -375,9 +380,22 @@ for filename in MODEL_FILES:
                 for value, label in literal(stmt.value.args[0]) or ():
                     add(label, "model:ir.model.fields.selection,name:%s.selection__%s__%s__%s" % (MODULE, under, field, value))
 
-missing = [t for t in terms if t not in FR]
+
+
+def fr_for(msgid):
+    """French translation of a term. v1.129.0: the TEXT of a view (between tags, not an attribute) is stored by Odoo as XML
+    (odoo/tools/translate.py, serialize_xml: « > » becomes « &gt; », « & » becomes « &amp; »), so its msgid and its msgstr
+    must be escaped the same way, otherwise Odoo never finds the translation (seen: « Click a question... (Surveys >
+    Detailed reports > ...) » stayed in English). FR is written with plain characters."""
+    if msgid in FR:
+        return FR[msgid]
+    raw = xml_unescape(msgid)
+    return xml_escape(FR[raw]) if raw in FR else None
+
+
+missing = [t for t in terms if fr_for(t) is None]
 assert not missing, "no French translation for: %r" % missing
-unused = [t for t in FR if t not in terms]
+unused = [t for t in FR if t not in terms and xml_escape(t) not in terms]
 assert not unused, "translation without term: %r" % unused
 
 # base file: header + entries; code entries get the « odoo-python » comment that Odoo requires to load them
@@ -392,7 +410,7 @@ for block in blocks:
         lines.insert(1, "#. odoo-python")
     if msgid in terms:                                       # same English text already in the base file: add the references
         extra = terms.pop(msgid)
-        assert re.search(r'^msgstr "(.*)"$', block, re.M).group(1) == FR[msgid], "different translation for %r" % msgid
+        assert re.search(r'^msgstr "(.*)"$', block, re.M).group(1) == fr_for(msgid), "different translation for %r" % msgid
         if extra["python"] and "#. odoo-python" not in lines:
             lines.insert(1, "#. odoo-python")
         at = max(i for i, line in enumerate(lines) if line.startswith("#"))
@@ -401,8 +419,8 @@ for block in blocks:
 for msgid, entry in terms.items():
     lines = ["#. module: %s" % MODULE] + (["#. odoo-python"] if entry["python"] else [])
     lines += ["#: " + ref for ref in entry["refs"]]
-    assert '"' not in msgid and '"' not in FR[msgid] and "\\" not in msgid
-    lines += ['msgid "%s"' % msgid, 'msgstr "%s"' % FR[msgid]]
+    assert '"' not in msgid and '"' not in fr_for(msgid) and "\\" not in msgid
+    lines += ['msgid "%s"' % msgid, 'msgstr "%s"' % fr_for(msgid)]
     out.append("\n".join(lines))
 open(root_dir + "/i18n/fr.po", "w", encoding="utf-8").write(header + "\n\n" + "\n\n".join(out) + "\n")
 ids = re.findall(r'^msgid "(.+)"$', "\n".join(out), re.M)

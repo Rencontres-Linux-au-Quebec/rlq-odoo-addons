@@ -1,5 +1,35 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.129.0
+
+**Short title:** "Modifier les réponses" window: explanation text in French, question titles on several lines; translation check added to the tests.
+
+**Reason for the request:** screenshot of the window "Modifier les réponses" (version 18.0.1.127.0): the explanation text "Click a question to change its answer..." is in English, the header of the last column shows "M...", every answer is repeated in "Nouvelle réponse (texte)", and the questions are cut ("De quelle régio...").
+
+**Bugs fixed:**
+
+- Symptom: "Click a question to change its answer. The questions changed are shown in bold; each one is written in the history (Surveys > Detailed reports > Manual changes of answers)." shown in English although `i18n/fr.po` had its translation. The same for the help text of the menu "Manual changes of answers" (empty list).
+  - Diagnosis: Odoo stores the text of a view as XML (`odoo/tools/translate.py`, `serialize_xml`): "Surveys > Detailed" becomes "Surveys &gt; Detailed", and the translation is looked up with that exact text. `scripts/build_fr_po.py` wrote the msgid with the raw ">", so Odoo never found it. Only these two texts contain ">" or "&".
+  - Fix: `scripts/build_fr_po.py` escapes the msgid and the msgstr of view texts (`fr_for()`); `i18n/fr.po` rebuilt. New test `tests/test_translations.py`, run by `run-all.sh`, which fails if a view text is written with a raw "<", ">" or "&", if a msgid is duplicated or untranslated, or if a code string lacks the "odoo-python" comment.
+- The header "M..." and the repeated answers were already fixed in 18.0.1.128.0 (fixed width of the column "Modifiée"; "Nouvelle réponse (texte)" filled only for the questions changed). The screenshot was taken with 18.0.1.127.0.
+
+**Changes:**
+
+- `models/survey_answer_edit.py`: field `question_text` (title of the question, multi-line text); `views/survey_answer_edit_views.xml`: the list shows it instead of the question link, so a long question wraps instead of being cut.
+- `scripts/build_fr_po.py`: `fr_for()`, escaping of view texts. `i18n/fr.po` rebuilt.
+- `tests/test_translations.py` (new, 3 standalone tests); `run-all.sh` 1.4 (see `doc/run-all.changelog.txt`).
+- `__manifest__.py`: version `18.0.1.129.0`. Guide header, `doc/NOTES_VALIDATION.md` (section -83).
+
+**Safeguards and edge cases:** attribute values (string, placeholder, help, confirm) are NOT escaped by Odoo and are left as they are; only texts between tags are escaped.
+
+**Checks:**
+
+- `./run-all.sh --sans-odoo`: ruff, syntax and manifest, 227 standalone tests: OK.
+- Serialization checked in the source of Odoo 18.0 and with lxml: `<p>A (Surveys &gt; Detailed) &amp; x</p>`.
+- The Odoo code was NOT run: no Odoo instance here.
+
+**Action required:** update the module on DEV with the French translations reloaded: `-u rlq_survey_report --i18n-overwrite` (or Settings > Translations > Languages, update of French). Without the reload, the corrected translation is not taken. Then open "Modifier les réponses" again.
+
 ## 18.0.1.128.0
 
 **Short title:** French labels and readable column headers; edit window shows only changed answers; more columns in "Surveys not completed"; links "Modifier mes réponses" and "Je ne peux plus venir" in the e-mail of answers; who marked a person present; volunteers' spreadsheet downloaded directly; error at the end of a survey fixed.

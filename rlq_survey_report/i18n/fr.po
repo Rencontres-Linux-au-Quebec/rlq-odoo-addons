@@ -631,8 +631,8 @@ msgstr "Exemple : correction demandée par la personne au téléphone"
 
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_edit_form
-msgid "Click a question to change its answer. The questions changed are shown in bold; each one is written in the history (Surveys > Detailed reports > Manual changes of answers)."
-msgstr "Cliquez sur une question pour changer sa réponse. Les questions modifiées sont en gras ; chacune est inscrite dans l'historique (Sondages > Rapports détaillés > Modifications manuelles des réponses)."
+msgid "Click a question to change its answer. The questions changed are shown in bold; each one is written in the history (Surveys &gt; Detailed reports &gt; Manual changes of answers)."
+msgstr "Cliquez sur une question pour changer sa réponse. Les questions modifiées sont en gras ; chacune est inscrite dans l'historique (Sondages &gt; Rapports détaillés &gt; Modifications manuelles des réponses)."
 
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_edit_form
@@ -688,8 +688,8 @@ msgstr "Aucune modification manuelle pour l'instant."
 
 #. module: rlq_survey_report
 #: model:ir.actions.act_window,help:rlq_survey_report.action_rlq_survey_answer_change
-msgid "To change an answer: Surveys > Detailed reports > Edit answers, open the participation, then « Edit the answers »."
-msgstr "Pour changer une réponse : Sondages > Rapports détaillés > Modifier des réponses, ouvrez la participation, puis « Modifier les réponses »."
+msgid "To change an answer: Surveys &gt; Detailed reports &gt; Edit answers, open the participation, then « Edit the answers »."
+msgstr "Pour changer une réponse : Sondages &gt; Rapports détaillés &gt; Modifier des réponses, ouvrez la participation, puis « Modifier les réponses »."
 
 #. module: rlq_survey_report
 #: model:ir.actions.act_window,name:rlq_survey_report.action_rlq_survey_answer_edit_participations
@@ -1039,6 +1039,7 @@ msgstr "Nom (ou adresse courriel) de la personne, au moment de la modification."
 #. module: rlq_survey_report
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_change__question_id
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__question_id
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__question_text
 msgid "Question"
 msgstr "Question"
 
@@ -1137,6 +1138,11 @@ msgstr "Séquence"
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__question_type_label
 msgid "Type of question"
 msgstr "Type de question"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_survey_answer_edit_line__question_text
+msgid "Title of the question, on several lines when it is long."
+msgstr "Titre de la question, sur plusieurs lignes quand il est long."
 
 #. module: rlq_survey_report
 #: model:ir.model.fields,help:rlq_survey_report.field_rlq_survey_answer_edit_line__question_type_label
