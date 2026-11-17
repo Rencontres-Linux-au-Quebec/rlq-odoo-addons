@@ -246,12 +246,14 @@ class TestRegistrationDeskReport(unittest.TestCase):
         self.assertEqual([title for title, _header, _lines in sheets], ["Bénévoles", "Rôles", "Langues"])
         _title, header, lines = sheets[0]
         self.assertEqual(header, ["Bénévole", "Courriel", "Billet", "Inscrit le", "Sondage", "Type", "Langues parlées", "Heure d'arrivée",
-                                  "Heure de départ", "Dîner", "Accueil", "Autre", "Modérateur", "Autre (2)", "Nombre de rôles"])
+                                  "Heure de départ", "Dîner", "Accueil", "Autre", "Modérateur", "Autre (2)", "Autres rôles (texte)",
+                                  "Nombre de rôles"])
         self.assertEqual(len(set(header)), len(header))                                       # unique names: needed by a pivot table
         self.assertEqual(lines[0], ["Zoé Tremblay", "zoe@exemple.org", "Bénévole", datetime.datetime(2026, 10, 1, 9, 0), "Complété",
-                                    "Présentiel", "Français, Anglais", "8 h", "16 h", "Oui", "X", "Photographe", "", "", 3])
+                                    "Présentiel", "Français, Anglais", "8 h", "16 h", "Oui", 1, 1, None, None, "Photographe", 3])
         self.assertEqual(lines[1][3], "2026-10-02 10:00")                                      # no datetime given: the text
-        self.assertEqual(lines[1][-5:], ["", "", "", "", 0])
+        self.assertEqual(lines[1][-6:], [None, None, None, None, "", 0])                      # v1.135.0: numbers, empty cells
+        self.assertEqual(sum(line[10] or 0 for line in lines), 1)                              # the column can be summed
         self.assertTrue(all(len(line) == len(header) for line in lines))
         _title, header, lines = sheets[1]
         self.assertEqual(header, ["Bénévole", "Courriel", "Type", "Langues parlées", "Sondage", "Question", "Rôle"])
@@ -296,6 +298,29 @@ class TestRegistrationDeskReport(unittest.TestCase):
         self.assertEqual(rd.deduced_type(["online", "on_site", "online"]), "Présentiel, Virtuel")
         self.assertEqual(rd.deduced_type(["online"], "en"), "Online")
         self.assertEqual(rd.deduced_type([]), "")
+
+    def test_answers_cell_html(self):
+        """v1.135.0: the answers are a link to every answer of the person, sortable without case or accents, escaped."""
+        html = rd.answers_cell_html("Dîner: <b>Oui</b>", "/rlq_survey_report/answers/7")
+        self.assertIn('href="/rlq_survey_report/answers/7"', html)
+        self.assertIn('data-rlq-sort="diner: <b>oui</b>"'.replace("<", "&lt;").replace(">", "&gt;"), html)
+        self.assertNotIn("<b>", html)
+        self.assertEqual(rd.answers_cell_html("", None), "")
+        self.assertIn("href", rd.answers_cell_html("", "/rlq_survey_report/answers/8"))          # answered, nothing shown: link
+        self.assertNotIn("href", rd.answers_cell_html("Oui", None))
+
+    def test_volunteer_survey_cell_links_to_the_answers(self):
+        html = rd.volunteer_table_html([{"name": "A", "survey": "done", "answers_url": "/rlq_survey_report/answers/3"},
+                                        {"name": "B", "survey": "not_started"}], [], "fr")
+        self.assertIn('<a href="/rlq_survey_report/answers/3" target="_blank">Complété</a>', html)
+        self.assertEqual(html.count("/rlq_survey_report/answers/"), 1)
+
+    def test_role_numbers(self):
+        """v1.135.0: 1 instead of « X » in the spreadsheet; the free text of « Autre » counts 1 and is returned apart."""
+        self.assertEqual(rd.role_numbers(["Accueil", "Salle 2", "Autre"], ["accueil"]), ([1, None, None], []))
+        self.assertEqual(rd.role_numbers(["Accueil", "Autre"], ["Photographe"]), ([None, 1], ["Photographe"]))
+        self.assertEqual(rd.role_numbers(["A", "B"], ["libre"]), ([None, 1], ["libre"]))
+        self.assertEqual(rd.role_numbers([], ["x"]), ([], ["x"]))
 
     def test_role_cells(self):
         self.assertEqual(rd.role_cells(["Accueil", "Salle 2", "Autre"], ["accueil"]), ["X", "", ""])

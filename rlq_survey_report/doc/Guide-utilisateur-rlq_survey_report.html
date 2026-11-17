@@ -42,8 +42,7 @@
 <div class="page">
 
 <h1>Guide utilisateur — Rapport de sondage</h1>
-<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.131.0</strong> — mis à jour le 2026-11-17.<br>
-Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
+<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.135.0</strong> du 2026-11-17 à 17 h 23 (heure locale, HNE).</p>
 
 <p>Ce module produit un compte-rendu détaillé — à l'écran, en fichier HTML, en PDF ou en Excel — des réponses à un ou plusieurs sondages Odoo, notamment les sondages de satisfaction envoyés après chaque rencontre. Il aide à repérer ce qui va bien, ce qui se dégrade, et à suivre les actions entreprises d'une rencontre à l'autre.</p>
 
@@ -425,6 +424,15 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
   <li>Le <strong>nom du participant</strong> est un lien (v1.131) : il ouvre une conversation avec la personne dans Odoo (Discussion), ou sa fiche si elle n'a pas de compte. Un clic sur l'en-tête de la colonne trie sans tenir compte des majuscules ni des accents. La date de l'événement est affichée sous l'événement, et un tableau explique les écarts entre les sondages complétés du sondage et ceux de l'événement (doublons, autre adresse courriel, inscription annulée, tests).</li>
 </ol>
 <p>Chaque ligne montre le billet, l'état de l'inscription, l'état du sondage, la <strong>date de soumission du sondage</strong> (colonne « Sondage soumis le », v1.133), les <strong>questions répondues</strong> (par exemple 8/12) et les <strong>réponses</strong> aux questions cochées. Les colonnes <strong>Heure de départ</strong> (v1.133), <strong>Statut</strong> et <strong>Questions répondues</strong> (v1.134) sont cachées par défaut : affichez-les au besoin avec le menu des colonnes, à droite des en-têtes. La liste est triée par nom par défaut (v1.134). Le bouton <strong>Aide de cette page</strong>, en haut, ouvre ce guide à cette section ; celui de la page <strong>Bénévoles</strong> ouvre la section des bénévoles (v1.134).</p>
+<h3>Réponses d'un participant, contact, recherche <span class="pastille">nouveau, v1.135</span></h3>
+<ul>
+  <li>Un clic sur les <strong>réponses</strong> d'un participant, ou le bouton <strong>Voir les réponses</strong> de sa ligne, ouvre dans un nouvel onglet toutes les réponses du sondage qu'il a rempli, sans passer par l'application Sondages.</li>
+  <li><strong>Modifier les réponses</strong> : bouton visible seulement pour les administrateurs des sondages ; il ouvre la fenêtre de modification des réponses (§&nbsp;16).</li>
+  <li><strong>Contacter les participants</strong> (en haut) : la fenêtre de courriel d'Odoo, pour écrire aux inscriptions <strong>listées</strong> (mêmes filtres et même recherche). Chaque personne reçoit son propre courriel ; les inscriptions sans adresse sont laissées de côté.</li>
+  <li><strong>Téléphone</strong> : colonne cachée par défaut, à afficher avec le menu des colonnes.</li>
+  <li><strong>Filtrer sur un texte</strong> : dans le bureau, <strong>Recherche</strong> cherche dans le nom, le courriel, l'entreprise, le téléphone, le billet et les réponses, sans tenir compte des majuscules ni des accents (« vege » trouve « Végétarien »). Dans <strong>Ouvrir en liste</strong>, tapez le texte dans la barre de recherche et choisissez la colonne dans la liste qui apparaît : Personne, Billet, Réponses, Téléphone, Courriel, Entreprise. Plusieurs critères se combinent.</li>
+  <li>Le bureau d'inscription et les bénévoles sont aussi dans le menu <strong>Sondages → Rapports détaillés</strong>.</li>
+</ul>
 <p>Tous les tableaux de ces pages ont le même aspect (v1.134) : en-tête foncé à texte blanc, une ligne sur deux en gris pâle, lignes de total en gris moyen ; dans le tableau des réponses, chaque question est encadrée avec toutes ses réponses.</p>
 <h3>Le sommaire</h3>
 <ul>
@@ -460,6 +468,9 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
   <li>Les autres questions cochées « Afficher au bureau d'inscription » dans ce sondage ajoutent chacune une colonne.</li>
   <li><strong>Trier par</strong>, <strong>Ordre décroissant</strong> et <strong>Sondage</strong> classent et filtrent le tableau. Il ne se trie pas en cliquant sur ses en-têtes : ses colonnes dépendent du sondage, ce qu'une liste Odoo ne permet pas.</li>
   <li>Le lien sur le nom ouvre la discussion directe avec la personne dans l'application Discussion si elle a un compte sur Odoo (interne ou portail) ; sinon il ouvre sa fiche de contact, d'où l'on peut lui écrire par courriel (« Envoyer un message »).</li>
+  <li><strong>Ouvrir en liste</strong> (v1.135) : les bénévoles du tableau dans la même liste Odoo que celle du bureau d'inscription : recherche dans les colonnes, filtres, regroupement, export, boutons « Présent », « Voir les réponses »…</li>
+  <li><strong>Contacter les participants</strong> (v1.135) : ouvre la fenêtre de courriel d'Odoo pour écrire aux bénévoles du tableau (même filtre « Sondage »). Chaque personne reçoit son propre courriel : les adresses des autres ne sont jamais montrées.</li>
+  <li>Un clic sur l'<strong>état du sondage</strong> d'un bénévole (Complété, Commencé) ouvre, dans un nouvel onglet, toutes les réponses du sondage qu'il a rempli (v1.135).</li>
   <li><strong>Heure d'arrivée et heure de départ</strong> (v1.126) : ce sont les heures <strong>prévues</strong> par le bénévole, lues dans le sondage (question dont le titre parle d'« arrivée » et de « départ »). Si le sondage n'a pas ces questions, ce sont les heures enregistrées au bureau d'inscription (boutons <strong>Présent</strong> et <strong>Départ</strong>), et une note le dit au-dessus du tableau.</li>
 </ul>
 
@@ -469,7 +480,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 </ol>
 <p>Le fichier a trois feuilles, chacune prête pour un <strong>tableau croisé dynamique</strong> (une ligne d'en-têtes, noms de colonnes uniques, aucune cellule fusionnée) :</p>
 <ul>
-  <li><strong>Bénévoles</strong> : une ligne par bénévole, avec le courriel, le billet, une colonne par rôle et le nombre de rôles.</li>
+  <li><strong>Bénévoles</strong> : une ligne par bénévole, avec le courriel, le billet, une colonne par rôle et le nombre de rôles. Depuis la v1.135, un rôle choisi vaut <strong>1</strong> (et non plus « X ») : chaque colonne de rôle s'additionne directement (=SOMME). Le texte libre d'un choix « Autre » compte 1 dans la colonne « Autre » et son texte est dans la colonne <strong>Autres rôles (texte)</strong>.</li>
   <li><strong>Rôles</strong> : une ligne par bénévole et par rôle choisi. C'est la feuille à utiliser pour compter les rôles par type, par langue ou par état du sondage : sélectionnez la feuille, puis Insertion → Tableau croisé dynamique (Excel) ou Données → Table dynamique (LibreOffice), avec « Rôle » en lignes, « Type » en colonnes et « Bénévole » en nombre.</li>
   <li><strong>Langues</strong> : une ligne par bénévole et par langue parlée.</li>
 </ul>

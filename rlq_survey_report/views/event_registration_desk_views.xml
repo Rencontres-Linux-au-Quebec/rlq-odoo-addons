@@ -18,6 +18,7 @@
                 <field name="rlq_desk_person" options="{'allow_order': True}"/>
                 <field name="name" optional="hide"/>
                 <field name="email" optional="hide"/>
+                <field name="phone" optional="hide"/>
                 <field name="create_date" string="Registered on" optional="show" width="150px"/>
                 <field name="state" optional="hide"/>
                 <field name="date_closed" string="Arrived at" optional="show" width="150px"/>
@@ -27,7 +28,10 @@
                 <field name="rlq_survey_state" options="{'allow_order': True}"/>
                 <field name="rlq_survey_done_date" options="{'allow_order': True}" optional="show" width="150px"/>
                 <field name="rlq_desk_progress" options="{'allow_order': True}" optional="hide"/>
-                <field name="rlq_desk_answers" options="{'allow_order': True}"/>
+                <!-- v1.135.0: the answers are a link to every answer of the survey of the person -->
+                <field name="rlq_desk_answers_html" options="{'allow_order': True}"/>
+                <field name="rlq_desk_user_input_id" column_invisible="1"/>
+                <field name="rlq_desk_can_edit_answers" column_invisible="1"/>
                 <button name="action_rlq_desk_present" type="object" string="Present" icon="fa-check" class="btn-primary"
                         invisible="state == 'done'"/>
                 <button name="action_rlq_desk_undo" type="object" string="Undo" icon="fa-undo"
@@ -36,6 +40,10 @@
                         invisible="state != 'done' or rlq_departure"/>
                 <button name="action_rlq_desk_depart_undo" type="object" string="Undo the departure" icon="fa-undo"
                         invisible="not rlq_departure" confirm="Clear the departure time of this person?"/>
+                <button name="action_rlq_desk_view_answers" type="object" string="See the answers" icon="fa-eye"
+                        invisible="not rlq_desk_user_input_id"/>
+                <button name="action_rlq_desk_edit_answers" type="object" string="Edit the answers" icon="fa-pencil"
+                        invisible="not rlq_desk_can_edit_answers" groups="survey.group_survey_manager"/>
             </list>
         </field>
     </record>
@@ -49,6 +57,11 @@
             <search string="Registration desk">
                 <field name="name" string="Person" filter_domain="['|', ('name', 'ilike', self), ('email', 'ilike', self)]"/>
                 <field name="event_ticket_id"/>
+                <!-- v1.135.0: search in more columns (the answers: case and accents ignored, _search_rlq_desk_answers) -->
+                <field name="rlq_desk_answers" string="Answers"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <field name="company_name"/>
                 <filter name="rlq_present" string="Present" domain="[('state', '=', 'done')]"/>
                 <filter name="rlq_not_present" string="Not present yet" domain="[('state', '!=', 'done')]"/>
                 <separator/>
@@ -73,6 +86,7 @@
                 <header>
                     <button name="action_refresh" type="object" string="Refresh" icon="fa-refresh" class="btn-primary"/>
                     <button name="action_open_list" type="object" string="Open as a list" icon="fa-list"/>
+                    <button name="action_contact" type="object" string="Contact the participants" icon="fa-envelope"/>
                     <!-- v1.134.0: the guide, opened at the section of this page -->
                     <button name="action_open_guide" type="object" string="Help for this page" icon="fa-question-circle"/>
                 </header>
@@ -85,7 +99,7 @@
                             <field name="sort_desc"/>
                         </group>
                         <group>
-                            <field name="search_text" placeholder="Name, e-mail address or company"/>
+                            <field name="search_text" placeholder="Name, e-mail, company, phone, ticket or answer"/>
                             <field name="survey_filter"/>
                             <field name="hide_present"/>
                             <field name="registration_count"/>
@@ -97,6 +111,7 @@
                         <list limit="200" create="false" delete="false" class="o_rlq_table" decoration-success="state == 'done'" decoration-muted="state == 'draft'">
                             <field name="event_ticket_id"/>
                             <field name="rlq_desk_person" options="{'allow_order': True}"/>
+                            <field name="phone" optional="hide"/>
                             <field name="create_date" string="Registered on" width="150px"/>
                             <field name="state" optional="hide"/>
                             <field name="date_closed" string="Arrived at" width="150px"/>
@@ -105,7 +120,10 @@
                             <field name="rlq_survey_state" options="{'allow_order': True}"/>
                             <field name="rlq_survey_done_date" options="{'allow_order': True}" optional="show" width="150px"/>
                             <field name="rlq_desk_progress" options="{'allow_order': True}" optional="hide"/>
-                            <field name="rlq_desk_answers" options="{'allow_order': True}"/>
+                            <!-- v1.135.0: the answers are a link to every answer of the survey of the person -->
+                            <field name="rlq_desk_answers_html" options="{'allow_order': True}"/>
+                            <field name="rlq_desk_user_input_id" column_invisible="1"/>
+                            <field name="rlq_desk_can_edit_answers" column_invisible="1"/>
                             <button name="action_rlq_desk_present" type="object" string="Present" icon="fa-check" class="btn-primary"
                                     invisible="state == 'done'"/>
                             <button name="action_rlq_desk_undo" type="object" string="Undo" icon="fa-undo"
@@ -114,6 +132,10 @@
                                     invisible="state != 'done' or rlq_departure"/>
                             <button name="action_rlq_desk_depart_undo" type="object" string="Undo the departure" icon="fa-undo"
                                     invisible="not rlq_departure" confirm="Clear the departure time of this person?"/>
+                            <button name="action_rlq_desk_view_answers" type="object" string="See the answers" icon="fa-eye"
+                                    invisible="not rlq_desk_user_input_id"/>
+                            <button name="action_rlq_desk_edit_answers" type="object" string="Edit the answers" icon="fa-pencil"
+                                    invisible="not rlq_desk_can_edit_answers" groups="survey.group_survey_manager"/>
                         </list>
                     </field>
                 </sheet>
@@ -174,6 +196,9 @@
                 <header>
                     <button name="action_refresh" type="object" string="Refresh" icon="fa-refresh" class="btn-primary"/>
                     <button name="action_export_excel" type="object" string="Export to a spreadsheet" icon="fa-file-excel-o"/>
+                    <!-- v1.135.0: as at the registration desk -->
+                    <button name="action_open_list" type="object" string="Open as a list" icon="fa-list"/>
+                    <button name="action_contact" type="object" string="Contact the participants" icon="fa-envelope"/>
                     <!-- v1.134.0: the guide, opened at the section of this page -->
                     <button name="action_open_guide" type="object" string="Help for this page" icon="fa-question-circle"/>
                 </header>
@@ -220,6 +245,21 @@
               parent="event.event_main_menu"
               action="action_rlq_guide_events"
               sequence="47"
+              groups="event.group_event_user"/>
+
+    <!-- v1.135.0 - The pages of the events in the menu Surveys > Rapports détaillés too. -->
+    <menuitem id="menu_rlq_registration_desk_surveys"
+              name="RLQ registration desk"
+              parent="menu_rlq_survey_report_in_survey_app"
+              action="action_rlq_registration_desk"
+              sequence="76"
+              groups="event.group_event_user"/>
+
+    <menuitem id="menu_rlq_volunteer_coordinator_surveys"
+              name="Volunteers"
+              parent="menu_rlq_survey_report_in_survey_app"
+              action="action_rlq_volunteer_coordinator"
+              sequence="77"
               groups="event.group_event_user"/>
 
 </odoo>

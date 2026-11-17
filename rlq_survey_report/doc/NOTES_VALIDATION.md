@@ -6,6 +6,18 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -89. Réponses d'un participant, contact, recherche, téléphone, 1 dans le chiffrier, menus (v1.135.0)
+
+**À confirmer après `-u rlq_survey_report --i18n-overwrite` :**
+1. Bureau : un clic sur les réponses d'une personne, ou « Voir les réponses », ouvre toutes ses réponses dans un nouvel onglet. Essayer aussi avec un bénévole qui n'a PAS les droits des Sondages : la liste s'affiche et le lien fonctionne.
+2. « Modifier les réponses » : visible seulement pour un administrateur des sondages ; ouvre la fenêtre de modification.
+3. « Contacter les participants » (bureau et bénévoles) : la fenêtre de courriel d'Odoo s'ouvre ; envoyer un essai à une liste filtrée de 1 ou 2 personnes et vérifier que chacune reçoit son propre courriel. Si la fenêtre n'a pas de destinataires, le noter (mode « mass_mail » de votre version d'Odoo).
+4. Bénévoles : « Ouvrir en liste » montre les bénévoles du tableau ; un clic sur « Complété » ouvre les réponses.
+5. Recherche : dans le bureau, « vege » trouve « Végétarien » ; dans « Ouvrir en liste », taper un texte et choisir « Réponses », « Téléphone »...
+6. Colonne « Téléphone » cachée, disponible dans le menu des colonnes.
+7. Chiffrier des bénévoles : des 1 au lieu des X ; =SOMME() d'une colonne de rôle donne le nombre de bénévoles ; colonne « Autres rôles (texte) ».
+8. Menu Sondages > Rapports détaillés : « Bureau d'inscription RLQ » et « Bénévoles ».
+
 ## -88. Aide de la page, couleurs des tableaux, inscriptions par semaine, % présents (v1.134.0)
 
 **À confirmer après `-u rlq_survey_report --i18n-overwrite` et Ctrl+F5 :**

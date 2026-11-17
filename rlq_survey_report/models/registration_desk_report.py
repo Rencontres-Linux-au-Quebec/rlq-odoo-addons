@@ -592,6 +592,20 @@ def role_cells(choices, values, yes="X"):
     return cells
 
 
+def role_numbers(choices, values):
+    """v1.135.0, for the spreadsheet: one cell per choice of a roles question, the NUMBER 1 when chosen and None (empty cell)
+    otherwise, so that a column can be summed. A free-text answer (comment of an « Autre » choice) counts 1 in the « Autre »
+    column (or the last column) and its text is returned apart: (cells, [free texts])."""
+    chosen = {sort_key(value): value for value in values or ()}
+    known = {sort_key(choice) for choice in choices}
+    free = [value for key, value in chosen.items() if key not in known]
+    cells = [1 if sort_key(choice) in chosen else None for choice in choices]
+    if free and cells:
+        other = next((i for i, choice in enumerate(choices) if _has_word(choice, OTHER_WORDS)), len(cells) - 1)
+        cells[other] = 1
+    return cells, free
+
+
 def person_cell_html(name, chat_url=None):
     """Name of a participant in the list of the registration desk (v1.131.0): a link that opens a conversation with the person
     in Odoo (Discuss) when the registration has a contact, otherwise the plain name. Everything is escaped.
@@ -603,6 +617,20 @@ def person_cell_html(name, chat_url=None):
     if chat_url:
         text = '<a href="%s" target="_blank" title="Message">%s</a>' % (escape(str(chat_url), quote=True), text)
     return '<span data-rlq-sort="%s">%s</span>' % (key, text)
+
+
+def answers_cell_html(text, url=None):
+    """v1.135.0: the answers of a registration in the lists of the desk, a link to every answer of the survey filled in by the
+    person (controllers/answers.py) when there is a participation. Starts with « <span data-rlq-sort> » like
+    person_cell_html(), so that the column sorts without case or accents. Everything is escaped; « » when empty."""
+    text = " ".join(str(text or "").split())
+    if not text and not url:
+        return ""
+    key = escape(sort_key(text), quote=True)
+    shown = _clean(text) or "&#8230;"
+    if url:
+        shown = '<a href="%s" target="_blank">%s</a>' % (escape(str(url), quote=True), shown)
+    return '<span data-rlq-sort="%s">%s</span>' % (key, shown)
 
 
 def reconciliation_html(items, lang=DEFAULT_LANG):
@@ -686,7 +714,8 @@ def volunteer_export_sheets(rows, role_groups=(), lang=DEFAULT_LANG, extra_colum
     Three sheets, each one a flat table (one header line, unique column names, no merged cell) so that a pivot table can be
     built on it directly:
       - « Bénévoles »: ONE line per volunteer, the same columns as the screen plus e-mail and ticket, one column per role
-        (« X » or the free text), and the number of roles;
+        (the number 1 when chosen, v1.135.0, so that it can be summed; the free texts in « Autres rôles (texte) »), and the number
+        of roles;
       - « Rôles »: ONE line per volunteer AND per role chosen (« (aucun rôle) » when none): the sheet for a pivot table of
         the roles by type, by language, by survey state;
       - « Langues »: ONE line per volunteer AND per language spoken (« (non précisé) » when none).
@@ -699,12 +728,13 @@ def volunteer_export_sheets(rows, role_groups=(), lang=DEFAULT_LANG, extra_colum
              "roles_count": "Number of roles" if english else "Nombre de rôles", "roles": "Roles" if english else "Rôles",
              "question": "Question", "role": "Role" if english else "Rôle", "no_role": "(no role)" if english else "(aucun rôle)",
              "languages_sheet": "Languages" if english else "Langues", "language": "Language" if english else "Langue",
-             "no_language": "(not specified)" if english else "(non précisé)"}
+             "no_language": "(not specified)" if english else "(non précisé)",
+             "other_text": "Other roles (text)" if english else "Autres rôles (texte)"}
     groups = [(index, group) for index, group in enumerate(role_groups or ()) if group.get("choices")]
     role_labels = _unique_labels([choice for _i, group in groups for choice in group["choices"]])
     header = _unique_labels([labels["name"], words["email"], words["ticket"], labels["registered"], labels["survey"], labels["type"],
                              labels["languages"], labels["arrived"], labels["departed"]] + list(extra_columns)
-                            + role_labels + [words["roles_count"]])
+                            + role_labels + [words["other_text"], words["roles_count"]])
     wide, long_roles, long_languages = [], [], []
     for row in rows or ():
         name = " ".join(str(row.get("name") or "").split())
@@ -714,10 +744,13 @@ def volunteer_export_sheets(rows, role_groups=(), lang=DEFAULT_LANG, extra_colum
         extra = list(row.get("extra") or ())
         base += [extra[i] if i < len(extra) else "" for i in range(len(extra_columns))]
         role_values = list(row.get("roles") or ())
-        cells, count = [], 0
+        cells, count, free_texts = [], 0, []
         for index, group in groups:
             values = [v for v in (role_values[index] if index < len(role_values) else ()) if str(v or "").strip()]
-            cells += role_cells(group["choices"], values, labels["yes"])
+            # v1.135.0: 1 instead of « X », so that the columns can be summed; the free text goes to « Autres rôles (texte) ».
+            numbers, free = role_numbers(group["choices"], values)
+            cells += numbers
+            free_texts += free
             count += len(values)
             for value in values:
                 long_roles.append([name, row.get("email") or "", row.get("type") or "", row.get("languages") or "", survey,
@@ -725,7 +758,7 @@ def volunteer_export_sheets(rows, role_groups=(), lang=DEFAULT_LANG, extra_colum
         if not count:
             long_roles.append([name, row.get("email") or "", row.get("type") or "", row.get("languages") or "", survey, "",
                                words["no_role"]])
-        wide.append(base + cells + [count])
+        wide.append(base + cells + [", ".join(free_texts), count])
         languages = row.get("languages_list")
         if languages is None:
             languages = [part.strip() for part in str(row.get("languages") or "").split(",")]
@@ -820,9 +853,11 @@ def volunteer_table_html(rows, role_groups=(), lang=DEFAULT_LANG, extra_columns=
         name = _clean(row.get("name"))
         if row.get("chat_url"):
             name = '<a href="%s" target="_blank">%s</a>' % (escape(str(row["chat_url"]), quote=True), name)
-        cells = [name] + [_clean(text) for text in (
-            row.get("registered"), labels.get(row.get("survey"), ""), row.get("type"), row.get("languages"),
-            row.get("arrived"), row.get("departed"))]
+        survey = _clean(labels.get(row.get("survey"), ""))
+        if row.get("answers_url") and survey:                     # v1.135.0: every answer of the survey of this person
+            survey = '<a href="%s" target="_blank">%s</a>' % (escape(str(row["answers_url"]), quote=True), survey)
+        cells = [name, _clean(row.get("registered")), survey] + [_clean(text) for text in (
+            row.get("type"), row.get("languages"), row.get("arrived"), row.get("departed"))]
         extra = list(row.get("extra") or ())
         cells += [_clean(extra[i] if i < len(extra) else "") for i in range(len(extra_columns))]
         role_values = list(row.get("roles") or ())

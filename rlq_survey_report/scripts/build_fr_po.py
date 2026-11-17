@@ -61,9 +61,6 @@ FR = {
     "Event": "Événement",
     "By default: the event in progress, otherwise the next one.": "Par défaut : l'événement en cours, sinon le prochain.",
     "Search": "Recherche",
-    "Part of a name, an e-mail address or a company: only the matching registrations are listed. The summary always counts the whole event.":
-        "Partie d'un nom, d'une adresse courriel ou d'une entreprise : seules les inscriptions correspondantes sont listées. Le sommaire compte toujours tout l'événement.",
-    "Name, e-mail address or company": "Nom, adresse courriel ou entreprise",
     "Hide the people already present": "Masquer les personnes déjà présentes",
     "Survey": "Sondage",
     "Lists only the registrations whose survey is in this state.": "Liste seulement les inscriptions dont le sondage est dans cet état.",
@@ -103,6 +100,20 @@ FR = {
     "Group By": "Regrouper par",
     "User guide": "Guide d'utilisation",
     "Help for this page": "Aide de cette page",                      # v1.134.0: button of the desk and the volunteers
+    # v1.135.0: answers of a person, contact, search in more columns
+    "See the answers": "Voir les réponses",
+    "Contact the participants": "Contacter les participants",
+    "Name, e-mail, company, phone, ticket or answer": "Nom, courriel, entreprise, téléphone, billet ou réponse",
+    "No participant of this list has an e-mail address.": "Aucun participant de cette liste n'a d'adresse courriel.",
+    "This person has not answered the survey yet.": "Cette personne n'a pas encore répondu au sondage.",
+    "Answers (text)": "Réponses (texte)",
+    "Answers of this person to the survey questions checked « Show at the registration desk ». Click them to see every answer of the survey filled in by this person.":
+        "Réponses de cette personne aux questions du sondage cochées « Afficher au bureau d'inscription ». Cliquez dessus pour voir toutes les réponses du sondage rempli par cette personne.",
+    "The participation of this person to the expected survey (the most advanced one, the most recent among equals).":
+        "La participation de cette personne au sondage attendu (la plus avancée, la plus récente à égalité).",
+    "Can edit the answers": "Peut modifier les réponses",
+    "Part of a name, an e-mail address, a company, a phone number, a ticket or an answer: only the matching registrations are listed (case and accents ignored). The summary always counts the whole event.":
+        "Une partie d'un nom, d'une adresse courriel, d'une entreprise, d'un numéro de téléphone, d'un billet ou d'une réponse : seules les inscriptions correspondantes sont listées (sans tenir compte des majuscules ni des accents). Le sommaire compte toujours tout l'événement.",
     "Export to a spreadsheet": "Exporter dans un chiffrier",
     "The spreadsheet export needs the Python library « openpyxl », which is not installed on this server (pip install openpyxl).":
         "L'export dans un chiffrier nécessite la bibliothèque Python « openpyxl », qui n'est pas installée sur ce serveur (pip install openpyxl).",
