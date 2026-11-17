@@ -109,6 +109,8 @@ except ImportError:  # pragma: no cover - selon la version installée sur l'inst
 
 from . import report_builder as rb  # noqa: E402 - placé après le bloc try/except des bibliothèques optionnelles
 
+CLE_CACHE_NOMS = "rlq_survey_report.noms_repondants"   # cache par transaction de _respondent_nom() (v1.125.0)
+
 MOIS_FR = {
     "janvier": 1, "janv": 1, "jan": 1,
     "février": 2, "fevrier": 2, "févr": 2, "fevr": 2, "fév": 2, "fev": 2,
@@ -771,8 +773,10 @@ class RlqSurveyReportWizard(models.TransientModel):
         # nom réel visible dans le rapport anonymisé. Normaliser les deux
         # côtés à la même forme élimine cette divergence.
         html = unicodedata.normalize("NFC", html)
-        for original, remplacement in remplacements:
-            html = rb.remplacer_nom_complet(html, original, remplacement)
+        # v1.125.0 : TOUS les remplacements en une seule lecture du HTML (rb.remplacer_noms_complets). Avant, chaque nom,
+        # ancre et courriel relisait tout le HTML jusqu'à trois fois : le temps croissait avec participants x taille
+        # (mesuré : 28,7 s pour 300 participants et 3 Mo, 0,2 s maintenant, résultat identique).
+        html = rb.remplacer_noms_complets(html, remplacements)
         # FILET DE SÉCURITÉ (v1.91.0) : en plus du remplacement exact ci-dessus
         # (qui ne masque qu'un courriel DÉJÀ CONNU comme appartenant à un
         # participant), une expression régulière masque TOUT texte ayant la
@@ -881,9 +885,18 @@ class RlqSurveyReportWizard(models.TransientModel):
         passe pour tout téléchargement) - lire seulement ces deux champs
         en sudo() n'expose rien de plus que ce que le rapport montre déjà
         normalement."""
-        if user_input.partner_id:
-            return user_input.partner_id.sudo().name
-        return user_input.email or _("Anonyme")
+        # v1.125.0 : appelée pour CHAQUE ligne de réponse (des dizaines de milliers pour un gros rapport) ; le nom d'une
+        # participation est lu une fois puis repris du cache de la transaction (vidé au début de chaque génération).
+        cache = self.env.cr.cache.setdefault(CLE_CACHE_NOMS, {})
+        nom = cache.get(user_input.id)
+        if nom is None:
+            if user_input.partner_id:
+                nom = user_input.partner_id.sudo().name
+            else:
+                nom = user_input.email or _("Anonyme")
+            if user_input.id:
+                cache[user_input.id] = nom
+        return nom
 
     def _respondent_email(self, user_input):
         return (user_input.partner_id.sudo().email or user_input.email or "") or None
@@ -1819,6 +1832,8 @@ class RlqSurveyReportWizard(models.TransientModel):
 
     def _compute_report(self):
         self.ensure_one()
+        chrono = [("début", time.perf_counter())]            # v1.125.0 : durée de chaque étape, écrite dans le journal
+        self.env.cr.cache.pop(CLE_CACHE_NOMS, None)
 
         emails = {}  # nom normalisé -> courriel
         # Accumulateurs pour la synthèse (fusion par titre de question / de ligne)
@@ -2170,16 +2185,24 @@ class RlqSurveyReportWizard(models.TransientModel):
             # avec >100 réponses, refaire un .filtered() sur l'ensemble des
             # lignes à chaque question (comme avant) devenait très lent, voire
             # semblait ne plus répondre du tout.
+            # v1.125.0 : des listes d'identifiants, pas « recordset |= ligne » pour chaque ligne (chaque union recopiait tout
+            # le recordset : temps quadratique pour une matrice à beaucoup de réponses). with_prefetch() garde la lecture
+            # groupée des champs sur TOUTES les lignes du sondage plutôt qu'une requête par question.
             toutes_lignes = user_inputs.mapped(self._lines_field_name())
-            lignes_par_question = defaultdict(lambda: self.env[self._answer_model_name()])
+            modele_lignes = self.env[self._answer_model_name()]
+            ids_par_question = defaultdict(list)
             for ligne in toutes_lignes:
-                lignes_par_question[ligne.question_id.id] |= ligne
+                ids_par_question[ligne.question_id.id].append(ligne.id)
+            lignes_par_question = {
+                question_id: modele_lignes.browse(ids).with_prefetch(toutes_lignes._prefetch_ids)
+                for question_id, ids in ids_par_question.items()
+            }
 
             for question in survey.question_ids.sorted("sequence"):
                 titre = question.title
                 synth_types.setdefault(titre, question.question_type)
                 try:
-                    lignes = lignes_par_question.get(question.id, self.env[self._answer_model_name()])
+                    lignes = lignes_par_question.get(question.id, modele_lignes)
                     if not lignes:
                         continue
                     contenu.append(
@@ -2223,6 +2246,7 @@ class RlqSurveyReportWizard(models.TransientModel):
         # été trouvée, donc un tri lexicographique équivaut à un tri
         # chronologique. Les deux listes sont réordonnées ensemble pour que
         # le corps du rapport suive le même ordre que la table des matières.
+        chrono.append(("sondages", time.perf_counter()))
         if toc_rencontres:
             paires = sorted(
                 zip(toc_rencontres, corps_rencontres, dates_rencontres, evenements_rencontres, survey_ids_rencontres),
@@ -2899,8 +2923,10 @@ class RlqSurveyReportWizard(models.TransientModel):
 {pied_de_page}
 </div>
 """
+        chrono.append(("synthèse et participants", time.perf_counter()))
         if self.anonymiser:
             html = self._anonymiser_html(html, participants_tries)
+        chrono.append(("anonymisation", time.perf_counter()))
         # v1.78.0 : résout les jetons de présentateurs (voir
         # rb.jeton_presentateur) vers leur nom réel - TOUJOURS, que le
         # rapport soit anonymisé ou non, puisque ce mécanisme protège
@@ -2912,6 +2938,13 @@ class RlqSurveyReportWizard(models.TransientModel):
         self.state = "done"
         attachment_ecran = self._sauvegarder_copie_ecran(html)
         self._journaliser_acces("ecran", attachment_ecran.name if attachment_ecran else None, attachment_ecran)
+        chrono.append(("enregistrement", time.perf_counter()))
+        _logger.info(
+            "rlq_survey_report : rapport généré en %.1f s (%s) - %d sondage(s), %d réponse(s), %d participant(s), %.1f Mo",
+            chrono[-1][1] - chrono[0][1], rb.texte_chrono(chrono), nb_total_a_traiter, nb_reponses_trouvees,
+            len(participants), len(html) / 1e6,
+        )
+        self.env.cr.cache.pop(CLE_CACHE_NOMS, None)
         return diagnostics
 
     def _sauvegarder_copie_ecran(self, html):

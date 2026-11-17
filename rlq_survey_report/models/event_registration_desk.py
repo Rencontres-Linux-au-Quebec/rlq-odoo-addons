@@ -1,0 +1,477 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2026 Services-Conseils Linux Inc.  (contact@exemple.org)
+# Copyright (C) 2026 Rencontres Linux au Québec contributors
+#
+# This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at your option) any later version. (http://www.gnu.org/licenses/agpl)
+"""
+event_registration_desk.py
+==========================
+
+Registration desk of an event (v1.121.0): ONE screen (Events > RLQ registration desk, or the button of the event form) for the
+volunteers who welcome people on the day of the event.
+
+  - Summary at the top (models/registration_desk_report.py, pure functions):
+      * per ticket type and in total: registered, present, surveys completed / started / not started, questions answered and
+        not answered;
+      * people marked present per hour (LOCAL time, see local_zone()), per ticket and in total;
+      * counts of the answers to the survey questions checked « Show at the registration desk » (online or on site, lunch...).
+  - List of the registrations (not cancelled), sorted by ticket then name, with the state of the survey, « 8/12 » questions
+    answered, the answers to the checked questions, and the buttons « Present » and « Undo ».
+
+« Present » uses the native state of Odoo (event.registration.state = « done », action_set_done()): the native registration desk,
+the badges and the attendance statistics of Odoo see the same thing. The hour of the check-in is the native field `date_closed`.
+« Undo » puts the registration back to « open » and clears `date_closed`.
+
+The survey of a registration is the one of models/event_survey_followup.py (survey of the ticket, otherwise of the event); the
+participation is found by the same contact or the same e-mail address. When a person has several participations, the most
+advanced one is used (completed, then started), the most recent one among equals. Test entries are ignored.
+
+The questions counted are the questions of the survey (pages excluded). A conditional question that was never shown to the
+person counts as « not answered »: Odoo does not record why a question has no answer.
+
+Sorting (v1.123.0):
+  - the list of the desk is sorted by the wizard (« Sort by », « Descending »): Python, case and accents ignored, every column;
+  - the full list (« Open as a list ») is sorted by clicking a column header. The action carries the context key
+    `rlq_desk_event_id`; with it, _order_field_to_sql() orders the text columns and the computed columns (survey, questions
+    answered, answers) by the position of the record in a list of ids sorted in Python with the same keys. Without the key,
+    nothing changes for the other screens of Odoo;
+  - events are listed most recent first in the selectors of this module (context key `rlq_recent_first`, search_fetch()).
+"""
+import logging
+from collections import defaultdict
+
+from odoo import _, api, fields, models
+from odoo.tools import SQL
+
+from . import registration_desk_report as rd
+from .registration_desk_report import sort_key
+
+_logger = logging.getLogger(__name__)
+
+STATE_RANK = {"done": 2, "in_progress": 1}
+LIST_STATES = ("draft", "open", "done")
+PROGRAM = "rlq_survey_report"
+COMPUTED_SORTS = ("rlq_survey_state", "rlq_desk_progress", "rlq_desk_answers")
+STATE_ORDER = {"draft": 0, "open": 1, "done": 2, "cancel": 3}
+RECENT_EVENTS_FIRST = "date_begin desc, id desc"
+DEFAULT_ZONE = "America/Toronto"
+
+
+def program_version(env):
+    """« 18.0.1.123.0 »: the installed version of this module (read from Odoo, never a hard-coded string)."""
+    module = env["ir.module.module"].sudo().search([("name", "=", PROGRAM)], limit=1)
+    return module.installed_version or module.latest_version or "?"
+
+
+class SurveyQuestionRegistrationDesk(models.Model):
+    _inherit = "survey.question"
+
+    rlq_registration_desk = fields.Boolean(
+        string="Show at the registration desk", default=False,
+        help="If checked, the answer of each registered person to this question is shown in the RLQ registration desk of the "
+             "event (Events > RLQ registration desk), and the answers are counted per ticket type. Useful for questions such as "
+             "« On site or online? » or « Will you be there for lunch? ».",
+    )
+    rlq_desk_label = fields.Char(
+        string="Short label at the registration desk", translate=True,
+        help="Short name of this question in the registration desk (for example « Lunch »). Empty: the title of the question.",
+    )
+
+
+def local_zone(env, event=None):
+    """Name of the LOCAL time zone used by the desk and the volunteers' table (v1.124.0): the time zone of the user (the one of
+    the browser, sent by the web client in the context, otherwise the one of the user's preferences), otherwise the time zone
+    of the event, otherwise America/Toronto. Never UTC by default: the database stores UTC, people read local time."""
+    return env.context.get("tz") or env.user.tz or (event.date_tz if event else False) or DEFAULT_ZONE
+
+
+def local_time(registration, value, pattern):
+    """Formats a UTC datetime of the database in local time (see local_zone()); « » when empty."""
+    if not value:
+        return ""
+    zone = local_zone(registration.env, registration.event_id)
+    return fields.Datetime.context_timestamp(registration.with_context(tz=zone), value).strftime(pattern)
+
+
+def program_stamp(env, event=None):
+    """Footer of the screens: program name, installed version, local date and time of the display, with the time zone."""
+    zone = local_zone(env, event)
+    now = fields.Datetime.context_timestamp(env["res.users"].with_context(tz=zone), fields.Datetime.now())
+    return rd.program_footer(PROGRAM, program_version(env), now.strftime("%Y-%m-%d %H:%M:%S %Z"), zone, env.lang or rd.DEFAULT_LANG)
+
+
+class EventRegistrationDesk(models.Model):
+    _inherit = "event.registration"
+
+    rlq_departure = fields.Datetime(
+        string="Left at", copy=False, readonly=True,
+        help="Time when the person left the event, recorded with the « Left » button of the RLQ registration desk.",
+    )
+    rlq_desk_progress = fields.Char(
+        string="Questions answered", compute="_compute_rlq_desk",
+        help="Questions answered / questions of the survey expected for this registration (pages excluded). Empty: no survey.",
+    )
+    rlq_desk_answers = fields.Char(
+        string="Answers", compute="_compute_rlq_desk",
+        help="Answers of this person to the survey questions checked « Show at the registration desk ».",
+    )
+
+    def _compute_rlq_desk(self):
+        data = self._rlq_desk_map()
+        for registration in self:
+            item = data.get(registration.id) or {}
+            registration.rlq_desk_progress = rd.progress_text(item.get("questions"), item.get("answered")) or False
+            registration.rlq_desk_answers = rd.answers_text(item.get("answers")) or False
+
+    @api.model
+    def _rlq_desk_value(self, row, answer_values):
+        """Text of one survey.user_input.line (dict of search_read); « » when the line carries no value."""
+        answer_type = row.get("answer_type") or ""
+        if answer_type == "suggestion":
+            value = answer_values.get((row.get("suggested_answer_id") or [False])[0], "")
+            matrix_row = answer_values.get((row.get("matrix_row_id") or [False])[0], "")
+            return "%s: %s" % (matrix_row, value) if matrix_row and value else value
+        value = row.get("value_%s" % answer_type)
+        if value in (None, False, ""):
+            return ""
+        if isinstance(value, float):
+            return ("%f" % value).rstrip("0").rstrip(".")
+        return str(value)
+
+    def _rlq_desk_participations(self, status):
+        """The survey answers of the registrations. status: the result of _rlq_survey_status_map().
+
+        Returns (inputs, answered, values, chosen):
+          chosen   {registration id: survey.user_input id}: the most advanced participation (completed, then started) of the same
+                   contact or e-mail address for the expected survey, the most recent one among equals;
+          inputs   the set of those participation ids;
+          answered {participation id: {question ids answered}} (skipped questions left out);
+          values   {(participation id, question id): [texts]}.
+        """
+        registrations = self.sudo().filtered("id")
+        survey_ids = sorted({survey.id for survey, _state, _done in status.values() if survey})
+        by_partner, by_email = defaultdict(list), defaultdict(list)
+        if survey_ids:
+            for row in self.env["survey.user_input"].sudo().search_read(
+                    [("survey_id", "in", survey_ids), ("test_entry", "=", False)], ["survey_id", "partner_id", "email", "state"]):
+                item = (STATE_RANK.get(row["state"], 0), row["id"])
+                if row["partner_id"]:
+                    by_partner[(row["survey_id"][0], row["partner_id"][0])].append(item)
+                if row["email"]:
+                    by_email[(row["survey_id"][0], row["email"].strip().lower())].append(item)
+        chosen = {}
+        for registration in registrations:
+            survey = status[registration.id][0]
+            if not survey:
+                continue
+            items = []
+            if registration.partner_id:
+                items += by_partner.get((survey.id, registration.partner_id.id), [])
+            if registration.email:
+                items += by_email.get((survey.id, registration.email.strip().lower()), [])
+            if items:
+                chosen[registration.id] = max(items)[1]
+
+        lines = self.env["survey.user_input.line"].sudo()
+        wanted = ["user_input_id", "question_id", "skipped", "answer_type", "suggested_answer_id", "matrix_row_id",
+                  "value_char_box", "value_text_box", "value_numerical_box", "value_date", "value_datetime"]
+        read = [name for name in wanted if name in lines._fields]
+        inputs = set(chosen.values())
+        rows = lines.search_read([("user_input_id", "in", sorted(inputs))], read, order="id") if inputs else []
+        answer_ids = {(row.get(name) or [False])[0] for row in rows for name in ("suggested_answer_id", "matrix_row_id")}
+        answer_values = {answer.id: answer.value or "" for answer in
+                         self.env["survey.question.answer"].sudo().browse(sorted(a for a in answer_ids if a)).exists()}
+        answered, values = defaultdict(set), defaultdict(list)
+        for row in rows:
+            if row.get("skipped") or not row.get("question_id"):
+                continue
+            input_id, question_id = row["user_input_id"][0], row["question_id"][0]
+            answered[input_id].add(question_id)
+            text = self._rlq_desk_value(row, answer_values)
+            if text:
+                values[(input_id, question_id)].append(text)
+        return inputs, answered, values, chosen
+
+    def _rlq_desk_map(self):
+        """{registration id: {"survey", "state", "questions", "answered", "answers": [(label, [values])]}} for the whole recordset.
+
+        A fixed number of queries whatever the number of registrations. Read with sudo(): a volunteer of the Events application
+        does not always have the rights of the Surveys application. Never raises for a missing optional field.
+        """
+        registrations = self.sudo().filtered("id")
+        status = registrations._rlq_survey_status_map()
+        survey_ids = sorted({survey.id for survey, _state, _done in status.values() if survey})
+        result = {}
+        if not survey_ids:
+            for registration in registrations:
+                result[registration.id] = {"survey": False, "state": "none", "questions": 0, "answered": 0, "answers": []}
+            return result
+
+        # Questions of each survey (pages excluded), and the ones shown at the desk.
+        questions = self.env["survey.question"].sudo()
+        domain = [("survey_id", "in", survey_ids)]
+        if "is_page" in questions._fields:
+            domain.append(("is_page", "=", False))
+        question_count, desk_questions = defaultdict(int), defaultdict(list)
+        for question in questions.search(domain, order="sequence, id"):
+            question_count[question.survey_id.id] += 1
+            if question.rlq_registration_desk:
+                desk_questions[question.survey_id.id].append((question.id, question.rlq_desk_label or question.title or ""))
+
+        _inputs, answered, values, chosen = registrations._rlq_desk_participations(status)
+
+        for registration in registrations:
+            survey, state, _done = status[registration.id]
+            if not survey:
+                result[registration.id] = {"survey": False, "state": "none", "questions": 0, "answered": 0, "answers": []}
+                continue
+            input_id = chosen.get(registration.id)
+            result[registration.id] = {
+                "survey": survey, "state": state, "questions": question_count.get(survey.id, 0),
+                "answered": len(answered.get(input_id, ())),
+                "answers": [(label, values.get((input_id, question_id), [])) for question_id, label in desk_questions.get(survey.id, [])],
+            }
+        return result
+
+    def _rlq_desk_rows(self):
+        """Rows of registration_desk_report (one per registration); every date and hour is in LOCAL time (local_zone()), never UTC."""
+        data = self._rlq_desk_map()
+        rows = []
+        for registration in self.sudo().filtered("id"):
+            item = data.get(registration.id) or {}
+            present = registration.state == "done"
+            closed = registration.date_closed if "date_closed" in registration._fields else False
+            hour = local_time(registration, closed, "%Y-%m-%d %H") if present and closed else None
+            ticket = registration.event_ticket_id if "event_ticket_id" in registration._fields else False
+            rows.append({"ticket": ticket.name if ticket else "", "present": present, "hour": hour,
+                         "survey_state": item.get("state", "none"), "questions": item.get("questions", 0),
+                         "answered": item.get("answered", 0), "answers": item.get("answers", []),
+                         "registered": local_time(registration, registration.create_date, "%Y-%m-%d %H:%M"),
+                         "arrived": local_time(registration, closed, "%Y-%m-%d %H:%M") if present else "",
+                         "departed": local_time(registration, registration.rlq_departure, "%Y-%m-%d %H:%M"),
+                         "event_date": registration.event_id.date_begin or False})
+        return rows
+
+    def _rlq_desk_sort_keys(self, field_name):
+        """{registration id: sort key} for one column of the desk. Texts: case and accents ignored, empty values last."""
+        data = self._rlq_desk_map() if field_name in COMPUTED_SORTS else {}
+        keys = {}
+        for registration in self.sudo().filtered("id"):
+            item = data.get(registration.id) or {}
+            if field_name == "rlq_survey_state":
+                key = (rd.SURVEY_RANK.get(item.get("state", "none"), 9),)
+            elif field_name == "rlq_desk_progress":
+                key = (not item.get("questions"), item.get("answered", 0), item.get("questions", 0))
+            elif field_name == "rlq_desk_answers":
+                text = rd.answers_text(item.get("answers"))
+                key = (not text, sort_key(text))
+            elif field_name == "state":
+                key = (STATE_ORDER.get(registration.state, 9),)
+            else:
+                field = registration._fields.get(field_name)
+                value = registration[field_name] if field else False
+                if field is not None and field.type == "many2one":
+                    value = value.display_name if value else ""
+                if field is not None and field.type in ("datetime", "date", "integer", "float"):
+                    key = (not value, value or 0)
+                else:
+                    key = (not value, sort_key(value))
+            keys[registration.id] = key
+        return keys
+
+    def _rlq_desk_sorted(self, field_name, descending=False):
+        """The recordset sorted by one column of the desk; equal values keep the order ticket, name (stable sort)."""
+        has_ticket = "event_ticket_id" in self._fields
+        base = self.sorted(lambda r: (sort_key(r.event_ticket_id.name if has_ticket else ""), sort_key(r.name), r.id))
+        if not field_name or field_name == "event_ticket_id":
+            return base.sorted(lambda r: sort_key(r.event_ticket_id.name if has_ticket else ""), reverse=bool(descending))
+        keys = base._rlq_desk_sort_keys(field_name)
+        return base.sorted(lambda r: keys.get(r.id, (True,)), reverse=bool(descending))
+
+    @api.model
+    def _rlq_desk_sorted_ids(self, event_id, field_name):
+        """Ids of the registrations of one event, in ascending order of one column (see _order_field_to_sql)."""
+        registrations = self.sudo().with_context(rlq_desk_event_id=False).search([("event_id", "=", event_id)], order="id")
+        return registrations._rlq_desk_sorted(field_name).ids
+
+    def _order_field_to_sql(self, alias, field_name, direction, nulls, query):
+        """In the full list of the RLQ registration desk only (context key `rlq_desk_event_id`): the text columns are sorted
+        without case or accents, and the computed columns (survey, questions answered, answers) become sortable.
+
+        PostgreSQL cannot do it alone: the database of Odoo sorts « É » after « z », and a computed column is not in the table.
+        The order is computed in Python for the registrations of the event, and PostgreSQL sorts by the position of each id.
+        Everything else (other screens, dates, many2one columns, grouped queries) goes to the standard code.
+        """
+        event_id = self.env.context.get("rlq_desk_event_id")
+        field = self._fields.get(field_name)
+        if event_id and field is not None:
+            computed = field_name in COMPUTED_SORTS
+            if computed and query.groupby:
+                return SQL()                                                    # a computed column cannot order groups
+            if not query.groupby and (computed or (field.store and field.type in ("char", "text"))):
+                ids = self._rlq_desk_sorted_ids(event_id, field_name)
+                return SQL("array_position(%s::integer[], %s) %s %s", ids, SQL.identifier(alias, "id"), direction, nulls)
+        return super()._order_field_to_sql(alias, field_name, direction, nulls, query)
+
+    def action_rlq_desk_present(self):
+        """Button « Present »: native state « done » (the hour is recorded by Odoo in date_closed). Cancelled: left alone."""
+        registrations = self.filtered(lambda r: r.state not in ("done", "cancel"))
+        if registrations:
+            if hasattr(registrations, "action_set_done"):
+                registrations.action_set_done()
+            else:
+                registrations.write({"state": "done"})
+            _logger.info("registration desk: %d registration(s) marked present by user %s", len(registrations), self.env.uid)
+        return True
+
+    def action_rlq_desk_depart(self):
+        """Button « Left »: records the time of departure (now). Only for people present, and only once."""
+        registrations = self.filtered(lambda r: r.state == "done" and not r.rlq_departure)
+        if registrations:
+            registrations.write({"rlq_departure": fields.Datetime.now()})
+            _logger.info("registration desk: %d departure(s) recorded by user %s", len(registrations), self.env.uid)
+        return True
+
+    def action_rlq_desk_depart_undo(self):
+        """Button « Undo the departure »: clears the time of departure."""
+        registrations = self.filtered("rlq_departure")
+        if registrations:
+            registrations.write({"rlq_departure": False})
+        return True
+
+    def action_rlq_desk_undo(self):
+        """Button « Undo »: a registration marked present by mistake goes back to « open »; the hour of the check-in is cleared."""
+        registrations = self.filtered(lambda r: r.state == "done")
+        if registrations:
+            vals = {"state": "open"}
+            if "date_closed" in registrations._fields:
+                vals["date_closed"] = False
+            registrations.write(vals)
+            _logger.info("registration desk: presence of %d registration(s) undone by user %s", len(registrations), self.env.uid)
+        return True
+
+
+class EventEventRegistrationDesk(models.Model):
+    _inherit = "event.event"
+
+    @api.model
+    @api.readonly
+    @api.returns("self")
+    def search_fetch(self, domain, field_names, offset=0, limit=None, order=None):
+        """Selectors of this module (context key `rlq_recent_first`): the most recent event first, instead of the oldest.
+
+        Only when the caller gives no order: the drop-down list of a many2one (name_search) and its « Search more » window.
+        """
+        if not order and self.env.context.get("rlq_recent_first"):
+            order = RECENT_EVENTS_FIRST
+        return super().search_fetch(domain, field_names, offset=offset, limit=limit, order=order)
+
+    def action_rlq_registration_desk(self):
+        """Opens the RLQ registration desk of this event."""
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "name": _("RLQ registration desk"),
+            "res_model": "rlq.registration.desk",
+            "view_mode": "form",
+            "target": "current",
+            "context": {"default_event_id": self.id},
+        }
+
+
+class RlqRegistrationDesk(models.TransientModel):
+    _name = "rlq.registration.desk"
+    _description = "RLQ registration desk"
+
+    @api.model
+    def _default_event_id(self):
+        """The event of the context, otherwise the event in progress or the next one, otherwise the most recent one."""
+        if self.env.context.get("active_model") == "event.event" and self.env.context.get("active_id"):
+            return self.env.context["active_id"]
+        events = self.env["event.event"]
+        event = events.search([("date_end", ">=", fields.Datetime.now())], order="date_begin, id", limit=1)
+        return (event or events.search([], order="date_begin desc, id desc", limit=1)).id or False
+
+    event_id = fields.Many2one("event.event", string="Event", required=True, default=_default_event_id,
+                               help="By default: the event in progress, otherwise the next one.")
+    search_text = fields.Char(string="Search",
+                              help="Part of a name, an e-mail address or a company: only the matching registrations are listed. "
+                                   "The summary always counts the whole event.")
+    hide_present = fields.Boolean(string="Hide the people already present", default=False)
+    survey_filter = fields.Selection(
+        [("all", "All"), ("done", "Survey completed"), ("in_progress", "Survey started"),
+         ("not_started", "Survey not started"), ("none", "No survey")],
+        string="Survey", default="all", required=True, help="Lists only the registrations whose survey is in this state.")
+    sort_by = fields.Selection(
+        [("event_ticket_id", "Ticket"), ("name", "Name"), ("create_date", "Registration date"), ("state", "Status"),
+         ("date_closed", "Arrival"), ("rlq_departure", "Departure"), ("rlq_survey_state", "Survey"),
+         ("rlq_desk_progress", "Questions answered"), ("rlq_desk_answers", "Answers")],
+        string="Sort by", default="event_ticket_id", required=True,
+        help="Order of the list below. Case and accents are ignored (« Élise » sorts with the « e »); equal values are sorted by "
+             "ticket, then by name.")
+    sort_desc = fields.Boolean(string="Descending", default=False, help="Reverses the order of the list.")
+    summary_html = fields.Html(string="Summary", compute="_compute_desk", sanitize=False)
+    registration_ids = fields.Many2many("event.registration", string="Registrations", compute="_compute_desk")
+    registration_count = fields.Integer(string="Registrations listed", compute="_compute_desk")
+
+    @api.depends("event_id")
+    def _compute_display_name(self):
+        for wizard in self:
+            wizard.display_name = _("Registration desk: %(event)s", event=wizard.event_id.name) if wizard.event_id \
+                else _("RLQ registration desk")
+
+    def _rlq_all_registrations(self):
+        self.ensure_one()
+        if not self.event_id:
+            return self.env["event.registration"]
+        return self.env["event.registration"].search([("event_id", "=", self.event_id.id), ("state", "in", list(LIST_STATES))])
+
+    @staticmethod
+    def _rlq_haystack(registration):
+        parts = [registration.name, registration.email]
+        if "company_name" in registration._fields:
+            parts.append(registration.company_name)
+        return " ".join(" ".join(str(p or "").lower().split()) for p in parts)
+
+    def _rlq_listed(self, registrations):
+        """The registrations of the list: filters « hide present », « survey » and « search », sorted by the chosen column."""
+        self.ensure_one()
+        listed = registrations
+        if self.hide_present:
+            listed = listed.filtered(lambda r: r.state != "done")
+        if self.survey_filter and self.survey_filter != "all":
+            status = listed._rlq_survey_status_map()
+            listed = listed.filtered(lambda r: status.get(r.id, (None, "none"))[1] == self.survey_filter)
+        needle = sort_key(" ".join((self.search_text or "").split()))
+        if needle:
+            listed = listed.filtered(lambda r: needle in sort_key(self._rlq_haystack(r)))
+        return listed._rlq_desk_sorted(self.sort_by or "event_ticket_id", self.sort_desc)
+
+    @api.depends("event_id", "search_text", "hide_present", "survey_filter", "sort_by", "sort_desc")
+    def _compute_desk(self):
+        for wizard in self:
+            registrations = wizard._rlq_all_registrations()
+            wizard.summary_html = (rd.desk_summary_html(registrations._rlq_desk_rows(), self.env.lang or rd.DEFAULT_LANG)
+                                   + program_stamp(self.env, wizard.event_id))
+            listed = wizard._rlq_listed(registrations)
+            wizard.registration_ids = listed
+            wizard.registration_count = len(listed)
+
+    def action_refresh(self):
+        """Button « Refresh »: the form is read again, so the summary and the list are computed again."""
+        return True
+
+    def action_open_list(self):
+        """The registrations of the event in a full list (native search, filters, grouping by ticket, export), same buttons."""
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "name": _("Registration desk: %(event)s", event=self.event_id.name),
+            "res_model": "event.registration",
+            "view_mode": "list,form",
+            "views": [(self.env.ref("rlq_survey_report.view_rlq_registration_desk_registration_list").id, "list"), (False, "form")],
+            "search_view_id": [self.env.ref("rlq_survey_report.view_rlq_registration_desk_registration_search").id, "search"],
+            "domain": [("event_id", "=", self.event_id.id), ("state", "in", list(LIST_STATES))],
+            "context": {"create": False, "rlq_desk_event_id": self.event_id.id},
+        }

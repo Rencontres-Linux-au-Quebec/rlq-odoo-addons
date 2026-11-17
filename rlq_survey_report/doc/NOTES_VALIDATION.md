@@ -6,6 +6,61 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -79. Génération du rapport HTML plus rapide (v1.125.0)
+
+**Non vérifié sans instance, à confirmer :**
+1. Générer le même rapport qu'avant (mêmes sondages, anonymisation cochée) : le temps doit baisser nettement s'il y a beaucoup de participants. Le gain réel n'a pas été mesuré : seule l'anonymisation a été chronométrée, sur des rapports fictifs (28,7 s -> 0,2 s pour 300 participants et 3 Mo).
+2. Comparer un rapport anonymisé avant / après : mêmes pseudonymes « Participant N », aucun nom ni courriel visible.
+3. Journal du serveur : une ligne « rlq_survey_report : rapport généré en X s (sondages ..., synthèse et participants ..., anonymisation ..., enregistrement ...) » après chaque génération. Si « sondages » domine, la suite est côté requêtes Odoo ; si c'est « synthèse et participants », côté construction du HTML ; si c'est « enregistrement », côté pièce jointe et chiffrement.
+4. Regroupement des lignes par question (`browse().with_prefetch()`) et cache des noms (`cr.cache`) : vérifiés dans le code source d'Odoo 18.0, pas exécutés. Le contenu du rapport doit être identique à celui de la 1.124.
+5. Ce qui n'est PAS touché et peut rester long : l'affichage par le navigateur d'un rapport de plusieurs Mo, et la génération PDF.
+
+## -78. Heure locale, date et heure sous les écrans, guide dans le menu Événements (v1.124.0)
+
+**Non vérifié sans instance, à confirmer :**
+1. Sous le sommaire du bureau d'inscription et sous le tableau des bénévoles : « rlq_survey_report 18.0.1.124.0 - affiché le <date> <heure> EST (heure locale, America/Toronto) », à l'heure de votre montre.
+2. Les heures d'inscription, d'arrivée et de départ du tableau des bénévoles et les heures du tableau « par heure » correspondent à l'heure locale. Le fuseau vient du navigateur (clé `tz` du contexte envoyé par le client web), sinon des préférences de l'utilisateur, sinon de l'événement, sinon America/Toronto. Avant la 1.124 c'était d'abord le fuseau de l'événement : un événement créé avec le fuseau UTC affichait donc des heures UTC.
+3. Menu Événements > « Guide d'utilisation » : ouvre le guide dans un nouvel onglet, à la section 15, pour un utilisateur de l'application Événements sans accès aux sondages.
+
+## -77. Traductions, tri par en-tête, filtre par sondage, tableau des bénévoles revu (v1.123.0)
+
+**Vérifié dans le code source d'Odoo 18.0 (dépôt odoo/odoo, branche 18.0), sans exécution :**
+- Les traductions du code Python (`_()`) ne sont chargées d'un `.po` que si l'entrée porte le commentaire `#. odoo-python` (`odoo/tools/translate.py`, `CodeTranslations`). Les termes des vues, champs, menus et actions sont rattachés par leur ligne `#:`. Les entrées ajoutées en 1.121 et 1.122 n'avaient pas toutes ces lignes : c'est la cause des libellés restés en anglais.
+- `list_renderer.js` : une colonne est triable si le champ est stocké OU si `options="{'allow_order': True}"`. `static_list.js` : la liste intégrée d'un formulaire trie côté navigateur avec une comparaison brute (`v1 < v2`), donc sensible à la casse et aux accents.
+- `models.py` : `_order_to_sql()` appelle `_order_field_to_sql()` pour chaque champ, y compris un champ calculé ; `name_search()` appelle `search_fetch()` sans ordre ; la base est créée avec `LC_COLLATE 'C'` (`odoo/service/db.py`), d'où « É » après « z » en SQL.
+- `discuss.channel.channel_get(partners_to)` retourne le canal ; adresse du canal : `/odoo/action-mail.action_discuss?active_id=<id>` ; la route `/chat/<id>` utilisée en 1.122 n'existe pas pour un contact (lien corrigé).
+- `survey.survey_question_form` a bien un `<sheet>` ; `event.registration` a `date_closed`, `company_name`, `action_set_done()`.
+
+**Non vérifié sans instance, à confirmer en priorité :**
+1. Après `-u rlq_survey_report`, les écrans sont en français (titre « Bureau d'inscription : ... », menu « Bénévoles », colonnes « Inscrit le », « Heure d'arrivée », « Heure de départ »). Si un libellé reste en anglais : Paramètres > Traductions > Langues, bouton de mise à jour des traductions du français, ou `-u rlq_survey_report --i18n-overwrite -l fr_CA` (la langue de l'utilisateur doit être installée).
+2. « Ouvrir en liste » : un clic sur « Nom du participant », « Sondage », « Questions répondues » ou « Réponses » trie ; l'ordre des noms ignore la casse et les accents. Le tri passe par `array_position(<ids triés en Python>, id)` : vérifier qu'aucune erreur SQL n'apparaît dans le journal, y compris liste regroupée par billet.
+3. Filtres de la liste : « Sondage complété », « commencé », « non commencé », « Aucun sondage » (méthode `_search_rlq_survey_state`).
+4. Sélecteur d'événement des trois écrans (bureau d'inscription, bénévoles, sondages non complétés) : le plus récent en premier, aussi dans « Recherche avancée ».
+5. Tableau des bénévoles : les deux questions sur les rôles apparaissent (présentiel d'abord) ; la colonne Type est remplie (question reconnue, sinon déduite des rôles) ; la colonne Sondage explique les lignes vides.
+6. Lien du nom d'un bénévole : discussion directe s'il a un compte, sinon fiche de contact.
+7. Les tests Odoo de `tests/test_registration_desk.py` (11) n'ont pas été exécutés ; les tests sans Odoo passent.
+
+## -76. Tri, ordre par défaut, départs et coordination des bénévoles (v1.122.0)
+
+**Points non vérifiés sans accès à une instance, à confirmer en priorité :**
+1. Lien vers le clavardage : `<web.base.url>/chat/<id du contact>` sert pour le nom des bénévoles. Ce chemin n'a pas été vérifié sur votre version d'Odoo 18 : s'il n'ouvre pas la conversation, indiquer l'adresse qu'Odoo utilise.
+2. Tri par en-tête : seule la liste complète (« Ouvrir en liste ») trie, et seulement sur les colonnes stockées. Le tri sans accents ni majuscules dépend de la collation PostgreSQL de la base : vérifier avec des noms comme « Éric », « eve », « Ève », « Zoé ».
+3. Colonnes des rôles : la question est trouvée par son titre contenant « rôle » (sans accents ni majuscules). Si plusieurs questions correspondent, la première du sondage est utilisée.
+4. Tables HTML du bureau d'inscription et de la coordination : non triables par l'en-tête (limite connue, voir CHANGELOG).
+5. Les deux tests Odoo de `tests/test_registration_desk.py` (départ, coordination) n'ont pas été exécutés ; `tests/test_registration_desk_report.py` (sans Odoo) passe.
+
+## -75. Bureau d'inscription RLQ (v1.121.0)
+
+**Points non vérifiés sans accès à une instance, à confirmer en priorité :**
+1. Après `-u rlq_survey_report` : le menu Événements > Bureau d'inscription RLQ et le bouton « Bureau d'inscription RLQ » du formulaire de l'événement ouvrent l'écran (formulaire d'un modèle transitoire en pleine page) avec l'événement en cours ou le prochain.
+2. Formulaire d'une question de sondage : le bloc « Bureau d'inscription » (case « Afficher au bureau d'inscription », libellé court) apparaît. La vue hérite de `survey.survey_question_form` par `//sheet` : si ce formulaire n'a pas de `<sheet>` sur cette instance, la mise à jour du module échoue à cette vue (rien n'est modifié, Odoo annule la mise à jour) ; le signaler pour changer le xpath.
+3. Boutons « Présent » et « Annuler la présence » dans la liste intégrée (boutons de ligne d'un champ many2many calculé) : l'inscription passe à « Présent » (`action_set_done()`), `date_closed` est rempli ; après l'annulation, l'état revient à « Confirmé » et `date_closed` est vide. Le sommaire et la liste se recalculent après chaque clic.
+4. Sommaire : le HTML s'affiche sans échappement parasite (champ `Html`, `sanitize=False`) ; les heures sont dans le fuseau de l'événement (`date_tz`).
+5. « Questions répondues » (ex. 8/12) : lignes `survey.user_input.line` non sautées (`skipped`) de la participation la plus avancée, sur les questions du sondage hors pages (`is_page`). Une question conditionnelle jamais affichée compte comme non répondue.
+6. Champs lus sur `survey.user_input.line` : `answer_type`, `suggested_answer_id`, `matrix_row_id`, `value_char_box`, `value_text_box`, `value_numerical_box`, `value_date`, `value_datetime` (un champ absent est ignoré).
+7. Même limite que -73 : le rattachement passe par le contact OU l'adresse ; plusieurs inscriptions du même contact montrent les mêmes réponses.
+8. Les quatre tests de `tests/test_registration_desk.py` n'ont pas été exécutés ; `tests/test_registration_desk_report.py` (sans Odoo) passe (run-all.sh, étape 4).
+
 ## -74. Langue du rapport quotidien (v1.115.0)
 
 **Points non vérifiés sans accès à une instance, à confirmer en priorité :**

@@ -65,6 +65,7 @@ msgstr "Courriels sortants de cette inscription (ou envoyés à son adresse) en 
 #. module: rlq_survey_report
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_email_fix__line_ids
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_pending__registration_ids
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__registration_ids
 msgid "Registrations"
 msgstr "Inscriptions"
 
@@ -96,11 +97,15 @@ msgstr "Inscription"
 #. module: rlq_survey_report
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_email_fix_line__event_id
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_search
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__event_id
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_coordinator__event_id
 msgid "Event"
 msgstr "Événement"
 
 #. module: rlq_survey_report
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_email_fix_line__name
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__sort_by__name
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__sort_by__name
 msgid "Name"
 msgstr "Nom"
 
@@ -136,6 +141,7 @@ msgid "Invalid e-mails (registrations)"
 msgstr "Courriels invalides (inscriptions)"
 
 #. module: rlq_survey_report
+#. odoo-python
 #: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_registration_email_events
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_list
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_search
@@ -164,6 +170,7 @@ msgid "No e-mail in « Delivery failed »."
 msgstr "Aucun courriel en « Échec d'envoi »."
 
 #. module: rlq_survey_report
+#. odoo-python
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_list
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_event_registration_form_rlq_email
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_fix_form
@@ -174,6 +181,8 @@ msgstr "Corriger et renvoyer"
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_list
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_registration_list
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
 msgid "Registered on"
 msgstr "Inscrit le"
 
@@ -184,6 +193,7 @@ msgstr "Non annulées"
 
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_search
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
 msgid "Group By"
 msgstr "Regrouper par"
 
@@ -208,30 +218,35 @@ msgid "Cancel"
 msgstr "Annuler"
 
 #. module: rlq_survey_report
+#. odoo-python
 #: code:addons/rlq_survey_report/models/event_registration_email.py:0
 #, python-format
 msgid "E-mail address corrected automatically: %(old)s → %(new)s"
 msgstr "Adresse courriel corrigée automatiquement : %(old)s → %(new)s"
 
 #. module: rlq_survey_report
+#. odoo-python
 #: code:addons/rlq_survey_report/models/event_registration_email.py:0
 #, python-format
 msgid "« %(email)s » (registration of %(name)s) is not a valid address either: %(reason)s."
 msgstr "« %(email)s » (inscription de %(name)s) n'est pas non plus une adresse valide : %(reason)s."
 
 #. module: rlq_survey_report
+#. odoo-python
 #: code:addons/rlq_survey_report/models/event_registration_email.py:0
 #, python-format
 msgid "Registration of %(name)s: address fixed, but the confirmation could not be resent (see the server log)."
 msgstr "Inscription de %(name)s : adresse corrigée, mais la confirmation n'a pas pu être renvoyée (voir le journal du serveur)."
 
 #. module: rlq_survey_report
+#. odoo-python
 #: code:addons/rlq_survey_report/models/event_registration_email.py:0
 #, python-format
 msgid "E-mail address corrected: %(old)s → %(new)s (%(n)d e-mail(s) resent)."
 msgstr "Adresse courriel corrigée : %(old)s → %(new)s (%(n)d courriel(s) renvoyé(s))."
 
 #. module: rlq_survey_report
+#. odoo-python
 #: code:addons/rlq_survey_report/models/event_registration_email.py:0
 #, python-format
 msgid "%(n)d registration(s) fixed."
@@ -239,6 +254,10 @@ msgstr "%(n)d inscription(s) corrigée(s)."
 
 #. module: rlq_survey_report
 #: model:ir.model.fields,field_description:rlq_survey_report.field_event_registration__rlq_survey_state
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__survey_filter
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__sort_by__rlq_survey_state
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_coordinator__survey_filter
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__sort_by__survey
 msgid "Survey"
 msgstr "Sondage"
 
@@ -249,6 +268,8 @@ msgstr "État du sondage attendu pour cette inscription (le sondage de son bille
 
 #. module: rlq_survey_report
 #: model:ir.model.fields.selection,name:rlq_survey_report.selection__event_registration__rlq_survey_state__none
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__survey_filter__none
 msgid "No survey"
 msgstr "Aucun sondage"
 
@@ -298,6 +319,7 @@ msgid "Date of the last daily report sent for this event."
 msgstr "Date du dernier rapport quotidien envoyé pour cet événement."
 
 #. module: rlq_survey_report
+#. odoo-python
 #: model:ir.model.fields,field_description:rlq_survey_report.field_event_event__rlq_survey_pending_count
 #: model:ir.actions.act_window,name:rlq_survey_report.action_rlq_survey_pending
 #: model:ir.model,name:rlq_survey_report.model_rlq_survey_pending
@@ -362,6 +384,7 @@ msgstr "Inscriptions confirmées dont la personne n'a pas encore complété le s
 
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
 msgid "Open as a list"
 msgstr "Ouvrir en liste"
 
@@ -386,31 +409,382 @@ msgid "Surveys not completed (registrations)"
 msgstr "Sondages non complétés (inscriptions)"
 
 #. module: rlq_survey_report
+#. odoo-python
 #: code:addons/rlq_survey_report/models/event_survey_followup.py:0
 #, python-format
 msgid "No valid address to send the daily report of « %(event)s » to: e-mail of the event, system parameter %(param)s, then e-mail of the company."
 msgstr "Aucune adresse valide pour envoyer le rapport quotidien de « %(event)s » : courriel de l'événement, paramètre système %(param)s, puis courriel de la société."
 
 #. module: rlq_survey_report
+#. odoo-python
 #: code:addons/rlq_survey_report/models/event_survey_followup.py:0
 #, python-format
 msgid "Daily report"
 msgstr "Rapport quotidien"
 
 #. module: rlq_survey_report
+#. odoo-python
 #: code:addons/rlq_survey_report/models/event_survey_followup.py:0
 #, python-format
 msgid "Daily report sent to %(dest)s."
 msgstr "Rapport quotidien envoyé à %(dest)s."
 
 #. module: rlq_survey_report
+#. odoo-python
 #: code:addons/rlq_survey_report/models/event_survey_followup.py:0
 #, python-format
 msgid "(no ticket)"
 msgstr "(sans billet)"
 
 #. module: rlq_survey_report
+#. odoo-python
 #, python-format
 #: code:addons/rlq_survey_report/models/survey_survey.py:0
 msgid "Pivot table: %s"
 msgstr "Tableau croisé : %s"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_event_form_rlq_registration_desk
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_survey_question_form_rlq_registration_desk
+msgid "Registration desk"
+msgstr "Bureau d'inscription"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+msgid "Arrived at"
+msgstr "Heure d'arrivée"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+#: model:ir.model.fields,field_description:rlq_survey_report.field_event_registration__rlq_departure
+msgid "Left at"
+msgstr "Heure de départ"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+msgid "Present"
+msgstr "Présent"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+msgid "Undo"
+msgstr "Annuler la présence"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+msgid "Undo the presence of this person?"
+msgstr "Annuler la présence de cette personne ?"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+msgid "Left"
+msgstr "Départ"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+msgid "Undo the departure"
+msgstr "Annuler le départ"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+msgid "Clear the departure time of this person?"
+msgstr "Effacer l'heure de départ de cette personne ?"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
+msgid "Person"
+msgstr "Personne"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
+msgid "Not present yet"
+msgstr "Pas encore présent"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__survey_filter__done
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__survey_filter__done
+msgid "Survey completed"
+msgstr "Sondage complété"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__survey_filter__in_progress
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__survey_filter__in_progress
+msgid "Survey started"
+msgstr "Sondage commencé"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__survey_filter__not_started
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__survey_filter__not_started
+msgid "Survey not started"
+msgstr "Sondage non commencé"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__sort_by__event_ticket_id
+msgid "Ticket"
+msgstr "Billet"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__sort_by__state
+msgid "Status"
+msgstr "Statut"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+#: model:ir.actions.act_window,name:rlq_survey_report.action_rlq_registration_desk
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_event_form_rlq_registration_desk
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_registration_desk_events
+#: code:addons/rlq_survey_report/models/event_registration_desk.py:0
+#: model:ir.model,name:rlq_survey_report.model_rlq_registration_desk
+msgid "RLQ registration desk"
+msgstr "Bureau d'inscription RLQ"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_form
+msgid "Refresh"
+msgstr "Actualiser"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+msgid "Name, e-mail address or company"
+msgstr "Nom, adresse courriel ou entreprise"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+msgid "« Present » records the hour of arrival. The questions listed under « Answers » are the survey questions checked « Show at the registration desk ». A survey belongs to a registration when it was answered by the same contact or with the same e-mail address."
+msgstr "« Présent » enregistre l'heure d'arrivée. Les questions listées sous « Réponses » sont les questions du sondage cochées « Afficher au bureau d'inscription ». Un sondage est rattaché à une inscription quand il a été rempli par le même contact ou avec la même adresse courriel."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_form
+#: model:ir.actions.act_window,name:rlq_survey_report.action_rlq_volunteer_coordinator
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_volunteer_coordinator_events
+#: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
+#: model:ir.model,name:rlq_survey_report.model_rlq_volunteer_coordinator
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_coordinator__table_html
+msgid "Volunteers"
+msgstr "Bénévoles"
+
+#. module: rlq_survey_report
+#: model:ir.actions.act_url,name:rlq_survey_report.action_rlq_guide_events
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_guide_events
+msgid "User guide"
+msgstr "Guide d'utilisation"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/event_registration_desk.py:0
+msgid "Registration desk: %(event)s"
+msgstr "Bureau d'inscription : %(event)s"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_survey_question__rlq_registration_desk
+msgid "Show at the registration desk"
+msgstr "Afficher au bureau d'inscription"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_survey_question__rlq_registration_desk
+msgid "If checked, the answer of each registered person to this question is shown in the RLQ registration desk of the event (Events > RLQ registration desk), and the answers are counted per ticket type. Useful for questions such as « On site or online? » or « Will you be there for lunch? »."
+msgstr "Si coché, la réponse de chaque inscrit à cette question est affichée dans le bureau d'inscription RLQ de l'événement (Événements > Bureau d'inscription RLQ), et les réponses sont comptées par type de billet. Utile pour des questions comme « Sur place ou en ligne ? » ou « Serez-vous présent pour le dîner ? »."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_survey_question__rlq_desk_label
+msgid "Short label at the registration desk"
+msgstr "Libellé court au bureau d'inscription"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_survey_question__rlq_desk_label
+msgid "Short name of this question in the registration desk (for example « Lunch »). Empty: the title of the question."
+msgstr "Nom court de cette question dans le bureau d'inscription (par exemple « Dîner »). Vide : le titre de la question."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_event_registration__rlq_departure
+msgid "Time when the person left the event, recorded with the « Left » button of the RLQ registration desk."
+msgstr "Heure à laquelle la personne a quitté l'événement, enregistrée avec le bouton « Départ » du bureau d'inscription RLQ."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_event_registration__rlq_desk_progress
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__sort_by__rlq_desk_progress
+msgid "Questions answered"
+msgstr "Questions répondues"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_event_registration__rlq_desk_progress
+msgid "Questions answered / questions of the survey expected for this registration (pages excluded). Empty: no survey."
+msgstr "Questions répondues / questions du sondage attendu pour cette inscription (pages exclues). Vide : aucun sondage."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_event_registration__rlq_desk_answers
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__sort_by__rlq_desk_answers
+msgid "Answers"
+msgstr "Réponses"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_event_registration__rlq_desk_answers
+msgid "Answers of this person to the survey questions checked « Show at the registration desk »."
+msgstr "Réponses de cette personne aux questions du sondage cochées « Afficher au bureau d'inscription »."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_registration_desk__event_id
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_coordinator__event_id
+msgid "By default: the event in progress, otherwise the next one."
+msgstr "Par défaut : l'événement en cours, sinon le prochain."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__search_text
+msgid "Search"
+msgstr "Recherche"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_registration_desk__search_text
+msgid "Part of a name, an e-mail address or a company: only the matching registrations are listed. The summary always counts the whole event."
+msgstr "Partie d'un nom, d'une adresse courriel ou d'une entreprise : seules les inscriptions correspondantes sont listées. Le sommaire compte toujours tout l'événement."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__hide_present
+msgid "Hide the people already present"
+msgstr "Masquer les personnes déjà présentes"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_registration_desk__survey_filter
+msgid "Lists only the registrations whose survey is in this state."
+msgstr "Liste seulement les inscriptions dont le sondage est dans cet état."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__survey_filter__all
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__survey_filter__all
+msgid "All"
+msgstr "Tous"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__sort_by
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_coordinator__sort_by
+msgid "Sort by"
+msgstr "Trier par"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_registration_desk__sort_by
+msgid "Order of the list below. Case and accents are ignored (« Élise » sorts with the « e »); equal values are sorted by ticket, then by name."
+msgstr "Ordre de la liste ci-dessous. Les majuscules et les accents sont ignorés (« Élise » est classée avec les « e ») ; à valeur égale, le tri se fait par billet, puis par nom."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__sort_by__create_date
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__sort_by__registered
+msgid "Registration date"
+msgstr "Date d'inscription"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__sort_by__date_closed
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__sort_by__arrived
+msgid "Arrival"
+msgstr "Arrivée"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__sort_by__rlq_departure
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__sort_by__departed
+msgid "Departure"
+msgstr "Départ"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__sort_desc
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_coordinator__sort_desc
+msgid "Descending"
+msgstr "Ordre décroissant"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_registration_desk__sort_desc
+msgid "Reverses the order of the list."
+msgstr "Inverse l'ordre de la liste."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__summary_html
+msgid "Summary"
+msgstr "Sommaire"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__registration_count
+msgid "Registrations listed"
+msgstr "Inscriptions listées"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
+msgid "Volunteers: %(event)s"
+msgstr "Bénévoles : %(event)s"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
+msgid "Some volunteer tickets have no survey: their volunteers are listed without answers."
+msgstr "Certains billets bénévoles n'ont pas de sondage : leurs bénévoles sont listés sans réponses."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
+msgid "No question about the roles (title containing « rôle ») in the survey « %(survey)s »."
+msgstr "Aucune question sur les rôles (titre contenant « rôle ») dans le sondage « %(survey)s »."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
+msgid "No question about the languages (title containing « langue ») in the survey « %(survey)s »."
+msgstr "Aucune question sur les langues (titre contenant « langue ») dans le sondage « %(survey)s »."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
+msgid "The survey « %(survey)s » has no question about the type (on site or online): the type is deduced from the roles questions that the volunteer answered."
+msgstr "Le sondage « %(survey)s » n'a pas de question sur le type (présentiel ou virtuel) : le type est déduit des questions sur les rôles auxquelles le bénévole a répondu."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
+msgid "No question about the type (on site or online) in the survey « %(survey)s »."
+msgstr "Aucune question sur le type (présentiel ou virtuel) dans le sondage « %(survey)s »."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_coordinator__survey_filter
+msgid "Lists only the volunteers whose survey is in this state."
+msgstr "Liste seulement les bénévoles dont le sondage est dans cet état."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_coordinator__sort_by
+msgid "Order of the table. Case and accents are ignored (« Élise » sorts with the « e »); equal values are sorted by name."
+msgstr "Ordre du tableau. Les majuscules et les accents sont ignorés (« Élise » est classée avec les « e ») ; à valeur égale, le tri se fait par nom."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__sort_by__type
+msgid "Type"
+msgstr "Type"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__sort_by__languages
+msgid "Languages spoken"
+msgstr "Langues parlées"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__sort_by__roles
+msgid "Number of roles"
+msgstr "Nombre de rôles"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_coordinator__sort_desc
+msgid "Reverses the order of the table."
+msgstr "Inverse l'ordre du tableau."

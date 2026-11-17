@@ -56,7 +56,7 @@ class EventRegistrationSurveyFollowup(models.Model):
     _inherit = "event.registration"
 
     rlq_survey_state = fields.Selection(
-        SURVEY_STATE_SELECTION, string="Survey", compute="_compute_rlq_survey_state",
+        SURVEY_STATE_SELECTION, string="Survey", compute="_compute_rlq_survey_state", search="_search_rlq_survey_state",
         help="State of the survey expected for this registration (the survey of its ticket, otherwise the survey of the event): "
              "completed, started, not started, or no survey.",
     )
@@ -71,6 +71,23 @@ class EventRegistrationSurveyFollowup(models.Model):
             survey, state, _done_at = status.get(registration.id, (False, "none", None))
             registration.rlq_survey_state = state
             registration.rlq_expected_survey_id = survey or False
+
+    @api.model
+    def _search_rlq_survey_state(self, operator, value):
+        """Makes the computed state of the survey usable in filters (v1.123.0): « Survey completed », « Survey not started »...
+
+        The state is not in the database, so the matching registrations (not cancelled; of the event of the registration desk
+        when the context names one) are found in Python and the domain becomes a list of ids.
+        """
+        if operator not in ("=", "!=", "in", "not in"):
+            raise ValueError("rlq_survey_state: unsupported search operator %r" % (operator,))
+        wanted = set(value) if isinstance(value, (list, tuple, set)) else {value}
+        domain = [("state", "!=", "cancel")]
+        if self.env.context.get("rlq_desk_event_id"):
+            domain.append(("event_id", "=", self.env.context["rlq_desk_event_id"]))
+        status = self.sudo().with_context(rlq_desk_event_id=False).search(domain)._rlq_survey_status_map()
+        ids = [registration_id for registration_id, (_survey, state, _done) in status.items() if state in wanted]
+        return [("id", "in" if operator in ("=", "in") else "not in", ids)]
 
     def _rlq_survey_status_map(self):
         """{registration id: (expected survey, state, end of the completed participation or None)} in TWO queries for the whole recordset."""

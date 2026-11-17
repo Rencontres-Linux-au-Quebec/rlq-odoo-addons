@@ -1,5 +1,254 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.125.0
+
+**Short title:** faster generation of the HTML report: anonymisation in one reading of the HTML, answer lines grouped without quadratic unions, timing of each step in the log.
+
+**Reason for the request:** the generation of the HTML report is long; see how to optimise it.
+
+**Diagnosis (what was measured, and what was not):**
+
+- No Odoo instance here: the real report could not be profiled. The code of `_compute_report()` was read, and the pure Python part was measured on fictitious reports.
+- Anonymisation (checked by default): `_anonymiser_html()` called `rb.remplacer_nom_complet()` for the name, the anchor and the e-mail address of EVERY participant, each one reading the whole HTML up to three times (three escaped forms). The time grew with participants x size of the report. Measured: 3.1 s for 100 participants and 1 MB; 28.7 s for 300 participants and 3 MB.
+- Answer lines of a survey were grouped per question with `recordset |= line` for each line: each union copies the recordset, so the time was quadratic for a matrix question with many answers. Not measured (needs Odoo).
+- `_respondent_nom()` was called for every answer line and read the contact with `sudo()` each time. Not measured (needs Odoo).
+
+**Changes:**
+
+- `models/report_builder.py`: new `remplacer_noms_complets(html, remplacements)`: every replacement in ONE reading of the HTML, with one regular expression built as a prefix tree (`_motif_trie()`); a control reading repeats while something is still found. Measured on the same fictitious reports: 0.08 s (100 participants, 1 MB), 0.22 s (300 participants, 3 MB), 0.59 s (600 participants, 8 MB); output identical to the old method on those reports. New `texte_chrono()`.
+- `models/rlq_survey_report_wizard.py`:
+  - `_anonymiser_html()` uses `rb.remplacer_noms_complets()`.
+  - `_compute_report()`: the answer lines are grouped per question as lists of ids, then `browse().with_prefetch()` (no union per line; the fields are still read in batch for the whole survey).
+  - `_respondent_nom()`: the name of a participation is read once and kept in the cache of the transaction (`CLE_CACHE_NOMS`), emptied at the start and at the end of each generation.
+  - One line in the server log at the end of each generation: total time, time of each step (surveys, synthesis and participants, anonymisation, saving), number of surveys, answers and participants, size of the HTML.
+- `tests/test_report_builder.py`: class `TestRemplacerNomsComplets` (inherits every test of the old function, plus 9 tests: several names, name + anchor + e-mail, same result as the old method on a fictitious report of 60 people, empty entries, duplicates, very long text, timing text).
+- `__manifest__.py`: version `18.0.1.125.0`. Guide (header, troubleshooting), `doc/NOTES_VALIDATION.md` (section -79).
+
+**Bugs fixed:**
+
+- Symptom: in an anonymised report, a name placed immediately after another replaced name could stay visible.
+- Diagnosis: the old method replaced one name at a time; "Participant 2" ends with a digit, so the next name looked "glued to a word character" and was skipped. Found by comparing the two methods on 4000 random texts (4 differences, all of this kind).
+- Fix: the single reading looks at the original text, so both names are replaced. Test `test_nom_colle_au_remplacement_precedent_n_est_plus_oublie`.
+
+**Safeguards and edge cases:**
+
+- Same rule as before: a name is replaced only when it is not glued to a letter, a digit or "_", in its three forms (attribute, text, raw), the longest first at a given position.
+- Only possible difference with the old method: two texts that overlap without starting at the same place ("Jean Dupont" and "Dupont Martin" in "Jean Dupont Martin"): the old method replaced the longest, the new one the first met; in both cases only one of the two can be replaced.
+- A text longer than 300 characters (never seen for a name or an address): the old method is used for the whole report.
+- The safety net that masks anything shaped like an e-mail address is unchanged.
+- The cache of names lives only during one transaction (one click), and is emptied at the start of each generation.
+
+**Checks:**
+
+- `./run-all.sh --sans-odoo`: ruff, syntax and manifest, standalone tests: OK.
+- Comparison old method / new method: identical output on fictitious reports of 1 MB and 3 MB; 4000 random adversarial texts: 4 differences, all in favour of the new method (see "Bugs fixed"), and nothing the old method could still replace remained in the new output.
+- Checked in the source of Odoo 18.0: `cr.cache`, `with_prefetch()`, `_prefetch_ids`.
+- The Odoo code was NOT run: the gain on the real report is not measured.
+
+**Action required:** update the module on DEV (`-u rlq_survey_report`), generate the same report as before and compare the time. Then send me the line of the server log that starts with "rlq_survey_report : rapport généré en": it tells which step takes the remaining time, so that the next optimisation is aimed at the right place.
+
+## 18.0.1.124.0
+
+**Short title:** local date and time (never UTC) on the registration desk and volunteers screens; user guide updated and added to the Events menu.
+
+**Reason for the request:** "add the local date and time (not UTC), and update the documentation (it must be in a menu)". Reading taken: (1) next to the program name and version shown under the screens since 1.123.0, show the date and time of the display, in local time; (2) every date and hour of these screens must be local time, not UTC; (3) the user guide must describe the new screens and be reachable from a menu by the people who use them.
+
+**Changes:**
+
+- `models/event_registration_desk.py`: new `local_zone(env, event)`: time zone of the user (the one of the browser, sent by the web client in the context, otherwise the one of the user's preferences), otherwise the time zone of the event, otherwise America/Toronto. `local_time()` uses it (before: the time zone of the event first). New `program_stamp(env, event)`: footer with program name, installed version, local date and time of the display, time zone.
+- `models/registration_desk_report.py`: `program_footer(program, version, shown_at, zone, lang)`: "rlq_survey_report 18.0.1.124.0 - affiché le 2026-11-16 21:15:02 EST (heure locale, America/Toronto)", in French or English.
+- `models/volunteer_coordinator.py`: same footer under the volunteers' table.
+- `views/event_registration_desk_views.xml`: action `action_rlq_guide_events` and menu Events > "User guide" (French: "Guide d'utilisation"), sequence 47, opens `/rlq_survey_report/aide#bureau-inscription` in a new tab.
+- `controllers/aide.py`: the guide is served to the users of the Events application too (before: Surveys users only).
+- `doc/Guide-utilisateur-rlq_survey_report.html`: header (version 18.0.1.124.0, 2026-11-16); section 15: where to open the guide, new subsection "Dates, heures et version affichées", hours of the summary described as local time.
+- `i18n/fr.po`: "User guide" -> "Guide d'utilisation".
+- `tests/test_registration_desk_report.py`: footer with date, time and zone (French, English, escaping). `tests/test_registration_desk.py`: new Odoo test `test_times_are_local_not_utc`.
+- `__manifest__.py`: version `18.0.1.124.0`. `doc/CONTEXTE.md`, `doc/NOTES_VALIDATION.md` (section -78).
+
+**Bugs fixed:**
+
+- Symptom: hours shown in UTC on the desk summary and the volunteers' table for some events.
+- Diagnosis: `local_time()` used the time zone of the EVENT first; an event whose time zone field is UTC therefore showed UTC hours, whatever the time zone of the person looking at the screen. Not confirmed on the instance (the time zone of the events was not checked).
+- Fix: the time zone of the user comes first (see `local_zone()`).
+
+**Safeguards and edge cases:**
+
+- The columns of the Odoo lists (registration date, arrival, departure) were already shown in the time zone of the browser by Odoo: unchanged.
+- The daily report by e-mail keeps the time zone of the event (it has no browser): unchanged.
+- No time zone anywhere (user without time zone, event without time zone): America/Toronto.
+- The footer shows the abbreviation of the zone (EST or EDT) and its name, so daylight saving time is unambiguous. Everything in it is escaped.
+- The guide stays restricted to connected internal users: Surveys users or Events users; anyone else gets "not found".
+
+**Checks:**
+
+- `./run-all.sh --sans-odoo`: ruff, syntax and manifest, standalone tests: OK.
+- XML of the view file parsed; `i18n/fr.po` rebuilt from the sources.
+- The Odoo code was NOT run: no Odoo instance here. The Odoo tests were not run.
+
+**Action required:** update the module on DEV (`-u rlq_survey_report`) and check the 3 points of `doc/NOTES_VALIDATION.md`, section -78.
+
+## 18.0.1.123.0
+
+**Short title:** registration desk and volunteers: French labels, sorting by any column, survey filter, most recent event first, version shown, volunteers' table fixed.
+
+**Reason for the request:** feedback with two screenshots of 18.0.1.122.0: (1) English words remain ("Registration desk", "Volunteers", "Registered on"...); (2) the event selector must list the events in reverse chronological order; (3) show the name of the program and its version; (4) everything must be sorted by the start date of the event; (5) it is not possible to sort or filter by survey completed or not; (6) survey values are missing in the volunteers' table.
+
+**Bugs fixed:**
+
+- English labels in a French session.
+  - Symptom: title "Registration desk: ...", menu "Volunteers", columns "Registered on", "Arrived at", "Left at", button "Refresh" and field "Event" of the volunteers' screen, note "Type question not found in the survey".
+  - Diagnosis: Odoo attaches a translation to a view, field, menu or action through the `#:` reference line of the entry, and loads the translation of a Python string (`_()`) only when the entry carries the comment `#. odoo-python`. Several entries added in 1.121 and 1.122 had no reference, and no code entry of the module had the comment (so the older messages of `event_registration_email.py`, `event_survey_followup.py` and `survey_survey.py` were not translated either).
+  - Fix: `i18n/fr.po` rebuilt from the sources (views, fields, selections, `_()` calls), every entry with its references; `#. odoo-python` added to every code entry, old ones included. The volunteers' screen gets a title ("Bénévoles : <event>") instead of "Nouveau".
+- Missing survey values in the volunteers' table.
+  - Symptom: no role for most volunteers, empty "Type" column, note "Type question not found".
+  - Diagnosis: only the FIRST question whose title contains "rôle" was used. The survey has two ("... (en virtuel) ?" and "... (en présentiel) ?"): the on-site roles were ignored. The type was searched only as a title containing "virtuel", which the roles question matched first.
+  - Fix: every roles question gets its columns, under its title, the on-site one first; the type question is recognized by its title or by its choices (présentiel, virtuel, en ligne, sur place...), never a roles question; without such a question the type is deduced from the roles questions the volunteer answered, and a note says so. A "Survey" column (completed, started, not started) explains the rows without answers.
+- Link on the name of a volunteer: `/chat/<id>` is not a route of Odoo for a contact. New route `/rlq_survey_report/chat/<contact>`: direct chat in Discuss when the contact has a user account, otherwise the contact form.
+- An answer starting with `<a ` was written without escaping in the volunteers' table (1.122.0). Every answer is now escaped.
+
+**Changes:**
+
+- `models/registration_desk_report.py`: `find_volunteer_questions()`, `role_kind()`, `deduced_type()`, `role_cells()`, `sort_volunteer_rows()`, `volunteer_sort_value()`, `program_footer()`, `volunteer_texts()`; `volunteer_table_html()` rewritten (two header rows, survey column, extra columns, notes).
+- `models/event_registration_desk.py`:
+  - `event.registration`: `_rlq_desk_participations()` (answers reader shared with the volunteers' table), `_rlq_desk_sort_keys()`, `_rlq_desk_sorted()`, `_rlq_desk_sorted_ids()`, and `_order_field_to_sql()` overridden ONLY with the context key `rlq_desk_event_id` (full list of the desk): text columns sorted without case or accents, computed columns (survey, questions answered, answers) sortable.
+  - `event.event`: `search_fetch()` lists the most recent event first when the context has `rlq_recent_first` and the caller gives no order (event selectors of this module and their "Search more" window).
+  - `rlq.registration.desk`: new fields `survey_filter`, `sort_by`, `sort_desc`; the search ignores accents; program name and version under the summary (`program_version()`).
+- `models/volunteer_coordinator.py` rewritten: fields `survey_filter`, `sort_by`, `sort_desc`, title, `_rlq_survey_layout()`, columns of the questions checked "Show at the registration desk", program name and version under the table.
+- `models/event_survey_followup.py`: `rlq_survey_state` gets a search method (`_search_rlq_survey_state`), so it can be used in filters.
+- `controllers/chat.py` (new): route `/rlq_survey_report/chat/<int:partner_id>` (internal users of Events only).
+- `views/event_registration_desk_views.xml`: `allow_order` on the computed columns; search view of the full list (person, present, not present yet, survey completed / started / not started / no survey, group by ticket or status); sort and filter fields on both screens; event selectors with `rlq_recent_first`.
+- `views/event_survey_followup_views.xml`, `views/event_registration_email_views.xml`: lists "Surveys not completed" and "Invalid e-mails" sorted by default with the most recent event first; event selector of "Surveys not completed" most recent first.
+- `tests/test_registration_desk_report.py` (19 standalone tests), `tests/test_registration_desk.py` (11 Odoo tests).
+- `__manifest__.py`: version `18.0.1.123.0`, description. Guide (section 15), `doc/CONTEXTE.md`, `doc/NOTES_VALIDATION.md` (section -77).
+
+**Sorting: what each screen does:**
+
+- Registration desk (the list under the summary): "Sort by" + "Descending", on every column, case and accents ignored. Clicking a header of this list also sorts, but with the raw comparison of the Odoo web client (capitals first, accented letters last): this cannot be changed without JavaScript.
+- "Open as a list": click any column header; case and accents ignored, computed columns included. No default grouping any more (group by ticket or status from the search bar).
+- Volunteers: "Sort by" + "Descending" + "Survey" filter. Not sortable by its headers (HTML table: its role columns depend on the survey).
+
+**Safeguards and edge cases:**
+
+- `_order_field_to_sql()` and `search_fetch()` behave as before without their context key: no other screen of Odoo is affected. Grouped queries and many2one or date columns go to the standard code.
+- The filter on the survey state computes the matching registrations in Python (not cancelled; only the event of the desk when opened from it).
+- Two roles questions with the same title in two volunteer surveys share their columns; choices are merged.
+- A free-text role ("Autre") is written in the "Autre" column; without such a column, in the last one.
+- A volunteer ticket without survey: its volunteers are listed without answers, and a note says so.
+- The chat route never fails: any error falls back to the contact form. A contact without account cannot receive a chat.
+
+**Checks:**
+
+- `./run-all.sh --sans-odoo`: ruff, syntax and manifest, standalone tests: OK.
+- XML of the three view files parsed; `i18n/fr.po` rebuilt by a script that stops if a term of the two screens has no translation.
+- Behaviour of Odoo read in the source of Odoo 18.0 (translation loading, `allow_order`, client-side sort, `_order_field_to_sql`, `name_search`, `channel_get`): see `doc/NOTES_VALIDATION.md`, section -77.
+- The Odoo code was NOT run: no Odoo instance here. The 11 Odoo tests were not run.
+
+**Action required:** update the module on DEV (`-u rlq_survey_report`), then check the 7 points of `doc/NOTES_VALIDATION.md`, section -77. If a label stays in English after the update, reload the French translations (Settings > Translations > Languages, update button of the language) or run the update with `--i18n-overwrite`.
+
+## 18.0.1.122.0
+
+**Short title:** registration desk: sorting, default order, registration date and departure; volunteers' coordinator.
+
+**Reason for the request:** feedback on the registration desk (18.0.1.121.0): the screen must be in ONE language (French and English both supported), events must be listed most recent first, the columns must be sortable (case and accents ignored), the registration date and time must be shown, and the volunteers' coordinator needs its own table built from the volunteer ticket survey only.
+
+**Choices made with the requester:**
+
+- Volunteers: only the registrations whose ticket name contains "bénévole" (any case, with or without accents); their answers come only from the survey of that ticket.
+- Type and languages: found by the title of the survey question ("virtuel" for the type, "langue" for the languages). Roles: the question whose title contains "rôle", one column per choice.
+- Name link: a link to the chat with the volunteer on Odoo (`<web.base.url>/chat/<partner id>`), see the action required below.
+- Arrival: the time of "Present" on the desk. Departure: a new "Left" button on the desk, recorded once.
+
+**Changes:**
+
+- `models/registration_desk_report.py`: `sort_key()` (casefold, accents removed), `is_volunteer_ticket()`, `volunteer_table_html()` (table of the volunteers, one column per role, escaped, name linked to the chat).
+- `models/event_registration_desk.py`: field `event.registration.rlq_departure` (readonly, not copied); methods `action_rlq_desk_depart()` and `action_rlq_desk_depart_undo()`; function `local_time()` (time in the time zone of the event); the rows of the desk carry the registration date, arrival, departure and event date. The desk list is sorted by ticket then name (accent-insensitive), then most recent event first (stable sort).
+- `models/volunteer_coordinator.py` (new): transient model `rlq.volunteer.coordinator` (event, table, Refresh). It reads the questions by title, the most advanced participation of each volunteer (same contact or e-mail address), and the answer lines.
+- `views/event_registration_desk_views.xml`: full list with `default_order="event_id desc, event_ticket_id, name"`, columns event, registration date, arrival, departure; buttons "Left" and "Undo the departure"; the desk list gets the same columns and buttons; form and menu "Volunteers" (Events, sequence 45).
+- `security/ir.model.access.csv`: access for `rlq.volunteer.coordinator` (event users).
+- `i18n/fr.po`: French strings of the new labels, menu, buttons and messages.
+- `tests/test_registration_desk_report.py`: 3 new standalone tests (accent-insensitive sort, volunteer tickets, volunteer table). `tests/test_registration_desk.py`: 2 new Odoo tests (departure, volunteer coordinator).
+- `__manifest__.py`: version `18.0.1.122.0`, description.
+- `doc/Guide-utilisateur-rlq_survey_report.html`, `doc/CONTEXTE.md`, `doc/NOTES_VALIDATION.md` (section -76).
+
+**Bugs fixed:** some labels of the registration desk were not translated (the French interface showed English labels such as "Registered", "Present since", "Questions answered"). Every label of the desk and of the volunteers' screen is now in `i18n/fr.po`. The word "Deck" does not appear anywhere in the code: if it is still seen on screen, the exact screen is needed to find where it comes from.
+
+**Safeguards and edge cases:**
+
+- Volunteer registrations of a ticket without survey are not listed; a note says so above the table.
+- A question not found (title without "virtuel", "langue" or "rôle") leaves its column empty, and a note is shown above the table.
+- The departure can only be recorded for a person present, once; "Undo the departure" clears it. A cancelled registration is never marked present.
+- Dates are shown in the time zone of the event (otherwise of the user, otherwise America/Toronto).
+- The volunteers' table is HTML and every value is escaped.
+
+**Sorting: what works and what does not (important):**
+
+- Clicking a column header sorts ONLY on the full list ("Ouvrir en liste") and only for stored columns: name, ticket, state, email, registration date, arrival, departure, event. Computed columns (survey state, questions answered, answers) cannot be sorted by Odoo.
+- The embedded list of the desk and the volunteers' table are NOT sortable by header. The desk list is sorted by event (most recent first), then ticket, then name; the volunteers' table is sorted by name. The role columns come from the survey (one per role), which an Odoo list cannot generate.
+- The sort key `sort_key()` ignores case and accents for the desk's Python sort. The header sorting of the full list is done by PostgreSQL, whose collation decides how accents sort. This has NOT been verified on DEV.
+
+**Checks:**
+
+- `ruff check` with the module's `ruff.toml`: passed.
+- Standalone tests (`tests.test_report_builder`, `tests.test_email_check`, `tests.test_followup_report`, `tests.test_registration_desk_report`): 188 tests, OK.
+- XML of the views and the manifest parsed.
+- The Odoo code was NOT run: no Odoo instance here (see `doc/NOTES_VALIDATION.md`, section -76).
+
+**Action required:** update the module on DEV (`-u rlq_survey_report`). Check: (1) Events > RLQ registration desk, labels in French; (2) "Ouvrir en liste" opens with the most recent event first, and clicking "Name" or "Registered on" sorts; (3) "Left", then "Undo the departure"; (4) Events > Volunteers: one row per volunteer, one column per role, and the name link opens the chat. If the link does not open a conversation, send me the URL that your Odoo version uses.
+
+## 18.0.1.121.0
+
+**Short title:** RLQ registration desk: surveys per ticket type, attendance per hour, answers to chosen questions.
+
+**Reason for the request:** a new option in the survey module to have a registration desk for an event that shows whether people completed their survey (number of questions completed and not completed) per ticket type, a count of the people marked present per hour, per ticket and in total, and, for each ticket, the answers to some survey questions (online or not, present for lunch or dinner, etc.).
+
+**Choices made with the requester:**
+
+- Form: a new dedicated screen (Events > RLQ registration desk), not an extension of the native attendee list.
+- Check-in: a « Present » button on each registration (native Odoo state, hour recorded), with « Undo ».
+- Questions shown: a box « Show at the registration desk » on each survey question.
+- Counts of questions: per person (8/12) and per ticket type.
+
+**Changes:**
+
+- `models/registration_desk_report.py` (new, pure Python): `question_progress()`, `progress_text()`, `answers_text()`, `ticket_summary()`, `hourly_attendance()`, `answers_breakdown()`, `desk_summary_html()`; labels in French or English (`TEXTS`).
+- `models/event_registration_desk.py` (new):
+  - `survey.question`: fields `rlq_registration_desk` (box) and `rlq_desk_label` (short label, optional).
+  - `event.registration`: computed fields `rlq_desk_progress` (« 8/12 ») and `rlq_desk_answers` (« Lunch: Yes | Mode: On site »); methods `_rlq_desk_map()`, `_rlq_desk_rows()`, `_rlq_desk_value()`, `action_rlq_desk_present()`, `action_rlq_desk_undo()`.
+  - `event.event`: `action_rlq_registration_desk()`.
+  - New transient model `rlq.registration.desk`: event, search, « Hide the people already present », summary, list of registrations; `action_refresh()`, `action_open_list()`.
+- `views/event_registration_desk_views.xml` (new): form of the desk, full list, menu Events > RLQ registration desk (sequence 43), button on the event form, block « Registration desk » on the survey question form.
+- `security/ir.model.access.csv`: `rlq.registration.desk` for `event.group_event_user`.
+- `i18n/fr.po`: French translations of the new strings.
+- `tests/test_registration_desk_report.py` (new, 10 standalone tests), `tests/test_registration_desk.py` (new, 4 Odoo tests), `tests/__init__.py`.
+- `run-all.sh` 1.3: the standalone step also runs `tests.test_registration_desk_report` (see `doc/run-all.changelog.txt`).
+- `doc/Guide-utilisateur-rlq_survey_report.html`: new section 15 « Bureau d'inscription » (sections 15 to 17 become 16 to 18); `doc/CONTEXTE.md`; `doc/NOTES_VALIDATION.md` section -75.
+- `__manifest__.py`: version `18.0.1.121.0`, new view file, description.
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:**
+
+- « Present » uses the native state `done` (`action_set_done()`), so the native registration desk and statistics of Odoo stay consistent. A cancelled registration is never marked present. « Undo » only acts on a registration that is present, and clears `date_closed`.
+- Only the people currently present are counted per hour (a presence that was undone is not counted). Hours are in the time zone of the event (`date_tz`), otherwise of the user, otherwise America/Toronto.
+- Cancelled registrations are neither listed nor counted. Unconfirmed registrations (`draft`) are listed (greyed) so that a person who shows up can be marked present.
+- Several participations for the same person: the most advanced one is used (completed, then started), the most recent among equals. Test entries are ignored.
+- Questions are counted without the pages. A conditional question never shown counts as not answered (Odoo does not record why a question has no answer). A registration without survey has no question count.
+- A person who did not answer a question shown at the desk is counted under « (no answer) »; a multiple-choice answer counts once per chosen value.
+- The survey data is read with `sudo()` (a desk volunteer may not have the rights of the Surveys application), in a fixed number of queries whatever the number of registrations. The summary contains no e-mail address; the e-mail column of the full list is hidden by default.
+- The summary is escaped (ticket names, question labels, free-text answers).
+- Optional fields (`event_ticket_id`, `date_closed`, `is_page`, `company_name`, value fields of the answer lines) are tested before use.
+- Same limit as « Surveys not completed »: a survey is matched by contact OR e-mail address, so several registrations made with the same contact show the same answers.
+- The answers are in ONE text column (« Label: value | Label: value »), not one column per question: an Odoo list cannot have columns that depend on the data.
+
+**Checks:**
+
+- `ruff check` with the module's `ruff.toml`: passed.
+- Standalone tests (`tests.test_report_builder`, `tests.test_email_check`, `tests.test_followup_report`, `tests.test_registration_desk_report`): OK.
+- XML of the new view file and the manifest parsed; `bash -n run-all.sh`.
+- The Odoo code was NOT run: no Odoo instance here. In particular the xpath `//sheet` on `survey.survey_question_form`, the row buttons in the embedded list and the fields of `survey.user_input.line` were not checked against this instance (see `doc/NOTES_VALIDATION.md`, section -75).
+
+**Action required:** update the module on DEV (`-u rlq_survey_report`). Check « Show at the registration desk » on one or two questions of a ticket survey, open Events > RLQ registration desk, mark a person present and undo it, and confirm the three tables of the summary. Then deploy to production.
+
 ## 18.0.1.120.0
 
 **Short title:** participant's e-mail with a registration summary, at the end of the survey.

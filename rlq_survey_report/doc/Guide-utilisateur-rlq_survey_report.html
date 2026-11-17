@@ -42,7 +42,7 @@
 <div class="page">
 
 <h1>Guide utilisateur — Rapport de sondage</h1>
-<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.118.0</strong> — mis à jour le 2026-10-22.<br>
+<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.125.0</strong> — mis à jour le 2026-11-16.<br>
 Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 
 <p>Ce module produit un compte-rendu détaillé — à l'écran, en fichier HTML, en PDF ou en Excel — des réponses à un ou plusieurs sondages Odoo, notamment les sondages de satisfaction envoyés après chaque rencontre. Il aide à repérer ce qui va bien, ce qui se dégrade, et à suivre les actions entreprises d'une rencontre à l'autre.</p>
@@ -68,6 +68,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
     <li><a href="#groupes">Groupes et étiquettes des inscrits et des sondages</a></li>
     <li><a href="#courriels-invalides">Adresses courriel invalides des inscriptions</a></li>
     <li><a href="#suivi-sondages">Sondages non complétés et rapport quotidien</a></li>
+    <li><a href="#bureau-inscription">Bureau d'inscription</a></li>
     <li><a href="#admin">Pour les administrateurs</a></li>
     <li><a href="#depannage">Dépannage</a></li>
     <li><a href="#limites">Limites et prudence</a></li>
@@ -399,7 +400,58 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 <p>Aucune adresse courriel d'inscrit n'y figure (Loi 25) : la liste à relancer reste dans Odoo. Le bouton <strong>Envoyer le rapport quotidien maintenant</strong> l'envoie tout de suite (pour l'essayer). Pour changer l'heure : Paramètres → Technique → Tâches planifiées (l'heure choisie est conservée par les mises à jour du module).</p>
 
 <!-- ============================================================ 15 -->
-<h2 id="admin">15. Pour les administrateurs</h2>
+<h2 id="bureau-inscription">15. Bureau d'inscription <span class="pastille">nouveau, v1.121 à v1.124</span></h2>
+<div class="encadre"><p>Ce guide s'ouvre aussi depuis l'application Événements : <strong>Événements → Guide d'utilisation</strong> (il s'ouvre directement à cette section). Les utilisateurs des sondages le trouvent toujours dans <strong>Sondage → Rapports détaillés → Guide d'utilisation</strong>.</p></div>
+<p>Un seul écran pour les bénévoles qui accueillent les gens le jour de l'événement : qui est inscrit, qui est arrivé, qui a rempli son sondage, et ce que chacun a répondu aux questions utiles sur place (en ligne ou sur place, présent pour le dîner, etc.).</p>
+<h3>Préparer : choisir les questions à afficher</h3>
+<ol>
+  <li>Ouvrez le sondage du billet (§&nbsp;11), puis la question voulue (par exemple « Serez-vous présent pour le dîner ? »).</li>
+  <li>Dans le bloc <strong>Bureau d'inscription</strong>, cochez <strong>Afficher au bureau d'inscription</strong>. Le <strong>libellé court</strong> (par exemple « Dîner ») remplace le titre de la question à l'écran ; laissez-le vide pour garder le titre.</li>
+</ol>
+<h3>Le jour de l'événement</h3>
+<ol>
+  <li>Ouvrez <strong>Événements → Bureau d'inscription RLQ</strong> (ou le bouton <strong>Bureau d'inscription RLQ</strong> du formulaire de l'événement). L'événement en cours, sinon le prochain, est déjà choisi.</li>
+  <li>Tapez une partie du nom, du courriel ou de l'entreprise dans <strong>Recherche</strong> pour trouver la personne. <strong>Masquer les personnes déjà présentes</strong> raccourcit la liste.</li>
+  <li>Cliquez <strong>Présent</strong> sur sa ligne : l'heure d'arrivée est enregistrée. <strong>Annuler la présence</strong> corrige une erreur.</li>
+  <li><strong>Actualiser</strong> recalcule le sommaire (utile quand plusieurs bénévoles pointent en même temps). <strong>Ouvrir en liste</strong> affiche les mêmes inscriptions dans une liste Odoo complète, regroupée par billet (recherche native, filtres, export).</li>
+</ol>
+<p>Chaque ligne montre le billet, l'état de l'inscription, l'état du sondage, les <strong>questions répondues</strong> (par exemple 8/12) et les <strong>réponses</strong> aux questions cochées.</p>
+<h3>Le sommaire</h3>
+<ul>
+  <li><strong>Par type de billet et au total</strong> : inscrits, présents, sondages complétés, commencés et non commencés, questions répondues et non répondues.</li>
+  <li><strong>Personnes marquées présentes, par heure</strong> : une ligne par heure, en <strong>heure locale</strong>, une colonne par billet, et le total.</li>
+  <li><strong>Réponses aux questions affichées</strong> : pour chaque réponse, le nombre de personnes par billet, le total et « dont présents » (par exemple, combien de dîners prévoir).</li>
+</ul>
+<p>« Présent » est l'état natif d'Odoo : le bureau d'inscription d'Odoo et ses statistiques voient la même chose. Les inscriptions annulées ne sont ni listées ni comptées. Une question conditionnelle que la personne n'a jamais vue compte comme non répondue. Un sondage est rattaché à une inscription par le même contact ou la même adresse courriel : si une personne a inscrit plusieurs participants avec son propre contact, ils montrent tous les mêmes réponses.</p>
+
+<h3>Trier et filtrer <span class="pastille">nouveau, v1.123</span></h3>
+<ul>
+  <li><strong>Dans le bureau d'inscription</strong> : <strong>Trier par</strong> (billet, nom, date d'inscription, statut, arrivée, départ, sondage, questions répondues, réponses) et <strong>Ordre décroissant</strong> classent la liste ; <strong>Sondage</strong> ne garde que les sondages complétés, commencés, non commencés ou les inscriptions sans sondage. Les majuscules et les accents sont ignorés : « Élise » est classée avec les « e ».</li>
+  <li><strong>Dans « Ouvrir en liste »</strong> : cliquez sur le nom d'une colonne pour trier, y compris Sondage, Questions répondues et Réponses, toujours sans tenir compte des majuscules ni des accents. Les filtres (Présent, Pas encore présent, Sondage complété, commencé, non commencé, Aucun sondage) et le regroupement par billet ou par statut sont dans la barre de recherche.</li>
+  <li>Cliquer sur un en-tête de la liste du bureau d'inscription lui-même trie aussi, mais avec le tri brut d'Odoo (majuscules d'abord, lettres accentuées à la fin) : préférez <strong>Trier par</strong>.</li>
+  <li>Dans les sélecteurs d'événement du module, les événements les plus récents sont en premier.</li>
+</ul>
+
+<h3>Dates, heures et version affichées <span class="pastille">nouveau, v1.124</span></h3>
+<ul>
+  <li>Toutes les dates et heures du bureau d'inscription et du tableau des bénévoles (inscription, arrivée, départ, présences par heure) sont en <strong>heure locale</strong>, jamais en UTC : le fuseau horaire est celui de votre navigateur (ou de vos préférences Odoo), sinon celui de l'événement, sinon America/Toronto.</li>
+  <li>Sous le sommaire et sous le tableau des bénévoles, une ligne indique le nom du module, sa version, puis la date et l'heure locales de l'affichage avec le fuseau, par exemple : <code>rlq_survey_report 18.0.1.124.0 - affiché le 2026-11-16 21:15:02 EST (heure locale, America/Toronto)</code>. Une capture d'écran dit ainsi quelle version l'a produite et quand.</li>
+</ul>
+
+<h3>Bénévoles <span class="pastille">v1.122, revu en v1.123</span></h3>
+<p>Événements &rarr; <strong>Bénévoles</strong> : un tableau pour le coordonnateur des bénévoles. Seules les inscriptions au billet dont le nom contient « bénévole » sont listées, et leurs réponses viennent uniquement du sondage de ce billet. Une ligne par bénévole : nom (lien pour lui écrire sur Odoo), date et heure de l'inscription, état du sondage, type (présentiel ou virtuel), langues parlées, heure d'arrivée et de départ, puis une colonne par choix de <strong>chaque</strong> question sur les rôles, sous le titre de la question (« Rôles pendant l'événement (en présentiel) ? » d'abord). Un <strong>X</strong> marque les rôles choisis ; une réponse libre (« Autre ») est écrite dans la colonne « Autre ».</p>
+<ul>
+  <li>Les questions sont reconnues par leur texte, sans tenir compte des majuscules ni des accents : <strong>rôles</strong> = titre contenant « rôle » ; <strong>langues</strong> = titre contenant « langue » ; <strong>type</strong> = une autre question à choix dont le titre ou les choix parlent de présentiel, virtuel, en ligne ou sur place.</li>
+  <li>Si le sondage n'a pas de question sur le type, il est <strong>déduit</strong> des questions sur les rôles auxquelles le bénévole a répondu (« en présentiel », « en virtuel »). Une note au-dessus du tableau le dit, ainsi que toute question introuvable.</li>
+  <li>Une ligne sans réponses a un sondage « Non commencé » : la personne n'a pas rempli le sondage, ou l'a rempli avec une autre adresse courriel que celle de son inscription.</li>
+  <li>Les autres questions cochées « Afficher au bureau d'inscription » dans ce sondage ajoutent chacune une colonne.</li>
+  <li><strong>Trier par</strong>, <strong>Ordre décroissant</strong> et <strong>Sondage</strong> classent et filtrent le tableau. Il ne se trie pas en cliquant sur ses en-têtes : ses colonnes dépendent du sondage, ce qu'une liste Odoo ne permet pas.</li>
+  <li>Le lien sur le nom ouvre la discussion directe avec la personne dans l'application Discussion si elle a un compte sur Odoo (interne ou portail) ; sinon il ouvre sa fiche de contact, d'où l'on peut lui écrire par courriel (« Envoyer un message »).</li>
+  <li>L'heure d'arrivée est celle du bouton <strong>Présent</strong> du bureau d'inscription, l'heure de départ celle du bouton <strong>Départ</strong>.</li>
+</ul>
+
+<!-- ============================================================ 16 -->
+<h2 id="admin">16. Pour les administrateurs</h2>
 <h3>Paramètres système</h3>
 <p>Réglages modifiables sans toucher au code, dans <strong>Paramètres (ou Réglages) → Technique → Paramètres système</strong> (le menu Technique exige le mode développeur) :</p>
 <table>
@@ -420,7 +472,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 <p>Le dossier du module contient <code>run-all.sh</code> : il lance ruff, les contrôles de syntaxe, les tests autonomes et — si PostgreSQL et Odoo sont installés — crée une base de test dédiée pour exécuter les tests Odoo, puis la supprime. Voir <code>scripts/LISEZMOI.md</code>. Les notes de conception se trouvent dans <code>doc/</code> (<code>CONTEXTE.md</code>, <code>CHANGELOG.md</code>, <code>NOTES_VALIDATION.md</code>).</p>
 
 <!-- ============================================================ 16 -->
-<h2 id="depannage">16. Dépannage</h2>
+<h2 id="depannage">17. Dépannage</h2>
 <table>
   <tr><th>Symptôme</th><th>Cause probable / solution</th></tr>
   <tr><td>Le bouton Générer ne fait rien</td><td>Vérifiez qu'au moins un sondage est sélectionné et que la case de confirmation est cochée.</td></tr>
@@ -432,6 +484,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
   <tr><td>Pas de Note globale pour une rencontre</td><td>Aucune des trois questions qui la composent n'a de réponse numérique pour cette rencontre.</td></tr>
   <tr><td>Un contour marqué ou un message de dérive</td><td>Ce sont des signaux à examiner (§&nbsp;6), pas forcément un problème confirmé.</td></tr>
   <tr><td>Un lien de date ouvre l'administration d'Odoo au lieu de défiler dans le rapport</td><td>Ce sondage ou événement n'est pas inclus dans ce rapport.</td></tr>
+  <tr><td>La génération du rapport est longue</td><td>Depuis la version 1.125, l'anonymisation ne relit plus tout le rapport pour chaque participant (c'était la cause principale pour un rapport de plusieurs centaines de participants). Si c'est encore long, réduisez le nombre de sondages ou la période, et demandez à l'administrateur la ligne du journal du serveur qui commence par « rlq_survey_report : rapport généré en » : elle donne la durée de chaque étape.</td></tr>
   <tr><td>La génération d'un PDF échoue ou reste incomplète</td><td>Dans « Options PDF », décochez « Tableaux de réponses par participant » et/ou « Saut de page forcé par participant ».</td></tr>
   <tr><td>Un avertissement dit qu'une date n'a pas été reconnue</td><td>Le titre du sondage ne suit pas le format attendu (ex. « 4 août 2026 ») : le message cite le titre en cause.</td></tr>
   <tr><td>Le nom d'un fichier est coupé dans l'historique</td><td>Le nom complet passe à la ligne dans la colonne « Télécharger » ; si ce n'était pas le cas, faites actualiser la page (Ctrl+F5) après la mise à jour du module.</td></tr>
@@ -440,7 +493,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 </table>
 
 <!-- ============================================================ 17 -->
-<h2 id="limites">17. Limites et prudence</h2>
+<h2 id="limites">18. Limites et prudence</h2>
 <ul>
   <li><strong>L'anonymisation réduit le risque, elle ne l'élimine pas</strong> : le contenu des réponses libres et un petit nombre de répondants peuvent permettre de reconnaître quelqu'un (§&nbsp;4).</li>
   <li><strong>Ni ce module ni ce guide ne donnent d'avis juridique.</strong> La conformité à la Loi 25 ou au RGPD, surtout pour une diffusion publique, relève d'une personne qualifiée.</li>

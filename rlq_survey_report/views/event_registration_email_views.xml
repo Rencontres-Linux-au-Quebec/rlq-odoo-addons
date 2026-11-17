@@ -8,7 +8,7 @@
         <field name="model">event.registration</field>
         <field name="priority">90</field>
         <field name="arch" type="xml">
-            <list string="Invalid e-mails" create="false" decoration-danger="rlq_email_issue == 'invalid'" decoration-warning="rlq_email_issue == 'typo'">
+            <list string="Invalid e-mails" create="false" default_order="event_id desc, name" decoration-danger="rlq_email_issue == 'invalid'" decoration-warning="rlq_email_issue == 'typo'">
                 <header>
                     <button name="action_rlq_fix_email" type="object" string="Fix and resend" class="btn-primary"/>
                 </header>
