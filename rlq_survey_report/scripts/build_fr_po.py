@@ -102,6 +102,7 @@ FR = {
     "Not present yet": "Pas encore présent",
     "Group By": "Regrouper par",
     "User guide": "Guide d'utilisation",
+    "Help for this page": "Aide de cette page",                      # v1.134.0: button of the desk and the volunteers
     "Export to a spreadsheet": "Exporter dans un chiffrier",
     "The spreadsheet export needs the Python library « openpyxl », which is not installed on this server (pip install openpyxl).":
         "L'export dans un chiffrier nécessite la bibliothèque Python « openpyxl », qui n'est pas installée sur ce serveur (pip install openpyxl).",

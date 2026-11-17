@@ -54,7 +54,8 @@ LIST_STATES = ("draft", "open", "done")
 PROGRAM = "rlq_survey_report"
 COMPUTED_SORTS = ("rlq_survey_state", "rlq_desk_progress", "rlq_desk_answers", "rlq_desk_person", "rlq_survey_done_date")
 MAP_SORTS = ("rlq_survey_state", "rlq_desk_progress", "rlq_desk_answers")      # the sorts that need _rlq_desk_map()
-CHAT_URL = "/rlq_survey_report/chat/%d"                                          # controllers/: opens Discuss with the contact
+CHAT_URL = "/rlq_survey_report/chat/%d"
+GUIDE_URL = "/rlq_survey_report/aide#%s"                                         # controllers/aide.py, section of the guide                                          # controllers/: opens Discuss with the contact
 STATE_ORDER = {"draft": 0, "open": 1, "done": 2, "cancel": 3}
 RECENT_EVENTS_FIRST = "date_begin desc, id desc"
 DEFAULT_ZONE = "America/Toronto"
@@ -94,6 +95,11 @@ def local_time(registration, value, pattern):
         return ""
     zone = local_zone(registration.env, registration.event_id)
     return fields.Datetime.context_timestamp(registration.with_context(tz=zone), value).strftime(pattern)
+
+
+def guide_action(env, anchor):
+    """Opens the user guide (controllers/aide.py) in a new tab, at the section `anchor` (v1.134.0)."""
+    return {"type": "ir.actions.act_url", "url": GUIDE_URL % anchor, "target": "new", "name": _("User guide")}
 
 
 def program_stamp(env, event=None):
@@ -476,7 +482,7 @@ class RlqRegistrationDesk(models.TransientModel):
          ("date_closed", "Arrival"), ("rlq_departure", "Departure"), ("rlq_survey_state", "Survey"),
          ("rlq_desk_progress", "Questions answered"), ("rlq_desk_answers", "Answers"),
          ("rlq_survey_done_date", "Survey submitted on")],
-        string="Sort by", default="event_ticket_id", required=True,
+        string="Sort by", default="name", required=True,                       # v1.134.0: by name by default
         help="Order of the list below. Case and accents are ignored (« Élise » sorts with the « e »); equal values are sorted by "
              "ticket, then by name.")
     sort_desc = fields.Boolean(string="Descending", default=False, help="Reverses the order of the list.")
@@ -599,6 +605,10 @@ class RlqRegistrationDesk(models.TransientModel):
     def action_refresh(self):
         """Button « Refresh »: the form is read again, so the summary and the list are computed again."""
         return True
+
+    def action_open_guide(self):
+        """v1.134.0: button « Help for this page »: the user guide, opened at the section of the registration desk."""
+        return guide_action(self.env, "bureau-inscription")
 
     def action_open_list(self):
         """The registrations of the event in a full list (native search, filters, grouping by ticket, export), same buttons."""

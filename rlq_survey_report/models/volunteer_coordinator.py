@@ -33,7 +33,7 @@ from odoo.exceptions import UserError
 
 from . import registration_desk_report as rd
 from . import report_builder as rb
-from .event_registration_desk import LIST_STATES, local_time, local_zone, program_stamp
+from .event_registration_desk import LIST_STATES, guide_action, local_time, local_zone, program_stamp
 
 try:
     import openpyxl
@@ -83,6 +83,10 @@ class RlqVolunteerCoordinator(models.TransientModel):
     def action_refresh(self):
         """Button « Refresh »: the form is read again, so the table is computed again."""
         return True
+
+    def action_open_guide(self):
+        """v1.134.0: button « Help for this page »: the user guide, opened at the section of the volunteers."""
+        return guide_action(self.env, "benevoles")
 
     def _rlq_volunteer_registrations(self):
         """Registrations (not cancelled) of the event whose ticket is a volunteer ticket."""

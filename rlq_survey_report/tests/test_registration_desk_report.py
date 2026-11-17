@@ -8,6 +8,7 @@
 
     python3 -m unittest tests.test_registration_desk_report -v
 """
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -118,7 +119,7 @@ class TestRegistrationDeskReport(unittest.TestCase):
         self.assertNotIn("Questions non répondues (%)", html)
         self.assertIn("Sondages complétés (%)", html)
         # Visitor: 1 completed of 3 with a survey -> 33,3 %, right-aligned like the counts; total: 2 of 4 (no survey excluded).
-        self.assertIn('<td style="text-align:right;">33,3\u00a0%</td>', html)
+        self.assertIn('text-align:right;">33,3\u00a0%</td>', html)
         self.assertIn("<strong>50,0\u00a0%</strong>", html)
         self.assertIn("50.0%", rd.desk_summary_html(ROWS, "en"))
         self.assertIn("(sans réponse) » : personnes inscrites", html)                          # the note explains it
@@ -126,14 +127,42 @@ class TestRegistrationDeskReport(unittest.TestCase):
     def test_answers_table_percentages_and_bold_questions(self):
         """v1.133.0: « % inscrits » and « % présents » next to « Total » and « dont présents »; the questions are in bold."""
         html = rd.desk_summary_html(ROWS)
-        self.assertIn("<th>% inscrits</th>", html)
-        self.assertIn("<th>% présents</th>", html)
-        self.assertIn("<td><strong>Lunch</strong></td>", html)
-        self.assertIn("<td><strong>Mode</strong></td>", html)
-        self.assertNotIn("<strong></strong>", html)                                            # the following lines stay empty
-        # Lunch « Yes »: 2 of the 4 registered people concerned -> 50,0 %, 2 of the 3 present -> 66,7 %.
-        self.assertIn('<td style="text-align:right;">2</td><td style="text-align:right;">50,0\u00a0%</td>'
-                      '<td style="text-align:right;">2</td><td style="text-align:right;">66,7\u00a0%</td>', html)
+        self.assertIn(">% inscrits</th>", html)
+        self.assertIn(">% présents</th>", html)
+        self.assertNotIn("<strong></strong>", html)
+        # v1.134.0: each question is framed (its own <tbody>), the question in ONE cell over all its answers.
+        self.assertEqual(html.count('<tbody style="border:2px solid'), 2)
+        self.assertRegex(html, r'<td rowspan="3"[^>]*><strong>Lunch</strong></td>')
+        self.assertRegex(html, r'<td rowspan="2"[^>]*><strong>Mode</strong></td>')
+        # Lunch « Yes »: 2 of the 4 registered people concerned -> 50,0 %; 2 present of those same 4 -> 50,0 % (v1.134.0:
+        # out of all the people concerned, no longer out of the people present only, which gave 100 % too often).
+        cells = re.findall(r"<td[^>]*>([^<]*)</td>", html.split("<strong>Lunch</strong>")[1].split("</tr>")[1])
+        self.assertEqual(cells, ["Yes", "1", "1", "2", "50,0\u00a0%", "2", "50,0\u00a0%"])
+
+    def test_tables_have_header_colour_and_stripes(self):
+        """v1.134.0: dark header with white text, one line out of two in pale grey, a border on every cell."""
+        html = rd.desk_summary_html(ROWS)
+        self.assertIn("background-color:%s;color:%s" % (rd.HEAD_BG, rd.HEAD_FG), html)
+        self.assertIn("background-color:%s" % rd.STRIPE_BG, html)
+        self.assertNotRegex(html, r"<t[dh]>")                                                  # every cell is styled
+        volunteers = rd.volunteer_table_html([{"name": "A"}, {"name": "B"}], [], "fr")
+        self.assertIn("background-color:%s;color:%s" % (rd.HEAD_BG, rd.HEAD_FG), volunteers)
+        self.assertIn("background-color:%s" % rd.STRIPE_BG, volunteers)
+
+    def test_weekly_registrations(self):
+        """v1.134.0: registrations per ISO week, empty weeks in between listed, cumulative total."""
+        rows = [dict(row("Visitor"), registered="2026-11-02 10:00"), dict(row("Visitor"), registered="2026-11-08 23:59"),
+                dict(row("Volunteer"), registered="2026-11-17 15:59"), dict(row("Visitor"), registered="")]
+        weekly = rd.weekly_registrations(rows, "fr")
+        self.assertEqual(weekly["tickets"], ["Visitor", "Volunteer"])
+        self.assertEqual([(w["week"], w["total"], w["cumulative"]) for w in weekly["weeks"]], [(45, 2, 2), (46, 0, 2), (47, 1, 3)])
+        self.assertEqual(str(weekly["weeks"][0]["monday"]), "2026-11-02")
+        self.assertEqual(str(weekly["weeks"][0]["sunday"]), "2026-11-08")
+        html = rd.desk_summary_html(rows, "fr")
+        self.assertIn("Inscriptions par semaine", html)
+        self.assertIn("Semaine 45 : 2026-11-02 au 2026-11-08", html)
+        self.assertIn("Week 47: 2026-11-16 to 2026-11-22", rd.desk_summary_html(rows, "en"))
+        self.assertEqual(rd.weekly_registrations([row("V")])["weeks"], [])                    # no date: no section
 
     def test_answers_that_differ_by_case_or_accents_are_grouped(self):
         rows = [row("Visitor", answers=[("Diet", ["Végétarien"])]), row("Visitor", answers=[("Diet", ["végétarien"])]),

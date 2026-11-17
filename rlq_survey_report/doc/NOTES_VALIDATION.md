@@ -6,6 +6,16 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -88. Aide de la page, couleurs des tableaux, inscriptions par semaine, % présents (v1.134.0)
+
+**À confirmer après `-u rlq_survey_report --i18n-overwrite` et Ctrl+F5 :**
+1. Bureau d'inscription et Bénévoles : bouton « Aide de cette page » ; il ouvre le guide à la bonne section, dans un nouvel onglet.
+2. Tous les tableaux : en-tête foncé à texte blanc, une ligne sur deux en gris pâle. Même chose dans la liste du bas et dans « Ouvrir en liste ».
+3. Tableau des réponses : chaque question encadrée, son nom dans une seule case en gras ; « % présents » n'est plus toujours 100 %.
+4. Nouvelle section « Inscriptions par semaine » (numéro de semaine, lundi au dimanche, total, cumul).
+5. Liste triée par nom à l'ouverture ; colonnes « Statut » et « Questions répondues » cachées (menu des colonnes pour les afficher).
+6. Si la liste d'Odoo ne prend pas les couleurs : noter la version d'Odoo (les sélecteurs de static/src/css/rlq_tables.css ne correspondent pas), rien d'autre n'est touché.
+
 ## -87. Bureau d'inscription : % de sondages complétés, % inscrits et % présents, date de soumission, heures de présence (v1.133.0)
 
 **À confirmer après `-u rlq_survey_report --i18n-overwrite` :**

@@ -1,5 +1,50 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.134.0
+
+**Short title:** registration desk and volunteers: "Aide de cette page" button, coloured tables (dark header, pale grey stripes), each question framed, "% présents" out of all the people concerned, registrations per week, sorted by name, "Statut" and "Questions répondues" hidden.
+
+**Reason for the request:** [0] "Assure-toi qu'il n'y a pas d'autres modifications en même temps sur ce dépôt"; [1] a button on the desk and "Bénévoles" pages to show the documentation of that page; [2] "une alternance de couleur dans tous les tableaux des nouvelles pages (en gris pâle) et l'entête d'une autre couleur plus foncée (mais lisible avec un bon contraste)"; [3] "Trié par nom par défaut"; [4] question: is the time change followed, or is "HNE" hard-coded?; [5] "Le % présents est toujours à 100 %, il devrait être basé sur le nombre total de la question"; [6] "il faut encadrer chacune des questions dans le tableau"; [7] "une section indiquant le nombre d'inscriptions par semaine (avec le numéro de semaine)"; [8] hide the columns "Questions" and "Statut".
+
+**[0] Concurrent changes:** before the work, `18.0` contained only PR #19 (merged 2026-11-17 16:02) after `feature/desk-columns-presence`, and no PR was open. Checked again before pushing.
+
+**[4] Answer, no change:** not hard-coded. `local_stamp()` takes the abbreviation from `strftime("%Z")` of a datetime converted with zoneinfo (America/Toronto by default), so it is "EST" in winter and "EDT" in summer; `zone_label()` only translates it to "HNE" / "HAE". Covered by `test_registration_desk_report` (2026-11-17 -> HNE, 2026-10-10 -> HAE).
+
+**Changes:**
+
+- `models/registration_desk_report.py`:
+  - New `cell_style()` and constants `HEAD_BG` (#34495e), `HEAD_FG` (#ffffff, contrast 9.9:1), `STRIPE_BG` (#f2f2f2), `TOTAL_BG`, `BORDER`, `GROUP_BORDER`: every cell of every table of the desk (tickets, weeks, hours, answers, reconciliation) and of the volunteers' table is styled inline (header, stripes, borders, totals). Inline because the HTML fields of Odoo do not load a style sheet of their own.
+  - `_row()`: new `stripe` and `first_attrs` arguments; a first cell `None` is left out (covered by a rowspan).
+  - Answers table: one `<tbody>` with a 2 px border per question, the question in ONE bold cell (rowspan) over all its answers.
+  - "% présents" = people present who gave the answer / all the registered people concerned by the question (same total as "% inscrits"). Note under the table updated.
+  - New `weekly_registrations()` and section "Inscriptions par semaine" / "Registrations per week" after the ticket table: ISO week number with its Monday and Sunday, one column per ticket, total and cumulative; empty weeks between the first and the last are listed with 0; dates in local time (the "registered" value of the rows).
+  - `volunteer_table_html()`: header, stripes and total lines styled the same way.
+- `models/event_registration_desk.py`: `guide_action()`, `GUIDE_URL`; `rlq.registration.desk.action_open_guide()` (section `#bureau-inscription`); "Sort by" default `name` (was `event_ticket_id`).
+- `models/volunteer_coordinator.py`: `action_open_guide()` (section `#benevoles`).
+- `views/event_registration_desk_views.xml`: button "Help for this page" / "Aide de cette page" on both pages; "Ouvrir en liste" ordered by name (`default_order="name"`, accents ignored by `_order_field_to_sql()`); columns "Statut" (`state`) and "Questions répondues" (`rlq_desk_progress`) `optional="hide"` in both lists; class `o_rlq_table` on both lists.
+- New `static/src/css/rlq_tables.css` (in `web.assets_backend`): same colours for the lists of Odoo carrying `o_rlq_table` only.
+- `doc/Guide-utilisateur-rlq_survey_report.html`: anchor `id="benevoles"`, desk section updated.
+- `scripts/build_fr_po.py`, `i18n/fr.po` (rebuilt): "Help for this page" -> "Aide de cette page".
+
+**Bugs fixed:**
+
+- [5] Symptom: "% présents" always 100 %. Diagnosis: it was "present with this answer / people present concerned by the question"; for a question answered the same way by everybody present (or with one answer), that is 100 % by construction. Fix: divided by all the registered people concerned by the question, as "% inscrits".
+- [6] Symptom: the answers table had no visible frame. Diagnosis: the table relied on the Bootstrap class `table-bordered` alone, not rendered in this HTML field. Fix: inline borders on every cell and one framed group per question.
+
+**Safeguards and edge cases:**
+
+- A question with one answer has no rowspan; empty first cells are never wrapped in `<strong>`.
+- Rows without a valid date of registration are not counted per week; no section when there is no date at all.
+- The list CSS targets only `o_rlq_table`: no other list of Odoo changes; if the selectors do not match, the list keeps the look of Odoo.
+- Columns hidden with `optional="hide"` are still loaded: the buttons and colours that use `state` keep working.
+
+**Checks performed:**
+
+- Standalone tests of run-all.sh: all [OK] (new: header colour and stripes, framed questions and new "% présents", registrations per week); ruff: OK; `scripts/build_fr_po.py`: all terms translated; view XML parsed.
+- New Odoo test (not run here, no Odoo instance): default sort by name, URLs of both help buttons.
+
+**Action required from the user:** `-u rlq_survey_report --i18n-overwrite` (new CSS file, views, translations), then reload the browser page (Ctrl+F5) so the new CSS is loaded. Then the points "v1.134.0" of `doc/NOTES_VALIDATION.md`.
+
 ## 18.0.1.133.0
 
 **Short title:** registration desk: "Sondages complétés (%)" instead of the question percentages, "% inscrits" and "% présents" in the answers table, questions in bold, date of submission of the survey, departure column hidden, "Sondage" column right in a form not saved yet, hours of arrival cleared and recorded again.

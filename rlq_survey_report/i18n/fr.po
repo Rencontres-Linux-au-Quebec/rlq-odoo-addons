@@ -586,6 +586,12 @@ msgstr "Actualiser"
 
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_form
+msgid "Help for this page"
+msgstr "Aide de cette page"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
 msgid "Name, e-mail address or company"
 msgstr "Nom, adresse courriel ou entreprise"
 
@@ -611,8 +617,10 @@ msgid "Export to a spreadsheet"
 msgstr "Exporter dans un chiffrier"
 
 #. module: rlq_survey_report
+#. odoo-python
 #: model:ir.actions.act_url,name:rlq_survey_report.action_rlq_guide_events
 #: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_guide_events
+#: code:addons/rlq_survey_report/models/event_registration_desk.py:0
 msgid "User guide"
 msgstr "Guide d'utilisation"
 

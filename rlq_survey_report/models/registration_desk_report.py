@@ -15,6 +15,7 @@ run by run-all.sh):
   progress_text(total, answered)      -> « 8/12 », or « » when the survey has no question.
   answers_text(answers)               -> « Lunch: Yes | On site: No » from [(label, [values])]; questions without answer left out.
   ticket_summary(rows)                -> one line per ticket + the total line (registered, present, surveys, questions).
+  weekly_registrations(rows)          -> registrations per ISO week (number, Monday to Sunday) and per ticket, with the cumulative.
   hourly_attendance(rows)             -> (hours, tickets, counts, totals per hour, totals per ticket, total) of the people present.
                                          Hours are LOCAL hours, formatted by the caller (never UTC).
   answers_breakdown(rows)             -> per question shown at the desk, per answer: count per ticket, total, of which present.
@@ -38,6 +39,7 @@ A row describes ONE registration (built by models/event_registration_desk.py):
 """
 import re
 import unicodedata
+from datetime import date, timedelta
 from html import escape
 
 DEFAULT_LANG = "fr_CA"
@@ -61,9 +63,16 @@ TEXTS = {
         "registered_pct": "% inscrits",
         "present_pct": "% présents",
         "pct_note": "« Sondages complétés (%) » : sondages complétés sur les inscriptions qui ont un sondage. « % inscrits » : "
-                    "personnes inscrites qui ont donné cette réponse, sur les inscrites concernées par la question ; « % "
-                    "présents » : même chose parmi les personnes présentes. Un choix multiple peut dépasser 100 % au total.",
+                    "personnes inscrites qui ont donné cette réponse, sur toutes les personnes inscrites concernées par la "
+                    "question ; « % présents » : personnes présentes qui ont donné cette réponse, sur ce même total. Un choix "
+                    "multiple peut dépasser 100 % au total.",
         "total": "Total",
+        "weeks_title": "Inscriptions par semaine",
+        "week": "Semaine",
+        "week_label": "Semaine %(week)d : %(monday)s au %(sunday)s",
+        "cumulative": "Cumul",
+        "weeks_note": "Semaines ISO (du lundi au dimanche), selon la date d'inscription en heure locale. Les inscriptions "
+                      "annulées ne sont pas comptées.",
         "hours_title": "Personnes marquées présentes, par heure",
         "hour": "Heure",
         "no_presence": "Personne n'est encore marqué présent.",
@@ -105,9 +114,16 @@ TEXTS = {
         "registered_pct": "% registered",
         "present_pct": "% present",
         "pct_note": "« Surveys completed (%) »: surveys completed out of the registrations that have a survey. « % registered »: "
-                    "registered people who gave this answer, out of the registered people concerned by the question; "
-                    "« % present »: the same among the people present. A multiple choice can exceed 100% in total.",
+                    "registered people who gave this answer, out of all the registered people concerned by the question; "
+                    "« % present »: people present who gave this answer, out of that same total. A multiple choice can exceed "
+                    "100% in total.",
         "total": "Total",
+        "weeks_title": "Registrations per week",
+        "week": "Week",
+        "week_label": "Week %(week)d: %(monday)s to %(sunday)s",
+        "cumulative": "Cumulative",
+        "weeks_note": "ISO weeks (Monday to Sunday), by the date of registration in local time. Cancelled registrations are "
+                      "not counted.",
         "hours_title": "People marked present, per hour",
         "hour": "Hour",
         "no_presence": "Nobody is marked present yet.",
@@ -227,6 +243,46 @@ def hourly_attendance(rows, lang=DEFAULT_LANG):
             "by_hour": by_hour, "by_ticket": by_ticket, "total": sum(by_hour.values())}
 
 
+def _row_date(row):
+    """The local date of registration of a row (« 2026-11-17 15:59 » -> date(2026, 11, 17)); None when missing or invalid."""
+    text = str(row.get("registered") or "").strip()[:10]
+    try:
+        return date(int(text[0:4]), int(text[5:7]), int(text[8:10]))
+    except (ValueError, IndexError):
+        return None
+
+
+def weekly_registrations(rows, lang=DEFAULT_LANG):
+    """v1.134.0: registrations per ISO week (Monday to Sunday) and per ticket, by the LOCAL date of registration.
+
+    Returns {"tickets": [...], "weeks": [{"year", "week", "monday", "sunday", "by_ticket": {ticket: n}, "total", "cumulative"}]}.
+    Weeks without any registration between the first and the last one are listed with 0, so the rhythm is visible. Rows
+    without a date are not counted."""
+    labels = texts(lang)
+    counts, tickets = {}, set()
+    for row in rows or ():
+        day = _row_date(row)
+        if day is None:
+            continue
+        monday = day - timedelta(days=day.weekday())
+        ticket = _ticket_name(row, labels)
+        tickets.add(ticket)
+        per_week = counts.setdefault(monday, {})
+        per_week[ticket] = per_week.get(ticket, 0) + 1
+    weeks, cumulative = [], 0
+    if counts:
+        monday, last = min(counts), max(counts)
+        while monday <= last:
+            by_ticket = counts.get(monday, {})
+            total = sum(by_ticket.values())
+            cumulative += total
+            year, week, _day = monday.isocalendar()
+            weeks.append({"year": year, "week": week, "monday": monday, "sunday": monday + timedelta(days=6),
+                          "by_ticket": by_ticket, "total": total, "cumulative": cumulative})
+            monday += timedelta(days=7)
+    return {"tickets": sorted(tickets, key=str.lower), "weeks": weeks}
+
+
 def answers_breakdown(rows, lang=DEFAULT_LANG):
     """Counts of the answers to the questions shown at the desk.
 
@@ -277,8 +333,33 @@ def answers_breakdown(rows, lang=DEFAULT_LANG):
     return sorted(tickets, key=str.lower), result
 
 
-_TABLE = '<table class="table table-sm table-bordered" style="width:auto;min-width:50%;">'
+# v1.134.0: every table of the desk and volunteers pages has the same look, in INLINE styles (the HTML fields of Odoo do not
+# load a style sheet of their own): dark header with white text (contrast 9.9:1, WCAG AAA), one line out of two in pale grey,
+# a border on every cell, total lines in a mid grey. Inline styles also survive a copy into an e-mail or a spreadsheet.
+HEAD_BG = "#34495e"
+HEAD_FG = "#ffffff"
+STRIPE_BG = "#f2f2f2"
+TOTAL_BG = "#dde3ea"
+BORDER = "1px solid #b8c0c8"
+GROUP_BORDER = "2px solid #34495e"
+_TABLE = ('<table class="table table-sm" style="width:auto;min-width:50%%;border-collapse:collapse;border:%s;">' % BORDER)
 _NUM = ' style="text-align:right;"'
+
+
+def cell_style(tag="td", numeric=False, stripe=False, total=False, extra=""):
+    """« style="..." » of one cell: header, pale grey line (stripe), total line, right-aligned number."""
+    parts = ["border:%s" % BORDER, "padding:2px 6px"]
+    if tag == "th":
+        parts += ["background-color:%s" % HEAD_BG, "color:%s" % HEAD_FG]
+    elif total:
+        parts += ["background-color:%s" % TOTAL_BG, "font-weight:bold"]
+    elif stripe:
+        parts.append("background-color:%s" % STRIPE_BG)
+    if numeric:
+        parts.append("text-align:right")
+    if extra:
+        parts.append(extra)
+    return ' style="%s;"' % ";".join(parts)
 
 
 class Number(str):
@@ -300,14 +381,21 @@ class Strong(str):
     """A text cell shown in bold (v1.133.0: the questions of the answers table)."""
 
 
-def _row(cells, tag="td", bold=False):
+def _row(cells, tag="td", bold=False, stripe=False, first_attrs=""):
+    """One line of a table. bold=True: a total line. stripe=True: pale grey background (one line out of two).
+    first_attrs: extra attributes of the first cell (v1.134.0: rowspan of the question in the answers table); a first cell
+    that is None is left out (covered by the rowspan of a previous line)."""
     out = []
     for index, cell in enumerate(cells):
+        if cell is None:
+            continue
         numeric = isinstance(cell, (int, Number))
         text = str(cell) if isinstance(cell, int) else escape(cell) if isinstance(cell, Number) else _clean(cell)
         if bold or (isinstance(cell, Strong) and text):
             text = "<strong>%s</strong>" % text
-        out.append("<%s%s>%s</%s>" % (tag, _NUM if index and numeric else "", text, tag))
+        style = cell_style(tag, numeric=bool(index and numeric), stripe=stripe, total=bold and tag == "td",
+                           extra="vertical-align:top;background-color:#ffffff" if index == 0 and first_attrs else "")
+        out.append("<%s%s%s>%s</%s>" % (tag, first_attrs if index == 0 else "", style, text, tag))
     return "<tr>%s</tr>" % "".join(out)
 
 
@@ -328,10 +416,22 @@ def desk_summary_html(rows, lang=DEFAULT_LANG):
     html = ["<h4>%s</h4>" % _clean(labels["tickets_title"]), _TABLE,
             "<thead>%s</thead><tbody>" % _row([labels["ticket"]] + [labels[k] for k in keys] + [labels["done_pct"]], tag="th")]
     lines, total = ticket_summary(rows, lang)
-    for line in lines:
-        html.append(_row([line["name"]] + _ticket_cells(line, keys, lang)))
+    for number, line in enumerate(lines):
+        html.append(_row([line["name"]] + _ticket_cells(line, keys, lang), stripe=number % 2 == 1))
     html.append(_row([total["name"]] + _ticket_cells(total, keys, lang), bold=True))
     html.append("</tbody></table>")
+
+    weekly = weekly_registrations(rows, lang)
+    if weekly["weeks"]:
+        html += ["<h4>%s</h4>" % _clean(labels["weeks_title"]), _TABLE, "<thead>%s</thead><tbody>" % _row(
+            [labels["week"]] + weekly["tickets"] + [labels["total"], labels["cumulative"]], tag="th")]
+        for number, week in enumerate(weekly["weeks"]):
+            label = labels["week_label"] % {"week": week["week"], "monday": week["monday"].isoformat(),
+                                            "sunday": week["sunday"].isoformat()}
+            html.append(_row([label] + [week["by_ticket"].get(t, 0) for t in weekly["tickets"]]
+                             + [week["total"], week["cumulative"]], stripe=number % 2 == 1))
+        html.append("</tbody></table>")
+        html.append('<p class="text-muted small">%s</p>' % _clean(labels["weeks_note"]))
 
     hourly = hourly_attendance(rows, lang)
     html.append("<h4>%s</h4>" % _clean(labels["hours_title"]))
@@ -339,9 +439,9 @@ def desk_summary_html(rows, lang=DEFAULT_LANG):
         html.append("<p>%s</p>" % _clean(labels["no_presence"]))
     else:
         html += [_TABLE, "<thead>%s</thead><tbody>" % _row([labels["hour"]] + hourly["tickets"] + [labels["total"]], tag="th")]
-        for hour in hourly["hours"]:
+        for number, hour in enumerate(hourly["hours"]):
             html.append(_row(["%s h" % hour] + [hourly["counts"].get((hour, t), 0) for t in hourly["tickets"]]
-                             + [hourly["by_hour"][hour]]))
+                             + [hourly["by_hour"][hour]], stripe=number % 2 == 1))
         html.append(_row([labels["total"]] + [hourly["by_ticket"][t] for t in hourly["tickets"]] + [hourly["total"]], bold=True))
         html.append("</tbody></table>")
 
@@ -350,16 +450,26 @@ def desk_summary_html(rows, lang=DEFAULT_LANG):
     if not questions:
         html.append("<p>%s</p>" % _clean(labels["no_desk_question"]))
     else:
-        html += [_TABLE, "<thead>%s</thead><tbody>" % _row(
+        html += [_TABLE, "<thead>%s" % _row(
             [labels["question"], labels["answer"]] + tickets
-            + [labels["total"], labels["registered_pct"], labels["of_which_present"], labels["present_pct"]], tag="th")]
+            + [labels["total"], labels["registered_pct"], labels["of_which_present"], labels["present_pct"]], tag="th")
+            + "</thead>"]
+        # v1.134.0: each question is framed (its own <tbody> with a thick border, the question in one cell over all its
+        # answers); « % présents » is out of ALL the people concerned by the question, like « % inscrits » (before: out of the
+        # people present only, so a question answered by everybody present always showed 100 %).
         for question in questions:
-            for index, answer in enumerate(question["answers"]):
-                html.append(_row([Strong(question["label"] if not index else ""), answer["value"]]
+            answers = question["answers"]
+            html.append('<tbody style="border:%s;">' % GROUP_BORDER)
+            for index, answer in enumerate(answers):
+                first = Strong(question["label"]) if not index else None
+                html.append(_row([first, answer["value"]]
                                  + [answer["by_ticket"].get(t, 0) for t in tickets]
                                  + [answer["total"], percent_text(answer["total"], question["registered"], lang),
-                                    answer["present"], percent_text(answer["present"], question["present"], lang)]))
-        html.append("</tbody></table>")
+                                    answer["present"], percent_text(answer["present"], question["registered"], lang)],
+                                 stripe=index % 2 == 1,
+                                 first_attrs=' rowspan="%d"' % len(answers) if not index and len(answers) > 1 else ""))
+            html.append("</tbody>")
+        html.append("</table>")
         html.append('<p class="text-muted small">%s</p>' % _clean(labels["no_answer_note"]))
         html.append('<p class="text-muted small">%s</p>' % _clean(labels["pct_note"]))
     return "".join(html)
@@ -507,8 +617,8 @@ def reconciliation_html(items, lang=DEFAULT_LANG):
     keys = ("survey_done", "matched_done", "duplicates", "cancelled_done", "unmatched_done", "tests")
     html = ["<h4>%s</h4>" % _clean(labels["reconcile_title"]), _TABLE,
             "<thead>%s</thead><tbody>" % _row([labels["survey"]] + [labels[k] for k in keys], tag="th")]
-    for item in items:
-        html.append(_row([item.get("survey") or ""] + [_int(item.get(k)) for k in keys]))
+    for number, item in enumerate(items):
+        html.append(_row([item.get("survey") or ""] + [_int(item.get(k)) for k in keys], stripe=number % 2 == 1))
     html.append("</tbody></table>")
     html.append('<p class="text-muted small">%s</p>' % _clean(labels["reconcile_note"]))
     return "".join(html)
@@ -690,20 +800,23 @@ def volunteer_table_html(rows, role_groups=(), lang=DEFAULT_LANG, extra_columns=
     fixed = [labels[k] for k in ("name", "registered", "survey", "type", "languages", "arrived", "departed")] + list(extra_columns)
     groups = [(index, group) for index, group in enumerate(role_groups or ()) if group.get("choices")]
     span = ' rowspan="2"' if groups else ""
-    head = "".join("<th%s>%s</th>" % (span, _clean(label)) for label in fixed)
-    head += "".join('<th colspan="%d" style="text-align:center;">%s</th>' % (len(g["choices"]), _clean(g["title"])) for _i, g in groups)
+    th = cell_style("th")
+    th_center = cell_style("th", extra="text-align:center")
+    head = "".join("<th%s%s>%s</th>" % (span, th, _clean(label)) for label in fixed)
+    head += "".join('<th colspan="%d"%s>%s</th>' % (len(g["choices"]), th_center, _clean(g["title"])) for _i, g in groups)
     html += ["<h4>%s</h4>" % _clean(labels["title"]), _TABLE, "<thead><tr>%s</tr>" % head]
     if groups:
-        html.append("<tr>%s</tr>" % "".join("<th>%s</th>" % _clean(choice) for _i, g in groups for choice in g["choices"]))
+        html.append("<tr>%s</tr>" % "".join("<th%s>%s</th>" % (th_center, _clean(choice)) for _i, g in groups for choice in g["choices"]))
     # v1.131.0: the totals per column, at the top (last line of the header) and at the bottom (footer) of the table.
     totals = volunteer_column_totals(rows, role_groups, len(extra_columns))
     total_cells = ["%s : %d" % (_clean(labels["column_total"]), totals[0]) if labels is VOLUNTEER_TEXTS["fr"]
                    else "%s: %d" % (_clean(labels["column_total"]), totals[0])] + [str(n) for n in totals[1:]]
     total_line = '<tr class="table-active">%s</tr>' % "".join(
-        '<th%s>%s</th>' % ("" if not index else ' style="text-align:center;"', cell) for index, cell in enumerate(total_cells))
+        '<th%s>%s</th>' % (cell_style(total=True, extra="text-align:center" if index else ""), cell)
+        for index, cell in enumerate(total_cells))
     html.append(total_line)
     html.append("</thead><tbody>")
-    for row in rows:
+    for number, row in enumerate(rows):
         name = _clean(row.get("name"))
         if row.get("chat_url"):
             name = '<a href="%s" target="_blank">%s</a>' % (escape(str(row["chat_url"]), quote=True), name)
@@ -717,6 +830,7 @@ def volunteer_table_html(rows, role_groups=(), lang=DEFAULT_LANG, extra_columns=
             values = role_values[index] if index < len(role_values) else ()
             cells += ['<span style="display:block;text-align:center;">%s</span>' % _clean(cell) if cell else ""
                       for cell in role_cells(group["choices"], values, labels["yes"])]
-        html.append("<tr>%s</tr>" % "".join("<td>%s</td>" % cell for cell in cells))
+        td = cell_style(stripe=number % 2 == 1)
+        html.append("<tr>%s</tr>" % "".join("<td%s>%s</td>" % (td, cell) for cell in cells))
     html.append("</tbody><tfoot>%s</tfoot></table><p>%s: %d</p>" % (total_line, _clean(labels["total"]), len(rows)))
     return "".join(html)

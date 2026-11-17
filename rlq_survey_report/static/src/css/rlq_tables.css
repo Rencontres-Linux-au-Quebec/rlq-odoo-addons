@@ -1,0 +1,31 @@
+/*
+ * v1.134.0 - Lists of the registration desk (« Bureau d'inscription RLQ » and « Ouvrir en liste »).
+ *
+ * Same look as the HTML tables of these pages (models/registration_desk_report.py, cell_style()):
+ * dark header with white text (#34495e on #ffffff, contrast 9.9:1), one line out of two in pale grey.
+ *
+ * Only the lists carrying the class « o_rlq_table » (views/event_registration_desk_views.xml) are touched:
+ * no other list of Odoo changes. `!important`: Odoo and Bootstrap set the background of the cells with
+ * their own rules (--bs-table-bg). If these selectors do not match your version of Odoo, nothing breaks:
+ * the list simply keeps the look of Odoo.
+ */
+.o_rlq_table .o_list_table thead th,
+.o_rlq_table .o_list_table thead th a,
+.o_rlq_table .o_list_table thead th span,
+.o_rlq_table .o_list_table thead th i {
+    background-color: #34495e !important;
+    color: #ffffff !important;
+}
+
+.o_rlq_table .o_list_table tbody tr.o_data_row:nth-of-type(even) > td {
+    background-color: #f2f2f2 !important;
+}
+
+.o_rlq_table .o_list_table tbody tr.o_data_row:nth-of-type(odd) > td {
+    background-color: #ffffff !important;
+}
+
+.o_rlq_table .o_list_table td,
+.o_rlq_table .o_list_table th {
+    border: 1px solid #b8c0c8;
+}

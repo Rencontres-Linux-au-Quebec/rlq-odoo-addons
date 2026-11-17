@@ -94,6 +94,17 @@ class TestRlqRegistrationDesk(TransactionCase):
         self.assertTrue(registration.date_closed)
         self.assertNotEqual(str(registration.date_closed), "2030-11-16 21:30:00")
 
+    def test_sorted_by_name_by_default_and_help_buttons(self):
+        """v1.134.0: the desk is sorted by name by default; both pages open the guide at their own section."""
+        zoe = self._registration("Zoé", "zoe@example.com")
+        eric = self._registration("éric", "eric@example.com")
+        desk = self.env["rlq.registration.desk"].create({"event_id": self.event.id})
+        self.assertEqual(desk.sort_by, "name")
+        self.assertEqual(desk.registration_ids.ids, (eric | zoe).ids)
+        self.assertEqual(desk.action_open_guide()["url"], "/rlq_survey_report/aide#bureau-inscription")
+        coordinator = self.env["rlq.volunteer.coordinator"].create({"event_id": self.event.id})
+        self.assertEqual(coordinator.action_open_guide()["url"], "/rlq_survey_report/aide#benevoles")
+
     def test_survey_columns_in_a_form_not_saved(self):
         """v1.133.0: in a form not saved yet, the registrations of the list are « new » copies (NewId): the survey state and
         the date of submission must be the ones of the real registration, not « No survey »."""

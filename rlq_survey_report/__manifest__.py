@@ -57,7 +57,7 @@ Copyright (C) 2026 Services-Conseils Linux Inc. (info@rencontres-linux.quebec)
 Copyright (C) 2026 Rencontres Linux au Québec contributors
 GNU Affero General Public License v3 or later (http://www.gnu.org/licenses/agpl)
 """,
-    "version": "18.0.1.133.0",
+    "version": "18.0.1.134.0",
     "category": "Marketing/Surveys",
     "author": "Services-Conseils Linux Inc. (info@rencontres-linux.quebec), Rencontres Linux au Québec contributors",
     "maintainer": "Rencontres Linux au Québec <info@rencontres-linux.quebec>",
@@ -90,6 +90,7 @@ GNU Affero General Public License v3 or later (http://www.gnu.org/licenses/agpl)
     "assets": {
         "web.assets_backend": [
             "rlq_survey_report/static/src/css/historique_fichiers.css",
+            "rlq_survey_report/static/src/css/rlq_tables.css",
         ],
     },
     "installable": True,
