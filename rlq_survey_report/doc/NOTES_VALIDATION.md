@@ -6,6 +6,16 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -90. Participants uniques, Présentiel, 1 à l'écran, confirmation une fois par page, menus « Rapports RLQ » (v1.136.0)
+
+**À confirmer après `-u rlq_survey_report --i18n-overwrite` :**
+1. Bureau, tableau par billet : colonne « Participants uniques (courriel) » ; une personne inscrite deux fois avec la même adresse compte 1.
+2. Bénévoles : colonne « Présentiel » (1 si sur place), total en haut et en bas ; les rôles affichent 1 au lieu de X ; sous le tableau, « Participants uniques (courriel) ».
+3. Chiffrier des bénévoles : colonne « Présentiel » avec des 1.
+4. « Ouvrir en liste », « Contacter les participants », « Exporter dans un chiffrier » : la fenêtre de confirmation apparaît la première fois seulement ; « Continuer » sans cocher affiche le message ; après, plus rien jusqu'à la réouverture de la page par le menu.
+5. Après la confirmation, l'export télécharge le fichier et la fenêtre se ferme (si elle reste ouverte, la fermer ; à signaler).
+6. Événements : un sous-menu « Rapports RLQ » contient Bureau d'inscription RLQ, Sondages non complétés, Bénévoles, Courriels invalides, Guide d'utilisation. Sondages : « Rapports RLQ » (ancien « Rapports détaillés »).
+
 ## -89. Réponses d'un participant, contact, recherche, téléphone, 1 dans le chiffrier, menus (v1.135.0)
 
 **À confirmer après `-u rlq_survey_report --i18n-overwrite` :**

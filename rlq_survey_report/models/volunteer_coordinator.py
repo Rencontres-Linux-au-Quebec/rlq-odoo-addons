@@ -51,6 +51,7 @@ CHOICE_TYPES = ("simple_choice", "multiple_choice")
 
 class RlqVolunteerCoordinator(models.TransientModel):
     _name = "rlq.volunteer.coordinator"
+    _inherit = ["rlq.pi.confirmation.mixin"]                              # v1.136.0: confirmation once per page
     _description = "Volunteers"
 
     @api.model
@@ -98,6 +99,9 @@ class RlqVolunteerCoordinator(models.TransientModel):
         """v1.135.0: button « Open as a list », as at the registration desk: the volunteers of the table in the full list
         (search on every column, filters, grouping, export, buttons « Present », « See the answers »...)."""
         self.ensure_one()
+        guard = self._rlq_pi_guard("action_open_list")
+        if guard:
+            return guard
         registrations = self._rlq_listed_registrations()
         return registration_list_action(self.env, _("Volunteers: %(event)s", event=self.event_id.name),
                                         [("id", "in", registrations.ids)], self.event_id.id)
@@ -105,6 +109,9 @@ class RlqVolunteerCoordinator(models.TransientModel):
     def action_contact(self):
         """v1.135.0: button « Contact the participants »: an e-mail to each volunteer of the table."""
         self.ensure_one()
+        guard = self._rlq_pi_guard("action_contact")
+        if guard:
+            return guard
         return contact_action(self.env, self._rlq_listed_registrations())
 
     def _rlq_volunteer_registrations(self):
@@ -270,6 +277,9 @@ class RlqVolunteerCoordinator(models.TransientModel):
 
         The file contains names and e-mail addresses: every export is written in the access history of the reports."""
         self.ensure_one()
+        guard = self._rlq_pi_guard("action_export_excel")                # v1.136.0: names and e-mail addresses in the file
+        if guard:
+            return guard
         if openpyxl is None:
             raise UserError(_("The spreadsheet export needs the Python library « openpyxl », which is not installed on this server "
                               "(pip install openpyxl)."))

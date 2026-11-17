@@ -100,6 +100,17 @@ FR = {
     "Group By": "Regrouper par",
     "User guide": "Guide d'utilisation",
     "Help for this page": "Aide de cette page",                      # v1.134.0: button of the desk and the volunteers
+    # v1.136.0: confirmation about personal information, once per page
+    "Confirmation": "Confirmation",
+    "This page shows personal information about the participants (names, e-mail addresses, phone numbers). I confirm that I am responsible for its confidentiality and will share it only with authorized people.":
+        "Cette page contient des renseignements personnels sur les participants (noms, courriels, téléphones). Je confirme être responsable de leur confidentialité et m'engage à ne les partager qu'avec les personnes autorisées.",
+    "Continue": "Continuer",
+    "Check the box about personal information to continue.":
+        "Cochez la case de confirmation concernant les renseignements personnels pour continuer.",
+    "Confirmation about personal information": "Confirmation concernant les renseignements personnels",
+    "I am responsible for the personal information shown": "Je suis responsable des renseignements personnels affichés",
+    "This page shows personal information about the participants (names, e-mail addresses, phone numbers). By checking this box, you confirm that you are aware of this responsibility and will share it only with authorized people (Loi 25 in Québec, GDPR in Europe).":
+        "Cette page contient des renseignements personnels sur les participants (noms, courriels, téléphones). En cochant cette case, vous confirmez être conscient(e) de cette responsabilité et vous engager à ne les partager qu'avec les personnes autorisées (Loi 25 au Québec, RGPD en Europe).",
     # v1.135.0: answers of a person, contact, search in more columns
     "See the answers": "Voir les réponses",
     "Contact the participants": "Contacter les participants",
@@ -129,8 +140,8 @@ FR = {
         'Modifier les réponses',
     'Example: correction asked by the person on the phone':
         'Exemple : correction demandée par la personne au téléphone',
-    'Click a question to change its answer. The questions changed are shown in bold; each one is written in the history (Surveys > Detailed reports > Manual changes of answers).':
-        "Cliquez sur une question pour changer sa réponse. Les questions modifiées sont en gras ; chacune est inscrite dans l'historique (Sondages > Rapports détaillés > Modifications manuelles des réponses).",
+    'Click a question to change its answer. The questions changed are shown in bold; each one is written in the history (Surveys > RLQ reports > Manual changes of answers).':
+        "Cliquez sur une question pour changer sa réponse. Les questions modifiées sont en gras ; chacune est inscrite dans l'historique (Sondages > Rapports RLQ > Modifications manuelles des réponses).",
     'Save the changes':
         'Enregistrer les changements',
     'Cancel':
@@ -151,8 +162,8 @@ FR = {
         'Modifié par',
     'No manual change yet.':
         "Aucune modification manuelle pour l'instant.",
-    'To change an answer: Surveys > Detailed reports > Edit answers, open the participation, then « Edit the answers ».':
-        'Pour changer une réponse : Sondages > Rapports détaillés > Modifier des réponses, ouvrez la participation, puis « Modifier les réponses ».',
+    'To change an answer: Surveys > RLQ reports > Edit answers, open the participation, then « Edit the answers ».':
+        'Pour changer une réponse : Sondages > Rapports RLQ > Modifier des réponses, ouvrez la participation, puis « Modifier les réponses ».',
     'Edit answers':
         'Modifier des réponses',
     'Open a participation, then click « Edit the answers ».':
@@ -406,7 +417,7 @@ def fr_for(msgid):
     """French translation of a term. v1.129.0: the TEXT of a view (between tags, not an attribute) is stored by Odoo as XML
     (odoo/tools/translate.py, serialize_xml: « > » becomes « &gt; », « & » becomes « &amp; »), so its msgid and its msgstr
     must be escaped the same way, otherwise Odoo never finds the translation (seen: « Click a question... (Surveys >
-    Detailed reports > ...) » stayed in English). FR is written with plain characters."""
+    RLQ reports > ...) » stayed in English). FR is written with plain characters."""
     if msgid in FR:
         return FR[msgid]
     raw = xml_unescape(msgid)

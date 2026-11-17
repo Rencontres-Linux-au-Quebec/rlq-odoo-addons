@@ -127,6 +127,16 @@ class TestRlqRegistrationDesk(TransactionCase):
         desk = self.env["rlq.registration.desk"].create({"event_id": self.event.id, "search_text": "végé"})
         self.assertEqual(desk.registration_ids, registration)
         action = desk.action_contact()
+        # v1.136.0: first the confirmation about personal information, once per page.
+        self.assertEqual(action["context"]["rlq_pi_next"], "action_contact")
+        self.assertEqual(action["res_model"], "rlq.registration.desk")
+        with self.assertRaises(UserError):
+            desk.with_context(rlq_pi_next="action_contact").action_rlq_pi_continue()     # box not checked
+        desk.rlq_pi_confirmed = True
+        action = desk.with_context(rlq_pi_next="action_contact").action_rlq_pi_continue()
+        self.assertEqual(action["res_model"], "mail.compose.message")
+        self.assertEqual(desk.action_open_list()["res_model"], "event.registration")     # not asked again on this page
+        action = desk.action_contact()
         self.assertEqual(action["res_model"], "mail.compose.message")
         self.assertEqual(action["context"]["default_res_ids"], registration.ids)
         self.assertEqual(action["context"]["default_composition_mode"], "mass_mail")
@@ -304,6 +314,8 @@ class TestRlqRegistrationDesk(TransactionCase):
         self._volunteer_setup()
         self._volunteer("Nadia Export", "nadia@example.com")
         coordinator = self.env["rlq.volunteer.coordinator"].create({"event_id": self.event.id})
+        self.assertEqual(coordinator.action_export_excel()["context"]["rlq_pi_next"], "action_export_excel")  # v1.136.0
+        coordinator.rlq_pi_confirmed = True
         action = coordinator.action_export_excel()
         self.assertIn(".xlsx", action["url"])
         attachment = self.env["ir.attachment"].search([("res_model", "=", "rlq.volunteer.coordinator"), ("res_id", "=", coordinator.id)])

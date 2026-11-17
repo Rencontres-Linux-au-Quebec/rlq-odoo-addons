@@ -422,7 +422,7 @@
         <field name="code">action = model.action_menu_autres()</field>
     </record>
 
-    <!-- Menu conteneur "Rapports détaillés", directement dans le menu "Sondage"
+    <!-- Menu conteneur "Rapports RLQ", directement dans le menu "Sondage"
          existant, comme demandé - avec les mêmes entrées que sous "Rapport de
          sondage" plus haut (sélection manuelle + les 4 raccourcis par
          catégorie).
@@ -433,8 +433,10 @@
          not found: survey.menu_surveys"). Il suffira alors de corriger ou de
          retirer ce bloc - le menu "Rapport de sondage" plus haut restera
          fonctionnel dans tous les cas. -->
+    <!-- v1.136.0: « Rapports RLQ » (was « Rapports détaillés »): every menu of this module is in a sub-menu of this name,
+         here in Surveys and in Events (menu_rlq_reports_events, event_survey_followup_views.xml). -->
     <menuitem id="menu_rlq_survey_report_in_survey_app"
-              name="Rapports détaillés"
+              name="Rapports RLQ"
               parent="survey.menu_surveys"
               sequence="50"
               groups="survey.group_survey_user"/>

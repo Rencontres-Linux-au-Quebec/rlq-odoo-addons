@@ -143,6 +143,52 @@
         </field>
     </record>
 
+    <!-- v1.136.0 - Confirmation about personal information, ONCE per page (rlq.pi.confirmation.mixin), before « Open as a
+         list », « Contact the participants » and « Export to a spreadsheet ». Same look as the one of the survey reports. -->
+    <record id="view_rlq_registration_desk_pi_confirmation" model="ir.ui.view">
+        <field name="name">rlq.registration.desk.form.pi.confirmation</field>
+        <field name="model">rlq.registration.desk</field>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <form string="Confirmation">
+                <sheet>
+                    <div class="alert alert-info" role="alert" style="display:flex;align-items:flex-start;gap:.6rem;">
+                        <span style="background:#fff;border:2px solid #000;border-radius:4px;padding:1px 3px;display:inline-flex;flex-shrink:0;margin-top:2px;">
+                            <field name="rlq_pi_confirmed" nolabel="1"/>
+                        </span>
+                        <label for="rlq_pi_confirmed" style="margin:0;" string="This page shows personal information about the participants (names, e-mail addresses, phone numbers). I confirm that I am responsible for its confidentiality and will share it only with authorized people."/>
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_rlq_pi_continue" type="object" string="Continue" class="btn-primary"/>
+                    <button special="cancel" string="Cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_rlq_volunteer_coordinator_pi_confirmation" model="ir.ui.view">
+        <field name="name">rlq.volunteer.coordinator.form.pi.confirmation</field>
+        <field name="model">rlq.volunteer.coordinator</field>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <form string="Confirmation">
+                <sheet>
+                    <div class="alert alert-info" role="alert" style="display:flex;align-items:flex-start;gap:.6rem;">
+                        <span style="background:#fff;border:2px solid #000;border-radius:4px;padding:1px 3px;display:inline-flex;flex-shrink:0;margin-top:2px;">
+                            <field name="rlq_pi_confirmed" nolabel="1"/>
+                        </span>
+                        <label for="rlq_pi_confirmed" style="margin:0;" string="This page shows personal information about the participants (names, e-mail addresses, phone numbers). I confirm that I am responsible for its confidentiality and will share it only with authorized people."/>
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_rlq_pi_continue" type="object" string="Continue" class="btn-primary"/>
+                    <button special="cancel" string="Cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
     <record id="action_rlq_registration_desk" model="ir.actions.act_window">
         <field name="name">RLQ registration desk</field>
         <field name="res_model">rlq.registration.desk</field>
@@ -182,9 +228,9 @@
 
     <menuitem id="menu_rlq_registration_desk_events"
               name="RLQ registration desk"
-              parent="event.event_main_menu"
+              parent="menu_rlq_reports_events"
               action="action_rlq_registration_desk"
-              sequence="43"
+              sequence="10"
               groups="event.group_event_user"/>
 
     <!-- v1.122.0 - Volunteers' coordinator (models/volunteer_coordinator.py): only the volunteer tickets. -->
@@ -228,9 +274,9 @@
 
     <menuitem id="menu_rlq_volunteer_coordinator_events"
               name="Volunteers"
-              parent="event.event_main_menu"
+              parent="menu_rlq_reports_events"
               action="action_rlq_volunteer_coordinator"
-              sequence="45"
+              sequence="30"
               groups="event.group_event_user"/>
 
     <!-- v1.124.0 - The user guide in the Events menu too (controllers/aide.py), opened at the registration desk section. -->
@@ -242,12 +288,12 @@
 
     <menuitem id="menu_rlq_guide_events"
               name="User guide"
-              parent="event.event_main_menu"
+              parent="menu_rlq_reports_events"
               action="action_rlq_guide_events"
-              sequence="47"
+              sequence="90"
               groups="event.group_event_user"/>
 
-    <!-- v1.135.0 - The pages of the events in the menu Surveys > Rapports détaillés too. -->
+    <!-- v1.135.0 - The pages of the events in the menu Surveys > Rapports RLQ too. -->
     <menuitem id="menu_rlq_registration_desk_surveys"
               name="RLQ registration desk"
               parent="menu_rlq_survey_report_in_survey_app"

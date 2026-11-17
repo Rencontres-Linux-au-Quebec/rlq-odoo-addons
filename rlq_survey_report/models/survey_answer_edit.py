@@ -10,14 +10,14 @@ survey_answer_edit.py
 
 Manual changes to the answers of a survey participation (v1.127.0).
 
-  - « Edit the answers » (button of a participation, menu Surveys > Detailed reports > Edit answers): the wizard
+  - « Edit the answers » (button of a participation, menu Surveys > RLQ reports > Edit answers): the wizard
     rlq.survey.answer.edit lists every question of the survey with the current answer; a click on a question opens its
     new answer, with the field that fits its type (text, number, scale, date, date and time, one choice, several
     choices, comment). Matrix questions are shown but cannot be changed here.
   - The answer is saved with survey.user_input._save_lines(), the method Odoo itself uses when a person answers: the
     statistics, scores and « save as e-mail » of Odoo stay consistent.
   - Every question changed writes one line in the history rlq.survey.answer.change (who, when, question, answer before,
-    answer after, reason). The history has its own menu (Surveys > Detailed reports > Manual changes of answers); it
+    answer after, reason). The history has its own menu (Surveys > RLQ reports > Manual changes of answers); it
     cannot be modified, only deleted by an administrator (right to erasure).
   - « Send the update by e-mail »: in the wizard (box), or from the history (button, for the selected changes): the
     person receives the list of the changes not yet sent, then all their answers as they are now. The changes are then

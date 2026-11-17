@@ -123,10 +123,18 @@
         </field>
     </record>
 
+    <!-- v1.136.0 - « Rapports RLQ » in Events: every menu of this module in the Events application is in this sub-menu
+         (defined here, the first view file of the manifest that puts a menu in Events). -->
+    <menuitem id="menu_rlq_reports_events"
+              name="RLQ reports"
+              parent="event.event_main_menu"
+              sequence="43"
+              groups="event.group_event_user"/>
+
     <menuitem id="menu_rlq_registration_email_events"
               name="Invalid e-mails"
-              parent="event.event_main_menu"
-              sequence="45"
+              parent="menu_rlq_reports_events"
+              sequence="40"
               groups="event.group_event_user"/>
     <menuitem id="menu_rlq_registration_email_list"
               name="Registrations with an invalid e-mail"

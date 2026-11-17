@@ -1,5 +1,42 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.136.0
+
+**Short title:** unique participants by e-mail, "Présentiel" column for the volunteers, 1 instead of "X" on screen, confirmation about personal information once per page, every menu of the module in a sub-menu "Rapports RLQ".
+
+**Reason for the request:** [1] "mettre dans le tableau le nombre de participants uniques (selon le courriel)"; [2] a column to know whether the volunteers will be on site; [3] on screen, replace the "X" by 1; [4] when sensitive information (e-mail) is shown, the window "Cochez la case de confirmation concernant les renseignements personnels", but only once per page; [4b] put every menu added by the module in a sub-menu "Rapports RLQ".
+
+**Concurrent changes:** checked before the work and before pushing: `18.0` unchanged since PR #19; PR #20 and #21 open, not merged; no other branch moved. This branch starts from PR #21, so merging it also brings #20 and #21.
+
+**Changes:**
+
+- `models/registration_desk_report.py`:
+  - `ticket_summary()`: new key `unique`, the different e-mail addresses (case and spaces ignored; a registration without address counts as one person), per ticket and for the whole event (a person with two tickets counts once in the total). New column "Participants uniques (courriel)" / "Unique participants (e-mail)" after "Inscrits".
+  - New `is_on_site()` ("Présentiel", "Sur place", "Hybride", or several types including one of them) and `unique_people()`.
+  - `volunteer_table_html()`: new column "Présentiel" / "On site" after "Type" (1 when on site), with its total in the header and the footer (`volunteer_column_totals()`); roles shown as "1" instead of "X" (`VOLUNTEER_TEXTS["yes"]`); under the table, "Participants uniques (courriel)".
+  - `volunteer_export_sheets()`: column "Présentiel" (the number 1, or empty) after "Type".
+- `models/event_registration_desk.py`: rows of the desk carry the e-mail; new abstract model `rlq.pi.confirmation.mixin` (field `rlq_pi_confirmed`, `_rlq_pi_guard()`, `action_rlq_pi_continue()`, allowed actions `PI_ACTIONS`); `rlq.registration.desk` inherits it; `action_open_list()` and `action_contact()` ask for the confirmation first. A download run after the confirmation also closes the window (`close`).
+- `models/volunteer_coordinator.py`: inherits the mixin; `action_open_list()`, `action_contact()` and `action_export_excel()` ask for the confirmation first.
+- `views/event_registration_desk_views.xml`: two confirmation windows (desk and volunteers), same look as the one of the survey reports; menus moved under "Rapports RLQ".
+- Menus: new `menu_rlq_reports_events` "RLQ reports" / "Rapports RLQ" in Events (`views/event_registration_email_views.xml`, the first view file that puts a menu in Events), containing the registration desk, the surveys not completed, the volunteers, the invalid e-mails and the guide; in Surveys, "Rapports détaillés" renamed "Rapports RLQ" (`views/rlq_survey_report_views.xml`), with the texts that name it (views, translations, guide, comments).
+- `scripts/fr_base.po`, `scripts/build_fr_po.py`, `i18n/fr.po` (rebuilt): new terms.
+- `doc/Guide-utilisateur-rlq_survey_report.html`: version 18.0.1.136.0 with its local time, menus, unique participants, "Présentiel", "1", confirmation.
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:**
+
+- The confirmation is stored on the page itself (a transient record): asked once, again only when the page is opened from the menu. `action_rlq_pi_continue()` runs only the actions of `PI_ACTIONS`, whatever the context says.
+- "Participants uniques" in the total can be lower than the sum of the tickets (one person, two tickets): intended.
+- `is_on_site()` uses the same words as the type of the volunteers (accents and case ignored); "Virtuel" alone or an empty type gives no 1.
+
+**Checks performed:**
+
+- Standalone tests of run-all.sh: all [OK] (new: unique people per ticket and in total, on site, "1" on screen, "Présentiel" in the spreadsheet); ruff: OK; `scripts/build_fr_po.py`: all terms translated; every view XML parsed.
+- Odoo tests updated and added (not run here, no Odoo instance): confirmation asked once, refused without the box, then contact, list and export.
+
+**Action required from the user:** `-u rlq_survey_report --i18n-overwrite` (new abstract model and field, views, menus, translations), then the points "v1.136.0" of `doc/NOTES_VALIDATION.md`.
+
 ## 18.0.1.135.0
 
 **Short title:** answers of a participant one click away ("Voir les réponses", "Modifier les réponses"), "Contacter les participants", "Ouvrir en liste" on the volunteers page, search in more columns, hidden phone column, 1 instead of "X" in the volunteers spreadsheet, pages in Surveys > Rapports détaillés, guide header.

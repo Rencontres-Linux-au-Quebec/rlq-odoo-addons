@@ -104,9 +104,9 @@
 
     <menuitem id="menu_rlq_survey_pending_events"
               name="Surveys not completed"
-              parent="event.event_main_menu"
+              parent="menu_rlq_reports_events"
               action="action_rlq_survey_pending"
-              sequence="44"
+              sequence="20"
               groups="event.group_event_user"/>
     <menuitem id="menu_rlq_survey_pending_survey"
               name="Surveys not completed (registrations)"

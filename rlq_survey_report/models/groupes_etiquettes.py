@@ -25,7 +25,7 @@ Fonctionnement :
     utilisateur (inscrits qui n'ont pas encore de compte portail) ne sont jamais touchés : une étiquette posée à la main leur reste.
   - Groupe SUPPRIMÉ (v1.104.0) : son étiquette est supprimée aussi (si aucun autre groupe ne l'utilise), donc retirée de tous les contacts.
     Groupe RENOMMÉ : l'étiquette est renommée (voir `write`).
-  - Menu Sondages > Rapports détaillés > « Vérifier les groupes et étiquettes » (assistant `rlq.groupes.verification`) : contrôle tous
+  - Menu Sondages > Rapports RLQ > « Vérifier les groupes et étiquettes » (assistant `rlq.groupes.verification`) : contrôle tous
     les événements, sondages, groupes et étiquettes, montre ce qui changerait et n'applique RIEN sans confirmation.
   - Paramètre système `rlq_survey_report.etiquettes_groupes` (défaut 1) : 0 = aucune étiquette créée ni synchronisée.
   - Jamais de blocage : toute erreur est journalisée et l'opération d'origine continue.

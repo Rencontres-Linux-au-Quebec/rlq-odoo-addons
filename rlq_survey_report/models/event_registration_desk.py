@@ -363,6 +363,7 @@ class EventRegistrationDesk(models.Model):
             hour = local_time(registration, closed, "%Y-%m-%d %H") if present and closed else None
             ticket = registration.event_ticket_id if "event_ticket_id" in registration._fields else False
             rows.append({"ticket": ticket.name if ticket else "", "present": present, "hour": hour,
+                         "email": registration.email or registration.partner_id.email or "",
                          "survey_state": item.get("state", "none"), "questions": item.get("questions", 0),
                          "answered": item.get("answered", 0), "answers": item.get("answers", []),
                          "registered": local_time(registration, registration.create_date, "%Y-%m-%d %H:%M"),
@@ -545,8 +546,52 @@ class EventEventRegistrationDesk(models.Model):
         }
 
 
+PI_ACTIONS = ("action_open_list", "action_contact", "action_export_excel")     # actions that show e-mail addresses
+
+
+class RlqPersonalInformationConfirmation(models.AbstractModel):
+    """v1.136.0: the confirmation about personal information, ONCE per page, before what shows e-mail addresses or phone
+    numbers (« Open as a list », « Contact the participants », « Export to a spreadsheet »), as for the survey reports
+    (v1.131.0). The page is a transient record: the box stays checked until the page is opened again from the menu."""
+    _name = "rlq.pi.confirmation.mixin"
+    _description = "Confirmation about personal information"
+
+    rlq_pi_confirmed = fields.Boolean(
+        string="I am responsible for the personal information shown", default=False,
+        help="This page shows personal information about the participants (names, e-mail addresses, phone numbers). By "
+             "checking this box, you confirm that you are aware of this responsibility and will share it only with authorized "
+             "people (Loi 25 in Québec, GDPR in Europe).",
+    )
+
+    def _rlq_pi_guard(self, method):
+        """None when the box is already checked on this page; otherwise the confirmation window, which runs `method` after."""
+        self.ensure_one()
+        if self.rlq_pi_confirmed:
+            return None
+        return {
+            "type": "ir.actions.act_window", "name": _("Confirmation"), "res_model": self._name, "res_id": self.id,
+            "view_mode": "form", "target": "new",
+            "views": [[self.env.ref("rlq_survey_report.view_%s_pi_confirmation" % self._name.replace(".", "_")).id, "form"]],
+            "context": {"rlq_pi_next": method},
+        }
+
+    def action_rlq_pi_continue(self):
+        """Button « Continue » of the confirmation window: checks the box, then runs the action that asked for it."""
+        self.ensure_one()
+        if not self.rlq_pi_confirmed:
+            raise UserError(_("Check the box about personal information to continue."))
+        method = self.env.context.get("rlq_pi_next")
+        if method not in PI_ACTIONS or not hasattr(self, method):
+            return {"type": "ir.actions.act_window_close"}
+        result = getattr(self, method)()
+        if isinstance(result, dict) and result.get("type") == "ir.actions.act_url":
+            result = dict(result, close=True)                             # a download: close this window too
+        return result
+
+
 class RlqRegistrationDesk(models.TransientModel):
     _name = "rlq.registration.desk"
+    _inherit = ["rlq.pi.confirmation.mixin"]
     _description = "RLQ registration desk"
 
     @api.model
@@ -711,10 +756,16 @@ class RlqRegistrationDesk(models.TransientModel):
     def action_contact(self):
         """v1.135.0: button « Contact the participants »: an e-mail to the registrations LISTED (same filters and search)."""
         self.ensure_one()
+        guard = self._rlq_pi_guard("action_contact")                     # v1.136.0: once per page
+        if guard:
+            return guard
         return contact_action(self.env, self._rlq_listed(self._rlq_all_registrations()))
 
     def action_open_list(self):
         """The registrations of the event in a full list (native search, filters, grouping by ticket, export), same buttons."""
         self.ensure_one()
+        guard = self._rlq_pi_guard("action_open_list")                   # v1.136.0: the list can show e-mails and phones
+        if guard:
+            return guard
         return registration_list_action(self.env, _("Registration desk: %(event)s", event=self.event_id.name),
                                         [("event_id", "=", self.event_id.id), ("state", "in", list(LIST_STATES))], self.event_id.id)

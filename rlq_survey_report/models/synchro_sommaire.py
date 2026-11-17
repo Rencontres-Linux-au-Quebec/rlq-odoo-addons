@@ -8,7 +8,7 @@
 synchro_sommaire.py
 ===================
 
-Sommaire « Synchronisation : sommaire » (v1.108.0), menu Sondages > Rapports détaillés.
+Sommaire « Synchronisation : sommaire » (v1.108.0), menu Sondages > Rapports RLQ.
 
 Répond à la question « est-ce que la synchronisation automatique est active, et pour quoi ? » sans fouiller les sondages et les événements un par un :
   - état de la tâche planifiée (active ou non, fréquence, dernier et prochain passage) ;

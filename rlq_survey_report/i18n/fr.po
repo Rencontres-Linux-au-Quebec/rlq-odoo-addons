@@ -218,6 +218,8 @@ msgstr "Corriger"
 
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_fix_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_pi_confirmation
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_pi_confirmation
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_edit_form
 msgid "Cancel"
 msgstr "Annuler"
@@ -464,6 +466,11 @@ msgid "Pivot table: %s"
 msgstr "Tableau croisé : %s"
 
 #. module: rlq_survey_report
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_reports_events
+msgid "RLQ reports"
+msgstr "Rapports RLQ"
+
+#. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_event_form_rlq_registration_desk
@@ -635,6 +642,26 @@ msgstr "« Présent » enregistre l'heure d'arrivée. Les questions listées sou
 
 #. module: rlq_survey_report
 #. odoo-python
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_pi_confirmation
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_pi_confirmation
+#: code:addons/rlq_survey_report/models/event_registration_desk.py:0
+msgid "Confirmation"
+msgstr "Confirmation"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_pi_confirmation
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_pi_confirmation
+msgid "This page shows personal information about the participants (names, e-mail addresses, phone numbers). I confirm that I am responsible for its confidentiality and will share it only with authorized people."
+msgstr "Cette page contient des renseignements personnels sur les participants (noms, courriels, téléphones). Je confirme être responsable de leur confidentialité et m'engage à ne les partager qu'avec les personnes autorisées."
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_pi_confirmation
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_pi_confirmation
+msgid "Continue"
+msgstr "Continuer"
+
+#. module: rlq_survey_report
+#. odoo-python
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_form
 #: model:ir.actions.act_window,name:rlq_survey_report.action_rlq_volunteer_coordinator
 #: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_volunteer_coordinator_events
@@ -676,8 +703,8 @@ msgstr "Exemple : correction demandée par la personne au téléphone"
 
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_edit_form
-msgid "Click a question to change its answer. The questions changed are shown in bold; each one is written in the history (Surveys &gt; Detailed reports &gt; Manual changes of answers)."
-msgstr "Cliquez sur une question pour changer sa réponse. Les questions modifiées sont en gras ; chacune est inscrite dans l'historique (Sondages &gt; Rapports détaillés &gt; Modifications manuelles des réponses)."
+msgid "Click a question to change its answer. The questions changed are shown in bold; each one is written in the history (Surveys &gt; RLQ reports &gt; Manual changes of answers)."
+msgstr "Cliquez sur une question pour changer sa réponse. Les questions modifiées sont en gras ; chacune est inscrite dans l'historique (Sondages &gt; Rapports RLQ &gt; Modifications manuelles des réponses)."
 
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_edit_form
@@ -733,8 +760,8 @@ msgstr "Aucune modification manuelle pour l'instant."
 
 #. module: rlq_survey_report
 #: model:ir.actions.act_window,help:rlq_survey_report.action_rlq_survey_answer_change
-msgid "To change an answer: Surveys &gt; Detailed reports &gt; Edit answers, open the participation, then « Edit the answers »."
-msgstr "Pour changer une réponse : Sondages &gt; Rapports détaillés &gt; Modifier des réponses, ouvrez la participation, puis « Modifier les réponses »."
+msgid "To change an answer: Surveys &gt; RLQ reports &gt; Edit answers, open the participation, then « Edit the answers »."
+msgstr "Pour changer une réponse : Sondages &gt; Rapports RLQ &gt; Modifier des réponses, ouvrez la participation, puis « Modifier les réponses »."
 
 #. module: rlq_survey_report
 #: model:ir.actions.act_window,name:rlq_survey_report.action_rlq_survey_answer_edit_participations
@@ -776,6 +803,12 @@ msgstr "Bureau d'inscription : %(event)s"
 #: code:addons/rlq_survey_report/models/event_registration_desk.py:0
 msgid "This person has not answered the survey yet."
 msgstr "Cette personne n'a pas encore répondu au sondage."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/event_registration_desk.py:0
+msgid "Check the box about personal information to continue."
+msgstr "Cochez la case de confirmation concernant les renseignements personnels pour continuer."
 
 #. module: rlq_survey_report
 #: model:ir.model.fields,field_description:rlq_survey_report.field_survey_question__rlq_registration_desk
@@ -864,6 +897,21 @@ msgstr "Nom du participant"
 #: model:ir.model.fields,help:rlq_survey_report.field_event_registration__rlq_desk_person
 msgid "Name of the participant. Click it to send a message to this person in Odoo (Discuss). Sorting by this column ignores case and accents."
 msgstr "Nom du participant. Cliquez dessus pour envoyer un message à cette personne dans Odoo (Discussion). Le tri de cette colonne ignore les majuscules et les accents."
+
+#. module: rlq_survey_report
+#: model:ir.model,name:rlq_survey_report.model_rlq_pi_confirmation_mixin
+msgid "Confirmation about personal information"
+msgstr "Confirmation concernant les renseignements personnels"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_pi_confirmation_mixin__rlq_pi_confirmed
+msgid "I am responsible for the personal information shown"
+msgstr "Je suis responsable des renseignements personnels affichés"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_pi_confirmation_mixin__rlq_pi_confirmed
+msgid "This page shows personal information about the participants (names, e-mail addresses, phone numbers). By checking this box, you confirm that you are aware of this responsibility and will share it only with authorized people (Loi 25 in Québec, GDPR in Europe)."
+msgstr "Cette page contient des renseignements personnels sur les participants (noms, courriels, téléphones). En cochant cette case, vous confirmez être conscient(e) de cette responsabilité et vous engager à ne les partager qu'avec les personnes autorisées (Loi 25 au Québec, RGPD en Europe)."
 
 #. module: rlq_survey_report
 #: model:ir.model.fields,help:rlq_survey_report.field_rlq_registration_desk__event_id

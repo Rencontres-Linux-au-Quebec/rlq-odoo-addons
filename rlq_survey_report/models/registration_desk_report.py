@@ -53,6 +53,7 @@ TEXTS = {
         "tickets_title": "Inscriptions et sondages par type de billet",
         "ticket": "Billet",
         "registered": "Inscrits",
+        "unique": "Participants uniques (courriel)",
         "present": "Présents",
         "done": "Sondages complétés",
         "in_progress": "Sondages commencés",
@@ -104,6 +105,7 @@ TEXTS = {
         "tickets_title": "Registrations and surveys per ticket type",
         "ticket": "Ticket",
         "registered": "Registered",
+        "unique": "Unique participants (e-mail)",
         "present": "Present",
         "done": "Surveys completed",
         "in_progress": "Surveys started",
@@ -200,17 +202,22 @@ def _ticket_name(row, labels):
 def ticket_summary(rows, lang=DEFAULT_LANG):
     """(lines, total): one dict per ticket, sorted by name, and the same dict for the whole event.
 
-    Keys: name, registered, present, done, in_progress, not_started, answered, unanswered. The questions are counted only for
+    Keys: name, registered, unique, present, done, in_progress, not_started, answered, unanswered. The questions are counted only for
     the registrations that have a survey: a person who did not start has all the questions of the survey « not answered ».
+    v1.136.0: « unique » counts the different e-mail addresses (case and spaces ignored): one person who registered several
+    times with the same address counts once; a registration without address counts as one person.
     """
     labels = texts(lang)
     keys = ("registered", "present", "done", "in_progress", "not_started", "answered", "unanswered")
-    lines = {}
+    lines, people = {}, {}
     total = dict.fromkeys(keys, 0)
     total["name"] = labels["total"]
-    for row in rows or ():
+    for number, row in enumerate(rows or ()):
         name = _ticket_name(row, labels)
         line = lines.setdefault(name, dict(dict.fromkeys(keys, 0), name=name))
+        person = " ".join(str(row.get("email") or "").lower().split()) or ("#", number)
+        people.setdefault(name, set()).add(person)
+        people.setdefault(None, set()).add(person)
         answered, unanswered = question_progress(row.get("questions"), row.get("answered"))
         state = row.get("survey_state")
         for target in (line, total):
@@ -220,6 +227,9 @@ def ticket_summary(rows, lang=DEFAULT_LANG):
                 target[state] += 1
                 target["answered"] += answered
                 target["unanswered"] += unanswered
+    for name, line in lines.items():
+        line["unique"] = len(people[name])
+    total["unique"] = len(people.get(None, ()))
     return sorted(lines.values(), key=lambda t: t["name"].lower()), total
 
 
@@ -412,7 +422,7 @@ def desk_summary_html(rows, lang=DEFAULT_LANG):
     rows = list(rows or ())
     if not rows:
         return "<p>%s</p>" % _clean(labels["no_registration"])
-    keys = ("registered", "present", "done", "in_progress", "not_started")
+    keys = ("registered", "unique", "present", "done", "in_progress", "not_started")
     html = ["<h4>%s</h4>" % _clean(labels["tickets_title"]), _TABLE,
             "<thead>%s</thead><tbody>" % _row([labels["ticket"]] + [labels[k] for k in keys] + [labels["done_pct"]], tag="th")]
     lines, total = ticket_summary(rows, lang)
@@ -495,14 +505,16 @@ VOLUNTEER_TEXTS = {
         "arrived": "Heure d'arrivée", "departed": "Heure de départ", "title": "Bénévoles", "total": "Bénévoles listés",
         "no_volunteer": "Aucun bénévole à afficher pour cet événement.",
         "done": "Complété", "in_progress": "Commencé", "not_started": "Non commencé", "none": "Aucun sondage",
-        "on_site": "Présentiel", "online": "Virtuel", "yes": "X", "column_total": "Total",
+        "on_site": "Présentiel", "online": "Virtuel", "yes": "1", "column_total": "Total",
+        "unique": "Participants uniques (courriel)",
     },
     "en": {
         "name": "Volunteer", "registered": "Registered on", "survey": "Survey", "type": "Type", "languages": "Languages spoken",
         "arrived": "Arrived at", "departed": "Left at", "title": "Volunteers", "total": "Volunteers listed",
         "no_volunteer": "No volunteer to show for this event.",
         "done": "Completed", "in_progress": "Started", "not_started": "Not started", "none": "No survey",
-        "on_site": "On site", "online": "Online", "yes": "X", "column_total": "Total",
+        "on_site": "On site", "online": "Online", "yes": "1", "column_total": "Total",
+        "unique": "Unique participants (e-mail)",
     },
 }
 
@@ -563,6 +575,17 @@ def find_volunteer_questions(questions):
             type_id = question["id"]
     roles.sort(key=lambda q: 0 if role_kind(q.get("title")) == "on_site" else 1)          # stable: keeps the survey order
     return {"roles": [q["id"] for q in roles], "languages": languages, "type": type_id, "arrival": arrival, "departure": departure}
+
+
+def is_on_site(type_text):
+    """v1.136.0: True when the type of a volunteer says they will be there in person (« Présentiel », « Sur place »,
+    « Hybride », or « Présentiel, Virtuel »); False for « Virtuel » alone or an empty type."""
+    return _has_word(type_text or "", ON_SITE_WORDS + ("hybride", "hybrid"))
+
+
+def unique_people(rows):
+    """v1.136.0: number of different people by e-mail address (case and spaces ignored); a row without address counts 1."""
+    return len({" ".join(str(row.get("email") or "").lower().split()) or ("#", index) for index, row in enumerate(rows or ())})
 
 
 def deduced_type(kinds, lang=DEFAULT_LANG):
@@ -657,9 +680,11 @@ def volunteer_column_totals(rows, role_groups=(), extra_count=0):
     completed surveys in the survey column, and the number of non-empty cells (a role chosen, an hour given...) elsewhere."""
     rows = list(rows or ())
     totals = [len(rows)]
-    for key in ("registered", "survey", "type", "languages", "arrived", "departed"):
+    for key in ("registered", "survey", "type", "on_site", "languages", "arrived", "departed"):
         if key == "survey":
             totals.append(sum(1 for row in rows if row.get("survey") == "done"))
+        elif key == "on_site":                                    # v1.136.0: the volunteers who will be there in person
+            totals.append(sum(1 for row in rows if is_on_site(row.get("type"))))
         else:
             totals.append(sum(1 for row in rows if str(row.get(key) or "").strip()))
     for index in range(extra_count):
@@ -733,14 +758,14 @@ def volunteer_export_sheets(rows, role_groups=(), lang=DEFAULT_LANG, extra_colum
     groups = [(index, group) for index, group in enumerate(role_groups or ()) if group.get("choices")]
     role_labels = _unique_labels([choice for _i, group in groups for choice in group["choices"]])
     header = _unique_labels([labels["name"], words["email"], words["ticket"], labels["registered"], labels["survey"], labels["type"],
-                             labels["languages"], labels["arrived"], labels["departed"]] + list(extra_columns)
+                             labels["on_site"], labels["languages"], labels["arrived"], labels["departed"]] + list(extra_columns)
                             + role_labels + [words["other_text"], words["roles_count"]])
     wide, long_roles, long_languages = [], [], []
     for row in rows or ():
         name = " ".join(str(row.get("name") or "").split())
         survey = labels.get(row.get("survey"), "")
         base = [name, row.get("email") or "", row.get("ticket") or "", row.get("registered_at") or row.get("registered") or "",
-                survey, row.get("type") or "", row.get("languages") or "", row.get("arrived") or "", row.get("departed") or ""]
+                survey, row.get("type") or "", 1 if is_on_site(row.get("type")) else None, row.get("languages") or "", row.get("arrived") or "", row.get("departed") or ""]
         extra = list(row.get("extra") or ())
         base += [extra[i] if i < len(extra) else "" for i in range(len(extra_columns))]
         role_values = list(row.get("roles") or ())
@@ -830,7 +855,7 @@ def volunteer_table_html(rows, role_groups=(), lang=DEFAULT_LANG, extra_columns=
     html = ["<p><em>%s</em></p>" % _clean(note) for note in notes or ()]
     if not rows:
         return "".join(html) + "<p>%s</p>" % _clean(labels["no_volunteer"])
-    fixed = [labels[k] for k in ("name", "registered", "survey", "type", "languages", "arrived", "departed")] + list(extra_columns)
+    fixed = [labels[k] for k in ("name", "registered", "survey", "type", "on_site", "languages", "arrived", "departed")] + list(extra_columns)
     groups = [(index, group) for index, group in enumerate(role_groups or ()) if group.get("choices")]
     span = ' rowspan="2"' if groups else ""
     th = cell_style("th")
@@ -856,8 +881,9 @@ def volunteer_table_html(rows, role_groups=(), lang=DEFAULT_LANG, extra_columns=
         survey = _clean(labels.get(row.get("survey"), ""))
         if row.get("answers_url") and survey:                     # v1.135.0: every answer of the survey of this person
             survey = '<a href="%s" target="_blank">%s</a>' % (escape(str(row["answers_url"]), quote=True), survey)
-        cells = [name, _clean(row.get("registered")), survey] + [_clean(text) for text in (
-            row.get("type"), row.get("languages"), row.get("arrived"), row.get("departed"))]
+        on_site = '<span style="display:block;text-align:center;">1</span>' if is_on_site(row.get("type")) else ""
+        cells = [name, _clean(row.get("registered")), survey, _clean(row.get("type")), on_site] + [_clean(text) for text in (
+            row.get("languages"), row.get("arrived"), row.get("departed"))]
         extra = list(row.get("extra") or ())
         cells += [_clean(extra[i] if i < len(extra) else "") for i in range(len(extra_columns))]
         role_values = list(row.get("roles") or ())
@@ -867,5 +893,6 @@ def volunteer_table_html(rows, role_groups=(), lang=DEFAULT_LANG, extra_columns=
                       for cell in role_cells(group["choices"], values, labels["yes"])]
         td = cell_style(stripe=number % 2 == 1)
         html.append("<tr>%s</tr>" % "".join("<td%s>%s</td>" % (td, cell) for cell in cells))
-    html.append("</tbody><tfoot>%s</tfoot></table><p>%s: %d</p>" % (total_line, _clean(labels["total"]), len(rows)))
+    html.append("</tbody><tfoot>%s</tfoot></table><p>%s: %d - %s: %d</p>" % (
+        total_line, _clean(labels["total"]), len(rows), _clean(labels["unique"]), unique_people(rows)))
     return "".join(html)

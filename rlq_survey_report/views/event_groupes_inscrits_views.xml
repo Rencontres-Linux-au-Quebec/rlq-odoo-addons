@@ -90,7 +90,7 @@
     </record>
 
     <!-- Assistant « Vérifier les groupes et étiquettes » (v1.104.0) : aperçu d'abord, changements seulement après confirmation.
-         Le menu est sous « Rapports détaillés » (menu_rlq_survey_report_in_survey_app, défini dans rlq_survey_report_views.xml,
+         Le menu est sous « Rapports RLQ » (menu_rlq_survey_report_in_survey_app, défini dans rlq_survey_report_views.xml,
          chargé avant ce fichier). Réservé aux responsables des sondages. -->
     <record id="view_rlq_groupes_verification_form" model="ir.ui.view">
         <field name="name">rlq.groupes.verification.form</field>

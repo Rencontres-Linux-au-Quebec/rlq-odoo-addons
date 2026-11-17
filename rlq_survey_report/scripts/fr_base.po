@@ -424,3 +424,8 @@ msgstr "(sans billet)"
 #: code:addons/rlq_survey_report/models/survey_survey.py:0
 msgid "Pivot table: %s"
 msgstr "Tableau croisé : %s"
+
+#. module: rlq_survey_report
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_reports_events
+msgid "RLQ reports"
+msgstr "Rapports RLQ"

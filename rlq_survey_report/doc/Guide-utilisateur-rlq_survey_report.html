@@ -42,7 +42,7 @@
 <div class="page">
 
 <h1>Guide utilisateur — Rapport de sondage</h1>
-<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.135.0</strong> du 2026-11-17 à 17 h 23 (heure locale, HNE).</p>
+<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.136.0</strong> du 2026-11-17 à 17 h 47 (heure locale, HNE).</p>
 
 <p>Ce module produit un compte-rendu détaillé — à l'écran, en fichier HTML, en PDF ou en Excel — des réponses à un ou plusieurs sondages Odoo, notamment les sondages de satisfaction envoyés après chaque rencontre. Il aide à repérer ce qui va bien, ce qui se dégrade, et à suivre les actions entreprises d'une rencontre à l'autre.</p>
 
@@ -77,14 +77,14 @@
 
 <!-- ============================================================ 1 -->
 <h2 id="acces">1. Accéder au rapport</h2>
-<p>Dans le menu <strong>Sondage</strong>, ouvrez <strong>Rapports détaillés</strong>. Seules les personnes ayant au moins le rôle « Utilisateur » du module Sondage voient ce menu. Il contient trois entrées :</p>
+<p>Dans le menu <strong>Sondage</strong>, ouvrez <strong>Rapports RLQ</strong>. Seules les personnes ayant au moins le rôle « Utilisateur » du module Sondage voient ce menu. Il contient trois entrées :</p>
 <table>
   <tr><th>Entrée</th><th>À quoi elle sert</th></tr>
   <tr><td><strong>Sélection manuelle des sondages</strong></td><td>Ouvre le formulaire de génération, à blanc. C'est le point de départ habituel (voir §&nbsp;2).</td></tr>
   <tr><td><strong>Actions de suivi (amélioration continue)</strong></td><td>Liste de tous les sondages, avec une colonne modifiable pour noter ce qui a été fait suite à chaque rencontre (voir §&nbsp;8).</td></tr>
   <tr><td><strong>Historique et fichiers déjà générés</strong></td><td>Qui a généré quoi, quand — et téléchargement des fichiers déjà produits, sans les régénérer (voir §&nbsp;9).</td></tr>
 </table>
-<figure class="capture"><b>Capture à ajouter — <code>01-menu-sondage.png</code></b><br>Le menu Sondage déroulé, avec « Rapports détaillés » et ses trois entrées.</figure>
+<figure class="capture"><b>Capture à ajouter — <code>01-menu-sondage.png</code></b><br>Le menu Sondage déroulé, avec « Rapports RLQ » et ses trois entrées.</figure>
 <div class="encadre"><p>Les anciens sous-menus « Premier mardi du mois », « Pause café », « Portes ouvertes »… n'existent plus : ils sont remplacés par la liste <strong>Filtrer par titre</strong> du formulaire (§&nbsp;3), qui fait la même chose sans quitter l'écran.</p></div>
 
 <!-- ============================================================ 2 -->
@@ -256,13 +256,13 @@
 <h2 id="suivi">8. Actions de suivi et commentaires internes</h2>
 <p>Un rapport montre où sont les problèmes ; ces deux champs permettent de noter ce qu'on en a fait, et de le retrouver la fois suivante.</p>
 <h3>Actions de suivi (par rencontre)</h3>
-<p>Notez, en texte libre, ce qui a été entrepris suite aux commentaires de cette rencontre (par exemple « Projecteur remplacé suite aux plaintes »). Deux endroits pour le faire : le menu <strong>Rapports détaillés → Actions de suivi (amélioration continue)</strong>, qui liste tous les sondages avec une colonne modifiable directement ; ou la fiche du sondage elle-même, dans le bloc « Amélioration continue ». La note est <strong>conservée</strong> et rappelée dans la section de cette rencontre à chaque rapport, ainsi que dans la liste consolidée de la Synthèse.</p>
+<p>Notez, en texte libre, ce qui a été entrepris suite aux commentaires de cette rencontre (par exemple « Projecteur remplacé suite aux plaintes »). Deux endroits pour le faire : le menu <strong>Rapports RLQ → Actions de suivi (amélioration continue)</strong>, qui liste tous les sondages avec une colonne modifiable directement ; ou la fiche du sondage elle-même, dans le bloc « Amélioration continue ». La note est <strong>conservée</strong> et rappelée dans la section de cette rencontre à chaque rapport, ainsi que dans la liste consolidée de la Synthèse.</p>
 <h3>Commentaire interne (par réponse)</h3>
 <p>Sur la fiche de la réponse d'<em>une</em> personne, le bloc « Commentaire (interne) » permet à l'équipe de noter une précision. Il est rappelé dans la fiche de cette personne, une fois le rapport généré.</p>
 
 <!-- ============================================================ 9 -->
 <h2 id="historique">9. Historique et fichiers déjà générés</h2>
-<p>Le menu <strong>Rapports détaillés → Historique et fichiers déjà générés</strong> garde une trace de chaque rapport affiché ou téléchargé, et permet de récupérer le fichier sans le régénérer.</p>
+<p>Le menu <strong>Rapports RLQ → Historique et fichiers déjà générés</strong> garde une trace de chaque rapport affiché ou téléchargé, et permet de récupérer le fichier sans le régénérer.</p>
 <table>
   <tr><th>Colonne</th><th>Contenu</th></tr>
   <tr><td>Date et heure · Utilisateur · Action</td><td>Qui a fait quoi : affiché à l'écran, téléchargé (HTML ou PDF) ou exporté (Excel).</td></tr>
@@ -340,18 +340,18 @@
 <h3>Mise à jour périodique d'un sondage (nouveau, v1.106)</h3>
 <p>Pour qu'un sondage soit remis à jour tout seul pendant que les gens répondent :</p>
 <ol>
-  <li>Menu <strong>Sondages → Rapports détaillés → Synchronisation périodique (sondages)</strong> (responsables des sondages), ou bloc <strong>Groupes des réponses</strong> du formulaire du sondage.</li>
+  <li>Menu <strong>Sondages → Rapports RLQ → Synchronisation périodique (sondages)</strong> (responsables des sondages), ou bloc <strong>Groupes des réponses</strong> du formulaire du sondage.</li>
   <li>Cochez <strong>Synchronisation périodique</strong> sur la ligne du sondage voulu et indiquez <strong>Toutes les (minutes)</strong> : <em>N</em> minutes, minimum 5.</li>
   <li>Les colonnes <em>Dernière synchronisation</em> et <em>Résultat</em> montrent le dernier passage ; la flèche circulaire de la ligne synchronise tout de suite.</li>
 </ol>
 <div class="encadre">
   <p>Une tâche planifiée (« RLQ Sondages et événements : synchronisation périodique des groupes et étiquettes ») s'exécute toutes les 5 minutes et ne traite que les sondages et événements cochés dont l'intervalle est écoulé : un intervalle de 15 minutes est donc respecté à ± 5 minutes près. <strong>Depuis la v1.108, cette tâche n'est active que si au moins une case est cochée</strong> ; sans case cochée, elle est désactivée et n'écrit plus rien dans le journal d'Odoo (elle se réactive seule dès qu'on coche une case). Les groupes sont de toute façon mis à jour <strong>tout de suite</strong> à chaque inscription créée ou modifiée, à chaque sondage terminé et à chaque création de compte : la synchronisation périodique ne sert qu'à rattraper un changement fait à la main.</p>
-  <p>L'intervalle proposé pour un nouveau sondage ou événement est de 15 minutes ; pour le changer : <em>Paramètres → Technique → Paramètres système</em>, clé <code>rlq_survey_report.synchro_minutes_defaut</code> (minimum 5). Le menu <strong>Sondages → Rapports détaillés → Synchronisation : sommaire</strong> dit en un coup d'œil si la tâche est active, quels sondages et événements sont cochés, et quel est l'intervalle par défaut.</p>
+  <p>L'intervalle proposé pour un nouveau sondage ou événement est de 15 minutes ; pour le changer : <em>Paramètres → Technique → Paramètres système</em>, clé <code>rlq_survey_report.synchro_minutes_defaut</code> (minimum 5). Le menu <strong>Sondages → Rapports RLQ → Synchronisation : sommaire</strong> dit en un coup d'œil si la tâche est active, quels sondages et événements sont cochés, et quel est l'intervalle par défaut.</p>
 </div>
 <h3>Mise à jour d'un événement précis (nouveau, v1.107)</h3>
-<p>Même principe pour les événements : menu <strong>Sondages → Rapports détaillés → Synchronisation périodique (événements)</strong> (événements qui ont un préfixe de groupes), ou bloc <strong>Groupes des inscrits</strong> du formulaire de l'événement. La flèche circulaire d'une ligne (ou le bouton « Créer / synchroniser les groupes ») met l'événement à jour tout de suite ; la case et l'intervalle (<em>N</em> minutes, minimum 5) le font automatiquement <strong>jusqu'au lendemain de la fin de l'événement</strong>, puis la synchronisation s'arrête seule.</p>
+<p>Même principe pour les événements : menu <strong>Sondages → Rapports RLQ → Synchronisation périodique (événements)</strong> (événements qui ont un préfixe de groupes), ou bloc <strong>Groupes des inscrits</strong> du formulaire de l'événement. La flèche circulaire d'une ligne (ou le bouton « Créer / synchroniser les groupes ») met l'événement à jour tout de suite ; la case et l'intervalle (<em>N</em> minutes, minimum 5) le font automatiquement <strong>jusqu'au lendemain de la fin de l'événement</strong>, puis la synchronisation s'arrête seule.</p>
 <h3>Vérifier et corriger</h3>
-<p>Menu <strong>Sondages → Rapports détaillés → Vérifier les groupes et étiquettes</strong> : un aperçu liste ce qui serait changé (groupes de billets manquants, étiquettes à créer ou renommer, participants à ajouter ou retirer). <strong>Rien n'est modifié</strong> avant le clic sur « Appliquer les changements » et la confirmation.</p>
+<p>Menu <strong>Sondages → Rapports RLQ → Vérifier les groupes et étiquettes</strong> : un aperçu liste ce qui serait changé (groupes de billets manquants, étiquettes à créer ou renommer, participants à ajouter ou retirer). <strong>Rien n'est modifié</strong> avant le clic sur « Appliquer les changements » et la confirmation.</p>
 <h3>Étiquettes</h3>
 <ul>
   <li>L'étiquette porte le nom du groupe ; renommer le groupe renomme l'étiquette ; supprimer le groupe supprime l'étiquette (sauf si un autre groupe l'utilise).</li>
@@ -366,7 +366,7 @@
 <p>Une personne qui écrit <code>marie@gmail'com</code> (apostrophe au lieu du point) ne reçoit jamais sa confirmation. Le module repère maintenant chaque inscription dont l'adresse est <strong>invalide</strong> (impossible à livrer telle quelle), contient une <strong>faute de frappe probable</strong> (<code>gmial.com</code>, <code>hotmal.com</code>) ou est <strong>jetable</strong>, et propose la correction quand elle se devine sans demander à la personne.</p>
 <ul>
   <li><strong>À l'inscription</strong> : une erreur de ponctuation ou d'espace qui ne change aucune lettre (<code>gmail'com</code>, <code>gmail..com</code>, <code>marie @gmail.com</code>) est corrigée automatiquement <em>avant</em> la création de l'inscription — le courriel de confirmation part donc à la bonne adresse ; une note est ajoutée à l'inscription. L'inscription n'est jamais refusée.</li>
-  <li><strong>Menu Événements → Courriels invalides → Inscriptions avec un courriel invalide</strong> (aussi dans Sondages → Rapports détaillés) : la liste, avec la correction suggérée. Le bouton <strong>Corriger et renvoyer</strong> (sur une ligne, ou sur plusieurs lignes cochées) ouvre une fenêtre où l'on accepte ou modifie chaque adresse ; il corrige l'inscription, son contact (seulement s'il porte la même adresse erronée), remet en file les courriels en échec de cette inscription et renvoie la confirmation.</li>
+  <li><strong>Menu Événements → Courriels invalides → Inscriptions avec un courriel invalide</strong> (aussi dans Sondages → Rapports RLQ) : la liste, avec la correction suggérée. Le bouton <strong>Corriger et renvoyer</strong> (sur une ligne, ou sur plusieurs lignes cochées) ouvre une fenêtre où l'on accepte ou modifie chaque adresse ; il corrige l'inscription, son contact (seulement s'il porte la même adresse erronée), remet en file les courriels en échec de cette inscription et renvoie la confirmation.</li>
   <li><strong>Menu Événements → Courriels invalides → Courriels en échec</strong> (administrateurs) : les courriels sortants en « Échec d'envoi ».</li>
 </ul>
 <h3>Pas à pas : corriger une adresse et renvoyer la confirmation</h3>
@@ -391,7 +391,7 @@
 <p>Quand un sondage est assigné à un type de billet (§&nbsp;11), remplir ce sondage confirme l'inscription. Le module montre maintenant qui ne l'a pas encore fait, et peut vous envoyer chaque matin un résumé des inscriptions et des sondages.</p>
 <h3>Liste des courriels à relancer</h3>
 <ol>
-  <li>Ouvrez <strong>Événements → Sondages non complétés</strong> (aussi dans Sondages → Rapports détaillés, ou le bouton <strong>Sondages non complétés</strong> du bloc « Suivi des sondages et rapport quotidien » du formulaire de l'événement).</li>
+  <li>Ouvrez <strong>Événements → Sondages non complétés</strong> (aussi dans Sondages → Rapports RLQ, ou le bouton <strong>Sondages non complétés</strong> du bloc « Suivi des sondages et rapport quotidien » du formulaire de l'événement).</li>
   <li>Les événements en cours et à venir dont un billet a un sondage sont déjà choisis ; ajoutez-en ou retirez-en au besoin. La case <strong>Inclure les sondages commencés</strong> (cochée par défaut) ajoute les personnes qui ont commencé le sondage sans le terminer.</li>
   <li>Le champ <strong>Adresses courriel</strong> contient les adresses, sans doublons, séparées par « ; » : le bouton de copie les met dans le presse-papiers, à coller dans le champ <em>Cci</em> d'un courriel. Le nombre d'inscriptions <em>sans</em> adresse est indiqué à part.</li>
   <li><strong>Ouvrir en liste</strong> affiche les mêmes inscriptions dans une liste Odoo (filtres, regroupement par événement, export).</li>
@@ -408,7 +408,7 @@
 
 <!-- ============================================================ 15 -->
 <h2 id="bureau-inscription">15. Bureau d'inscription <span class="pastille">nouveau, v1.121 à v1.124</span></h2>
-<div class="encadre"><p>Ce guide s'ouvre aussi depuis l'application Événements : <strong>Événements → Guide d'utilisation</strong> (il s'ouvre directement à cette section). Les utilisateurs des sondages le trouvent toujours dans <strong>Sondage → Rapports détaillés → Guide d'utilisation</strong>.</p></div>
+<div class="encadre"><p>Ce guide s'ouvre aussi depuis l'application Événements : <strong>Événements → Guide d'utilisation</strong> (il s'ouvre directement à cette section). Les utilisateurs des sondages le trouvent toujours dans <strong>Sondage → Rapports RLQ → Guide d'utilisation</strong>.</p></div>
 <p>Un seul écran pour les bénévoles qui accueillent les gens le jour de l'événement : qui est inscrit, qui est arrivé, qui a rempli son sondage, et ce que chacun a répondu aux questions utiles sur place (en ligne ou sur place, présent pour le dîner, etc.).</p>
 <h3>Préparer : choisir les questions à afficher</h3>
 <ol>
@@ -417,7 +417,7 @@
 </ol>
 <h3>Le jour de l'événement</h3>
 <ol>
-  <li>Ouvrez <strong>Événements → Bureau d'inscription RLQ</strong> (ou le bouton <strong>Bureau d'inscription RLQ</strong> du formulaire de l'événement). L'événement en cours, sinon le prochain, est déjà choisi.</li>
+  <li>Ouvrez <strong>Événements → Rapports RLQ → Bureau d'inscription RLQ</strong> (ou le bouton <strong>Bureau d'inscription RLQ</strong> du formulaire de l'événement). L'événement en cours, sinon le prochain, est déjà choisi.</li>
   <li>Tapez une partie du nom, du courriel ou de l'entreprise dans <strong>Recherche</strong> pour trouver la personne. <strong>Masquer les personnes déjà présentes</strong> raccourcit la liste.</li>
   <li>Cliquez <strong>Présent</strong> sur sa ligne : l'heure d'arrivée et la personne qui l'a marquée présente (colonne <strong>Marqué présent par</strong>, v1.128) sont enregistrées, aussi quand la présence est pointée dans le bureau d'inscription d'Odoo. <strong>Annuler la présence</strong> corrige une erreur et efface les deux, ainsi que l'heure de départ ; si la personne est marquée présente de nouveau, c'est la nouvelle heure qui est enregistrée (v1.133, aussi quand la présence est annulée ailleurs dans Odoo).</li>
   <li><strong>Actualiser</strong> recalcule le sommaire (utile quand plusieurs bénévoles pointent en même temps). <strong>Ouvrir en liste</strong> affiche les mêmes inscriptions dans une liste Odoo complète, regroupée par billet (recherche native, filtres, export).</li>
@@ -431,12 +431,13 @@
   <li><strong>Contacter les participants</strong> (en haut) : la fenêtre de courriel d'Odoo, pour écrire aux inscriptions <strong>listées</strong> (mêmes filtres et même recherche). Chaque personne reçoit son propre courriel ; les inscriptions sans adresse sont laissées de côté.</li>
   <li><strong>Téléphone</strong> : colonne cachée par défaut, à afficher avec le menu des colonnes.</li>
   <li><strong>Filtrer sur un texte</strong> : dans le bureau, <strong>Recherche</strong> cherche dans le nom, le courriel, l'entreprise, le téléphone, le billet et les réponses, sans tenir compte des majuscules ni des accents (« vege » trouve « Végétarien »). Dans <strong>Ouvrir en liste</strong>, tapez le texte dans la barre de recherche et choisissez la colonne dans la liste qui apparaît : Personne, Billet, Réponses, Téléphone, Courriel, Entreprise. Plusieurs critères se combinent.</li>
-  <li>Le bureau d'inscription et les bénévoles sont aussi dans le menu <strong>Sondages → Rapports détaillés</strong>.</li>
+  <li><strong>Menus</strong> (v1.136) : tous les menus ajoutés par ce module sont dans un sous-menu <strong>Rapports RLQ</strong>, dans l'application Événements (bureau d'inscription, sondages non complétés, bénévoles, courriels invalides, guide) comme dans l'application Sondages (ancien nom : « Rapports détaillés »). Le bureau d'inscription et les bénévoles sont dans les deux.</li>
+  <li><strong>Renseignements personnels</strong> (v1.136) : avant <strong>Ouvrir en liste</strong>, <strong>Contacter les participants</strong> et <strong>Exporter dans un chiffrier</strong>, qui montrent des courriels et des téléphones, une fenêtre demande de cocher la case de confirmation. Elle n'est demandée qu'<strong>une fois par page</strong> : elle revient seulement quand la page est rouverte par le menu.</li>
 </ul>
 <p>Tous les tableaux de ces pages ont le même aspect (v1.134) : en-tête foncé à texte blanc, une ligne sur deux en gris pâle, lignes de total en gris moyen ; dans le tableau des réponses, chaque question est encadrée avec toutes ses réponses.</p>
 <h3>Le sommaire</h3>
 <ul>
-  <li><strong>Par type de billet et au total</strong> : inscrits, présents, sondages complétés, commencés et non commencés, puis <strong>Sondages complétés (%)</strong> (v1.133, remplace les pourcentages de questions répondues et non répondues) : les sondages complétés, sur les inscriptions qui ont un sondage.</li>
+  <li><strong>Par type de billet et au total</strong> : inscrits, <strong>participants uniques (courriel)</strong> (v1.136 : une même adresse courriel compte une seule fois, par billet comme au total ; une inscription sans adresse compte pour une personne), présents, sondages complétés, commencés et non commencés, puis <strong>Sondages complétés (%)</strong> (v1.133, remplace les pourcentages de questions répondues et non répondues) : les sondages complétés, sur les inscriptions qui ont un sondage.</li>
   <li><strong>Inscriptions par semaine</strong> (v1.134) : une ligne par semaine (numéro de semaine ISO, du lundi au dimanche, selon la date d'inscription en heure locale), une colonne par billet, le total et le cumul. Les semaines sans inscription entre la première et la dernière sont affichées avec 0.</li>
   <li><strong>Personnes marquées présentes, par heure</strong> : une ligne par heure, en <strong>heure locale</strong>, une colonne par billet, et le total.</li>
   <li><strong>Réponses aux questions affichées</strong> : les questions sont en gras ; pour chaque réponse, le nombre de personnes par billet, le total, <strong>% inscrits</strong>, « dont présents » et <strong>% présents</strong> (v1.133 ; par exemple, combien de dîners prévoir). Les deux pourcentages se calculent sur le même total : toutes les personnes inscrites concernées par la question (v1.134 : « % présents » se calculait sur les seules personnes présentes et affichait trop souvent 100 %) ; avec un choix multiple, leur somme peut dépasser 100 %.</li>
@@ -460,7 +461,7 @@
 </ul>
 
 <h3 id="benevoles">Bénévoles <span class="pastille">v1.122, revu en v1.123</span></h3>
-<p>Événements &rarr; <strong>Bénévoles</strong> : un tableau pour le coordonnateur des bénévoles. Seules les inscriptions au billet dont le nom contient « bénévole » sont listées, et leurs réponses viennent uniquement du sondage de ce billet. Une ligne par bénévole : nom (lien pour lui écrire sur Odoo), date et heure de l'inscription, état du sondage, type (présentiel ou virtuel), langues parlées, heure d'arrivée et de départ, puis une colonne par choix de <strong>chaque</strong> question sur les rôles, sous le titre de la question (« Rôles pendant l'événement (en présentiel) ? » d'abord). Un <strong>X</strong> marque les rôles choisis ; une réponse libre (« Autre ») est écrite dans la colonne « Autre ».</p>
+<p>Événements &rarr; Rapports RLQ &rarr; <strong>Bénévoles</strong> : un tableau pour le coordonnateur des bénévoles. Seules les inscriptions au billet dont le nom contient « bénévole » sont listées, et leurs réponses viennent uniquement du sondage de ce billet. Une ligne par bénévole : nom (lien pour lui écrire sur Odoo), date et heure de l'inscription, état du sondage, type (présentiel ou virtuel), langues parlées, heure d'arrivée et de départ, puis une colonne par choix de <strong>chaque</strong> question sur les rôles, sous le titre de la question (« Rôles pendant l'événement (en présentiel) ? » d'abord). Un <strong>1</strong> marque les rôles choisis (v1.136, au lieu de « X ») ; une réponse libre (« Autre ») est écrite dans la colonne « Autre ». La colonne <strong>Présentiel</strong> (v1.136) vaut 1 quand le bénévole sera sur place (type « Présentiel », « Hybride » ou les deux) ; son total, en haut et en bas, donne le nombre de bénévoles sur place. Sous le tableau : le nombre de bénévoles listés et de <strong>participants uniques (courriel)</strong>.</p>
 <ul>
   <li>Les questions sont reconnues par leur texte, sans tenir compte des majuscules ni des accents : <strong>rôles</strong> = titre contenant « rôle » ; <strong>langues</strong> = titre contenant « langue » ; <strong>type</strong> = une autre question à choix dont le titre ou les choix parlent de présentiel, virtuel, en ligne ou sur place.</li>
   <li>Si le sondage n'a pas de question sur le type, il est <strong>déduit</strong> des questions sur les rôles auxquelles le bénévole a répondu (« en présentiel », « en virtuel »). Une note au-dessus du tableau le dit, ainsi que toute question introuvable.</li>
@@ -476,7 +477,7 @@
 
 <h3>Exporter les bénévoles dans un chiffrier <span class="pastille">nouveau, v1.126</span></h3>
 <ol>
-  <li>Dans <strong>Événements → Bénévoles</strong>, cliquez <strong>Exporter dans un chiffrier</strong> : le fichier <code>.xlsx</code> (Excel, LibreOffice Calc) se télécharge directement (depuis la v1.128 ; avant, il était dans une archive ZIP protégée par mot de passe). Le filtre « Sondage » et le tri de l'écran s'appliquent.</li>
+  <li>Dans <strong>Événements → Rapports RLQ → Bénévoles</strong>, cliquez <strong>Exporter dans un chiffrier</strong> : le fichier <code>.xlsx</code> (Excel, LibreOffice Calc) se télécharge directement (depuis la v1.128 ; avant, il était dans une archive ZIP protégée par mot de passe). Le filtre « Sondage » et le tri de l'écran s'appliquent.</li>
 </ol>
 <p>Le fichier a trois feuilles, chacune prête pour un <strong>tableau croisé dynamique</strong> (une ligne d'en-têtes, noms de colonnes uniques, aucune cellule fusionnée) :</p>
 <ul>
@@ -490,13 +491,13 @@
 <h2 id="modifier-reponses">16. Modifier les réponses d'un sondage <span class="pastille">nouveau, v1.127</span></h2>
 <p>Pour corriger une réponse à la demande d'une personne (mauvais choix, faute de frappe, changement de dernière minute), réservé aux <strong>administrateurs des sondages</strong>.</p>
 <ol>
-  <li><strong>Sondage → Rapports détaillés → Modifier des réponses</strong>, ouvrez la participation (recherche par nom, courriel ou sondage), puis cliquez <strong>Modifier les réponses</strong>.</li>
+  <li><strong>Sondage → Rapports RLQ → Modifier des réponses</strong>, ouvrez la participation (recherche par nom, courriel ou sondage), puis cliquez <strong>Modifier les réponses</strong>.</li>
   <li>La fenêtre liste chaque question avec la réponse actuelle ; la colonne <strong>Nouvelle réponse (texte)</strong> n'est remplie que pour les questions modifiées. Cliquez sur une question : le bon champ s'affiche selon son type (texte, nombre, échelle, date, choix unique, choix multiples, commentaire ou réponse « Autre »). La case <strong>Aucune réponse</strong> efface un nombre ou une valeur d'échelle. Les questions en matrice s'affichent mais ne se modifient pas ici.</li>
   <li>Indiquez au besoin un <strong>motif</strong> (inscrit dans l'historique), cochez <strong>Envoyer la mise à jour par courriel à la personne</strong> si elle doit être prévenue, puis cliquez <strong>Enregistrer les changements</strong>.</li>
 </ol>
 <p>La réponse est enregistrée comme si la personne l'avait donnée elle-même : statistiques, rapports et bureau d'inscription en tiennent compte.</p>
 <h3>Historique des modifications</h3>
-<p><strong>Sondage → Rapports détaillés → Modifications manuelles des réponses</strong> : une ligne par question modifiée (date, auteur, personne, question, réponse avant, réponse après, motif, date d'envoi à la personne). Filtres « Pas encore envoyées » et « Envoyées », regroupement par personne, sondage ou auteur. L'historique ne peut pas être modifié. La fiche d'une participation affiche aussi le bouton <strong>Modifications manuelles</strong> quand elle en a.</p>
+<p><strong>Sondage → Rapports RLQ → Modifications manuelles des réponses</strong> : une ligne par question modifiée (date, auteur, personne, question, réponse avant, réponse après, motif, date d'envoi à la personne). Filtres « Pas encore envoyées » et « Envoyées », regroupement par personne, sondage ou auteur. L'historique ne peut pas être modifié. La fiche d'une participation affiche aussi le bouton <strong>Modifications manuelles</strong> quand elle en a.</p>
 <h3>Envoyer la mise à jour à la personne</h3>
 <p>Dans l'historique, sélectionnez les lignes puis cliquez <strong>Envoyer la mise à jour par courriel</strong>. La personne reçoit le tableau des changements (avant, après), puis toutes ses réponses telles qu'elles sont maintenant. Seules les modifications pas encore envoyées partent ; la date et l'auteur de l'envoi sont notés. Sans adresse courriel, rien n'est envoyé et un message le dit. Le texte du courriel se change dans Paramètres → Technique → Modèles de courriel (« Sondage : mise à jour de vos réponses »).</p>
 
