@@ -11,6 +11,7 @@
     odoo-bin -d TEST_DB -i rlq_survey_report --test-enable --test-tags rlq_survey_report --stop-after-init
 """
 from odoo.addons.rlq_survey_report.models import registration_desk_report as rd
+from odoo.exceptions import UserError
 from odoo.tests.common import TransactionCase
 
 
@@ -93,6 +94,52 @@ class TestRlqRegistrationDesk(TransactionCase):
         registration.action_rlq_desk_present()
         self.assertTrue(registration.date_closed)
         self.assertNotEqual(str(registration.date_closed), "2030-11-16 21:30:00")
+
+    def test_sorted_by_name_by_default_and_help_buttons(self):
+        """v1.134.0: the desk is sorted by name by default; both pages open the guide at their own section."""
+        zoe = self._registration("Zoé", "zoe@example.com")
+        eric = self._registration("éric", "eric@example.com")
+        desk = self.env["rlq.registration.desk"].create({"event_id": self.event.id})
+        self.assertEqual(desk.sort_by, "name")
+        self.assertEqual(desk.registration_ids.ids, (eric | zoe).ids)
+        self.assertEqual(desk.action_open_guide()["url"], "/rlq_survey_report/aide#bureau-inscription")
+        coordinator = self.env["rlq.volunteer.coordinator"].create({"event_id": self.event.id})
+        self.assertEqual(coordinator.action_open_guide()["url"], "/rlq_survey_report/aide#benevoles")
+
+    def test_answers_link_buttons_search_and_contact(self):
+        """v1.135.0: link and buttons to the answers of a person, search in the answers, contact, volunteers as a list."""
+        registration = self._registration("Réponses Visibles", "visibles@example.com")
+        self._participation("visibles@example.com", "done", lunch="Végétarien")
+        other = self._registration("Sans Réponse", "sans@example.com")
+        self.assertTrue(registration.rlq_desk_user_input_id)
+        self.assertIn("/rlq_survey_report/answers/%d" % registration.rlq_desk_user_input_id, registration.rlq_desk_answers_html)
+        self.assertEqual(registration.action_rlq_desk_view_answers()["url"],
+                         "/rlq_survey_report/answers/%d" % registration.rlq_desk_user_input_id)
+        manager = self.env.user.has_group("survey.group_survey_manager")
+        self.assertEqual(registration.rlq_desk_can_edit_answers, manager)             # the button follows the rights
+        if manager:
+            self.assertEqual(registration.action_rlq_desk_edit_answers()["res_model"], "rlq.survey.answer.edit")
+        with self.assertRaises(UserError):
+            other.action_rlq_desk_view_answers()
+        registrations = self.env["event.registration"].with_context(rlq_desk_event_id=self.event.id)
+        self.assertIn(registration, registrations.search([("rlq_desk_answers", "ilike", "vegetarien")]))
+        self.assertNotIn(other, registrations.search([("rlq_desk_answers", "ilike", "vegetarien")]))
+        desk = self.env["rlq.registration.desk"].create({"event_id": self.event.id, "search_text": "végé"})
+        self.assertEqual(desk.registration_ids, registration)
+        action = desk.action_contact()
+        # v1.136.0: first the confirmation about personal information, once per page.
+        self.assertEqual(action["context"]["rlq_pi_next"], "action_contact")
+        self.assertEqual(action["res_model"], "rlq.registration.desk")
+        with self.assertRaises(UserError):
+            desk.with_context(rlq_pi_next="action_contact").action_rlq_pi_continue()     # box not checked
+        desk.rlq_pi_confirmed = True
+        action = desk.with_context(rlq_pi_next="action_contact").action_rlq_pi_continue()
+        self.assertEqual(action["res_model"], "mail.compose.message")
+        self.assertEqual(desk.action_open_list()["res_model"], "event.registration")     # not asked again on this page
+        action = desk.action_contact()
+        self.assertEqual(action["res_model"], "mail.compose.message")
+        self.assertEqual(action["context"]["default_res_ids"], registration.ids)
+        self.assertEqual(action["context"]["default_composition_mode"], "mass_mail")
 
     def test_survey_columns_in_a_form_not_saved(self):
         """v1.133.0: in a form not saved yet, the registrations of the list are « new » copies (NewId): the survey state and
@@ -267,6 +314,8 @@ class TestRlqRegistrationDesk(TransactionCase):
         self._volunteer_setup()
         self._volunteer("Nadia Export", "nadia@example.com")
         coordinator = self.env["rlq.volunteer.coordinator"].create({"event_id": self.event.id})
+        self.assertEqual(coordinator.action_export_excel()["context"]["rlq_pi_next"], "action_export_excel")  # v1.136.0
+        coordinator.rlq_pi_confirmed = True
         action = coordinator.action_export_excel()
         self.assertIn(".xlsx", action["url"])
         attachment = self.env["ir.attachment"].search([("res_model", "=", "rlq.volunteer.coordinator"), ("res_id", "=", coordinator.id)])

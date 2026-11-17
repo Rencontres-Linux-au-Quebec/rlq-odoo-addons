@@ -10,7 +10,7 @@
         <field name="model">event.registration</field>
         <field name="priority">92</field>
         <field name="arch" type="xml">
-            <list string="Registration desk" create="false" default_order="event_id desc, event_ticket_id, name"
+            <list string="Registration desk" create="false" default_order="name" class="o_rlq_table"
                   decoration-success="state == 'done'" decoration-muted="state == 'draft'">
                 <field name="event_id" optional="hide"/>
                 <field name="event_ticket_id"/>
@@ -18,16 +18,20 @@
                 <field name="rlq_desk_person" options="{'allow_order': True}"/>
                 <field name="name" optional="hide"/>
                 <field name="email" optional="hide"/>
+                <field name="phone" optional="hide"/>
                 <field name="create_date" string="Registered on" optional="show" width="150px"/>
-                <field name="state"/>
+                <field name="state" optional="hide"/>
                 <field name="date_closed" string="Arrived at" optional="show" width="150px"/>
                 <field name="rlq_present_by" optional="show"/>
                 <!-- v1.133.0: the hour of departure is hidden by default (optional column, still in the list menu). -->
                 <field name="rlq_departure" string="Left at" optional="hide" width="150px"/>
                 <field name="rlq_survey_state" options="{'allow_order': True}"/>
                 <field name="rlq_survey_done_date" options="{'allow_order': True}" optional="show" width="150px"/>
-                <field name="rlq_desk_progress" options="{'allow_order': True}"/>
-                <field name="rlq_desk_answers" options="{'allow_order': True}"/>
+                <field name="rlq_desk_progress" options="{'allow_order': True}" optional="hide"/>
+                <!-- v1.135.0: the answers are a link to every answer of the survey of the person -->
+                <field name="rlq_desk_answers_html" options="{'allow_order': True}"/>
+                <field name="rlq_desk_user_input_id" column_invisible="1"/>
+                <field name="rlq_desk_can_edit_answers" column_invisible="1"/>
                 <button name="action_rlq_desk_present" type="object" string="Present" icon="fa-check" class="btn-primary"
                         invisible="state == 'done'"/>
                 <button name="action_rlq_desk_undo" type="object" string="Undo" icon="fa-undo"
@@ -36,6 +40,10 @@
                         invisible="state != 'done' or rlq_departure"/>
                 <button name="action_rlq_desk_depart_undo" type="object" string="Undo the departure" icon="fa-undo"
                         invisible="not rlq_departure" confirm="Clear the departure time of this person?"/>
+                <button name="action_rlq_desk_view_answers" type="object" string="See the answers" icon="fa-eye"
+                        invisible="not rlq_desk_user_input_id"/>
+                <button name="action_rlq_desk_edit_answers" type="object" string="Edit the answers" icon="fa-pencil"
+                        invisible="not rlq_desk_can_edit_answers" groups="survey.group_survey_manager"/>
             </list>
         </field>
     </record>
@@ -49,6 +57,11 @@
             <search string="Registration desk">
                 <field name="name" string="Person" filter_domain="['|', ('name', 'ilike', self), ('email', 'ilike', self)]"/>
                 <field name="event_ticket_id"/>
+                <!-- v1.135.0: search in more columns (the answers: case and accents ignored, _search_rlq_desk_answers) -->
+                <field name="rlq_desk_answers" string="Answers"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <field name="company_name"/>
                 <filter name="rlq_present" string="Present" domain="[('state', '=', 'done')]"/>
                 <filter name="rlq_not_present" string="Not present yet" domain="[('state', '!=', 'done')]"/>
                 <separator/>
@@ -73,6 +86,9 @@
                 <header>
                     <button name="action_refresh" type="object" string="Refresh" icon="fa-refresh" class="btn-primary"/>
                     <button name="action_open_list" type="object" string="Open as a list" icon="fa-list"/>
+                    <button name="action_contact" type="object" string="Contact the participants" icon="fa-envelope"/>
+                    <!-- v1.134.0: the guide, opened at the section of this page -->
+                    <button name="action_open_guide" type="object" string="Help for this page" icon="fa-question-circle"/>
                 </header>
                 <sheet>
                     <group>
@@ -83,7 +99,7 @@
                             <field name="sort_desc"/>
                         </group>
                         <group>
-                            <field name="search_text" placeholder="Name, e-mail address or company"/>
+                            <field name="search_text" placeholder="Name, e-mail, company, phone, ticket or answer"/>
                             <field name="survey_filter"/>
                             <field name="hide_present"/>
                             <field name="registration_count"/>
@@ -91,19 +107,23 @@
                     </group>
                     <field name="summary_html" readonly="1" nolabel="1"/>
                     <p class="text-muted">« Present » records the hour of arrival. The questions listed under « Answers » are the survey questions checked « Show at the registration desk ». A survey belongs to a registration when it was answered by the same contact or with the same e-mail address.</p>
-                    <field name="registration_ids" readonly="1" nolabel="1">
-                        <list limit="200" create="false" delete="false" decoration-success="state == 'done'" decoration-muted="state == 'draft'">
+                    <field name="registration_ids" readonly="1" nolabel="1" class="o_rlq_table">
+                        <list limit="200" create="false" delete="false" class="o_rlq_table" decoration-success="state == 'done'" decoration-muted="state == 'draft'">
                             <field name="event_ticket_id"/>
                             <field name="rlq_desk_person" options="{'allow_order': True}"/>
+                            <field name="phone" optional="hide"/>
                             <field name="create_date" string="Registered on" width="150px"/>
-                            <field name="state"/>
+                            <field name="state" optional="hide"/>
                             <field name="date_closed" string="Arrived at" width="150px"/>
                             <field name="rlq_present_by" optional="show"/>
                             <field name="rlq_departure" string="Left at" optional="hide" width="150px"/>
                             <field name="rlq_survey_state" options="{'allow_order': True}"/>
                             <field name="rlq_survey_done_date" options="{'allow_order': True}" optional="show" width="150px"/>
-                            <field name="rlq_desk_progress" options="{'allow_order': True}"/>
-                            <field name="rlq_desk_answers" options="{'allow_order': True}"/>
+                            <field name="rlq_desk_progress" options="{'allow_order': True}" optional="hide"/>
+                            <!-- v1.135.0: the answers are a link to every answer of the survey of the person -->
+                            <field name="rlq_desk_answers_html" options="{'allow_order': True}"/>
+                            <field name="rlq_desk_user_input_id" column_invisible="1"/>
+                            <field name="rlq_desk_can_edit_answers" column_invisible="1"/>
                             <button name="action_rlq_desk_present" type="object" string="Present" icon="fa-check" class="btn-primary"
                                     invisible="state == 'done'"/>
                             <button name="action_rlq_desk_undo" type="object" string="Undo" icon="fa-undo"
@@ -112,9 +132,59 @@
                                     invisible="state != 'done' or rlq_departure"/>
                             <button name="action_rlq_desk_depart_undo" type="object" string="Undo the departure" icon="fa-undo"
                                     invisible="not rlq_departure" confirm="Clear the departure time of this person?"/>
+                            <button name="action_rlq_desk_view_answers" type="object" string="See the answers" icon="fa-eye"
+                                    invisible="not rlq_desk_user_input_id"/>
+                            <button name="action_rlq_desk_edit_answers" type="object" string="Edit the answers" icon="fa-pencil"
+                                    invisible="not rlq_desk_can_edit_answers" groups="survey.group_survey_manager"/>
                         </list>
                     </field>
                 </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- v1.136.0 - Confirmation about personal information, ONCE per page (rlq.pi.confirmation.mixin), before « Open as a
+         list », « Contact the participants » and « Export to a spreadsheet ». Same look as the one of the survey reports. -->
+    <record id="view_rlq_registration_desk_pi_confirmation" model="ir.ui.view">
+        <field name="name">rlq.registration.desk.form.pi.confirmation</field>
+        <field name="model">rlq.registration.desk</field>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <form string="Confirmation">
+                <sheet>
+                    <div class="alert alert-info" role="alert" style="display:flex;align-items:flex-start;gap:.6rem;">
+                        <span style="background:#fff;border:2px solid #000;border-radius:4px;padding:1px 3px;display:inline-flex;flex-shrink:0;margin-top:2px;">
+                            <field name="rlq_pi_confirmed" nolabel="1"/>
+                        </span>
+                        <label for="rlq_pi_confirmed" style="margin:0;" string="This page shows personal information about the participants (names, e-mail addresses, phone numbers). I confirm that I am responsible for its confidentiality and will share it only with authorized people."/>
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_rlq_pi_continue" type="object" string="Continue" class="btn-primary"/>
+                    <button special="cancel" string="Cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_rlq_volunteer_coordinator_pi_confirmation" model="ir.ui.view">
+        <field name="name">rlq.volunteer.coordinator.form.pi.confirmation</field>
+        <field name="model">rlq.volunteer.coordinator</field>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <form string="Confirmation">
+                <sheet>
+                    <div class="alert alert-info" role="alert" style="display:flex;align-items:flex-start;gap:.6rem;">
+                        <span style="background:#fff;border:2px solid #000;border-radius:4px;padding:1px 3px;display:inline-flex;flex-shrink:0;margin-top:2px;">
+                            <field name="rlq_pi_confirmed" nolabel="1"/>
+                        </span>
+                        <label for="rlq_pi_confirmed" style="margin:0;" string="This page shows personal information about the participants (names, e-mail addresses, phone numbers). I confirm that I am responsible for its confidentiality and will share it only with authorized people."/>
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_rlq_pi_continue" type="object" string="Continue" class="btn-primary"/>
+                    <button special="cancel" string="Cancel" class="btn-secondary"/>
+                </footer>
             </form>
         </field>
     </record>
@@ -158,9 +228,9 @@
 
     <menuitem id="menu_rlq_registration_desk_events"
               name="RLQ registration desk"
-              parent="event.event_main_menu"
+              parent="menu_rlq_reports_events"
               action="action_rlq_registration_desk"
-              sequence="43"
+              sequence="10"
               groups="event.group_event_user"/>
 
     <!-- v1.122.0 - Volunteers' coordinator (models/volunteer_coordinator.py): only the volunteer tickets. -->
@@ -172,6 +242,11 @@
                 <header>
                     <button name="action_refresh" type="object" string="Refresh" icon="fa-refresh" class="btn-primary"/>
                     <button name="action_export_excel" type="object" string="Export to a spreadsheet" icon="fa-file-excel-o"/>
+                    <!-- v1.135.0: as at the registration desk -->
+                    <button name="action_open_list" type="object" string="Open as a list" icon="fa-list"/>
+                    <button name="action_contact" type="object" string="Contact the participants" icon="fa-envelope"/>
+                    <!-- v1.134.0: the guide, opened at the section of this page -->
+                    <button name="action_open_guide" type="object" string="Help for this page" icon="fa-question-circle"/>
                 </header>
                 <sheet>
                     <group>
@@ -199,9 +274,9 @@
 
     <menuitem id="menu_rlq_volunteer_coordinator_events"
               name="Volunteers"
-              parent="event.event_main_menu"
+              parent="menu_rlq_reports_events"
               action="action_rlq_volunteer_coordinator"
-              sequence="45"
+              sequence="30"
               groups="event.group_event_user"/>
 
     <!-- v1.124.0 - The user guide in the Events menu too (controllers/aide.py), opened at the registration desk section. -->
@@ -213,9 +288,24 @@
 
     <menuitem id="menu_rlq_guide_events"
               name="User guide"
-              parent="event.event_main_menu"
+              parent="menu_rlq_reports_events"
               action="action_rlq_guide_events"
-              sequence="47"
+              sequence="90"
+              groups="event.group_event_user"/>
+
+    <!-- v1.135.0 - The pages of the events in the menu Surveys > Rapports RLQ too. -->
+    <menuitem id="menu_rlq_registration_desk_surveys"
+              name="RLQ registration desk"
+              parent="menu_rlq_survey_report_in_survey_app"
+              action="action_rlq_registration_desk"
+              sequence="76"
+              groups="event.group_event_user"/>
+
+    <menuitem id="menu_rlq_volunteer_coordinator_surveys"
+              name="Volunteers"
+              parent="menu_rlq_survey_report_in_survey_app"
+              action="action_rlq_volunteer_coordinator"
+              sequence="77"
               groups="event.group_event_user"/>
 
 </odoo>

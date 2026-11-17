@@ -8,7 +8,7 @@
 verification_groupes.py
 =======================
 
-Assistant « Vérifier les groupes et étiquettes » (v1.104.0), menu Sondages > Rapports détaillés.
+Assistant « Vérifier les groupes et étiquettes » (v1.104.0), menu Sondages > Rapports RLQ.
 
 Contrôle d'un coup TOUS les événements, sondages, groupes et étiquettes de contact créés par le module :
   - billets d'événements (avec préfixe de groupes) dont le groupe manque ;

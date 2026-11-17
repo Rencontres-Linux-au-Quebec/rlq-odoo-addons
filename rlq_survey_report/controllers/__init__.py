@@ -7,3 +7,4 @@
 from . import aide
 from . import chat
 from . import reponses
+from . import answers

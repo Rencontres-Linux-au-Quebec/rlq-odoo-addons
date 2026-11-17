@@ -61,9 +61,6 @@ FR = {
     "Event": "Événement",
     "By default: the event in progress, otherwise the next one.": "Par défaut : l'événement en cours, sinon le prochain.",
     "Search": "Recherche",
-    "Part of a name, an e-mail address or a company: only the matching registrations are listed. The summary always counts the whole event.":
-        "Partie d'un nom, d'une adresse courriel ou d'une entreprise : seules les inscriptions correspondantes sont listées. Le sommaire compte toujours tout l'événement.",
-    "Name, e-mail address or company": "Nom, adresse courriel ou entreprise",
     "Hide the people already present": "Masquer les personnes déjà présentes",
     "Survey": "Sondage",
     "Lists only the registrations whose survey is in this state.": "Liste seulement les inscriptions dont le sondage est dans cet état.",
@@ -102,6 +99,32 @@ FR = {
     "Not present yet": "Pas encore présent",
     "Group By": "Regrouper par",
     "User guide": "Guide d'utilisation",
+    "Help for this page": "Aide de cette page",                      # v1.134.0: button of the desk and the volunteers
+    # v1.136.0: confirmation about personal information, once per page
+    "Confirmation": "Confirmation",
+    "This page shows personal information about the participants (names, e-mail addresses, phone numbers). I confirm that I am responsible for its confidentiality and will share it only with authorized people.":
+        "Cette page contient des renseignements personnels sur les participants (noms, courriels, téléphones). Je confirme être responsable de leur confidentialité et m'engage à ne les partager qu'avec les personnes autorisées.",
+    "Continue": "Continuer",
+    "Check the box about personal information to continue.":
+        "Cochez la case de confirmation concernant les renseignements personnels pour continuer.",
+    "Confirmation about personal information": "Confirmation concernant les renseignements personnels",
+    "I am responsible for the personal information shown": "Je suis responsable des renseignements personnels affichés",
+    "This page shows personal information about the participants (names, e-mail addresses, phone numbers). By checking this box, you confirm that you are aware of this responsibility and will share it only with authorized people (Loi 25 in Québec, GDPR in Europe).":
+        "Cette page contient des renseignements personnels sur les participants (noms, courriels, téléphones). En cochant cette case, vous confirmez être conscient(e) de cette responsabilité et vous engager à ne les partager qu'avec les personnes autorisées (Loi 25 au Québec, RGPD en Europe).",
+    # v1.135.0: answers of a person, contact, search in more columns
+    "See the answers": "Voir les réponses",
+    "Contact the participants": "Contacter les participants",
+    "Name, e-mail, company, phone, ticket or answer": "Nom, courriel, entreprise, téléphone, billet ou réponse",
+    "No participant of this list has an e-mail address.": "Aucun participant de cette liste n'a d'adresse courriel.",
+    "This person has not answered the survey yet.": "Cette personne n'a pas encore répondu au sondage.",
+    "Answers (text)": "Réponses (texte)",
+    "Answers of this person to the survey questions checked « Show at the registration desk ». Click them to see every answer of the survey filled in by this person.":
+        "Réponses de cette personne aux questions du sondage cochées « Afficher au bureau d'inscription ». Cliquez dessus pour voir toutes les réponses du sondage rempli par cette personne.",
+    "The participation of this person to the expected survey (the most advanced one, the most recent among equals).":
+        "La participation de cette personne au sondage attendu (la plus avancée, la plus récente à égalité).",
+    "Can edit the answers": "Peut modifier les réponses",
+    "Part of a name, an e-mail address, a company, a phone number, a ticket or an answer: only the matching registrations are listed (case and accents ignored). The summary always counts the whole event.":
+        "Une partie d'un nom, d'une adresse courriel, d'une entreprise, d'un numéro de téléphone, d'un billet ou d'une réponse : seules les inscriptions correspondantes sont listées (sans tenir compte des majuscules ni des accents). Le sommaire compte toujours tout l'événement.",
     "Export to a spreadsheet": "Exporter dans un chiffrier",
     "The spreadsheet export needs the Python library « openpyxl », which is not installed on this server (pip install openpyxl).":
         "L'export dans un chiffrier nécessite la bibliothèque Python « openpyxl », qui n'est pas installée sur ce serveur (pip install openpyxl).",
@@ -117,8 +140,8 @@ FR = {
         'Modifier les réponses',
     'Example: correction asked by the person on the phone':
         'Exemple : correction demandée par la personne au téléphone',
-    'Click a question to change its answer. The questions changed are shown in bold; each one is written in the history (Surveys > Detailed reports > Manual changes of answers).':
-        "Cliquez sur une question pour changer sa réponse. Les questions modifiées sont en gras ; chacune est inscrite dans l'historique (Sondages > Rapports détaillés > Modifications manuelles des réponses).",
+    'Click a question to change its answer. The questions changed are shown in bold; each one is written in the history (Surveys > RLQ reports > Manual changes of answers).':
+        "Cliquez sur une question pour changer sa réponse. Les questions modifiées sont en gras ; chacune est inscrite dans l'historique (Sondages > Rapports RLQ > Modifications manuelles des réponses).",
     'Save the changes':
         'Enregistrer les changements',
     'Cancel':
@@ -139,8 +162,8 @@ FR = {
         'Modifié par',
     'No manual change yet.':
         "Aucune modification manuelle pour l'instant.",
-    'To change an answer: Surveys > Detailed reports > Edit answers, open the participation, then « Edit the answers ».':
-        'Pour changer une réponse : Sondages > Rapports détaillés > Modifier des réponses, ouvrez la participation, puis « Modifier les réponses ».',
+    'To change an answer: Surveys > RLQ reports > Edit answers, open the participation, then « Edit the answers ».':
+        'Pour changer une réponse : Sondages > Rapports RLQ > Modifier des réponses, ouvrez la participation, puis « Modifier les réponses ».',
     'Edit answers':
         'Modifier des réponses',
     'Open a participation, then click « Edit the answers ».':
@@ -394,7 +417,7 @@ def fr_for(msgid):
     """French translation of a term. v1.129.0: the TEXT of a view (between tags, not an attribute) is stored by Odoo as XML
     (odoo/tools/translate.py, serialize_xml: « > » becomes « &gt; », « & » becomes « &amp; »), so its msgid and its msgstr
     must be escaped the same way, otherwise Odoo never finds the translation (seen: « Click a question... (Surveys >
-    Detailed reports > ...) » stayed in English). FR is written with plain characters."""
+    RLQ reports > ...) » stayed in English). FR is written with plain characters."""
     if msgid in FR:
         return FR[msgid]
     raw = xml_unescape(msgid)

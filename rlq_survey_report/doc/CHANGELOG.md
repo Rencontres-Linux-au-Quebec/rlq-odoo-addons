@@ -1,5 +1,125 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.136.0
+
+**Short title:** unique participants by e-mail, "Présentiel" column for the volunteers, 1 instead of "X" on screen, confirmation about personal information once per page, every menu of the module in a sub-menu "Rapports RLQ".
+
+**Reason for the request:** [1] "mettre dans le tableau le nombre de participants uniques (selon le courriel)"; [2] a column to know whether the volunteers will be on site; [3] on screen, replace the "X" by 1; [4] when sensitive information (e-mail) is shown, the window "Cochez la case de confirmation concernant les renseignements personnels", but only once per page; [4b] put every menu added by the module in a sub-menu "Rapports RLQ".
+
+**Concurrent changes:** checked before the work and before pushing: `18.0` unchanged since PR #19; PR #20 and #21 open, not merged; no other branch moved. This branch starts from PR #21, so merging it also brings #20 and #21.
+
+**Changes:**
+
+- `models/registration_desk_report.py`:
+  - `ticket_summary()`: new key `unique`, the different e-mail addresses (case and spaces ignored; a registration without address counts as one person), per ticket and for the whole event (a person with two tickets counts once in the total). New column "Participants uniques (courriel)" / "Unique participants (e-mail)" after "Inscrits".
+  - New `is_on_site()` ("Présentiel", "Sur place", "Hybride", or several types including one of them) and `unique_people()`.
+  - `volunteer_table_html()`: new column "Présentiel" / "On site" after "Type" (1 when on site), with its total in the header and the footer (`volunteer_column_totals()`); roles shown as "1" instead of "X" (`VOLUNTEER_TEXTS["yes"]`); under the table, "Participants uniques (courriel)".
+  - `volunteer_export_sheets()`: column "Présentiel" (the number 1, or empty) after "Type".
+- `models/event_registration_desk.py`: rows of the desk carry the e-mail; new abstract model `rlq.pi.confirmation.mixin` (field `rlq_pi_confirmed`, `_rlq_pi_guard()`, `action_rlq_pi_continue()`, allowed actions `PI_ACTIONS`); `rlq.registration.desk` inherits it; `action_open_list()` and `action_contact()` ask for the confirmation first. A download run after the confirmation also closes the window (`close`).
+- `models/volunteer_coordinator.py`: inherits the mixin; `action_open_list()`, `action_contact()` and `action_export_excel()` ask for the confirmation first.
+- `views/event_registration_desk_views.xml`: two confirmation windows (desk and volunteers), same look as the one of the survey reports; menus moved under "Rapports RLQ".
+- Menus: new `menu_rlq_reports_events` "RLQ reports" / "Rapports RLQ" in Events (`views/event_registration_email_views.xml`, the first view file that puts a menu in Events), containing the registration desk, the surveys not completed, the volunteers, the invalid e-mails and the guide; in Surveys, "Rapports détaillés" renamed "Rapports RLQ" (`views/rlq_survey_report_views.xml`), with the texts that name it (views, translations, guide, comments).
+- `scripts/fr_base.po`, `scripts/build_fr_po.py`, `i18n/fr.po` (rebuilt): new terms.
+- `doc/Guide-utilisateur-rlq_survey_report.html`: version 18.0.1.136.0 with its local time, menus, unique participants, "Présentiel", "1", confirmation.
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:**
+
+- The confirmation is stored on the page itself (a transient record): asked once, again only when the page is opened from the menu. `action_rlq_pi_continue()` runs only the actions of `PI_ACTIONS`, whatever the context says.
+- "Participants uniques" in the total can be lower than the sum of the tickets (one person, two tickets): intended.
+- `is_on_site()` uses the same words as the type of the volunteers (accents and case ignored); "Virtuel" alone or an empty type gives no 1.
+
+**Checks performed:**
+
+- Standalone tests of run-all.sh: all [OK] (new: unique people per ticket and in total, on site, "1" on screen, "Présentiel" in the spreadsheet); ruff: OK; `scripts/build_fr_po.py`: all terms translated; every view XML parsed.
+- Odoo tests updated and added (not run here, no Odoo instance): confirmation asked once, refused without the box, then contact, list and export.
+
+**Action required from the user:** `-u rlq_survey_report --i18n-overwrite` (new abstract model and field, views, menus, translations), then the points "v1.136.0" of `doc/NOTES_VALIDATION.md`.
+
+## 18.0.1.135.0
+
+**Short title:** answers of a participant one click away ("Voir les réponses", "Modifier les réponses"), "Contacter les participants", "Ouvrir en liste" on the volunteers page, search in more columns, hidden phone column, 1 instead of "X" in the volunteers spreadsheet, pages in Surveys > Rapports détaillés, guide header.
+
+**Reason for the request:** [1] a button "Ouvrir en liste" on the "Bénévoles" page, as at the registration desk; [2] remove "Ce guide remplace celui du 10 septembre (module 18.0.1.32.0)." from the guide and add the time of the module version; [3] "Peut-on filtrer sur certains textes dans les colonnes ?"; [4] "remplacer les X par des 1 afin de pouvoir les additionner dans le chiffrier exporté"; [5] clicking the answers of a participant must show the survey filled in by the participant, without going through the Surveys menu; [6] a button "Voir les réponses" and, with the rights, "Modifier les réponses"; [7] a phone column, hidden by default; [8] a button "Contacter les participants"; [9] the new pages in the menu Surveys > Rapports détaillés (answer to the question asked: "Menu Rapports de sondage").
+
+**Concurrent changes:** checked before the work: `18.0` unchanged since PR #19, only PR #20 (18.0.1.134.0) open and not merged, no other branch moved. This branch starts from PR #20 (`feature/desk-docs-colors-weeks`), so the two do not conflict; merging this PR also brings PR #20.
+
+**Changes:**
+
+- `controllers/answers.py` (new): `/rlq_survey_report/answers/<participation id>`, for the users of the Events application: redirects to the page "print" of Odoo (`/survey/print/<survey token>?answer_token=<answer token>`), every answer of the survey filled in by the person. Test participations refused. Every opening is logged.
+- `models/event_registration_desk.py`:
+  - `event.registration`: new computed fields `rlq_desk_answers_html` (the answers, a link to the page above; sortable without case or accents), `rlq_desk_user_input_id` (Integer: the participation used by the desk) and `rlq_desk_can_edit_answers`; `rlq_desk_answers` renamed "Answers (text)" and searchable (`_search_rlq_desk_answers()`, case and accents ignored, within the event of the desk); buttons `action_rlq_desk_view_answers()` and `action_rlq_desk_edit_answers()` (the window of survey_answer_edit.py, survey administrators only); `_rlq_desk_map()` returns the participation ("input").
+  - New `contact_action()`: the e-mail window of Odoo in mass-mail mode on `event.registration` (one e-mail per person, addresses never shown to the others; registrations without address left out). `rlq.registration.desk.action_contact()` contacts the registrations LISTED (filters and search).
+  - New `registration_list_action()`, used by "Ouvrir en liste" of the desk and of the volunteers.
+  - Search of the desk (`_rlq_haystack()`): also the phone, the mobile, the ticket and the answers.
+- `models/volunteer_coordinator.py`: `action_open_list()`, `action_contact()`, `_rlq_listed_registrations()` (same "Sondage" filter as the table); each row carries `answers_url` and `registration_id`; column widths of the spreadsheet ignore empty cells.
+- `models/registration_desk_report.py`: `answers_cell_html()`; `role_numbers()`; `volunteer_export_sheets()`: a chosen role is the NUMBER 1 (empty cell otherwise) instead of "X", the free text of "Autre" counts 1 and goes to the new column "Autres rôles (texte)" / "Other roles (text)"; `volunteer_table_html()`: the survey state is a link to the answers.
+- `views/event_registration_desk_views.xml`: both lists: column "Réponses" as a link, buttons "Voir les réponses" / "Modifier les réponses" (`groups="survey.group_survey_manager"`), column "Téléphone" `optional="hide"`; search of "Ouvrir en liste": Réponses, Téléphone, Courriel, Entreprise; header buttons "Contacter les participants" (desk and volunteers) and "Ouvrir en liste" (volunteers); menus "Bureau d'inscription RLQ" and "Bénévoles" under Surveys > Rapports détaillés.
+- `doc/Guide-utilisateur-rlq_survey_report.html`: header "version 18.0.1.135.0 du 2026-11-17 à <heure> (heure locale, HNE)", sentence about the guide of September removed; new section "Réponses d'un participant, contact, recherche"; volunteers and spreadsheet sections updated.
+- `scripts/build_fr_po.py`, `i18n/fr.po` (rebuilt): French of the new labels; two obsolete entries removed.
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:**
+
+- The participation is an Integer field, not a Many2one: a volunteer without the rights of the Surveys application can still read the lists (a Many2one would read the name of the participation and be refused). The answers page is opened through `sudo()` in the controller, for the Events users only.
+- "Modifier les réponses" is shown only to survey administrators (view `groups` and `rlq_desk_can_edit_answers`), and `action_rlq_edit_answers()` checks the group again.
+- No participation: no link, no button; the buttons raise a clear message if called anyway.
+- "Contacter les participants" without any address: a message, no empty window.
+
+**Checks performed:**
+
+- Standalone tests of run-all.sh: all [OK] (new: answers cell, survey link of the volunteers, numbers in the spreadsheet); ruff: OK; `scripts/build_fr_po.py`: all terms translated; view XML parsed.
+- New Odoo test (not run here, no Odoo instance): answers link and buttons, search in the answers, search of the desk, contact action.
+
+**Action required from the user:** `-u rlq_survey_report --i18n-overwrite` (new controller, fields, views, menus, translations), then the points "v1.135.0" of `doc/NOTES_VALIDATION.md`. Merge PR #20 first, or this PR alone (it contains PR #20).
+
+## 18.0.1.134.0
+
+**Short title:** registration desk and volunteers: "Aide de cette page" button, coloured tables (dark header, pale grey stripes), each question framed, "% présents" out of all the people concerned, registrations per week, sorted by name, "Statut" and "Questions répondues" hidden.
+
+**Reason for the request:** [0] "Assure-toi qu'il n'y a pas d'autres modifications en même temps sur ce dépôt"; [1] a button on the desk and "Bénévoles" pages to show the documentation of that page; [2] "une alternance de couleur dans tous les tableaux des nouvelles pages (en gris pâle) et l'entête d'une autre couleur plus foncée (mais lisible avec un bon contraste)"; [3] "Trié par nom par défaut"; [4] question: is the time change followed, or is "HNE" hard-coded?; [5] "Le % présents est toujours à 100 %, il devrait être basé sur le nombre total de la question"; [6] "il faut encadrer chacune des questions dans le tableau"; [7] "une section indiquant le nombre d'inscriptions par semaine (avec le numéro de semaine)"; [8] hide the columns "Questions" and "Statut".
+
+**[0] Concurrent changes:** before the work, `18.0` contained only PR #19 (merged 2026-11-17 16:02) after `feature/desk-columns-presence`, and no PR was open. Checked again before pushing.
+
+**[4] Answer, no change:** not hard-coded. `local_stamp()` takes the abbreviation from `strftime("%Z")` of a datetime converted with zoneinfo (America/Toronto by default), so it is "EST" in winter and "EDT" in summer; `zone_label()` only translates it to "HNE" / "HAE". Covered by `test_registration_desk_report` (2026-11-17 -> HNE, 2026-10-10 -> HAE).
+
+**Changes:**
+
+- `models/registration_desk_report.py`:
+  - New `cell_style()` and constants `HEAD_BG` (#34495e), `HEAD_FG` (#ffffff, contrast 9.9:1), `STRIPE_BG` (#f2f2f2), `TOTAL_BG`, `BORDER`, `GROUP_BORDER`: every cell of every table of the desk (tickets, weeks, hours, answers, reconciliation) and of the volunteers' table is styled inline (header, stripes, borders, totals). Inline because the HTML fields of Odoo do not load a style sheet of their own.
+  - `_row()`: new `stripe` and `first_attrs` arguments; a first cell `None` is left out (covered by a rowspan).
+  - Answers table: one `<tbody>` with a 2 px border per question, the question in ONE bold cell (rowspan) over all its answers.
+  - "% présents" = people present who gave the answer / all the registered people concerned by the question (same total as "% inscrits"). Note under the table updated.
+  - New `weekly_registrations()` and section "Inscriptions par semaine" / "Registrations per week" after the ticket table: ISO week number with its Monday and Sunday, one column per ticket, total and cumulative; empty weeks between the first and the last are listed with 0; dates in local time (the "registered" value of the rows).
+  - `volunteer_table_html()`: header, stripes and total lines styled the same way.
+- `models/event_registration_desk.py`: `guide_action()`, `GUIDE_URL`; `rlq.registration.desk.action_open_guide()` (section `#bureau-inscription`); "Sort by" default `name` (was `event_ticket_id`).
+- `models/volunteer_coordinator.py`: `action_open_guide()` (section `#benevoles`).
+- `views/event_registration_desk_views.xml`: button "Help for this page" / "Aide de cette page" on both pages; "Ouvrir en liste" ordered by name (`default_order="name"`, accents ignored by `_order_field_to_sql()`); columns "Statut" (`state`) and "Questions répondues" (`rlq_desk_progress`) `optional="hide"` in both lists; class `o_rlq_table` on both lists.
+- New `static/src/css/rlq_tables.css` (in `web.assets_backend`): same colours for the lists of Odoo carrying `o_rlq_table` only.
+- `doc/Guide-utilisateur-rlq_survey_report.html`: anchor `id="benevoles"`, desk section updated.
+- `scripts/build_fr_po.py`, `i18n/fr.po` (rebuilt): "Help for this page" -> "Aide de cette page".
+
+**Bugs fixed:**
+
+- [5] Symptom: "% présents" always 100 %. Diagnosis: it was "present with this answer / people present concerned by the question"; for a question answered the same way by everybody present (or with one answer), that is 100 % by construction. Fix: divided by all the registered people concerned by the question, as "% inscrits".
+- [6] Symptom: the answers table had no visible frame. Diagnosis: the table relied on the Bootstrap class `table-bordered` alone, not rendered in this HTML field. Fix: inline borders on every cell and one framed group per question.
+
+**Safeguards and edge cases:**
+
+- A question with one answer has no rowspan; empty first cells are never wrapped in `<strong>`.
+- Rows without a valid date of registration are not counted per week; no section when there is no date at all.
+- The list CSS targets only `o_rlq_table`: no other list of Odoo changes; if the selectors do not match, the list keeps the look of Odoo.
+- Columns hidden with `optional="hide"` are still loaded: the buttons and colours that use `state` keep working.
+
+**Checks performed:**
+
+- Standalone tests of run-all.sh: all [OK] (new: header colour and stripes, framed questions and new "% présents", registrations per week); ruff: OK; `scripts/build_fr_po.py`: all terms translated; view XML parsed.
+- New Odoo test (not run here, no Odoo instance): default sort by name, URLs of both help buttons.
+
+**Action required from the user:** `-u rlq_survey_report --i18n-overwrite` (new CSS file, views, translations), then reload the browser page (Ctrl+F5) so the new CSS is loaded. Then the points "v1.134.0" of `doc/NOTES_VALIDATION.md`.
+
 ## 18.0.1.133.0
 
 **Short title:** registration desk: "Sondages complétés (%)" instead of the question percentages, "% inscrits" and "% présents" in the answers table, questions in bold, date of submission of the survey, departure column hidden, "Sondage" column right in a form not saved yet, hours of arrival cleared and recorded again.

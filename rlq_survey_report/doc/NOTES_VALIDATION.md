@@ -6,6 +6,38 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -90. Participants uniques, Présentiel, 1 à l'écran, confirmation une fois par page, menus « Rapports RLQ » (v1.136.0)
+
+**À confirmer après `-u rlq_survey_report --i18n-overwrite` :**
+1. Bureau, tableau par billet : colonne « Participants uniques (courriel) » ; une personne inscrite deux fois avec la même adresse compte 1.
+2. Bénévoles : colonne « Présentiel » (1 si sur place), total en haut et en bas ; les rôles affichent 1 au lieu de X ; sous le tableau, « Participants uniques (courriel) ».
+3. Chiffrier des bénévoles : colonne « Présentiel » avec des 1.
+4. « Ouvrir en liste », « Contacter les participants », « Exporter dans un chiffrier » : la fenêtre de confirmation apparaît la première fois seulement ; « Continuer » sans cocher affiche le message ; après, plus rien jusqu'à la réouverture de la page par le menu.
+5. Après la confirmation, l'export télécharge le fichier et la fenêtre se ferme (si elle reste ouverte, la fermer ; à signaler).
+6. Événements : un sous-menu « Rapports RLQ » contient Bureau d'inscription RLQ, Sondages non complétés, Bénévoles, Courriels invalides, Guide d'utilisation. Sondages : « Rapports RLQ » (ancien « Rapports détaillés »).
+
+## -89. Réponses d'un participant, contact, recherche, téléphone, 1 dans le chiffrier, menus (v1.135.0)
+
+**À confirmer après `-u rlq_survey_report --i18n-overwrite` :**
+1. Bureau : un clic sur les réponses d'une personne, ou « Voir les réponses », ouvre toutes ses réponses dans un nouvel onglet. Essayer aussi avec un bénévole qui n'a PAS les droits des Sondages : la liste s'affiche et le lien fonctionne.
+2. « Modifier les réponses » : visible seulement pour un administrateur des sondages ; ouvre la fenêtre de modification.
+3. « Contacter les participants » (bureau et bénévoles) : la fenêtre de courriel d'Odoo s'ouvre ; envoyer un essai à une liste filtrée de 1 ou 2 personnes et vérifier que chacune reçoit son propre courriel. Si la fenêtre n'a pas de destinataires, le noter (mode « mass_mail » de votre version d'Odoo).
+4. Bénévoles : « Ouvrir en liste » montre les bénévoles du tableau ; un clic sur « Complété » ouvre les réponses.
+5. Recherche : dans le bureau, « vege » trouve « Végétarien » ; dans « Ouvrir en liste », taper un texte et choisir « Réponses », « Téléphone »...
+6. Colonne « Téléphone » cachée, disponible dans le menu des colonnes.
+7. Chiffrier des bénévoles : des 1 au lieu des X ; =SOMME() d'une colonne de rôle donne le nombre de bénévoles ; colonne « Autres rôles (texte) ».
+8. Menu Sondages > Rapports détaillés : « Bureau d'inscription RLQ » et « Bénévoles ».
+
+## -88. Aide de la page, couleurs des tableaux, inscriptions par semaine, % présents (v1.134.0)
+
+**À confirmer après `-u rlq_survey_report --i18n-overwrite` et Ctrl+F5 :**
+1. Bureau d'inscription et Bénévoles : bouton « Aide de cette page » ; il ouvre le guide à la bonne section, dans un nouvel onglet.
+2. Tous les tableaux : en-tête foncé à texte blanc, une ligne sur deux en gris pâle. Même chose dans la liste du bas et dans « Ouvrir en liste ».
+3. Tableau des réponses : chaque question encadrée, son nom dans une seule case en gras ; « % présents » n'est plus toujours 100 %.
+4. Nouvelle section « Inscriptions par semaine » (numéro de semaine, lundi au dimanche, total, cumul).
+5. Liste triée par nom à l'ouverture ; colonnes « Statut » et « Questions répondues » cachées (menu des colonnes pour les afficher).
+6. Si la liste d'Odoo ne prend pas les couleurs : noter la version d'Odoo (les sélecteurs de static/src/css/rlq_tables.css ne correspondent pas), rien d'autre n'est touché.
+
 ## -87. Bureau d'inscription : % de sondages complétés, % inscrits et % présents, date de soumission, heures de présence (v1.133.0)
 
 **À confirmer après `-u rlq_survey_report --i18n-overwrite` :**

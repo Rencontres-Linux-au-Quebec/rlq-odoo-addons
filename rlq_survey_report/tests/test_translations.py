@@ -10,7 +10,7 @@
 
 Odoo finds the translation of a view TEXT (between tags) only if the msgid is written as Odoo stores the view: XML-escaped
 (« > » as « &gt; », « & » as « &amp; »). An entry written with the raw character is silently ignored and the text stays in
-English (seen in 18.0.1.127.0: « Click a question to change its answer... (Surveys > Detailed reports > ...) »).
+English (seen in 18.0.1.127.0: « Click a question to change its answer... (Surveys > RLQ reports > ...) »).
 """
 import re
 import unittest

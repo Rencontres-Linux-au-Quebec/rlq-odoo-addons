@@ -17,7 +17,7 @@ Invalid e-mail addresses of event registrations (v1.109.0).
     is corrected BEFORE the registration is created, so the confirmation e-mail leaves to the right address; a note is posted on the registration.
     System parameter `rlq_survey_report.registration_email_autofix`: "syntax" (default), "off" (never), "typos" (also a misspelled popular domain).
     The registration is NEVER refused or blocked.
-  - Menu Events > Invalid e-mails (and Surveys > Detailed reports): the registrations with an issue, and the button « Fix and resend » (wizard
+  - Menu Events > Invalid e-mails (and Surveys > RLQ reports): the registrations with an issue, and the button « Fix and resend » (wizard
     rlq.registration.email.fix): the corrected address is written on the registration and on its contact (only if the contact holds the same wrong
     address), the failed e-mails of the registration are re-addressed and put back in the queue, and the confirmation e-mail is sent again
     (templates of the event's « after each registration » schedulers, otherwise event.event_subscription).

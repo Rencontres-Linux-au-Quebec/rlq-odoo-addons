@@ -55,7 +55,7 @@
                         <field name="send_email"/>
                     </group>
                 </group>
-                <p class="text-muted">Click a question to change its answer. The questions changed are shown in bold; each one is written in the history (Surveys > Detailed reports > Manual changes of answers).</p>
+                <p class="text-muted">Click a question to change its answer. The questions changed are shown in bold; each one is written in the history (Surveys > RLQ reports > Manual changes of answers).</p>
                 <field name="line_ids" nolabel="1">
                     <list create="false" delete="false" decoration-bf="changed" decoration-muted="not editable">
                         <field name="question_text"/>
@@ -159,7 +159,7 @@
         <field name="context">{'create': False}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">No manual change yet.</p>
-            <p>To change an answer: Surveys > Detailed reports > Edit answers, open the participation, then « Edit the answers ».</p>
+            <p>To change an answer: Surveys > RLQ reports > Edit answers, open the participation, then « Edit the answers ».</p>
         </field>
     </record>
 

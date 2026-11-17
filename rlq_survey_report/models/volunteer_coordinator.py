@@ -33,7 +33,8 @@ from odoo.exceptions import UserError
 
 from . import registration_desk_report as rd
 from . import report_builder as rb
-from .event_registration_desk import LIST_STATES, local_time, local_zone, program_stamp
+from .event_registration_desk import (ANSWERS_URL, LIST_STATES, contact_action, guide_action, local_time, local_zone,
+                                      program_stamp, registration_list_action)
 
 try:
     import openpyxl
@@ -50,6 +51,7 @@ CHOICE_TYPES = ("simple_choice", "multiple_choice")
 
 class RlqVolunteerCoordinator(models.TransientModel):
     _name = "rlq.volunteer.coordinator"
+    _inherit = ["rlq.pi.confirmation.mixin"]                              # v1.136.0: confirmation once per page
     _description = "Volunteers"
 
     @api.model
@@ -83,6 +85,34 @@ class RlqVolunteerCoordinator(models.TransientModel):
     def action_refresh(self):
         """Button « Refresh »: the form is read again, so the table is computed again."""
         return True
+
+    def action_open_guide(self):
+        """v1.134.0: button « Help for this page »: the user guide, opened at the section of the volunteers."""
+        return guide_action(self.env, "benevoles")
+
+    def _rlq_listed_registrations(self):
+        """The registrations of the volunteers shown in the table (same « Survey » filter)."""
+        rows = self._rlq_table_data()[0]
+        return self.env["event.registration"].browse([row["registration_id"] for row in rows])
+
+    def action_open_list(self):
+        """v1.135.0: button « Open as a list », as at the registration desk: the volunteers of the table in the full list
+        (search on every column, filters, grouping, export, buttons « Present », « See the answers »...)."""
+        self.ensure_one()
+        guard = self._rlq_pi_guard("action_open_list")
+        if guard:
+            return guard
+        registrations = self._rlq_listed_registrations()
+        return registration_list_action(self.env, _("Volunteers: %(event)s", event=self.event_id.name),
+                                        [("id", "in", registrations.ids)], self.event_id.id)
+
+    def action_contact(self):
+        """v1.135.0: button « Contact the participants »: an e-mail to each volunteer of the table."""
+        self.ensure_one()
+        guard = self._rlq_pi_guard("action_contact")
+        if guard:
+            return guard
+        return contact_action(self.env, self._rlq_listed_registrations())
 
     def _rlq_volunteer_registrations(self):
         """Registrations (not cancelled) of the event whose ticket is a volunteer ticket."""
@@ -212,6 +242,8 @@ class RlqVolunteerCoordinator(models.TransientModel):
                 "ticket": registration.event_ticket_id.name or "",
                 "survey": state, "type": type_text, "languages": ", ".join(languages_list), "languages_list": languages_list,
                 "arrived": arrived, "departed": departed, "roles": roles, "extra": extra,
+                # v1.135.0: the survey cell is a link to every answer of the person; the id serves « Contact » and the list.
+                "answers_url": ANSWERS_URL % input_id if input_id else None, "registration_id": registration.id,
             })
         rows = rd.sort_volunteer_rows(rows, self.sort_by or "name", self.sort_desc)
         return rows, groups, extra_labels, notes
@@ -232,7 +264,8 @@ class RlqVolunteerCoordinator(models.TransientModel):
             sheet.freeze_panes = "A2"
             sheet.auto_filter.ref = sheet.dimensions
             for index, label in enumerate(header, 1):
-                longest = max([len(str(label))] + [len(str(line[index - 1])) for line in lines if index <= len(line)])
+                longest = max([len(str(label))] + [len(str(line[index - 1] if line[index - 1] is not None else ""))
+                                                   for line in lines if index <= len(line)])
                 sheet.column_dimensions[get_column_letter(index)].width = min(max(longest + 2, 10), 60)
         buffer = io.BytesIO()
         workbook.save(buffer)
@@ -244,6 +277,9 @@ class RlqVolunteerCoordinator(models.TransientModel):
 
         The file contains names and e-mail addresses: every export is written in the access history of the reports."""
         self.ensure_one()
+        guard = self._rlq_pi_guard("action_export_excel")                # v1.136.0: names and e-mail addresses in the file
+        if guard:
+            return guard
         if openpyxl is None:
             raise UserError(_("The spreadsheet export needs the Python library « openpyxl », which is not installed on this server "
                               "(pip install openpyxl)."))

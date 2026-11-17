@@ -8,6 +8,7 @@
 
     python3 -m unittest tests.test_registration_desk_report -v
 """
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -62,6 +63,15 @@ class TestRegistrationDeskReport(unittest.TestCase):
         self.assertEqual((total["registered"], total["present"], total["done"]), (5, 3, 2))
         self.assertEqual((total["answered"], total["unanswered"]), (7, 7))
         self.assertEqual(total["name"], "Total")
+
+    def test_ticket_summary_unique_people_by_email(self):
+        """v1.136.0: « Participants uniques (courriel) »: the same address counts once, per ticket and in total."""
+        rows = [dict(row("Visitor"), email="A@x.org"), dict(row("Visitor"), email="a@x.org"), dict(row("Volunteer"), email="a@x.org"),
+                dict(row("Volunteer"), email=""), dict(row("Volunteer"), email="b@x.org")]
+        lines, total = rd.ticket_summary(rows, "fr")
+        self.assertEqual([(line["name"], line["registered"], line["unique"]) for line in lines], [("Visitor", 2, 1), ("Volunteer", 3, 3)])
+        self.assertEqual((total["registered"], total["unique"]), (5, 3))                     # a@x.org once in the whole event
+        self.assertIn("Participants uniques (courriel)", rd.desk_summary_html(rows, "fr"))
 
     def test_hourly_attendance_counts_only_the_people_present(self):
         hourly = rd.hourly_attendance(ROWS + [row("Visitor", True, None)], "en")           # present without hour: not counted
@@ -118,7 +128,7 @@ class TestRegistrationDeskReport(unittest.TestCase):
         self.assertNotIn("Questions non répondues (%)", html)
         self.assertIn("Sondages complétés (%)", html)
         # Visitor: 1 completed of 3 with a survey -> 33,3 %, right-aligned like the counts; total: 2 of 4 (no survey excluded).
-        self.assertIn('<td style="text-align:right;">33,3\u00a0%</td>', html)
+        self.assertIn('text-align:right;">33,3\u00a0%</td>', html)
         self.assertIn("<strong>50,0\u00a0%</strong>", html)
         self.assertIn("50.0%", rd.desk_summary_html(ROWS, "en"))
         self.assertIn("(sans réponse) » : personnes inscrites", html)                          # the note explains it
@@ -126,14 +136,42 @@ class TestRegistrationDeskReport(unittest.TestCase):
     def test_answers_table_percentages_and_bold_questions(self):
         """v1.133.0: « % inscrits » and « % présents » next to « Total » and « dont présents »; the questions are in bold."""
         html = rd.desk_summary_html(ROWS)
-        self.assertIn("<th>% inscrits</th>", html)
-        self.assertIn("<th>% présents</th>", html)
-        self.assertIn("<td><strong>Lunch</strong></td>", html)
-        self.assertIn("<td><strong>Mode</strong></td>", html)
-        self.assertNotIn("<strong></strong>", html)                                            # the following lines stay empty
-        # Lunch « Yes »: 2 of the 4 registered people concerned -> 50,0 %, 2 of the 3 present -> 66,7 %.
-        self.assertIn('<td style="text-align:right;">2</td><td style="text-align:right;">50,0\u00a0%</td>'
-                      '<td style="text-align:right;">2</td><td style="text-align:right;">66,7\u00a0%</td>', html)
+        self.assertIn(">% inscrits</th>", html)
+        self.assertIn(">% présents</th>", html)
+        self.assertNotIn("<strong></strong>", html)
+        # v1.134.0: each question is framed (its own <tbody>), the question in ONE cell over all its answers.
+        self.assertEqual(html.count('<tbody style="border:2px solid'), 2)
+        self.assertRegex(html, r'<td rowspan="3"[^>]*><strong>Lunch</strong></td>')
+        self.assertRegex(html, r'<td rowspan="2"[^>]*><strong>Mode</strong></td>')
+        # Lunch « Yes »: 2 of the 4 registered people concerned -> 50,0 %; 2 present of those same 4 -> 50,0 % (v1.134.0:
+        # out of all the people concerned, no longer out of the people present only, which gave 100 % too often).
+        cells = re.findall(r"<td[^>]*>([^<]*)</td>", html.split("<strong>Lunch</strong>")[1].split("</tr>")[1])
+        self.assertEqual(cells, ["Yes", "1", "1", "2", "50,0\u00a0%", "2", "50,0\u00a0%"])
+
+    def test_tables_have_header_colour_and_stripes(self):
+        """v1.134.0: dark header with white text, one line out of two in pale grey, a border on every cell."""
+        html = rd.desk_summary_html(ROWS)
+        self.assertIn("background-color:%s;color:%s" % (rd.HEAD_BG, rd.HEAD_FG), html)
+        self.assertIn("background-color:%s" % rd.STRIPE_BG, html)
+        self.assertNotRegex(html, r"<t[dh]>")                                                  # every cell is styled
+        volunteers = rd.volunteer_table_html([{"name": "A"}, {"name": "B"}], [], "fr")
+        self.assertIn("background-color:%s;color:%s" % (rd.HEAD_BG, rd.HEAD_FG), volunteers)
+        self.assertIn("background-color:%s" % rd.STRIPE_BG, volunteers)
+
+    def test_weekly_registrations(self):
+        """v1.134.0: registrations per ISO week, empty weeks in between listed, cumulative total."""
+        rows = [dict(row("Visitor"), registered="2026-11-02 10:00"), dict(row("Visitor"), registered="2026-11-08 23:59"),
+                dict(row("Volunteer"), registered="2026-11-17 15:59"), dict(row("Visitor"), registered="")]
+        weekly = rd.weekly_registrations(rows, "fr")
+        self.assertEqual(weekly["tickets"], ["Visitor", "Volunteer"])
+        self.assertEqual([(w["week"], w["total"], w["cumulative"]) for w in weekly["weeks"]], [(45, 2, 2), (46, 0, 2), (47, 1, 3)])
+        self.assertEqual(str(weekly["weeks"][0]["monday"]), "2026-11-02")
+        self.assertEqual(str(weekly["weeks"][0]["sunday"]), "2026-11-08")
+        html = rd.desk_summary_html(rows, "fr")
+        self.assertIn("Inscriptions par semaine", html)
+        self.assertIn("Semaine 45 : 2026-11-02 au 2026-11-08", html)
+        self.assertIn("Week 47: 2026-11-16 to 2026-11-22", rd.desk_summary_html(rows, "en"))
+        self.assertEqual(rd.weekly_registrations([row("V")])["weeks"], [])                    # no date: no section
 
     def test_answers_that_differ_by_case_or_accents_are_grouped(self):
         rows = [row("Visitor", answers=[("Diet", ["Végétarien"])]), row("Visitor", answers=[("Diet", ["végétarien"])]),
@@ -216,13 +254,16 @@ class TestRegistrationDeskReport(unittest.TestCase):
         sheets = rd.volunteer_export_sheets(rows, groups, "fr_CA", extra_columns=["Dîner"])
         self.assertEqual([title for title, _header, _lines in sheets], ["Bénévoles", "Rôles", "Langues"])
         _title, header, lines = sheets[0]
-        self.assertEqual(header, ["Bénévole", "Courriel", "Billet", "Inscrit le", "Sondage", "Type", "Langues parlées", "Heure d'arrivée",
-                                  "Heure de départ", "Dîner", "Accueil", "Autre", "Modérateur", "Autre (2)", "Nombre de rôles"])
+        self.assertEqual(header, ["Bénévole", "Courriel", "Billet", "Inscrit le", "Sondage", "Type", "Présentiel", "Langues parlées", "Heure d'arrivée",
+                                  "Heure de départ", "Dîner", "Accueil", "Autre", "Modérateur", "Autre (2)", "Autres rôles (texte)",
+                                  "Nombre de rôles"])
         self.assertEqual(len(set(header)), len(header))                                       # unique names: needed by a pivot table
         self.assertEqual(lines[0], ["Zoé Tremblay", "zoe@exemple.org", "Bénévole", datetime.datetime(2026, 10, 1, 9, 0), "Complété",
-                                    "Présentiel", "Français, Anglais", "8 h", "16 h", "Oui", "X", "Photographe", "", "", 3])
+                                    "Présentiel", 1, "Français, Anglais", "8 h", "16 h", "Oui", 1, 1, None, None, "Photographe", 3])
         self.assertEqual(lines[1][3], "2026-10-02 10:00")                                      # no datetime given: the text
-        self.assertEqual(lines[1][-5:], ["", "", "", "", 0])
+        self.assertEqual(lines[1][-6:], [None, None, None, None, "", 0])                      # v1.135.0: numbers, empty cells
+        self.assertEqual(sum(line[11] or 0 for line in lines), 1)                              # the column can be summed
+        self.assertEqual([line[6] for line in lines], [1, None])                               # v1.136.0: « Présentiel »
         self.assertTrue(all(len(line) == len(header) for line in lines))
         _title, header, lines = sheets[1]
         self.assertEqual(header, ["Bénévole", "Courriel", "Type", "Langues parlées", "Sondage", "Question", "Rôle"])
@@ -268,6 +309,29 @@ class TestRegistrationDeskReport(unittest.TestCase):
         self.assertEqual(rd.deduced_type(["online"], "en"), "Online")
         self.assertEqual(rd.deduced_type([]), "")
 
+    def test_answers_cell_html(self):
+        """v1.135.0: the answers are a link to every answer of the person, sortable without case or accents, escaped."""
+        html = rd.answers_cell_html("Dîner: <b>Oui</b>", "/rlq_survey_report/answers/7")
+        self.assertIn('href="/rlq_survey_report/answers/7"', html)
+        self.assertIn('data-rlq-sort="diner: <b>oui</b>"'.replace("<", "&lt;").replace(">", "&gt;"), html)
+        self.assertNotIn("<b>", html)
+        self.assertEqual(rd.answers_cell_html("", None), "")
+        self.assertIn("href", rd.answers_cell_html("", "/rlq_survey_report/answers/8"))          # answered, nothing shown: link
+        self.assertNotIn("href", rd.answers_cell_html("Oui", None))
+
+    def test_volunteer_survey_cell_links_to_the_answers(self):
+        html = rd.volunteer_table_html([{"name": "A", "survey": "done", "answers_url": "/rlq_survey_report/answers/3"},
+                                        {"name": "B", "survey": "not_started"}], [], "fr")
+        self.assertIn('<a href="/rlq_survey_report/answers/3" target="_blank">Complété</a>', html)
+        self.assertEqual(html.count("/rlq_survey_report/answers/"), 1)
+
+    def test_role_numbers(self):
+        """v1.135.0: 1 instead of « X » in the spreadsheet; the free text of « Autre » counts 1 and is returned apart."""
+        self.assertEqual(rd.role_numbers(["Accueil", "Salle 2", "Autre"], ["accueil"]), ([1, None, None], []))
+        self.assertEqual(rd.role_numbers(["Accueil", "Autre"], ["Photographe"]), ([None, 1], ["Photographe"]))
+        self.assertEqual(rd.role_numbers(["A", "B"], ["libre"]), ([None, 1], ["libre"]))
+        self.assertEqual(rd.role_numbers([], ["x"]), ([], ["x"]))
+
     def test_role_cells(self):
         self.assertEqual(rd.role_cells(["Accueil", "Salle 2", "Autre"], ["accueil"]), ["X", "", ""])
         self.assertEqual(rd.role_cells(["Accueil", "Autre"], ["Autre", "Photographe"]), ["", "Photographe"])   # free text replaces X
@@ -306,13 +370,16 @@ class TestRegistrationDeskReport(unittest.TestCase):
         html = rd.volunteer_table_html(self._volunteers(), groups, "fr_CA", extra_columns=["Dîner"], notes=["Une <note>"])
         for text in ("Bénévole", "Inscrit le", "Sondage", "Langues parlées", "Heure d&#x27;arrivée", "Heure de départ", "Dîner",
                      "Rôles (en présentiel)", "Rôles (en virtuel)", "Accueil", "Salle 2", "Modérateur",
-                     "Complété", "Commencé", "Non commencé", "Bénévoles listés: 3", "Une &lt;note&gt;"):
+                     "Complété", "Commencé", "Non commencé", "Bénévoles listés: 3", "Une &lt;note&gt;", "Présentiel",
+                     "Participants uniques (courriel): "):
             self.assertIn(text, html)
         self.assertIn('<a href="/rlq_survey_report/chat/7" target="_blank">Zoé &lt;b&gt;Tremblay&lt;/b&gt;</a>', html)
         self.assertNotIn("<b>Tremblay</b>", html)
         self.assertIn('colspan="2"', html)
         self.assertIn('rowspan="2"', html)
-        self.assertEqual(html.count(">X</span>"), 4)                                           # Accueil x2, Salle 2, Modérateur
+        # v1.136.0: « 1 » instead of « X » (roles: Accueil x2, Salle 2, Modérateur), plus « 1 » in « Présentiel ».
+        self.assertNotIn(">X</span>", html)
+        self.assertEqual(html.count(">1</span>"), 4 + 1)                                       # 4 roles + Zoé on site
         english = rd.volunteer_table_html(self._volunteers(), groups, "en_US")
         for text in ("Volunteer", "Registered on", "Survey", "Languages spoken", "Arrived at", "Left at", "Completed", "Not started"):
             self.assertIn(text, english)
@@ -386,10 +453,20 @@ class TestRegistrationDeskReport(unittest.TestCase):
         groups = [{"title": "Rôles", "choices": ["Accueil", "Technique", "Autre"]}]
         totals = rd.volunteer_column_totals(rows, groups)
         self.assertEqual(totals[0], len(rows))
-        self.assertEqual(len(totals), 7 + 3)
+        self.assertEqual(len(totals), 8 + 3)                                     # v1.136.0: + « Présentiel »
         html = rd.volunteer_table_html(rows, groups, "fr")
         self.assertIn("<tfoot>", html)
         self.assertEqual(html.count("Total : %d" % len(rows)), 2)        # top (header) and bottom (footer)
+
+    def test_on_site_and_unique_people(self):
+        """v1.136.0: who will be there in person, and the number of different people by e-mail address."""
+        self.assertTrue(rd.is_on_site("Présentiel"))
+        self.assertTrue(rd.is_on_site("Présentiel, Virtuel"))
+        self.assertTrue(rd.is_on_site("Hybride"))
+        self.assertFalse(rd.is_on_site("Virtuel"))
+        self.assertFalse(rd.is_on_site(""))
+        rows = [{"email": "A@x.org"}, {"email": " a@x.org "}, {"email": "b@x.org"}, {"email": ""}, {}]
+        self.assertEqual(rd.unique_people(rows), 4)                          # a@x.org once, two rows without address
 
     def test_reconciliation(self):
         self.assertEqual(rd.reconciliation_html([]), "")

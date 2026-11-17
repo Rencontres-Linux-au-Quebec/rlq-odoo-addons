@@ -42,6 +42,7 @@ import logging
 from collections import defaultdict
 
 from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 from odoo.tools import SQL
 
 from . import registration_desk_report as rd
@@ -52,9 +53,14 @@ _logger = logging.getLogger(__name__)
 STATE_RANK = {"done": 2, "in_progress": 1}
 LIST_STATES = ("draft", "open", "done")
 PROGRAM = "rlq_survey_report"
-COMPUTED_SORTS = ("rlq_survey_state", "rlq_desk_progress", "rlq_desk_answers", "rlq_desk_person", "rlq_survey_done_date")
-MAP_SORTS = ("rlq_survey_state", "rlq_desk_progress", "rlq_desk_answers")      # the sorts that need _rlq_desk_map()
-CHAT_URL = "/rlq_survey_report/chat/%d"                                          # controllers/: opens Discuss with the contact
+COMPUTED_SORTS = ("rlq_survey_state", "rlq_desk_progress", "rlq_desk_answers", "rlq_desk_person", "rlq_survey_done_date",
+                  "rlq_desk_answers_html")
+MAP_SORTS = ("rlq_survey_state", "rlq_desk_progress", "rlq_desk_answers", "rlq_desk_answers_html")   # sorts that need _rlq_desk_map()
+SURVEY_MANAGER_GROUP = "survey.group_survey_manager"                             # may change the answers (survey_answer_edit.py)
+TEXT_OPERATORS = ("ilike", "not ilike", "=", "!=")
+CHAT_URL = "/rlq_survey_report/chat/%d"
+GUIDE_URL = "/rlq_survey_report/aide#%s"
+ANSWERS_URL = "/rlq_survey_report/answers/%d"                                    # controllers/reponses.py: the answers of a person                                         # controllers/aide.py, section of the guide                                          # controllers/: opens Discuss with the contact
 STATE_ORDER = {"draft": 0, "open": 1, "done": 2, "cancel": 3}
 RECENT_EVENTS_FIRST = "date_begin desc, id desc"
 DEFAULT_ZONE = "America/Toronto"
@@ -96,6 +102,35 @@ def local_time(registration, value, pattern):
     return fields.Datetime.context_timestamp(registration.with_context(tz=zone), value).strftime(pattern)
 
 
+def guide_action(env, anchor):
+    """Opens the user guide (controllers/aide.py) in a new tab, at the section `anchor` (v1.134.0)."""
+    return {"type": "ir.actions.act_url", "url": GUIDE_URL % anchor, "target": "new", "name": _("User guide")}
+
+
+def contact_action(env, registrations):
+    """v1.135.0: the e-mail window of Odoo, one e-mail per registration that has an address (mass mailing on
+    event.registration: each person receives their own e-mail, the addresses are never shown to the others)."""
+    with_email = registrations.filtered(lambda r: (r.email or "").strip())
+    if not with_email:
+        raise UserError(_("No participant of this list has an e-mail address."))
+    return {
+        "type": "ir.actions.act_window", "name": _("Contact the participants"), "res_model": "mail.compose.message",
+        "view_mode": "form", "target": "new",
+        "context": {"default_model": "event.registration", "default_res_ids": with_email.ids,
+                    "default_composition_mode": "mass_mail", "active_model": "event.registration", "active_ids": with_email.ids},
+    }
+
+
+def registration_list_action(env, name, domain, event_id):
+    """« Open as a list »: the registrations in the full list of the desk (search, filters, grouping, export, same buttons)."""
+    return {
+        "type": "ir.actions.act_window", "name": name, "res_model": "event.registration", "view_mode": "list,form",
+        "views": [(env.ref("rlq_survey_report.view_rlq_registration_desk_registration_list").id, "list"), (False, "form")],
+        "search_view_id": [env.ref("rlq_survey_report.view_rlq_registration_desk_registration_search").id, "search"],
+        "domain": domain, "context": {"create": False, "rlq_desk_event_id": event_id},
+    }
+
+
 def program_stamp(env, event=None):
     """Footer of the screens: program name, installed version, local date and time of the display, with the time zone."""
     zone = local_zone(env, event)
@@ -121,9 +156,21 @@ class EventRegistrationDesk(models.Model):
         help="Questions answered / questions of the survey expected for this registration (pages excluded). Empty: no survey.",
     )
     rlq_desk_answers = fields.Char(
-        string="Answers", compute="_compute_rlq_desk",
+        string="Answers (text)", compute="_compute_rlq_desk", search="_search_rlq_desk_answers",
         help="Answers of this person to the survey questions checked « Show at the registration desk ».",
     )
+    rlq_desk_answers_html = fields.Html(
+        string="Answers", compute="_compute_rlq_desk", sanitize=False,
+        help="Answers of this person to the survey questions checked « Show at the registration desk ». Click them to see "
+             "every answer of the survey filled in by this person.",
+    )
+    # An Integer, not a Many2one: a volunteer of the Events application without the rights of the Surveys application must
+    # be able to read the list (a Many2one would read the name of the participation, refused by the access rights).
+    rlq_desk_user_input_id = fields.Integer(
+        string="Participation", compute="_compute_rlq_desk",
+        help="The participation of this person to the expected survey (the most advanced one, the most recent among equals).",
+    )
+    rlq_desk_can_edit_answers = fields.Boolean(string="Can edit the answers", compute="_compute_rlq_desk")
     rlq_desk_person = fields.Html(
         string="Participant name", compute="_compute_rlq_desk_person", sanitize=False,
         help="Name of the participant. Click it to send a message to this person in Odoo (Discuss). Sorting by this column "
@@ -140,11 +187,59 @@ class EventRegistrationDesk(models.Model):
 
     def _compute_rlq_desk(self):
         data = self._origin._rlq_desk_map()                     # v1.133.0: _origin, see _compute_rlq_survey_state()
+        can_edit = self.env.user.has_group(SURVEY_MANAGER_GROUP)
         for registration in self:
             item = data.get(registration._origin.id) or {}
+            text = rd.answers_text(item.get("answers"))
             registration.rlq_desk_progress = rd.progress_text(item.get("questions"), item.get("answered")) or False
-            registration.rlq_desk_answers = rd.answers_text(item.get("answers")) or False
+            registration.rlq_desk_answers = text or False
+            input_id = item.get("input")
+            registration.rlq_desk_user_input_id = input_id or 0
+            # v1.135.0: the answers are a link to the survey filled in by the person (see action_rlq_desk_view_answers).
+            registration.rlq_desk_answers_html = rd.answers_cell_html(text, ANSWERS_URL % input_id if input_id else None)
+            registration.rlq_desk_can_edit_answers = bool(can_edit and input_id)
 
+    @api.model
+    def _search_rlq_desk_answers(self, operator, value):
+        """v1.135.0: « Answers » usable in the search bar of « Open as a list » (« contains Végé » finds « Végétarien »): the
+        text is computed, so the matching registrations (of the event of the desk when the context names one) are found in
+        Python, case and accents ignored."""
+        if operator not in TEXT_OPERATORS:
+            raise ValueError("rlq_desk_answers: unsupported search operator %r" % (operator,))
+        domain = [("state", "!=", "cancel")]
+        if self.env.context.get("rlq_desk_event_id"):
+            domain.append(("event_id", "=", self.env.context["rlq_desk_event_id"]))
+        registrations = self.sudo().with_context(rlq_desk_event_id=False).search(domain)
+        data = registrations._rlq_desk_map()
+        needle = sort_key(" ".join(str(value or "").split()))
+        ids = []
+        for registration in registrations:
+            text = sort_key(rd.answers_text((data.get(registration.id) or {}).get("answers")))
+            found = needle in text if operator in ("ilike", "not ilike") else needle == text
+            if found:
+                ids.append(registration.id)
+        return [("id", "in" if operator in ("ilike", "=") else "not in", ids)]
+
+    def action_rlq_desk_view_answers(self):
+        """v1.135.0: button « See the answers »: every answer of the survey filled in by this person, in a new tab (the page
+        « print » of Odoo), without going through the Surveys application."""
+        self.ensure_one()
+        user_input = self._rlq_desk_user_input()
+        if not user_input:
+            raise UserError(_("This person has not answered the survey yet."))
+        return {"type": "ir.actions.act_url", "url": ANSWERS_URL % user_input.id, "target": "new"}
+
+    def action_rlq_desk_edit_answers(self):
+        """v1.135.0: button « Edit the answers » (survey administrators only): the window of survey_answer_edit.py."""
+        self.ensure_one()
+        user_input = self._rlq_desk_user_input()
+        if not user_input:
+            raise UserError(_("This person has not answered the survey yet."))
+        return user_input.action_rlq_edit_answers()
+
+    def _rlq_desk_user_input(self):
+        input_id = (self._origin._rlq_desk_map().get(self._origin.id) or {}).get("input")
+        return self.env["survey.user_input"].browse(input_id) if input_id else self.env["survey.user_input"]
     @api.model
     def _rlq_desk_value(self, row, answer_values):
         """Text of one survey.user_input.line (dict of search_read); « » when the line carries no value."""
@@ -226,7 +321,8 @@ class EventRegistrationDesk(models.Model):
         result = {}
         if not survey_ids:
             for registration in registrations:
-                result[registration.id] = {"survey": False, "state": "none", "questions": 0, "answered": 0, "answers": []}
+                result[registration.id] = {"survey": False, "state": "none", "questions": 0, "answered": 0, "answers": [],
+                                           "input": False}
             return result
 
         # Questions of each survey (pages excluded), and the ones shown at the desk.
@@ -245,12 +341,13 @@ class EventRegistrationDesk(models.Model):
         for registration in registrations:
             survey, state, _done = status[registration.id]
             if not survey:
-                result[registration.id] = {"survey": False, "state": "none", "questions": 0, "answered": 0, "answers": []}
+                result[registration.id] = {"survey": False, "state": "none", "questions": 0, "answered": 0, "answers": [],
+                                           "input": False}
                 continue
             input_id = chosen.get(registration.id)
             result[registration.id] = {
                 "survey": survey, "state": state, "questions": question_count.get(survey.id, 0),
-                "answered": len(answered.get(input_id, ())),
+                "answered": len(answered.get(input_id, ())), "input": input_id or False,
                 "answers": [(label, values.get((input_id, question_id), [])) for question_id, label in desk_questions.get(survey.id, [])],
             }
         return result
@@ -266,6 +363,7 @@ class EventRegistrationDesk(models.Model):
             hour = local_time(registration, closed, "%Y-%m-%d %H") if present and closed else None
             ticket = registration.event_ticket_id if "event_ticket_id" in registration._fields else False
             rows.append({"ticket": ticket.name if ticket else "", "present": present, "hour": hour,
+                         "email": registration.email or registration.partner_id.email or "",
                          "survey_state": item.get("state", "none"), "questions": item.get("questions", 0),
                          "answered": item.get("answered", 0), "answers": item.get("answers", []),
                          "registered": local_time(registration, registration.create_date, "%Y-%m-%d %H:%M"),
@@ -284,7 +382,7 @@ class EventRegistrationDesk(models.Model):
                 key = (rd.SURVEY_RANK.get(item.get("state", "none"), 9),)
             elif field_name == "rlq_desk_progress":
                 key = (not item.get("questions"), item.get("answered", 0), item.get("questions", 0))
-            elif field_name == "rlq_desk_answers":
+            elif field_name in ("rlq_desk_answers", "rlq_desk_answers_html"):
                 text = rd.answers_text(item.get("answers"))
                 key = (not text, sort_key(text))
             elif field_name == "rlq_desk_person":
@@ -448,8 +546,52 @@ class EventEventRegistrationDesk(models.Model):
         }
 
 
+PI_ACTIONS = ("action_open_list", "action_contact", "action_export_excel")     # actions that show e-mail addresses
+
+
+class RlqPersonalInformationConfirmation(models.AbstractModel):
+    """v1.136.0: the confirmation about personal information, ONCE per page, before what shows e-mail addresses or phone
+    numbers (« Open as a list », « Contact the participants », « Export to a spreadsheet »), as for the survey reports
+    (v1.131.0). The page is a transient record: the box stays checked until the page is opened again from the menu."""
+    _name = "rlq.pi.confirmation.mixin"
+    _description = "Confirmation about personal information"
+
+    rlq_pi_confirmed = fields.Boolean(
+        string="I am responsible for the personal information shown", default=False,
+        help="This page shows personal information about the participants (names, e-mail addresses, phone numbers). By "
+             "checking this box, you confirm that you are aware of this responsibility and will share it only with authorized "
+             "people (Loi 25 in Québec, GDPR in Europe).",
+    )
+
+    def _rlq_pi_guard(self, method):
+        """None when the box is already checked on this page; otherwise the confirmation window, which runs `method` after."""
+        self.ensure_one()
+        if self.rlq_pi_confirmed:
+            return None
+        return {
+            "type": "ir.actions.act_window", "name": _("Confirmation"), "res_model": self._name, "res_id": self.id,
+            "view_mode": "form", "target": "new",
+            "views": [[self.env.ref("rlq_survey_report.view_%s_pi_confirmation" % self._name.replace(".", "_")).id, "form"]],
+            "context": {"rlq_pi_next": method},
+        }
+
+    def action_rlq_pi_continue(self):
+        """Button « Continue » of the confirmation window: checks the box, then runs the action that asked for it."""
+        self.ensure_one()
+        if not self.rlq_pi_confirmed:
+            raise UserError(_("Check the box about personal information to continue."))
+        method = self.env.context.get("rlq_pi_next")
+        if method not in PI_ACTIONS or not hasattr(self, method):
+            return {"type": "ir.actions.act_window_close"}
+        result = getattr(self, method)()
+        if isinstance(result, dict) and result.get("type") == "ir.actions.act_url":
+            result = dict(result, close=True)                             # a download: close this window too
+        return result
+
+
 class RlqRegistrationDesk(models.TransientModel):
     _name = "rlq.registration.desk"
+    _inherit = ["rlq.pi.confirmation.mixin"]
     _description = "RLQ registration desk"
 
     @api.model
@@ -464,8 +606,9 @@ class RlqRegistrationDesk(models.TransientModel):
     event_id = fields.Many2one("event.event", string="Event", required=True, default=_default_event_id,
                                help="By default: the event in progress, otherwise the next one.")
     search_text = fields.Char(string="Search",
-                              help="Part of a name, an e-mail address or a company: only the matching registrations are listed. "
-                                   "The summary always counts the whole event.")
+                              help="Part of a name, an e-mail address, a company, a phone number, a ticket or an answer: only "
+                                   "the matching registrations are listed (case and accents ignored). The summary always counts "
+                                   "the whole event.")
     hide_present = fields.Boolean(string="Hide the people already present", default=False)
     survey_filter = fields.Selection(
         [("all", "All"), ("done", "Survey completed"), ("in_progress", "Survey started"),
@@ -476,7 +619,7 @@ class RlqRegistrationDesk(models.TransientModel):
          ("date_closed", "Arrival"), ("rlq_departure", "Departure"), ("rlq_survey_state", "Survey"),
          ("rlq_desk_progress", "Questions answered"), ("rlq_desk_answers", "Answers"),
          ("rlq_survey_done_date", "Survey submitted on")],
-        string="Sort by", default="event_ticket_id", required=True,
+        string="Sort by", default="name", required=True,                       # v1.134.0: by name by default
         help="Order of the list below. Case and accents are ignored (« Élise » sorts with the « e »); equal values are sorted by "
              "ticket, then by name.")
     sort_desc = fields.Boolean(string="Descending", default=False, help="Reverses the order of the list.")
@@ -524,10 +667,14 @@ class RlqRegistrationDesk(models.TransientModel):
         return self.env["event.registration"].search([("event_id", "=", self.event_id.id), ("state", "in", list(LIST_STATES))])
 
     @staticmethod
-    def _rlq_haystack(registration):
-        parts = [registration.name, registration.email]
-        if "company_name" in registration._fields:
-            parts.append(registration.company_name)
+    def _rlq_haystack(registration, answers=""):
+        """v1.135.0: the search of the desk also looks in the phone number, the ticket and the answers."""
+        parts = [registration.name, registration.email, answers]
+        for name in ("company_name", "phone", "mobile"):
+            if name in registration._fields:
+                parts.append(registration[name])
+        if "event_ticket_id" in registration._fields:
+            parts.append(registration.event_ticket_id.name)
         return " ".join(" ".join(str(p or "").lower().split()) for p in parts)
 
     def _rlq_listed(self, registrations):
@@ -541,7 +688,9 @@ class RlqRegistrationDesk(models.TransientModel):
             listed = listed.filtered(lambda r: status.get(r.id, (None, "none"))[1] == self.survey_filter)
         needle = sort_key(" ".join((self.search_text or "").split()))
         if needle:
-            listed = listed.filtered(lambda r: needle in sort_key(self._rlq_haystack(r)))
+            data = listed._rlq_desk_map()
+            listed = listed.filtered(lambda r: needle in sort_key(self._rlq_haystack(
+                r, rd.answers_text((data.get(r.id) or {}).get("answers")))))
         return listed._rlq_desk_sorted(self.sort_by or "event_ticket_id", self.sort_desc)
 
     @api.depends("event_id", "search_text", "hide_present", "survey_filter", "sort_by", "sort_desc")
@@ -600,16 +749,23 @@ class RlqRegistrationDesk(models.TransientModel):
         """Button « Refresh »: the form is read again, so the summary and the list are computed again."""
         return True
 
+    def action_open_guide(self):
+        """v1.134.0: button « Help for this page »: the user guide, opened at the section of the registration desk."""
+        return guide_action(self.env, "bureau-inscription")
+
+    def action_contact(self):
+        """v1.135.0: button « Contact the participants »: an e-mail to the registrations LISTED (same filters and search)."""
+        self.ensure_one()
+        guard = self._rlq_pi_guard("action_contact")                     # v1.136.0: once per page
+        if guard:
+            return guard
+        return contact_action(self.env, self._rlq_listed(self._rlq_all_registrations()))
+
     def action_open_list(self):
         """The registrations of the event in a full list (native search, filters, grouping by ticket, export), same buttons."""
         self.ensure_one()
-        return {
-            "type": "ir.actions.act_window",
-            "name": _("Registration desk: %(event)s", event=self.event_id.name),
-            "res_model": "event.registration",
-            "view_mode": "list,form",
-            "views": [(self.env.ref("rlq_survey_report.view_rlq_registration_desk_registration_list").id, "list"), (False, "form")],
-            "search_view_id": [self.env.ref("rlq_survey_report.view_rlq_registration_desk_registration_search").id, "search"],
-            "domain": [("event_id", "=", self.event_id.id), ("state", "in", list(LIST_STATES))],
-            "context": {"create": False, "rlq_desk_event_id": self.event_id.id},
-        }
+        guard = self._rlq_pi_guard("action_open_list")                   # v1.136.0: the list can show e-mails and phones
+        if guard:
+            return guard
+        return registration_list_action(self.env, _("Registration desk: %(event)s", event=self.event_id.name),
+                                        [("event_id", "=", self.event_id.id), ("state", "in", list(LIST_STATES))], self.event_id.id)
