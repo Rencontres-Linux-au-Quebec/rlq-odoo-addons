@@ -38,6 +38,7 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 from . import followup_report as fr
+from . import registration_desk_report as rd
 from .event_inscriptions_alerte import CLE_PARAMETRE_COURRIEL_INSCRIPTIONS, ETATS_COMPTES
 
 _logger = logging.getLogger(__name__)
@@ -268,7 +269,7 @@ class EventEventSurveyFollowup(models.Model):
         generated = fields.Datetime.context_timestamp(event.with_context(tz=event.date_tz or "America/Toronto"), now)
         event._rlq_envoyer_courriel(
             recipient, fr.daily_report_subject(event.name, generated.strftime("%Y-%m-%d"), lang),
-            fr.daily_report_html(event.name, event._rlq_debut_texte(), generated.strftime("%Y-%m-%d %H:%M %Z"),
+            fr.daily_report_html(event.name, event._rlq_debut_texte(), rd.local_stamp(generated, "%Y-%m-%d %H:%M", lang),
                                  totals, tickets, new_registrations, event._rlq_url(), lang=lang),
         )
         event.rlq_daily_report_sent = now

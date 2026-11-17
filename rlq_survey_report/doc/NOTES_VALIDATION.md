@@ -6,6 +6,17 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -85. HNE/HAE, lien de message et date au bureau d'inscription, totaux des bénévoles (v1.131.0)
+
+**À confirmer après `-u rlq_survey_report --i18n-overwrite` :**
+1. En-tête du rapport de sondage, pied du bureau d'inscription, rapport quotidien par courriel : « HNE » (hiver) ou « HAE » (été) au lieu de « EST » / « EDT » ; en anglais, EST / EDT.
+2. Bureau d'inscription : le nom du participant est un lien ; il ouvre la conversation Discussion (contact avec un compte) ou la fiche du contact.
+3. Clic sur l'en-tête « Nom du participant » : « éric » et « Élise » sont classés avec les « e », dans les deux sens. Même chose dans « Ouvrir en liste ».
+4. La date de l'événement est affichée sous l'événement et dans le titre du bureau.
+5. Tableau des bénévoles : ligne « Total » en haut et en bas ; « À quelle heure pensez-vous arriver ? » et « Heure de départ prévue? » remplissent les colonnes d'heures.
+6. Tableau « Pourquoi les nombres du sondage diffèrent... » : comparer avec la liste des sondages (colonne « Terminé »).
+7. Fenêtre « Modifier les réponses » : le nom de la question n'est plus un lien ; la fenêtre « Oups ! » (OwlError) ne revient plus. Si elle revient ailleurs, noter l'écran.
+
 ## -84. Correctif urgent : base non chargée avec la 1.129 (v1.130.0)
 
 **À confirmer :**

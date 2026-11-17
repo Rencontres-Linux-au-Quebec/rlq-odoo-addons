@@ -52,7 +52,9 @@ _logger = logging.getLogger(__name__)
 STATE_RANK = {"done": 2, "in_progress": 1}
 LIST_STATES = ("draft", "open", "done")
 PROGRAM = "rlq_survey_report"
-COMPUTED_SORTS = ("rlq_survey_state", "rlq_desk_progress", "rlq_desk_answers")
+COMPUTED_SORTS = ("rlq_survey_state", "rlq_desk_progress", "rlq_desk_answers", "rlq_desk_person")
+MAP_SORTS = ("rlq_survey_state", "rlq_desk_progress", "rlq_desk_answers")      # the sorts that need _rlq_desk_map()
+CHAT_URL = "/rlq_survey_report/chat/%d"                                          # controllers/: opens Discuss with the contact
 STATE_ORDER = {"draft": 0, "open": 1, "done": 2, "cancel": 3}
 RECENT_EVENTS_FIRST = "date_begin desc, id desc"
 DEFAULT_ZONE = "America/Toronto"
@@ -98,7 +100,8 @@ def program_stamp(env, event=None):
     """Footer of the screens: program name, installed version, local date and time of the display, with the time zone."""
     zone = local_zone(env, event)
     now = fields.Datetime.context_timestamp(env["res.users"].with_context(tz=zone), fields.Datetime.now())
-    return rd.program_footer(PROGRAM, program_version(env), now.strftime("%Y-%m-%d %H:%M:%S %Z"), zone, env.lang or rd.DEFAULT_LANG)
+    lang = env.lang or rd.DEFAULT_LANG
+    return rd.program_footer(PROGRAM, program_version(env), rd.local_stamp(now, "%Y-%m-%d %H:%M:%S", lang), zone, lang)
 
 
 class EventRegistrationDesk(models.Model):
@@ -121,6 +124,19 @@ class EventRegistrationDesk(models.Model):
         string="Answers", compute="_compute_rlq_desk",
         help="Answers of this person to the survey questions checked « Show at the registration desk ».",
     )
+    rlq_desk_person = fields.Html(
+        string="Participant name", compute="_compute_rlq_desk_person", sanitize=False,
+        help="Name of the participant. Click it to send a message to this person in Odoo (Discuss). Sorting by this column "
+             "ignores case and accents.",
+    )
+
+    @api.depends("name", "partner_id")
+    def _compute_rlq_desk_person(self):
+        """v1.131.0: the name, a link to talk to the contact in Odoo (same link as the volunteers' table)."""
+        for registration in self:
+            partner = registration.partner_id
+            registration.rlq_desk_person = rd.person_cell_html(
+                registration.name or partner.name or "", CHAT_URL % partner.id if partner else None)
 
     def _compute_rlq_desk(self):
         data = self._rlq_desk_map()
@@ -260,7 +276,7 @@ class EventRegistrationDesk(models.Model):
 
     def _rlq_desk_sort_keys(self, field_name):
         """{registration id: sort key} for one column of the desk. Texts: case and accents ignored, empty values last."""
-        data = self._rlq_desk_map() if field_name in COMPUTED_SORTS else {}
+        data = self._rlq_desk_map() if field_name in MAP_SORTS else {}
         keys = {}
         for registration in self.sudo().filtered("id"):
             item = data.get(registration.id) or {}
@@ -271,6 +287,9 @@ class EventRegistrationDesk(models.Model):
             elif field_name == "rlq_desk_answers":
                 text = rd.answers_text(item.get("answers"))
                 key = (not text, sort_key(text))
+            elif field_name == "rlq_desk_person":
+                name = registration.name or registration.partner_id.name or ""
+                key = (not name, sort_key(name))
             elif field_name == "state":
                 key = (STATE_ORDER.get(registration.state, 9),)
             else:
@@ -289,6 +308,8 @@ class EventRegistrationDesk(models.Model):
         """The recordset sorted by one column of the desk; equal values keep the order ticket, name (stable sort)."""
         has_ticket = "event_ticket_id" in self._fields
         base = self.sorted(lambda r: (sort_key(r.event_ticket_id.name if has_ticket else ""), sort_key(r.name), r.id))
+        if field_name == "name":
+            field_name = "rlq_desk_person"                                     # same order, the name of the contact as fallback
         if not field_name or field_name == "event_ticket_id":
             return base.sorted(lambda r: sort_key(r.event_ticket_id.name if has_ticket else ""), reverse=bool(descending))
         keys = base._rlq_desk_sort_keys(field_name)
@@ -438,15 +459,42 @@ class RlqRegistrationDesk(models.TransientModel):
         help="Order of the list below. Case and accents are ignored (« Élise » sorts with the « e »); equal values are sorted by "
              "ticket, then by name.")
     sort_desc = fields.Boolean(string="Descending", default=False, help="Reverses the order of the list.")
+    event_date_text = fields.Char(string="Date of the event", compute="_compute_event_date_text",
+                                  help="Local date and time of the event (start, and end when it is another day).")
     summary_html = fields.Html(string="Summary", compute="_compute_desk", sanitize=False)
     registration_ids = fields.Many2many("event.registration", string="Registrations", compute="_compute_desk")
     registration_count = fields.Integer(string="Registrations listed", compute="_compute_desk")
 
     @api.depends("event_id")
+    def _compute_event_date_text(self):
+        """v1.131.0: « 2026-11-21 09:00 - 16:00 HNE » in local time, next to the event and in the title of the desk."""
+        lang = self.env.lang or rd.DEFAULT_LANG
+        for wizard in self:
+            event = wizard.event_id
+            if not event or not event.date_begin:
+                wizard.event_date_text = False
+                continue
+            zone = local_zone(self.env, event)
+            begin = fields.Datetime.context_timestamp(event.with_context(tz=zone), event.date_begin)
+            end = fields.Datetime.context_timestamp(event.with_context(tz=zone), event.date_end) if event.date_end else None
+            if end and end.date() == begin.date():
+                text = "%s - %s" % (begin.strftime("%Y-%m-%d %H:%M"), rd.local_stamp(end, "%H:%M", lang))
+            elif end:
+                text = "%s - %s" % (begin.strftime("%Y-%m-%d %H:%M"), rd.local_stamp(end, "%Y-%m-%d %H:%M", lang))
+            else:
+                text = rd.local_stamp(begin, "%Y-%m-%d %H:%M", lang)
+            wizard.event_date_text = text
+
+    @api.depends("event_id")
     def _compute_display_name(self):
         for wizard in self:
-            wizard.display_name = _("Registration desk: %(event)s", event=wizard.event_id.name) if wizard.event_id \
-                else _("RLQ registration desk")
+            if wizard.event_id:
+                name = _("Registration desk: %(event)s", event=wizard.event_id.name)
+                if wizard.event_date_text:
+                    name = "%s (%s)" % (name, wizard.event_date_text)
+                wizard.display_name = name
+            else:
+                wizard.display_name = _("RLQ registration desk")
 
     def _rlq_all_registrations(self):
         self.ensure_one()
@@ -480,11 +528,52 @@ class RlqRegistrationDesk(models.TransientModel):
         for wizard in self:
             registrations = wizard._rlq_all_registrations()
             # v1.126.0: the program name, version, local date and time come FIRST, above the summary.
+            lang = self.env.lang or rd.DEFAULT_LANG
             wizard.summary_html = (program_stamp(self.env, wizard.event_id)
-                                   + rd.desk_summary_html(registrations._rlq_desk_rows(), self.env.lang or rd.DEFAULT_LANG))
+                                   + rd.desk_summary_html(registrations._rlq_desk_rows(), lang)
+                                   + rd.reconciliation_html(wizard._rlq_reconciliation_items(), lang))
             listed = wizard._rlq_listed(registrations)
             wizard.registration_ids = listed
             wizard.registration_count = len(listed)
+
+    def _rlq_reconciliation_items(self):
+        """v1.131.0: per survey of the event, the numbers that explain why « completed » differs between the survey (it counts
+        participations) and the event (it counts registrations). See registration_desk_report.reconciliation_html()."""
+        self.ensure_one()
+        if not self.event_id:
+            return []
+        every = self.env["event.registration"].sudo().search([("event_id", "=", self.event_id.id)])
+        status = every._rlq_survey_status_map()
+        items = []
+        for survey in sorted({s for s, _st, _d in status.values() if s}, key=lambda s: sort_key(s.title)):
+            active = every.filtered(lambda r, survey=survey: status[r.id][0] == survey and r.state in LIST_STATES)
+            cancelled = every.filtered(lambda r, survey=survey: status[r.id][0] == survey and r.state not in LIST_STATES)
+
+            def keys(registrations):
+                partners = set(registrations.partner_id.ids)
+                emails = {(r.email or "").strip().lower() for r in registrations if r.email}
+                return partners, emails
+
+            active_keys, cancelled_keys = keys(active), keys(cancelled)
+
+            def matches(row, found):
+                partners, emails = found
+                return bool((row["partner_id"] and row["partner_id"][0] in partners)
+                            or (row["email"] and row["email"].strip().lower() in emails))
+
+            rows = self.env["survey.user_input"].sudo().search_read(
+                [("survey_id", "=", survey.id)], ["partner_id", "email", "state", "test_entry"])
+            done = [row for row in rows if row["state"] == "done" and not row["test_entry"]]
+            matched = [row for row in done if matches(row, active_keys)]
+            cancelled_done = [row for row in done if row not in matched and matches(row, cancelled_keys)]
+            matched_done = sum(1 for r in active if status[r.id][1] == "done")
+            items.append({
+                "survey": survey.title, "survey_done": len(done), "matched_done": matched_done,
+                "duplicates": max(len(matched) - matched_done, 0), "cancelled_done": len(cancelled_done),
+                "unmatched_done": len(done) - len(matched) - len(cancelled_done),
+                "tests": sum(1 for row in rows if row["test_entry"]),
+            })
+        return items
 
     def action_refresh(self):
         """Button « Refresh »: the form is read again, so the summary and the list are computed again."""

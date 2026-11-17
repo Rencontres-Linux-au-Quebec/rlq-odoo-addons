@@ -36,6 +36,13 @@ FR = {
     "Short label at the registration desk": "Libellé court au bureau d'inscription",
     "Short name of this question in the registration desk (for example « Lunch »). Empty: the title of the question.":
         "Nom court de cette question dans le bureau d'inscription (par exemple « Dîner »). Vide : le titre de la question.",
+    # v1.131.0: name with a link to send a message, date of the event
+    "Participant name": "Nom du participant",
+    "Name of the participant. Click it to send a message to this person in Odoo (Discuss). Sorting by this column ignores case and accents.":
+        "Nom du participant. Cliquez dessus pour envoyer un message à cette personne dans Odoo (Discussion). Le tri de cette colonne ignore les majuscules et les accents.",
+    "Date of the event": "Date de l'événement",
+    "Local date and time of the event (start, and end when it is another day).":
+        "Date et heure locales de l'événement (début, et fin si c'est un autre jour).",
     # event.registration
     "Left at": "Heure de départ",
     "Time when the person left the event, recorded with the « Left » button of the RLQ registration desk.":

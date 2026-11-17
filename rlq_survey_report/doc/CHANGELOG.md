@@ -1,5 +1,38 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.131.0
+
+**Short title:** HNE/HAE time zones, message link and event date at the registration desk, volunteers totals, OwlError fixed.
+
+**Reason for the request:** several requests of 2026-11-17: the header of the report showed "(2026-11-17 11:14 EST)" instead of the French abbreviation; screenshot of an "Oups !" window (OwlError, `surveyQuestionTriggerError`, `question_and_page_ids is undefined`); at the registration desk, a link on the name of the participants to send them a message in Odoo, the date of the event, and the column "Nom du participant" sorted wrongly (capitals, accents); totals per column at the top and bottom of the volunteers' table; the planned hours of arrival and departure (asked only in the surveys of the "Bénévoles" tickets) not found; a difference between the "completed" counts of the event and of the survey.
+
+**Changes:**
+
+- `models/registration_desk_report.py` (pure functions): `zone_label()` and `local_stamp()`: in French, the abbreviations of the North American time zones are the ones of the OQLF (EST -> HNE, EDT -> HAE, CST -> HNC...), English unchanged; the change of time is already given by `strftime("%Z")` from the date, nothing is hard-coded. `person_cell_html()`: name of a participant, link to `/rlq_survey_report/chat/<contact>` (same controller as the volunteers' table: Discuss for a contact with an account, otherwise the contact form and its chatter), with a sort key without case or accents at the start of the value. `volunteer_column_totals()` and a total line at the top (last line of the header) and at the bottom (`<tfoot>`) of the volunteers' table: number of volunteers, of completed surveys, of non-empty cells, of "X" per role. `reconciliation_html()`: table "Pourquoi les nombres du sondage diffèrent de ceux de l'événement". `ARRIVAL_PATTERN` and `DEPARTURE_PATTERN`: "arriver" and "partir" added.
+- `models/event_registration_desk.py`: field `event.registration.rlq_desk_person` (Html, computed: name and link); sort key of this column (header of the full list, field "Sort by" = Name); wizard: field `event_date_text` ("2026-11-21 09:00 - 16:00 HNE") under the event and in the title of the desk; `_rlq_reconciliation_items()`; footer date with `local_stamp()`.
+- `models/event_survey_followup.py` (daily report e-mail) and `models/rlq_survey_report_wizard.py` (version line of the report, "Rapport généré le" banner): HNE/HAE instead of EST/EDT.
+- `views/event_registration_desk_views.xml`: column "Nom du participant" = `rlq_desk_person` in the desk and in the full list (the plain name stays available as a hidden optional column of the full list); date of the event under the event.
+- `views/survey_answer_edit_views.xml`: `question_id` with `no_open`.
+- `scripts/build_fr_po.py` and `i18n/fr.po` (rebuilt): the 4 new terms.
+- `tests/test_registration_desk_report.py`: 6 new tests. `__manifest__.py`: version `18.0.1.131.0`. Guide header, `doc/NOTES_VALIDATION.md` (section -85).
+
+**Bugs fixed:**
+
+- Symptom: "EST" shown in French screens and e-mails. Diagnosis: `strftime("%Z")` gives only the English abbreviation. Fix: `zone_label()`. Note: on 2026-11-17 Québec is on standard time (since 2026-11-01): HNE = EST = UTC-5 was the right time, only the abbreviation was English.
+- Symptom: OwlError "can't access property records, record.model.root.data.question_and_page_ids is undefined" (widget `survey_question_trigger`). Diagnosis: the form of a survey question only works inside its survey (the widget reads the other questions of the parent survey); the link "Question" of the window "Modifier les réponses" (v1.127.0) opened it alone. Fix: `no_open` on that field. If the error comes from another screen, say which one.
+- Symptom: clicking the header "Nom du participant" in the list of the desk put "éric" and "Élise" after "Zoé". Diagnosis: a list inside a form is sorted by the web client with a plain string comparison (case and accents count); the field "Sort by" was right. Fix: the column is `rlq_desk_person`, whose value starts with the normalized key, so the same comparison gives the right order; the full list sorts it on the server with the same key.
+- Symptom: the volunteers' table showed the hours of the registration desk and the note "no question about the hour of arrival" although the survey asks "À quelle heure pensez-vous arriver ?". Diagnosis: "arriver" was not in the words searched ("arrivée", "arriverez"...). Fix: "arriver" and "partir" added.
+- Difference of "completed" between the survey and the event: no counting error found; the survey counts participations, the event counts registrations. The new table of the desk gives, per survey: participations completed, registrations with the survey completed, duplicate participations of the same person, completed by a cancelled registration, completed without a matching registration (other e-mail address, or survey shared with another event), tests excluded.
+
+**Safeguards and edge cases:** every new value is escaped (name, link, survey title); a registration without contact shows its name without link; a datetime without zone gets no abbreviation; unknown zones (UTC, CET) are left as they are; English screens keep EST/EDT; the "Total" of the volunteers counts the survey column as completed surveys only.
+
+**Checks:**
+
+- Standalone tests (235, including 6 new ones): OK. `ruff check`: OK. XML of the changed views: well formed.
+- The Odoo code was NOT run: no Odoo instance here (see `doc/NOTES_VALIDATION.md`, section -85).
+
+**Action required:** update the module on DEV with `-u rlq_survey_report --i18n-overwrite`, check the points of section -85 of `doc/NOTES_VALIDATION.md`, then PROD.
+
 ## 18.0.1.130.0
 
 **Short title:** urgent fix: Odoo could not load the database with 18.0.1.129.0.

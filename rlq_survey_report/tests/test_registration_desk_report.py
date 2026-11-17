@@ -321,6 +321,67 @@ class TestRegistrationDeskReport(unittest.TestCase):
         self.assertIn("shown on 2026-11-16 21:15:02 EST (local time)", english)
         self.assertNotIn("<b>", rd.program_footer("p", "v", "<b>x</b>", "<b>z</b>"))
 
+    # ------------------------------------------------------------------ v1.131.0
+
+    def test_zone_label_french_abbreviations(self):
+        self.assertEqual(rd.zone_label("EST", "fr_CA"), "HNE")
+        self.assertEqual(rd.zone_label("EDT", "fr_CA"), "HAE")
+        self.assertEqual(rd.zone_label("PDT", "fr_FR"), "HAP")
+        self.assertEqual(rd.zone_label("EST", "en_US"), "EST")
+        self.assertEqual(rd.zone_label("UTC", "fr_CA"), "UTC")
+        self.assertEqual(rd.zone_label("", "fr_CA"), "")
+
+    def test_local_stamp_follows_the_change_of_time(self):
+        from datetime import datetime
+        try:
+            from zoneinfo import ZoneInfo
+        except ImportError:                                            # Python 3.8: no zoneinfo, dateutil from Odoo
+            from dateutil.tz import gettz as ZoneInfo
+        zone = ZoneInfo("America/Toronto")
+        winter = datetime(2026, 11, 17, 11, 14, tzinfo=zone)
+        summer = datetime(2026, 10, 10, 9, 0, tzinfo=zone)
+        self.assertEqual(rd.local_stamp(winter, "%Y-%m-%d %H:%M", "fr_CA"), "2026-11-17 11:14 HNE")
+        self.assertEqual(rd.local_stamp(summer, "%Y-%m-%d %H:%M", "fr_CA"), "2026-10-10 09:00 HAE")
+        self.assertEqual(rd.local_stamp(winter, "%H:%M", "en_US"), "11:14 EST")
+        self.assertEqual(rd.local_stamp(datetime(2026, 1, 1, 8, 0), "%H:%M", "fr_CA"), "08:00")
+        self.assertEqual(rd.local_stamp(None), "")
+
+    def test_person_cell_sorts_without_case_or_accents(self):
+        names = ["Zoé", "éric", "Denis", "Élise", "fanny", "denis"]
+        cells = [rd.person_cell_html(name, "/rlq_survey_report/chat/%d" % i) for i, name in enumerate(names)]
+        ordered = [names[cells.index(cell)] for cell in sorted(cells)]       # what the web client does: plain string order
+        self.assertEqual([rd.sort_key(n) for n in ordered], sorted(rd.sort_key(n) for n in names))
+        self.assertIn('href="/rlq_survey_report/chat/0"', cells[0])
+        self.assertEqual(rd.person_cell_html("Ann", None), '<span data-rlq-sort="ann">Ann</span>')
+        hostile = rd.person_cell_html('"><script>x</script>', "javascript:\"x")
+        self.assertNotIn("<script>", hostile)
+        self.assertNotIn('"x"', hostile)
+
+    def test_arrival_and_departure_questions_found(self):
+        found = rd.find_volunteer_questions([
+            {"id": 1, "title": "À quelle heure pensez-vous arriver ?", "choices": [], "is_choice": False},
+            {"id": 2, "title": "Heure de départ prévue?", "choices": [], "is_choice": False},
+            {"id": 3, "title": "Département", "choices": [], "is_choice": False}])
+        self.assertEqual((found["arrival"], found["departure"]), (1, 2))
+
+    def test_volunteer_totals_in_header_and_footer(self):
+        rows = self._volunteers()
+        groups = [{"title": "Rôles", "choices": ["Accueil", "Technique", "Autre"]}]
+        totals = rd.volunteer_column_totals(rows, groups)
+        self.assertEqual(totals[0], len(rows))
+        self.assertEqual(len(totals), 7 + 3)
+        html = rd.volunteer_table_html(rows, groups, "fr")
+        self.assertIn("<tfoot>", html)
+        self.assertEqual(html.count("Total : %d" % len(rows)), 2)        # top (header) and bottom (footer)
+
+    def test_reconciliation(self):
+        self.assertEqual(rd.reconciliation_html([]), "")
+        html = rd.reconciliation_html([{"survey": "S<1>", "survey_done": 12, "matched_done": 9, "duplicates": 1,
+                                        "cancelled_done": 1, "unmatched_done": 1, "tests": 3}], "fr")
+        self.assertIn("Pourquoi", html)
+        self.assertIn("S&lt;1&gt;", html)
+        self.assertIn(">12<", html)
+
 
 if __name__ == "__main__":
     unittest.main()
