@@ -10,7 +10,9 @@
             <form string="Answer to edit">
                 <sheet>
                     <group>
-                        <field name="question_id" readonly="1"/>
+                        <!-- v1.131.0: no_open. Opening survey.question outside of its survey crashed the web client (OwlError, widget
+                             survey_question_trigger reads the questions of the parent survey, absent here). -->
+                        <field name="question_id" readonly="1" options="{'no_open': True}"/>
                         <field name="question_type" invisible="1"/>
                         <field name="question_type_label" readonly="1"/>
                         <field name="current_text" readonly="1"/>

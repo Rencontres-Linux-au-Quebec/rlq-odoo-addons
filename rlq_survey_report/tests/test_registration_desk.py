@@ -82,6 +82,28 @@ class TestRlqRegistrationDesk(TransactionCase):
         cancelled.action_rlq_desk_present()
         self.assertEqual(cancelled.state, "cancel")
 
+    def test_presence_hours_follow_the_state(self):
+        """v1.133.0: leaving « done » by any way clears the hours of arrival and departure; present again: a NEW hour."""
+        registration = self._registration("Retour", "retour@example.com")
+        registration.write({"state": "done", "date_closed": "2030-11-16 21:30:00", "rlq_departure": "2030-11-16 23:00:00"})
+        registration.write({"state": "open"})                            # not the button: the form or the desk of Odoo
+        self.assertFalse(registration.date_closed)
+        self.assertFalse(registration.rlq_departure)
+        self.assertFalse(registration._rlq_desk_rows()[0]["arrived"])
+        registration.action_rlq_desk_present()
+        self.assertTrue(registration.date_closed)
+        self.assertNotEqual(str(registration.date_closed), "2030-11-16 21:30:00")
+
+    def test_survey_columns_in_a_form_not_saved(self):
+        """v1.133.0: in a form not saved yet, the registrations of the list are « new » copies (NewId): the survey state and
+        the date of submission must be the ones of the real registration, not « No survey »."""
+        registration = self._registration("Nouveau", "nouveau@example.com")
+        self._participation("nouveau@example.com", "done", lunch="Yes")
+        copy = registration.new(origin=registration)
+        self.assertEqual(copy.rlq_survey_state, "done")
+        self.assertEqual(copy.rlq_desk_answers, "Lunch: Yes")
+        self.assertEqual(copy.rlq_survey_done_date, registration.rlq_survey_done_date)
+
     def test_desk_wizard_summary_search_and_filter(self):
         marie = self._registration("Marie Tremblay", "marie@example.com")
         paul = self._registration("Paul Roy", "paul@example.com")

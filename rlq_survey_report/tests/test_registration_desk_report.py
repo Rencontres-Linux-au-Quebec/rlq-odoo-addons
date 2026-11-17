@@ -84,6 +84,9 @@ class TestRegistrationDeskReport(unittest.TestCase):
         self.assertEqual((lunch["(no answer)"]["total"], lunch["(no answer)"]["present"]), (1, 0))
         mode = {a["value"]: a for a in questions[1]["answers"]}
         self.assertEqual((mode["On site"]["total"], mode["(no answer)"]["total"]), (1, 2))
+        # v1.133.0: people concerned by each question, denominators of « % registered » and « % present ».
+        self.assertEqual((questions[0]["registered"], questions[0]["present"]), (4, 3))
+        self.assertEqual((questions[1]["registered"], questions[1]["present"]), (3, 2))
 
     def test_answers_breakdown_multiple_choice_counts_each_value_once(self):
         _tickets, questions = rd.answers_breakdown([row("V", answers=[("Meals", ["Lunch", "Dinner", "Lunch"])])], "en")
@@ -91,12 +94,12 @@ class TestRegistrationDeskReport(unittest.TestCase):
 
     def test_html_french_by_default_and_english(self):
         html = rd.desk_summary_html(ROWS)
-        for text in ("Inscriptions et sondages par type de billet", "Questions non répondues", "dont présents", "(sans billet)",
+        for text in ("Inscriptions et sondages par type de billet", "Sondages complétés (%)", "dont présents", "(sans billet)",
                      "2026-10-10 09 h"):
             self.assertIn(text, html)
         self.assertNotIn("Registered", html)
         html = rd.desk_summary_html(ROWS, "en_CA")
-        for text in ("Registered", "Questions not answered", "of which present", "(no ticket)"):
+        for text in ("Registered", "Surveys completed (%)", "of which present", "% present", "(no ticket)"):
             self.assertIn(text, html)
         self.assertNotIn("Inscrits", html)
 
@@ -107,16 +110,30 @@ class TestRegistrationDeskReport(unittest.TestCase):
         self.assertEqual(rd.percent_text(5, 0), "")
         self.assertIsInstance(rd.percent_text(1, 2), rd.Number)
 
-    def test_question_columns_are_percentages(self):
+    def test_survey_completed_percentage_replaces_the_question_columns(self):
+        """v1.133.0: « Questions répondues (%) » and « Questions non répondues (%) » are gone; « Sondages complétés (%) »
+        counts the completed surveys out of the registrations that have a survey."""
         html = rd.desk_summary_html(ROWS)
-        self.assertIn("Questions répondues (%)", html)
-        self.assertIn("Questions non répondues (%)", html)
-        # Visitor: 5 answered of 12 questions -> 41,7 %, 7 not answered -> 58,3 %; right-aligned like the counts.
-        self.assertIn('<td style="text-align:right;">41,7\u00a0%</td>', html)
-        self.assertIn('<td style="text-align:right;">58,3\u00a0%</td>', html)
-        self.assertIn("<strong>50,0\u00a0%</strong>", html)                                   # total: 7 of 14
+        self.assertNotIn("Questions répondues (%)", html)
+        self.assertNotIn("Questions non répondues (%)", html)
+        self.assertIn("Sondages complétés (%)", html)
+        # Visitor: 1 completed of 3 with a survey -> 33,3 %, right-aligned like the counts; total: 2 of 4 (no survey excluded).
+        self.assertIn('<td style="text-align:right;">33,3\u00a0%</td>', html)
+        self.assertIn("<strong>50,0\u00a0%</strong>", html)
         self.assertIn("50.0%", rd.desk_summary_html(ROWS, "en"))
         self.assertIn("(sans réponse) » : personnes inscrites", html)                          # the note explains it
+
+    def test_answers_table_percentages_and_bold_questions(self):
+        """v1.133.0: « % inscrits » and « % présents » next to « Total » and « dont présents »; the questions are in bold."""
+        html = rd.desk_summary_html(ROWS)
+        self.assertIn("<th>% inscrits</th>", html)
+        self.assertIn("<th>% présents</th>", html)
+        self.assertIn("<td><strong>Lunch</strong></td>", html)
+        self.assertIn("<td><strong>Mode</strong></td>", html)
+        self.assertNotIn("<strong></strong>", html)                                            # the following lines stay empty
+        # Lunch « Yes »: 2 of the 4 registered people concerned -> 50,0 %, 2 of the 3 present -> 66,7 %.
+        self.assertIn('<td style="text-align:right;">2</td><td style="text-align:right;">50,0\u00a0%</td>'
+                      '<td style="text-align:right;">2</td><td style="text-align:right;">66,7\u00a0%</td>', html)
 
     def test_answers_that_differ_by_case_or_accents_are_grouped(self):
         rows = [row("Visitor", answers=[("Diet", ["Végétarien"])]), row("Visitor", answers=[("Diet", ["végétarien"])]),
@@ -320,6 +337,67 @@ class TestRegistrationDeskReport(unittest.TestCase):
         english = rd.program_footer("rlq_survey_report", "18.0.1.124.0", "2026-11-16 21:15:02 EST", "", "en_US")
         self.assertIn("shown on 2026-11-16 21:15:02 EST (local time)", english)
         self.assertNotIn("<b>", rd.program_footer("p", "v", "<b>x</b>", "<b>z</b>"))
+
+    # ------------------------------------------------------------------ v1.131.0
+
+    def test_zone_label_french_abbreviations(self):
+        self.assertEqual(rd.zone_label("EST", "fr_CA"), "HNE")
+        self.assertEqual(rd.zone_label("EDT", "fr_CA"), "HAE")
+        self.assertEqual(rd.zone_label("PDT", "fr_FR"), "HAP")
+        self.assertEqual(rd.zone_label("EST", "en_US"), "EST")
+        self.assertEqual(rd.zone_label("UTC", "fr_CA"), "UTC")
+        self.assertEqual(rd.zone_label("", "fr_CA"), "")
+
+    def test_local_stamp_follows_the_change_of_time(self):
+        from datetime import datetime
+        try:
+            from zoneinfo import ZoneInfo
+        except ImportError:                                            # Python 3.8: no zoneinfo, dateutil from Odoo
+            from dateutil.tz import gettz as ZoneInfo
+        zone = ZoneInfo("America/Toronto")
+        winter = datetime(2026, 11, 17, 11, 14, tzinfo=zone)
+        summer = datetime(2026, 10, 10, 9, 0, tzinfo=zone)
+        self.assertEqual(rd.local_stamp(winter, "%Y-%m-%d %H:%M", "fr_CA"), "2026-11-17 11:14 HNE")
+        self.assertEqual(rd.local_stamp(summer, "%Y-%m-%d %H:%M", "fr_CA"), "2026-10-10 09:00 HAE")
+        self.assertEqual(rd.local_stamp(winter, "%H:%M", "en_US"), "11:14 EST")
+        self.assertEqual(rd.local_stamp(datetime(2026, 1, 1, 8, 0), "%H:%M", "fr_CA"), "08:00")
+        self.assertEqual(rd.local_stamp(None), "")
+
+    def test_person_cell_sorts_without_case_or_accents(self):
+        names = ["Zoé", "éric", "Denis", "Élise", "fanny", "denis"]
+        cells = [rd.person_cell_html(name, "/rlq_survey_report/chat/%d" % i) for i, name in enumerate(names)]
+        ordered = [names[cells.index(cell)] for cell in sorted(cells)]       # what the web client does: plain string order
+        self.assertEqual([rd.sort_key(n) for n in ordered], sorted(rd.sort_key(n) for n in names))
+        self.assertIn('href="/rlq_survey_report/chat/0"', cells[0])
+        self.assertEqual(rd.person_cell_html("Ann", None), '<span data-rlq-sort="ann">Ann</span>')
+        hostile = rd.person_cell_html('"><script>x</script>', "javascript:\"x")
+        self.assertNotIn("<script>", hostile)
+        self.assertNotIn('"x"', hostile)
+
+    def test_arrival_and_departure_questions_found(self):
+        found = rd.find_volunteer_questions([
+            {"id": 1, "title": "À quelle heure pensez-vous arriver ?", "choices": [], "is_choice": False},
+            {"id": 2, "title": "Heure de départ prévue?", "choices": [], "is_choice": False},
+            {"id": 3, "title": "Département", "choices": [], "is_choice": False}])
+        self.assertEqual((found["arrival"], found["departure"]), (1, 2))
+
+    def test_volunteer_totals_in_header_and_footer(self):
+        rows = self._volunteers()
+        groups = [{"title": "Rôles", "choices": ["Accueil", "Technique", "Autre"]}]
+        totals = rd.volunteer_column_totals(rows, groups)
+        self.assertEqual(totals[0], len(rows))
+        self.assertEqual(len(totals), 7 + 3)
+        html = rd.volunteer_table_html(rows, groups, "fr")
+        self.assertIn("<tfoot>", html)
+        self.assertEqual(html.count("Total : %d" % len(rows)), 2)        # top (header) and bottom (footer)
+
+    def test_reconciliation(self):
+        self.assertEqual(rd.reconciliation_html([]), "")
+        html = rd.reconciliation_html([{"survey": "S<1>", "survey_done": 12, "matched_done": 9, "duplicates": 1,
+                                        "cancelled_done": 1, "unmatched_done": 1, "tests": 3}], "fr")
+        self.assertIn("Pourquoi", html)
+        self.assertIn("S&lt;1&gt;", html)
+        self.assertIn(">12<", html)
 
 
 if __name__ == "__main__":

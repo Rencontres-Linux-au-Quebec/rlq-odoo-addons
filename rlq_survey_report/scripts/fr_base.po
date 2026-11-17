@@ -278,6 +278,16 @@ msgid "The survey of the ticket of this registration, otherwise the survey of th
 msgstr "Le sondage du billet de cette inscription, sinon celui de l'événement."
 
 #. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_event_registration__rlq_survey_done_date
+msgid "Survey submitted on"
+msgstr "Sondage soumis le"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_event_registration__rlq_survey_done_date
+msgid "Date and time when the expected survey was completed (the most recent completed participation). Empty: not completed."
+msgstr "Date et heure où le sondage attendu a été complété (la participation complétée la plus récente). Vide : non complété."
+
+#. module: rlq_survey_report
 #: model:ir.model.fields,field_description:rlq_survey_report.field_event_event__rlq_daily_report
 msgid "Daily report by e-mail"
 msgstr "Rapport quotidien par courriel"

@@ -21,8 +21,12 @@ run by run-all.sh):
   desk_summary_html(rows, lang)       -> the three tables above, in ONE language (French or English), everything escaped.
   sort_key(text)                      -> sort key that ignores case and accents (« Élise » with the « e »).
   find_volunteer_questions(questions) -> the roles, languages and type questions of a volunteer survey, found by their wording.
+  person_cell_html(name, chat_url)    -> the name of a participant, link to talk to the person in Odoo, sortable without case or accents.
+  reconciliation_html(items, lang)    -> why the « completed » of the survey differs from the one of the event.
+  volunteer_column_totals(rows, ...)  -> one total per column of the volunteers' table (header and footer lines).
   volunteer_table_html(rows, ...)     -> the table of the volunteers' coordinator (one column per role), everything escaped.
   volunteer_export_sheets(rows, ...)  -> the three flat sheets of the volunteers' spreadsheet (pivot tables).
+  zone_label(abbreviation, lang)      -> « HNE » / « HAE » in French for « EST » / « EDT » (North American zones), unchanged otherwise.
   program_footer(program, version...) -> « rlq_survey_report 18.0.1.124.0 - affiché le <local date and time> » under the screens.
 
 A row describes ONE registration (built by models/event_registration_desk.py):
@@ -53,6 +57,12 @@ TEXTS = {
         "not_started": "Sondages non commencés",
         "answered": "Questions répondues (%)",
         "unanswered": "Questions non répondues (%)",
+        "done_pct": "Sondages complétés (%)",
+        "registered_pct": "% inscrits",
+        "present_pct": "% présents",
+        "pct_note": "« Sondages complétés (%) » : sondages complétés sur les inscriptions qui ont un sondage. « % inscrits » : "
+                    "personnes inscrites qui ont donné cette réponse, sur les inscrites concernées par la question ; « % "
+                    "présents » : même chose parmi les personnes présentes. Un choix multiple peut dépasser 100 % au total.",
         "total": "Total",
         "hours_title": "Personnes marquées présentes, par heure",
         "hour": "Heure",
@@ -66,6 +76,18 @@ TEXTS = {
                           "commencé, question sautée, ou question non affichée parce qu'elle dépend d'une autre réponse). Les "
                           "réponses écrites qui ne diffèrent que par les majuscules ou les accents sont regroupées.",
         "no_desk_question": "Aucune question n'est cochée « Afficher au bureau d'inscription » dans les sondages de cet événement.",
+        "reconcile_title": "Pourquoi les nombres du sondage diffèrent de ceux de l'événement",
+        "survey": "Sondage",
+        "survey_done": "Participations complétées (sondage)",
+        "matched_done": "Inscriptions au sondage complété (événement)",
+        "duplicates": "Participations en double (même personne)",
+        "unmatched_done": "Complétées sans inscription correspondante",
+        "cancelled_done": "Complétées par une inscription annulée",
+        "tests": "Tests (exclus)",
+        "reconcile_note": "Le sondage compte des participations, l'événement compte des inscriptions. Une participation est "
+                          "rattachée à une inscription par le même contact ou la même adresse courriel. Une personne qui a "
+                          "répondu deux fois, ou avec une autre adresse que celle de son inscription, ou dont l'inscription "
+                          "est annulée, explique l'écart, de même qu'un sondage partagé avec un autre événement. Les tests ne sont jamais comptés.",
     },
     "en": {
         "no_ticket": "(no ticket)",
@@ -79,6 +101,12 @@ TEXTS = {
         "not_started": "Surveys not started",
         "answered": "Questions answered (%)",
         "unanswered": "Questions not answered (%)",
+        "done_pct": "Surveys completed (%)",
+        "registered_pct": "% registered",
+        "present_pct": "% present",
+        "pct_note": "« Surveys completed (%) »: surveys completed out of the registrations that have a survey. « % registered »: "
+                    "registered people who gave this answer, out of the registered people concerned by the question; "
+                    "« % present »: the same among the people present. A multiple choice can exceed 100% in total.",
         "total": "Total",
         "hours_title": "People marked present, per hour",
         "hour": "Hour",
@@ -92,6 +120,18 @@ TEXTS = {
                           "skipped, or question not shown because it depends on another answer). Written answers that differ "
                           "only by capitals or accents are grouped.",
         "no_desk_question": "No question is checked « Show at the registration desk » in the surveys of this event.",
+        "reconcile_title": "Why the numbers of the survey differ from those of the event",
+        "survey": "Survey",
+        "survey_done": "Participations completed (survey)",
+        "matched_done": "Registrations with the survey completed (event)",
+        "duplicates": "Duplicate participations (same person)",
+        "unmatched_done": "Completed without a matching registration",
+        "cancelled_done": "Completed by a cancelled registration",
+        "tests": "Tests (excluded)",
+        "reconcile_note": "The survey counts participations, the event counts registrations. A participation belongs to a "
+                          "registration through the same contact or the same e-mail address. A person who answered twice, or "
+                          "with another address than the one of the registration, or whose registration is cancelled, "
+                          "explains the difference, as does a survey shared with another event. Tests are never counted.",
     },
 }
 
@@ -191,13 +231,14 @@ def answers_breakdown(rows, lang=DEFAULT_LANG):
     """Counts of the answers to the questions shown at the desk.
 
     Returns (tickets, questions): tickets is the sorted list of ticket names that have at least one such question; questions is
-    [{"label": ..., "answers": [{"value": ..., "by_ticket": {ticket: n}, "total": n, "present": n}]}], in the order the
+    [{"label": ..., "registered": n, "present": n, "answers": [{"value": ..., "by_ticket": {ticket: n}, "total": n, "present": n}]}]
+    (the question's "registered" / "present": people concerned by the question, denominators of the percentages), in the order the
     questions first appear, the answers sorted by name with « (no answer) » last. A multiple-choice answer counts once per
     chosen value; a person without answer to a question counts under « (no answer) ». Answers that differ only by case or
     accents are one answer (v1.127.0), shown with their most frequent spelling.
     """
     labels = texts(lang)
-    questions, order, tickets = {}, [], set()
+    questions, order, tickets, people = {}, [], set(), {}
     for row in rows or ():
         ticket = _ticket_name(row, labels)
         for label, values in row.get("answers") or ():
@@ -208,6 +249,9 @@ def answers_breakdown(rows, lang=DEFAULT_LANG):
             if label not in questions:
                 questions[label] = {}
                 order.append(label)
+                people[label] = [0, 0]
+            people[label][0] += 1                                    # v1.133.0: denominators of « % registered / % present »
+            people[label][1] += 1 if row.get("present") else 0
             values = [" ".join(str(v).split()) for v in (values or ()) if str(v or "").strip()] or [None]
             keys = {}
             for value in values:                                      # the same value twice counts once
@@ -229,7 +273,7 @@ def answers_breakdown(rows, lang=DEFAULT_LANG):
         for answer in answers:
             if answer["value"] is None:
                 answer["value"] = labels["no_answer"]
-        result.append({"label": label, "answers": answers})
+        result.append({"label": label, "answers": answers, "registered": people[label][0], "present": people[label][1]})
     return sorted(tickets, key=str.lower), result
 
 
@@ -252,22 +296,26 @@ def percent_text(part, whole, lang=DEFAULT_LANG):
     return Number(value.replace(".", ",") + "\u00a0%")
 
 
+class Strong(str):
+    """A text cell shown in bold (v1.133.0: the questions of the answers table)."""
+
+
 def _row(cells, tag="td", bold=False):
     out = []
     for index, cell in enumerate(cells):
         numeric = isinstance(cell, (int, Number))
         text = str(cell) if isinstance(cell, int) else escape(cell) if isinstance(cell, Number) else _clean(cell)
-        if bold:
+        if bold or (isinstance(cell, Strong) and text):
             text = "<strong>%s</strong>" % text
         out.append("<%s%s>%s</%s>" % (tag, _NUM if index and numeric else "", text, tag))
     return "<tr>%s</tr>" % "".join(out)
 
 
 def _ticket_cells(line, keys, lang):
-    """Cells of one line of the ticket table: counts, then the questions answered / not answered as percentages."""
-    questions = line["answered"] + line["unanswered"]
-    return [line[k] for k in keys if k not in ("answered", "unanswered")] + [
-        percent_text(line["answered"], questions, lang), percent_text(line["unanswered"], questions, lang)]
+    """Cells of one line of the ticket table: counts, then the percentage of surveys completed (v1.133.0, replaces the
+    percentages of questions answered / not answered), out of the registrations that have a survey."""
+    with_survey = sum(line[state] for state in SURVEY_STATES)
+    return [line[k] for k in keys] + [percent_text(line["done"], with_survey, lang)]
 
 
 def desk_summary_html(rows, lang=DEFAULT_LANG):
@@ -276,9 +324,9 @@ def desk_summary_html(rows, lang=DEFAULT_LANG):
     rows = list(rows or ())
     if not rows:
         return "<p>%s</p>" % _clean(labels["no_registration"])
-    keys = ("registered", "present", "done", "in_progress", "not_started", "answered", "unanswered")
+    keys = ("registered", "present", "done", "in_progress", "not_started")
     html = ["<h4>%s</h4>" % _clean(labels["tickets_title"]), _TABLE,
-            "<thead>%s</thead><tbody>" % _row([labels["ticket"]] + [labels[k] for k in keys], tag="th")]
+            "<thead>%s</thead><tbody>" % _row([labels["ticket"]] + [labels[k] for k in keys] + [labels["done_pct"]], tag="th")]
     lines, total = ticket_summary(rows, lang)
     for line in lines:
         html.append(_row([line["name"]] + _ticket_cells(line, keys, lang)))
@@ -303,13 +351,17 @@ def desk_summary_html(rows, lang=DEFAULT_LANG):
         html.append("<p>%s</p>" % _clean(labels["no_desk_question"]))
     else:
         html += [_TABLE, "<thead>%s</thead><tbody>" % _row(
-            [labels["question"], labels["answer"]] + tickets + [labels["total"], labels["of_which_present"]], tag="th")]
+            [labels["question"], labels["answer"]] + tickets
+            + [labels["total"], labels["registered_pct"], labels["of_which_present"], labels["present_pct"]], tag="th")]
         for question in questions:
             for index, answer in enumerate(question["answers"]):
-                html.append(_row([question["label"] if not index else "", answer["value"]]
-                                 + [answer["by_ticket"].get(t, 0) for t in tickets] + [answer["total"], answer["present"]]))
+                html.append(_row([Strong(question["label"] if not index else ""), answer["value"]]
+                                 + [answer["by_ticket"].get(t, 0) for t in tickets]
+                                 + [answer["total"], percent_text(answer["total"], question["registered"], lang),
+                                    answer["present"], percent_text(answer["present"], question["present"], lang)]))
         html.append("</tbody></table>")
         html.append('<p class="text-muted small">%s</p>' % _clean(labels["no_answer_note"]))
+        html.append('<p class="text-muted small">%s</p>' % _clean(labels["pct_note"]))
     return "".join(html)
 
 
@@ -321,8 +373,9 @@ ON_SITE_WORDS = ("presentiel", "sur place", "en personne", "on site", "in person
 ONLINE_WORDS = ("virtuel", "en ligne", "a distance", "online", "remote")
 TYPE_WORDS = ON_SITE_WORDS + ONLINE_WORDS + ("hybride", "hybrid")
 OTHER_WORDS = ("autre", "other")
-ARRIVAL_PATTERN = re.compile(r"\b(arrivee|arrival|arriverez|arriveras|arrives?)\b")
-DEPARTURE_PATTERN = re.compile(r"\b(depart|departure|partirez|partiras|quitterez|quitteras|leave|leaving)\b")   # never « departement »
+# v1.131.0: « arriver » and « partir » added: « À quelle heure pensez-vous arriver ? » was not found (only « arrivée »...).
+ARRIVAL_PATTERN = re.compile(r"\b(arrivee|arrival|arriver|arriverez|arriveras|arrives?)\b")
+DEPARTURE_PATTERN = re.compile(r"\b(depart|departure|partir|partirez|partiras|quitterez|quitteras|leave|leaving)\b")   # never « departement »
 SURVEY_RANK = {"done": 0, "in_progress": 1, "not_started": 2, "none": 3}
 VOLUNTEER_SORTS = ("name", "registered", "survey", "type", "languages", "arrived", "departed", "roles")
 
@@ -332,14 +385,14 @@ VOLUNTEER_TEXTS = {
         "arrived": "Heure d'arrivée", "departed": "Heure de départ", "title": "Bénévoles", "total": "Bénévoles listés",
         "no_volunteer": "Aucun bénévole à afficher pour cet événement.",
         "done": "Complété", "in_progress": "Commencé", "not_started": "Non commencé", "none": "Aucun sondage",
-        "on_site": "Présentiel", "online": "Virtuel", "yes": "X",
+        "on_site": "Présentiel", "online": "Virtuel", "yes": "X", "column_total": "Total",
     },
     "en": {
         "name": "Volunteer", "registered": "Registered on", "survey": "Survey", "type": "Type", "languages": "Languages spoken",
         "arrived": "Arrived at", "departed": "Left at", "title": "Volunteers", "total": "Volunteers listed",
         "no_volunteer": "No volunteer to show for this event.",
         "done": "Completed", "in_progress": "Started", "not_started": "Not started", "none": "No survey",
-        "on_site": "On site", "online": "Online", "yes": "X",
+        "on_site": "On site", "online": "Online", "yes": "X", "column_total": "Total",
     },
 }
 
@@ -427,6 +480,64 @@ def role_cells(choices, values, yes="X"):
             text = ("%s %s" % (cells[other], text)).strip()
         cells[other] = text
     return cells
+
+
+def person_cell_html(name, chat_url=None):
+    """Name of a participant in the list of the registration desk (v1.131.0): a link that opens a conversation with the person
+    in Odoo (Discuss) when the registration has a contact, otherwise the plain name. Everything is escaped.
+
+    The value starts with « <span data-rlq-sort="key"> », key = sort_key(name): the web client sorts the column of the list
+    by comparing these strings, so the order ignores case and accents (« éric » between « Denis » and « Fanny »)."""
+    key = escape(sort_key(" ".join(str(name or "").split())), quote=True)
+    text = _clean(name)
+    if chat_url:
+        text = '<a href="%s" target="_blank" title="Message">%s</a>' % (escape(str(chat_url), quote=True), text)
+    return '<span data-rlq-sort="%s">%s</span>' % (key, text)
+
+
+def reconciliation_html(items, lang=DEFAULT_LANG):
+    """v1.131.0: why « completed » differs between the survey (participations) and the event (registrations).
+
+    items: [{"survey": title, "survey_done", "matched_done", "duplicates", "unmatched_done", "cancelled_done", "tests"}], one
+    per survey of the event. « » when there is no survey. Everything is escaped."""
+    labels = texts(lang)
+    items = list(items or ())
+    if not items:
+        return ""
+    keys = ("survey_done", "matched_done", "duplicates", "cancelled_done", "unmatched_done", "tests")
+    html = ["<h4>%s</h4>" % _clean(labels["reconcile_title"]), _TABLE,
+            "<thead>%s</thead><tbody>" % _row([labels["survey"]] + [labels[k] for k in keys], tag="th")]
+    for item in items:
+        html.append(_row([item.get("survey") or ""] + [_int(item.get(k)) for k in keys]))
+    html.append("</tbody></table>")
+    html.append('<p class="text-muted small">%s</p>' % _clean(labels["reconcile_note"]))
+    return "".join(html)
+
+
+def volunteer_column_totals(rows, role_groups=(), extra_count=0):
+    """v1.131.0: one total per column of the volunteers' table: the number of volunteers in the name column, the number of
+    completed surveys in the survey column, and the number of non-empty cells (a role chosen, an hour given...) elsewhere."""
+    rows = list(rows or ())
+    totals = [len(rows)]
+    for key in ("registered", "survey", "type", "languages", "arrived", "departed"):
+        if key == "survey":
+            totals.append(sum(1 for row in rows if row.get("survey") == "done"))
+        else:
+            totals.append(sum(1 for row in rows if str(row.get(key) or "").strip()))
+    for index in range(extra_count):
+        totals.append(sum(1 for row in rows if index < len(row.get("extra") or ()) and str(row["extra"][index] or "").strip()))
+    for group_index, group in enumerate(role_groups or ()):
+        if not group.get("choices"):
+            continue
+        counts = [0] * len(group["choices"])
+        for row in rows:
+            values = list(row.get("roles") or ())
+            cells = role_cells(group["choices"], values[group_index] if group_index < len(values) else ())
+            for index, cell in enumerate(cells):
+                if cell:
+                    counts[index] += 1
+        totals += counts
+    return totals
 
 
 def volunteer_sort_value(row, sort_by):
@@ -519,8 +630,40 @@ def volunteer_export_sheets(rows, role_groups=(), lang=DEFAULT_LANG, extra_colum
     ]
 
 
+# French abbreviations of the North American time zones (Office québécois de la langue française): « N » = normale (standard
+# time), « A » = avancée (daylight saving time). Python and the system only give the English ones (%Z: EST, EDT...).
+FRENCH_ZONE_ABBREVIATIONS = {
+    "NST": "HNT", "NDT": "HAT",       # Newfoundland
+    "AST": "HNA", "ADT": "HAA",       # Atlantic
+    "EST": "HNE", "EDT": "HAE",       # Eastern (Québec, Ontario)
+    "CST": "HNC", "CDT": "HAC",       # Central
+    "MST": "HNR", "MDT": "HAR",       # Mountain (« Rocheuses »)
+    "PST": "HNP", "PDT": "HAP",       # Pacific
+}
+
+
+def zone_label(abbreviation, lang=DEFAULT_LANG):
+    """Abbreviation of a time zone for the reader: « HNE » / « HAE » in French for « EST » / « EDT » (the change of time is
+    already in the abbreviation given by strftime('%Z'), computed from the date), unchanged in English or for an unknown zone
+    (« UTC », « CET »...)."""
+    abbreviation = (abbreviation or "").strip()
+    if texts(lang) is not TEXTS["en"]:
+        return FRENCH_ZONE_ABBREVIATIONS.get(abbreviation.upper(), abbreviation)
+    return abbreviation
+
+
+def local_stamp(moment, pattern="%Y-%m-%d %H:%M", lang=DEFAULT_LANG):
+    """« 2026-11-17 11:14 HNE »: a datetime ALREADY in local time (with its tzinfo) and the abbreviation of its zone, in the
+    language of the reader. « » when moment is empty; no abbreviation when the datetime has no zone."""
+    if not moment:
+        return ""
+    label = zone_label(moment.strftime("%Z"), lang)
+    text = moment.strftime(pattern)
+    return "%s %s" % (text, label) if label else text
+
+
 def program_footer(program, version, shown_at="", zone="", lang=DEFAULT_LANG):
-    """« rlq_survey_report 18.0.1.124.0 - affiché le 2026-11-16 21:15:02 EST (heure locale, America/Toronto) » under a screen,
+    """« rlq_survey_report 18.0.1.124.0 - affiché le 2026-11-16 21:15:02 HNE (heure locale, America/Toronto) » under a screen,
     so that a screenshot says which version produced it and when. shown_at is already formatted in LOCAL time, never UTC."""
     text = "%s %s" % (_clean(program), _clean(version or "?"))
     if shown_at:
@@ -552,6 +695,13 @@ def volunteer_table_html(rows, role_groups=(), lang=DEFAULT_LANG, extra_columns=
     html += ["<h4>%s</h4>" % _clean(labels["title"]), _TABLE, "<thead><tr>%s</tr>" % head]
     if groups:
         html.append("<tr>%s</tr>" % "".join("<th>%s</th>" % _clean(choice) for _i, g in groups for choice in g["choices"]))
+    # v1.131.0: the totals per column, at the top (last line of the header) and at the bottom (footer) of the table.
+    totals = volunteer_column_totals(rows, role_groups, len(extra_columns))
+    total_cells = ["%s : %d" % (_clean(labels["column_total"]), totals[0]) if labels is VOLUNTEER_TEXTS["fr"]
+                   else "%s: %d" % (_clean(labels["column_total"]), totals[0])] + [str(n) for n in totals[1:]]
+    total_line = '<tr class="table-active">%s</tr>' % "".join(
+        '<th%s>%s</th>' % ("" if not index else ' style="text-align:center;"', cell) for index, cell in enumerate(total_cells))
+    html.append(total_line)
     html.append("</thead><tbody>")
     for row in rows:
         name = _clean(row.get("name"))
@@ -568,5 +718,5 @@ def volunteer_table_html(rows, role_groups=(), lang=DEFAULT_LANG, extra_columns=
             cells += ['<span style="display:block;text-align:center;">%s</span>' % _clean(cell) if cell else ""
                       for cell in role_cells(group["choices"], values, labels["yes"])]
         html.append("<tr>%s</tr>" % "".join("<td>%s</td>" % cell for cell in cells))
-    html.append("</tbody></table><p>%s: %d</p>" % (_clean(labels["total"]), len(rows)))
+    html.append("</tbody><tfoot>%s</tfoot></table><p>%s: %d</p>" % (total_line, _clean(labels["total"]), len(rows)))
     return "".join(html)
