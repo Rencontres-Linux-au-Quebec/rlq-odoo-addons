@@ -89,6 +89,9 @@ class SurveyUserInputReponses(models.Model):
         if numerique or numerique == 0:
             if getattr(ligne, "answer_type", None) == "numerical_box":
                 return prefixe + f"{numerique:g}"
+        # v1.127.0 : les questions « échelle » (scale) étaient omises du courriel de réponses.
+        if getattr(ligne, "answer_type", None) == "scale":
+            return prefixe + str(getattr(ligne, "value_scale", "") or 0)
         for champ in ("value_date", "value_datetime"):
             valeur = getattr(ligne, champ, None)
             if valeur:

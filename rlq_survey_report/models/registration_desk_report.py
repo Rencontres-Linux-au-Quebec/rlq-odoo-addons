@@ -51,8 +51,8 @@ TEXTS = {
         "done": "Sondages complétés",
         "in_progress": "Sondages commencés",
         "not_started": "Sondages non commencés",
-        "answered": "Questions répondues",
-        "unanswered": "Questions non répondues",
+        "answered": "Questions répondues (%)",
+        "unanswered": "Questions non répondues (%)",
         "total": "Total",
         "hours_title": "Personnes marquées présentes, par heure",
         "hour": "Heure",
@@ -62,6 +62,9 @@ TEXTS = {
         "answer": "Réponse",
         "of_which_present": "dont présents",
         "no_answer": "(sans réponse)",
+        "no_answer_note": "« (sans réponse) » : personnes inscrites qui n'ont pas de réponse à cette question (sondage non "
+                          "commencé, question sautée, ou question non affichée parce qu'elle dépend d'une autre réponse). Les "
+                          "réponses écrites qui ne diffèrent que par les majuscules ou les accents sont regroupées.",
         "no_desk_question": "Aucune question n'est cochée « Afficher au bureau d'inscription » dans les sondages de cet événement.",
     },
     "en": {
@@ -74,8 +77,8 @@ TEXTS = {
         "done": "Surveys completed",
         "in_progress": "Surveys started",
         "not_started": "Surveys not started",
-        "answered": "Questions answered",
-        "unanswered": "Questions not answered",
+        "answered": "Questions answered (%)",
+        "unanswered": "Questions not answered (%)",
         "total": "Total",
         "hours_title": "People marked present, per hour",
         "hour": "Hour",
@@ -85,6 +88,9 @@ TEXTS = {
         "answer": "Answer",
         "of_which_present": "of which present",
         "no_answer": "(no answer)",
+        "no_answer_note": "« (no answer) »: registered people who have no answer to this question (survey not started, question "
+                          "skipped, or question not shown because it depends on another answer). Written answers that differ "
+                          "only by capitals or accents are grouped.",
         "no_desk_question": "No question is checked « Show at the registration desk » in the surveys of this event.",
     },
 }
@@ -187,7 +193,8 @@ def answers_breakdown(rows, lang=DEFAULT_LANG):
     Returns (tickets, questions): tickets is the sorted list of ticket names that have at least one such question; questions is
     [{"label": ..., "answers": [{"value": ..., "by_ticket": {ticket: n}, "total": n, "present": n}]}], in the order the
     questions first appear, the answers sorted by name with « (no answer) » last. A multiple-choice answer counts once per
-    chosen value; a person without answer to a question counts under « (no answer) ».
+    chosen value; a person without answer to a question counts under « (no answer) ». Answers that differ only by case or
+    accents are one answer (v1.127.0), shown with their most frequent spelling.
     """
     labels = texts(lang)
     questions, order, tickets = {}, [], set()
@@ -202,14 +209,23 @@ def answers_breakdown(rows, lang=DEFAULT_LANG):
                 questions[label] = {}
                 order.append(label)
             values = [" ".join(str(v).split()) for v in (values or ()) if str(v or "").strip()] or [None]
-            for value in dict.fromkeys(values):                       # the same value twice counts once
-                cell = questions[label].setdefault(value, {"value": value, "by_ticket": {}, "total": 0, "present": 0})
+            keys = {}
+            for value in values:                                      # the same value twice counts once
+                keys.setdefault(sort_key(value) if value is not None else None, value)
+            for key, value in keys.items():
+                # v1.127.0: « Végétarien » and « végétarien » are ONE answer; the spelling shown is the most frequent one.
+                cell = questions[label].setdefault(key, {"value": value, "spellings": {}, "by_ticket": {}, "total": 0, "present": 0})
+                cell["spellings"][value] = cell["spellings"].get(value, 0) + 1
                 cell["by_ticket"][ticket] = cell["by_ticket"].get(ticket, 0) + 1
                 cell["total"] += 1
                 cell["present"] += 1 if row.get("present") else 0
     result = []
     for label in order:
-        answers = sorted(questions[label].values(), key=lambda a: (a["value"] is None, str(a["value"] or "").lower()))
+        answers = list(questions[label].values())
+        for answer in answers:
+            spellings = answer.pop("spellings")
+            answer["value"] = max(spellings, key=lambda s: (spellings[s], s is not None and s[:1].isupper()))
+        answers.sort(key=lambda a: (a["value"] is None, sort_key(a["value"])))
         for answer in answers:
             if answer["value"] is None:
                 answer["value"] = labels["no_answer"]
@@ -221,14 +237,37 @@ _TABLE = '<table class="table table-sm table-bordered" style="width:auto;min-wid
 _NUM = ' style="text-align:right;"'
 
 
+class Number(str):
+    """A number already formatted as text (a percentage): escaped like any text, but right-aligned like a number."""
+
+
+def percent_text(part, whole, lang=DEFAULT_LANG):
+    """« 40,5 % » (French) or « 40.5% » (English) of part / whole, one decimal; « » when whole is 0 (v1.127.0)."""
+    part, whole = _int(part), _int(whole)
+    if whole <= 0:
+        return Number("")
+    value = "%.1f" % (100.0 * part / whole)
+    if texts(lang) is TEXTS["en"]:
+        return Number(value + "%")
+    return Number(value.replace(".", ",") + "\u00a0%")
+
+
 def _row(cells, tag="td", bold=False):
     out = []
     for index, cell in enumerate(cells):
-        text = _clean(cell) if not isinstance(cell, int) else str(cell)
+        numeric = isinstance(cell, (int, Number))
+        text = str(cell) if isinstance(cell, int) else escape(cell) if isinstance(cell, Number) else _clean(cell)
         if bold:
             text = "<strong>%s</strong>" % text
-        out.append("<%s%s>%s</%s>" % (tag, _NUM if index and isinstance(cell, int) else "", text, tag))
+        out.append("<%s%s>%s</%s>" % (tag, _NUM if index and numeric else "", text, tag))
     return "<tr>%s</tr>" % "".join(out)
+
+
+def _ticket_cells(line, keys, lang):
+    """Cells of one line of the ticket table: counts, then the questions answered / not answered as percentages."""
+    questions = line["answered"] + line["unanswered"]
+    return [line[k] for k in keys if k not in ("answered", "unanswered")] + [
+        percent_text(line["answered"], questions, lang), percent_text(line["unanswered"], questions, lang)]
 
 
 def desk_summary_html(rows, lang=DEFAULT_LANG):
@@ -242,8 +281,8 @@ def desk_summary_html(rows, lang=DEFAULT_LANG):
             "<thead>%s</thead><tbody>" % _row([labels["ticket"]] + [labels[k] for k in keys], tag="th")]
     lines, total = ticket_summary(rows, lang)
     for line in lines:
-        html.append(_row([line["name"]] + [line[k] for k in keys]))
-    html.append(_row([total["name"]] + [total[k] for k in keys], bold=True))
+        html.append(_row([line["name"]] + _ticket_cells(line, keys, lang)))
+    html.append(_row([total["name"]] + _ticket_cells(total, keys, lang), bold=True))
     html.append("</tbody></table>")
 
     hourly = hourly_attendance(rows, lang)
@@ -270,6 +309,7 @@ def desk_summary_html(rows, lang=DEFAULT_LANG):
                 html.append(_row([question["label"] if not index else "", answer["value"]]
                                  + [answer["by_ticket"].get(t, 0) for t in tickets] + [answer["total"], answer["present"]]))
         html.append("</tbody></table>")
+        html.append('<p class="text-muted small">%s</p>' % _clean(labels["no_answer_note"]))
     return "".join(html)
 
 

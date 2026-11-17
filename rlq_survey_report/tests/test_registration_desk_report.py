@@ -100,6 +100,34 @@ class TestRegistrationDeskReport(unittest.TestCase):
             self.assertIn(text, html)
         self.assertNotIn("Inscrits", html)
 
+    def test_percent_text(self):
+        self.assertEqual(rd.percent_text(431, 1064), "40,5\u00a0%")
+        self.assertEqual(rd.percent_text(1, 3, "en_US"), "33.3%")
+        self.assertEqual(rd.percent_text(0, 7), "0,0\u00a0%")
+        self.assertEqual(rd.percent_text(5, 0), "")
+        self.assertIsInstance(rd.percent_text(1, 2), rd.Number)
+
+    def test_question_columns_are_percentages(self):
+        html = rd.desk_summary_html(ROWS)
+        self.assertIn("Questions répondues (%)", html)
+        self.assertIn("Questions non répondues (%)", html)
+        # Visitor: 5 answered of 12 questions -> 41,7 %, 7 not answered -> 58,3 %; right-aligned like the counts.
+        self.assertIn('<td style="text-align:right;">41,7\u00a0%</td>', html)
+        self.assertIn('<td style="text-align:right;">58,3\u00a0%</td>', html)
+        self.assertIn("<strong>50,0\u00a0%</strong>", html)                                   # total: 7 of 14
+        self.assertIn("50.0%", rd.desk_summary_html(ROWS, "en"))
+        self.assertIn("(sans réponse) » : personnes inscrites", html)                          # the note explains it
+
+    def test_answers_that_differ_by_case_or_accents_are_grouped(self):
+        rows = [row("Visitor", answers=[("Diet", ["Végétarien"])]), row("Visitor", answers=[("Diet", ["végétarien"])]),
+                row("Volunteer", True, answers=[("Diet", ["Végétarien "])]), row("Visitor", answers=[("Diet", ["vegetarien"])]),
+                row("Visitor", answers=[("Diet", ["végétarienne"])])]
+        _tickets, questions = rd.answers_breakdown(rows, "fr")
+        answers = {a["value"]: a for a in questions[0]["answers"]}
+        self.assertEqual(sorted(answers), ["Végétarien", "végétarienne"])
+        self.assertEqual((answers["Végétarien"]["total"], answers["Végétarien"]["present"]), (4, 1))
+        self.assertEqual(answers["Végétarien"]["by_ticket"], {"Visitor": 3, "Volunteer": 1})
+
     def test_html_empty_cases(self):
         self.assertIn("Aucune inscription", rd.desk_summary_html([]))
         html = rd.desk_summary_html([row("Visitor")], "en")

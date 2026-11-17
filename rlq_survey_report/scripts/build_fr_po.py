@@ -104,6 +104,151 @@ FR = {
     "Password of the spreadsheet": "Mot de passe du chiffrier",
     "The spreadsheet contains names and e-mail addresses: it is delivered in a ZIP archive encrypted with this password (same rules as the survey reports: at least 12 characters, with a lower-case letter, a capital letter, a digit and a special character). Pre-filled with the default password of the survey reports.":
         "Le chiffrier contient des noms et des adresses courriel : il est livré dans une archive ZIP chiffrée avec ce mot de passe (mêmes règles que les rapports de sondage : au moins 12 caractères, avec une minuscule, une majuscule, un chiffre et un caractère spécial). Pré-rempli avec le mot de passe par défaut des rapports de sondage.",
+    # rlq.survey.answer.change / rlq.survey.answer.edit (v1.127.0)
+    'Answer to edit':
+        'Réponse à modifier',
+    'This type of question (matrix) cannot be changed here.':
+        'Ce type de question (matrice) ne peut pas être modifié ici.',
+    'Edit the answers':
+        'Modifier les réponses',
+    'Example: correction asked by the person on the phone':
+        'Exemple : correction demandée par la personne au téléphone',
+    'Click a question to change its answer. The questions changed are shown in bold; each one is written in the history (Surveys > Detailed reports > Manual changes of answers).':
+        "Cliquez sur une question pour changer sa réponse. Les questions modifiées sont en gras ; chacune est inscrite dans l'historique (Sondages > Rapports détaillés > Modifications manuelles des réponses).",
+    'Save the changes':
+        'Enregistrer les changements',
+    'Cancel':
+        'Annuler',
+    'Manual changes of answers':
+        'Modifications manuelles des réponses',
+    'Send the update by e-mail':
+        'Envoyer la mise à jour par courriel',
+    'Manual change of a survey answer':
+        "Modification manuelle d'une réponse de sondage",
+    'Not sent yet':
+        'Pas encore envoyées',
+    'Sent':
+        'Envoyées',
+    'Date of the change':
+        'Date de la modification',
+    'Changed by':
+        'Modifié par',
+    'No manual change yet.':
+        "Aucune modification manuelle pour l'instant.",
+    'To change an answer: Surveys > Detailed reports > Edit answers, open the participation, then « Edit the answers ».':
+        'Pour changer une réponse : Sondages > Rapports détaillés > Modifier des réponses, ouvrez la participation, puis « Modifier les réponses ».',
+    'Edit answers':
+        'Modifier des réponses',
+    'Open a participation, then click « Edit the answers ».':
+        'Ouvrez une participation, puis cliquez « Modifier les réponses ».',
+    'Manual changes':
+        'Modifications manuelles',
+    'Update sent to %(count)s person(s).':
+        'Mise à jour envoyée à %(count)s personne(s).',
+    '%(count)s answer(s) changed; the changes are in the history.':
+        "%(count)s réponse(s) modifiée(s) ; les changements sont dans l'historique.",
+    'The history of the manual changes cannot be modified.':
+        "L'historique des modifications manuelles ne peut pas être modifié.",
+    'Only a survey administrator can send the update of the answers.':
+        'Seul un administrateur des sondages peut envoyer la mise à jour des réponses.',
+    'The selected changes have already been sent.':
+        'Les modifications sélectionnées ont déjà été envoyées.',
+    'Not sent (no e-mail address): %(names)s.':
+        'Non envoyée (aucune adresse courriel) : %(names)s.',
+    'Update of the answers':
+        'Mise à jour des réponses',
+    'Only a survey administrator can change the answers of a participation.':
+        "Seul un administrateur des sondages peut modifier les réponses d'une participation.",
+    'No answer was changed.':
+        "Aucune réponse n'a été modifiée.",
+    'Answers saved':
+        'Réponses enregistrées',
+    'The update was sent to %(email)s.':
+        'La mise à jour a été envoyée à %(email)s.',
+    'No e-mail sent: the person has no e-mail address.':
+        "Aucun courriel envoyé : la personne n'a pas d'adresse courriel.",
+    'Changed on':
+        'Modifié le',
+    'Participation':
+        'Participation',
+    'Deleting the participation deletes its history too (personal data).':
+        'Supprimer la participation supprime aussi son historique (renseignements personnels).',
+    'Name (or e-mail address) of the person, at the time of the change.':
+        'Nom (ou adresse courriel) de la personne, au moment de la modification.',
+    'E-mail address':
+        'Adresse courriel',
+    'Question':
+        'Question',
+    'Question title':
+        'Titre de la question',
+    'Title of the question at the time of the change, kept if the question is deleted.':
+        'Titre de la question au moment de la modification, conservé si la question est supprimée.',
+    'Answer before':
+        'Réponse avant',
+    'Answer after':
+        'Réponse après',
+    'Reason':
+        'Motif',
+    'Sent to the person on':
+        'Envoyé à la personne le',
+    'Sent by':
+        'Envoyé par',
+    'Number of manual changes':
+        'Nombre de modifications manuelles',
+    'Changes (e-mail)':
+        'Changements (courriel)',
+    'The manual changes put in the update e-mail sent to the person (question, answer before, answer after).':
+        'Les modifications manuelles mises dans le courriel de mise à jour envoyé à la personne (question, réponse avant, réponse après).',
+    'Edit the answers of a participation':
+        "Modifier les réponses d'une participation",
+    'Questions':
+        'Questions',
+    'Reason of the change':
+        'Motif de la modification',
+    'Written in the history with each question changed (optional).':
+        "Inscrit dans l'historique avec chaque question modifiée (facultatif).",
+    'Send the update by e-mail to the person':
+        'Envoyer la mise à jour par courriel à la personne',
+    'After saving, the person receives the list of the changes, then all their answers as they are now.':
+        "Après l'enregistrement, la personne reçoit la liste des changements, puis toutes ses réponses telles qu'elles sont maintenant.",
+    'Edit':
+        'Modification',
+    'Sequence':
+        'Séquence',
+    'Type of question':
+        'Type de question',
+    'Comment allowed':
+        'Commentaire permis',
+    'Can be changed':
+        'Modifiable',
+    'Current answer':
+        'Réponse actuelle',
+    'Answer (cannot be changed here)':
+        'Réponse (non modifiable ici)',
+    'New answer':
+        'Nouvelle réponse',
+    'New number':
+        'Nouveau nombre',
+    'New value of the scale':
+        "Nouvelle valeur de l'échelle",
+    'New date':
+        'Nouvelle date',
+    'New date and time':
+        'Nouvelles date et heure',
+    'New choice':
+        'Nouveau choix',
+    'New choices':
+        'Nouveaux choix',
+    'Comment or « Other » answer':
+        'Commentaire ou réponse « Autre »',
+    'No answer':
+        'Aucune réponse',
+    'Removes the answer to this question: the question becomes « skipped ».':
+        'Retire la réponse à cette question : la question devient « sautée ».',
+    'New answer (text)':
+        'Nouvelle réponse (texte)',
+    'Changed':
+        'Modifiée',
     # rlq.volunteer.coordinator
     "Volunteers": "Bénévoles",
     "Volunteers: %(event)s": "Bénévoles : %(event)s",
@@ -140,8 +285,10 @@ def add(msgid, ref, python=False):
 
 
 # 1. views
-tree = ET.parse(root_dir + "/views/event_registration_desk_views.xml")
-for record in tree.getroot():
+VIEW_FILES = ("views/event_registration_desk_views.xml", "views/survey_answer_edit_views.xml")
+MODEL_FILES = ("event_registration_desk.py", "volunteer_coordinator.py", "survey_answer_edit.py")
+records = [record for view_file in VIEW_FILES for record in ET.parse("%s/%s" % (root_dir, view_file)).getroot()]
+for record in records:
     xmlid = record.get("id")
     if record.tag == "menuitem":
         add(record.get("name"), "model:ir.ui.menu,name:%s.%s" % (MODULE, xmlid))
@@ -158,6 +305,13 @@ for record in tree.getroot():
                     add(node.get(attribute), ref)
             if node.tag in ("p", "span", "div", "label", "h1", "h2", "h3") and (node.text or "").strip():
                 add(node.text, ref)
+        continue
+    for field_name in ("help",):
+        node = record.find("field[@name='%s']" % field_name)
+        if node is not None and model == "ir.actions.act_window":
+            for paragraph in node.iter("p"):
+                if (paragraph.text or "").strip():
+                    add(paragraph.text, "model:ir.actions.act_window,help:%s.%s" % (MODULE, xmlid))
 
 
 # 2. model fields and 3. _() calls
@@ -168,7 +322,7 @@ def literal(node):
         return None
 
 
-for filename in ("event_registration_desk.py", "volunteer_coordinator.py"):
+for filename in MODEL_FILES:
     source = open("%s/models/%s" % (root_dir, filename), encoding="utf-8").read()
     module_ast = ast.parse(source)
     code_ref = "code:addons/%s/models/%s:0" % (MODULE, filename)

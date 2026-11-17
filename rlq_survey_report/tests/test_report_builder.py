@@ -1216,6 +1216,29 @@ class TestRemplacerNomsComplets(TestRemplacerNomComplet):
         self.assertEqual(rb.texte_chrono([("début", 1.0)]), "")
 
 
+class TestHtmlChangementsCourriel(unittest.TestCase):
+    """v1.127.0 - tableau des changements du courriel « Mise à jour de vos réponses »."""
+
+    def test_tableau_avant_apres(self):
+        html = rb.html_changements_courriel([("Dîner ?", "Non", "Oui"), ("Commentaire", "", "Ligne 1\nLigne 2")])
+        self.assertIn("<th", html)
+        self.assertIn("<strong>Dîner ?</strong>", html)
+        self.assertIn(">Non</td>", html)
+        self.assertIn(">Oui</td>", html)
+        self.assertIn("(aucune réponse)", html)                                      # réponse vide avant
+        self.assertIn("Ligne 1<br/>Ligne 2", html)
+
+    def test_tout_est_echappe(self):
+        html = rb.html_changements_courriel([("<b>Q</b>", "<script>x</script>", "a & b")])
+        self.assertNotIn("<script>", html)
+        self.assertNotIn("<b>Q</b>", html)
+        self.assertIn("a &amp; b", html)
+
+    def test_aucun_changement(self):
+        self.assertEqual(rb.html_changements_courriel([]), "")
+        self.assertEqual(rb.html_changements_courriel(None), "")
+
+
 class TestHtmlReponsesCourriel(unittest.TestCase):
     """v1.94.0 : corps du courriel qui rappelle ses réponses au participant."""
 

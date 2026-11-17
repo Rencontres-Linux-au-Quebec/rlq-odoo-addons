@@ -6,6 +6,19 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -81. Pourcentages, « (sans réponse) », modification manuelle des réponses (v1.127.0)
+
+**Non vérifié sans instance, à confirmer :**
+1. Bureau d'inscription : colonnes « Questions répondues (%) » et « Questions non répondues (%) » ; note sous le tableau des réponses ; « Végétarien » et « végétarien » sur une seule ligne.
+2. Nouveau rapport de sondage : « Voir les personnes n'ayant pas répondu » est coché.
+3. Fiche d'une participation (administrateur des sondages) : bouton « Modifier les réponses » dans l'en-tête. La vue hérite de `survey.survey_user_input_view_form` par `//header` et `//div[@name='button_box']` (vérifiés dans le code d'Odoo 18.0).
+4. Fenêtre « Modifier les réponses » : un clic sur une question ouvre le bon champ ; « Enregistrer les changements » modifie la réponse (vérifier dans la fiche de la participation et dans un rapport) ; une ligne par question modifiée dans Sondage > Rapports détaillés > Modifications manuelles des réponses.
+5. Nombre 0 : enregistré comme réponse, pas comme question sautée.
+6. Courriel de mise à jour : reçu par la personne, avec le tableau avant / après et toutes les réponses ; la ligne de l'historique montre « Envoyé à la personne le ». Un deuxième envoi des mêmes lignes est refusé.
+7. Utilisateur des sondages qui n'est pas administrateur : voit l'historique, pas le bouton ni le menu « Modifier des réponses ».
+8. Questions « échelle » : maintenant présentes dans le courriel de réponses, le bureau d'inscription et le tableau des bénévoles.
+9. Les 4 tests Odoo de `tests/test_survey_answer_edit.py` n'ont pas été exécutés.
+
 ## -80. Export des bénévoles dans un chiffrier, heures prévues, durée de génération à l'écran (v1.126.0)
 
 **Non vérifié sans instance, à confirmer :**

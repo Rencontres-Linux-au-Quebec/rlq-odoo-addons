@@ -11,3 +11,7 @@ access_rlq_registration_email_fix_line_event_user,rlq.registration.email.fix.lin
 access_rlq_survey_pending_event_user,rlq.survey.pending.event.user,model_rlq_survey_pending,event.group_event_user,1,1,1,1
 access_rlq_registration_desk_event_user,rlq.registration.desk.event.user,model_rlq_registration_desk,event.group_event_user,1,1,1,1
 access_rlq_volunteer_coordinator_event_user,rlq.volunteer.coordinator.event.user,model_rlq_volunteer_coordinator,event.group_event_user,1,1,1,1
+access_rlq_survey_answer_change_survey_user,rlq.survey.answer.change.survey.user,model_rlq_survey_answer_change,survey.group_survey_user,1,0,0,0
+access_rlq_survey_answer_change_system,rlq.survey.answer.change.system,model_rlq_survey_answer_change,base.group_system,1,0,0,1
+access_rlq_survey_answer_edit_survey_manager,rlq.survey.answer.edit.survey.manager,model_rlq_survey_answer_edit,survey.group_survey_manager,1,1,1,1
+access_rlq_survey_answer_edit_line_survey_manager,rlq.survey.answer.edit.line.survey.manager,model_rlq_survey_answer_edit_line,survey.group_survey_manager,1,1,1,1

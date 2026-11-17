@@ -391,7 +391,7 @@ class RlqSurveyReportWizard(models.TransientModel):
              "jamais comptées comme des réponses.",
     )
     voir_non_repondants = fields.Boolean(
-        string="Voir les personnes n'ayant pas répondu", default=False,
+        string="Voir les personnes n'ayant pas répondu", default=True,   # coché par défaut depuis la v1.127.0
         help="Ajoute, pour chaque rencontre, la liste des personnes invitées "
              "au sondage mais n'ayant jamais commencé à y répondre (statut "
              "'Nouveau'). Nécessite que ces invitations existent bien comme "

@@ -175,7 +175,7 @@ class EventRegistrationDesk(models.Model):
 
         lines = self.env["survey.user_input.line"].sudo()
         wanted = ["user_input_id", "question_id", "skipped", "answer_type", "suggested_answer_id", "matrix_row_id",
-                  "value_char_box", "value_text_box", "value_numerical_box", "value_date", "value_datetime"]
+                  "value_char_box", "value_text_box", "value_numerical_box", "value_scale", "value_date", "value_datetime"]
         read = [name for name in wanted if name in lines._fields]
         inputs = set(chosen.values())
         rows = lines.search_read([("user_input_id", "in", sorted(inputs))], read, order="id") if inputs else []

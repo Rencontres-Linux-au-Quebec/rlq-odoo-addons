@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Modèle du courriel « Mise à jour de vos réponses » (v1.127.0), envoyé à la main au participant après une
+         modification manuelle de ses réponses (fenêtre « Modifier les réponses » ou historique des modifications).
+         noupdate="1" : vos modifications du texte ne sont pas écrasées par une mise à jour (-u).
+         rlq_changes_html : les changements envoyés ; rlq_reponses_html : toutes les réponses telles qu'elles sont. -->
+    <data noupdate="1">
+        <record id="mail_template_mise_a_jour_reponses" model="mail.template">
+            <field name="name">Sondage : mise à jour de vos réponses (rlq_survey_report)</field>
+            <field name="model_id" ref="survey.model_survey_user_input"/>
+            <field name="subject">Mise à jour de vos réponses : {{ object.survey_id.title }}</field>
+            <field name="email_from">{{ object.survey_id.user_id.email_formatted or user.company_id.email_formatted or user.email_formatted }}</field>
+            <field name="email_to">{{ object.email or object.partner_id.email }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+<div style="margin:0; padding:0; font-size:14px;">
+    <p>Bonjour<t t-if="object.partner_id.name"> <t t-out="object.partner_id.name"/></t>,</p>
+    <p>Vos réponses au sondage <strong><t t-out="object.survey_id.title"/></strong> ont été mises à jour par notre équipe.
+       Voici les changements :</p>
+    <t t-out="object.rlq_changes_html"/>
+    <p>Voici l'ensemble de vos réponses, à jour :</p>
+    <t t-out="object.rlq_reponses_html"/>
+    <p>Si un de ces changements ne vous semble pas juste, répondez simplement à ce courriel.</p>
+    <p style="color:#666; font-size:12px;">Ce courriel n'est conservé dans aucun courriel sortant après son envoi.</p>
+</div>
+            </field>
+        </record>
+    </data>
+</odoo>

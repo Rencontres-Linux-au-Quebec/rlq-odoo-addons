@@ -21,3 +21,4 @@ from . import event_survey_followup
 from . import registration_desk_report
 from . import event_registration_desk
 from . import volunteer_coordinator
+from . import survey_answer_edit

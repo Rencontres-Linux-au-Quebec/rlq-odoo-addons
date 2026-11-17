@@ -42,7 +42,7 @@
 <div class="page">
 
 <h1>Guide utilisateur — Rapport de sondage</h1>
-<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.126.0</strong> — mis à jour le 2026-11-16.<br>
+<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.127.0</strong> — mis à jour le 2026-11-16.<br>
 Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 
 <p>Ce module produit un compte-rendu détaillé — à l'écran, en fichier HTML, en PDF ou en Excel — des réponses à un ou plusieurs sondages Odoo, notamment les sondages de satisfaction envoyés après chaque rencontre. Il aide à repérer ce qui va bien, ce qui se dégrade, et à suivre les actions entreprises d'une rencontre à l'autre.</p>
@@ -69,6 +69,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
     <li><a href="#courriels-invalides">Adresses courriel invalides des inscriptions</a></li>
     <li><a href="#suivi-sondages">Sondages non complétés et rapport quotidien</a></li>
     <li><a href="#bureau-inscription">Bureau d'inscription</a></li>
+    <li><a href="#modifier-reponses">Modifier les réponses d'un sondage</a></li>
     <li><a href="#admin">Pour les administrateurs</a></li>
     <li><a href="#depannage">Dépannage</a></li>
     <li><a href="#limites">Limites et prudence</a></li>
@@ -129,7 +130,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
   <tr><th>Option</th><th>Défaut</th><th>Effet</th></tr>
   <tr><td><strong>Format de sortie</strong></td><td>À l'écran</td><td>« À l'écran, dans Odoo », « Fichier HTML » ou « Fichier PDF ». Une fois le rapport affiché, les boutons de téléchargement restent disponibles.</td></tr>
   <tr><td><strong>Inclure les réponses partielles (non terminées)</strong></td><td>coché</td><td>Compte aussi les réponses commencées mais non terminées.</td></tr>
-  <tr><td><strong>Voir les personnes n'ayant pas répondu</strong></td><td>décoché</td><td>Ajoute, par rencontre, les invités qui n'ont jamais commencé. Suppose que ces invitations existent dans Odoo, ce qui dépend de la façon dont vos sondages sont envoyés.</td></tr>
+  <tr><td><strong>Voir les personnes n'ayant pas répondu</strong></td><td>coché (depuis la v1.127)</td><td>Ajoute, par rencontre, les invités qui n'ont jamais commencé. Suppose que ces invitations existent dans Odoo, ce qui dépend de la façon dont vos sondages sont envoyés.</td></tr>
   <tr><td><strong>Ventiler les notes (liste dépliable détaillée)</strong></td><td>coché</td><td>Sous chaque note moyenne, une liste dépliable indique qui a donné quelle note.</td></tr>
   <tr><td><strong>Combiner les réponses d'un utilisateur à un même sondage</strong></td><td>décoché</td><td>Voir §&nbsp;7.</td></tr>
   <tr><td><strong>Dédoublonner les réponses libres avec compteur</strong></td><td>coché</td><td>Regroupe les réponses libres identiques avec un compteur (×2, ×3…).</td></tr>
@@ -418,9 +419,11 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 <p>Chaque ligne montre le billet, l'état de l'inscription, l'état du sondage, les <strong>questions répondues</strong> (par exemple 8/12) et les <strong>réponses</strong> aux questions cochées.</p>
 <h3>Le sommaire</h3>
 <ul>
-  <li><strong>Par type de billet et au total</strong> : inscrits, présents, sondages complétés, commencés et non commencés, questions répondues et non répondues.</li>
+  <li><strong>Par type de billet et au total</strong> : inscrits, présents, sondages complétés, commencés et non commencés, puis le <strong>pourcentage</strong> des questions répondues et non répondues (v1.127) : parmi toutes les questions attendues des inscrits qui ont un sondage, la part qui a une réponse.</li>
   <li><strong>Personnes marquées présentes, par heure</strong> : une ligne par heure, en <strong>heure locale</strong>, une colonne par billet, et le total.</li>
   <li><strong>Réponses aux questions affichées</strong> : pour chaque réponse, le nombre de personnes par billet, le total et « dont présents » (par exemple, combien de dîners prévoir).</li>
+  <li><strong>« (sans réponse) »</strong> : les personnes inscrites qui n'ont pas de réponse à cette question, parce qu'elles n'ont pas commencé le sondage, ont sauté la question, ou ne l'ont pas vue (question qui dépend d'une autre réponse). Une note sous le tableau le rappelle.</li>
+  <li>Les réponses écrites qui ne diffèrent que par les majuscules ou les accents (« Végétarien », « végétarien ») sont comptées ensemble, sous l'orthographe la plus fréquente (v1.127).</li>
 </ul>
 <p>« Présent » est l'état natif d'Odoo : le bureau d'inscription d'Odoo et ses statistiques voient la même chose. Les inscriptions annulées ne sont ni listées ni comptées. Une question conditionnelle que la personne n'a jamais vue compte comme non répondue. Un sondage est rattaché à une inscription par le même contact ou la même adresse courriel : si une personne a inscrit plusieurs participants avec son propre contact, ils montrent tous les mêmes réponses.</p>
 
@@ -464,7 +467,21 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 <p>Le chiffrier contient des noms et des courriels : il n'est jamais livré sans mot de passe, et chaque export est inscrit dans l'historique d'accès des rapports.</p>
 
 <!-- ============================================================ 16 -->
-<h2 id="admin">16. Pour les administrateurs</h2>
+<h2 id="modifier-reponses">16. Modifier les réponses d'un sondage <span class="pastille">nouveau, v1.127</span></h2>
+<p>Pour corriger une réponse à la demande d'une personne (mauvais choix, faute de frappe, changement de dernière minute), réservé aux <strong>administrateurs des sondages</strong>.</p>
+<ol>
+  <li><strong>Sondage → Rapports détaillés → Modifier des réponses</strong>, ouvrez la participation (recherche par nom, courriel ou sondage), puis cliquez <strong>Modifier les réponses</strong>.</li>
+  <li>La fenêtre liste chaque question avec la réponse actuelle. Cliquez sur une question : le bon champ s'affiche selon son type (texte, nombre, échelle, date, choix unique, choix multiples, commentaire ou réponse « Autre »). La case <strong>Aucune réponse</strong> efface un nombre ou une valeur d'échelle. Les questions en matrice s'affichent mais ne se modifient pas ici.</li>
+  <li>Indiquez au besoin un <strong>motif</strong> (inscrit dans l'historique), cochez <strong>Envoyer la mise à jour par courriel à la personne</strong> si elle doit être prévenue, puis cliquez <strong>Enregistrer les changements</strong>.</li>
+</ol>
+<p>La réponse est enregistrée comme si la personne l'avait donnée elle-même : statistiques, rapports et bureau d'inscription en tiennent compte.</p>
+<h3>Historique des modifications</h3>
+<p><strong>Sondage → Rapports détaillés → Modifications manuelles des réponses</strong> : une ligne par question modifiée (date, auteur, personne, question, réponse avant, réponse après, motif, date d'envoi à la personne). Filtres « Pas encore envoyées » et « Envoyées », regroupement par personne, sondage ou auteur. L'historique ne peut pas être modifié. La fiche d'une participation affiche aussi le bouton <strong>Modifications manuelles</strong> quand elle en a.</p>
+<h3>Envoyer la mise à jour à la personne</h3>
+<p>Dans l'historique, sélectionnez les lignes puis cliquez <strong>Envoyer la mise à jour par courriel</strong>. La personne reçoit le tableau des changements (avant, après), puis toutes ses réponses telles qu'elles sont maintenant. Seules les modifications pas encore envoyées partent ; la date et l'auteur de l'envoi sont notés. Sans adresse courriel, rien n'est envoyé et un message le dit. Le texte du courriel se change dans Paramètres → Technique → Modèles de courriel (« Sondage : mise à jour de vos réponses »).</p>
+
+<!-- ============================================================ 17 -->
+<h2 id="admin">17. Pour les administrateurs</h2>
 <h3>Paramètres système</h3>
 <p>Réglages modifiables sans toucher au code, dans <strong>Paramètres (ou Réglages) → Technique → Paramètres système</strong> (le menu Technique exige le mode développeur) :</p>
 <table>
@@ -485,7 +502,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 <p>Le dossier du module contient <code>run-all.sh</code> : il lance ruff, les contrôles de syntaxe, les tests autonomes et — si PostgreSQL et Odoo sont installés — crée une base de test dédiée pour exécuter les tests Odoo, puis la supprime. Voir <code>scripts/LISEZMOI.md</code>. Les notes de conception se trouvent dans <code>doc/</code> (<code>CONTEXTE.md</code>, <code>CHANGELOG.md</code>, <code>NOTES_VALIDATION.md</code>).</p>
 
 <!-- ============================================================ 16 -->
-<h2 id="depannage">17. Dépannage</h2>
+<h2 id="depannage">18. Dépannage</h2>
 <table>
   <tr><th>Symptôme</th><th>Cause probable / solution</th></tr>
   <tr><td>Le bouton Générer ne fait rien</td><td>Vérifiez qu'au moins un sondage est sélectionné et que la case de confirmation est cochée.</td></tr>
@@ -506,7 +523,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 </table>
 
 <!-- ============================================================ 17 -->
-<h2 id="limites">18. Limites et prudence</h2>
+<h2 id="limites">19. Limites et prudence</h2>
 <ul>
   <li><strong>L'anonymisation réduit le risque, elle ne l'élimine pas</strong> : le contenu des réponses libres et un petit nombre de répondants peuvent permettre de reconnaître quelqu'un (§&nbsp;4).</li>
   <li><strong>Ni ce module ni ce guide ne donnent d'avis juridique.</strong> La conformité à la Loi 25 ou au RGPD, surtout pour une diffusion publique, relève d'une personne qualifiée.</li>

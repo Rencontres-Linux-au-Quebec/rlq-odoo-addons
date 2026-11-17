@@ -1,5 +1,52 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.127.0
+
+**Short title:** registration desk: questions in percent, "(sans réponse)" explained, answers grouped; "Voir les personnes n'ayant pas répondu" checked by default; manual changes of survey answers with history and update e-mail.
+
+**Reason for the request:** feedback with a screenshot of the registration desk: (1) show the columns "Questions répondues" and "Questions non répondues" as percentages; (2) what is "(sans réponse)"?; (3) check "Voir les personnes n'ayant pas répondu" by default in the survey reports; (4) be able to change the answers of a survey by hand, see the history of the manual changes in a menu, and send an update by e-mail to the person with the latest changes.
+
+**Changes:**
+
+- `models/registration_desk_report.py`:
+  - `percent_text()` and `Number` (text right-aligned like a number); the ticket table shows "Questions répondues (%)" and "Questions non répondues (%)": share of the questions expected from the registrations that have a survey, one decimal ("40,5 %" in French, "40.5%" in English). `_ticket_cells()`.
+  - `answers_breakdown()`: answers that differ only by capitals or accents ("Végétarien", "végétarien") are counted as ONE answer, shown with their most frequent spelling.
+  - A note under the answers table explains "(sans réponse)": registered people with no answer to the question (survey not started, question skipped, or question not shown because it depends on another answer).
+- `models/rlq_survey_report_wizard.py`: `voir_non_repondants` checked by default.
+- `models/survey_answer_edit.py` (new):
+  - `rlq.survey.answer.change`: history (date, user, participation, survey, person and e-mail at the time, question, answer before, answer after, reason, sent on, sent by). Cannot be modified; deleted with the participation; an administrator can delete it (right to erasure). Button "Send the update by e-mail" (`action_send_update()`).
+  - `rlq.survey.answer.edit` and `rlq.survey.answer.edit.line`: window "Edit the answers": one line per question with the current answer; a click opens the field that fits the type (text, number, scale, date, date and time, one choice, several choices, comment or "Other"); "No answer" erases a number or a scale. `action_apply()` saves with `survey.user_input._save_lines()`, the method Odoo uses when the person answers, and writes the history.
+  - `survey.user_input`: `rlq_change_ids`, `rlq_change_count` (smart button), `rlq_changes_html`, `_rlq_send_answer_update()`, `action_rlq_edit_answers()`, `action_rlq_open_changes()`.
+- `views/survey_answer_edit_views.xml` (new): windows, history list (filters "Not sent yet" / "Sent", group by person, survey, user), button "Edit the answers" and smart button "Manual changes" on the participation form of Odoo, menus Surveys > Detailed reports > "Edit answers" (administrators) and "Manual changes of answers" (survey users).
+- `data/mail_template_mise_a_jour.xml` (new): e-mail "Mise à jour de vos réponses" (changes before / after, then all the answers as they are now). `noupdate="1"`: the text can be changed in Settings > Technical > E-mail templates.
+- `models/report_builder.py`: `html_changements_courriel()`.
+- `security/ir.model.access.csv`, `__manifest__.py` (version `18.0.1.127.0`, data files, description), `i18n/fr.po` (rebuilt; `scripts/build_fr_po.py` now also reads the new files).
+- Tests: 6 standalone tests (percentages, grouping, e-mail table); `tests/test_survey_answer_edit.py` (4 Odoo tests).
+- Guide (sections 15 and new 16), `doc/CONTEXTE.md`, `doc/NOTES_VALIDATION.md` (section -81).
+
+**Bugs fixed:**
+
+- Symptom: the answers to "scale" questions (for example a satisfaction from 0 to 10) were missing from the e-mail "Vos réponses au sondage", from the registration desk and from the volunteers' table.
+- Diagnosis: the text of an answer line was read from the char, text, number and date fields only; a scale answer is stored in `value_scale`.
+- Fix: `value_scale` read in `survey_reponses_courriel._rlq_texte_ligne()` and in `event_registration_desk._rlq_desk_participations()`.
+
+**Safeguards and edge cases:**
+
+- Rights: only "Surveys: Administrator" can change answers and send the update (Odoo gives the right to write answer lines to that group only); every survey user can read the history.
+- A number 0 is saved as an answer, not as "skipped" (`_save_lines()` treats a false value as skipped: numbers are given as text, as the web form of Odoo does).
+- Matrix questions are shown with their answer but cannot be changed in the window.
+- No e-mail address: the changes are saved, no e-mail is sent, the notification says so. The changes already sent are never sent again; the history shows when and by whom.
+- The update e-mail is deleted from the outgoing mails after sending (`auto_delete`), like the e-mail of answers.
+- The e-mail template is in French, like the existing e-mail of answers.
+
+**Checks:**
+
+- `./run-all.sh --sans-odoo`: ruff, syntax and manifest, 221 standalone tests: OK.
+- XML of the new view and data files parsed. `_save_lines()`, `_read_group()`, `value_scale`, `comments_allowed` and the participation form (`header`, `button_box`) checked in the source of Odoo 18.0.
+- The Odoo code was NOT run: no Odoo instance here. The 4 Odoo tests were not run.
+
+**Action required:** update the module on DEV (`-u rlq_survey_report`) and check the points of `doc/NOTES_VALIDATION.md`, section -81.
+
 ## 18.0.1.126.0
 
 **Short title:** volunteers' table exported to a spreadsheet (pivot tables); planned hours of arrival and departure read from the survey; program line at the top; generation time shown on screen.

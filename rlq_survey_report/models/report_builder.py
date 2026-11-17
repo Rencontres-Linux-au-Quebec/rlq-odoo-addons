@@ -211,6 +211,35 @@ def html_reponses_courriel(blocs):
     return "".join(morceaux)
 
 
+def html_changements_courriel(changements):
+    """HTML des changements faits à la main dans les réponses d'un participant (v1.127.0), pour le courriel de mise à jour.
+    `changements` = [(question, réponse avant, réponse après)] ; tout est échappé, les retours à la ligne sont conservés,
+    une réponse vide s'affiche « (aucune réponse) ». Retourne une chaîne vide s'il n'y a aucun changement."""
+    def cellule(texte):
+        texte = str(texte or "").strip()
+        if not texte:
+            return '<em style="color:#666;">(aucune réponse)</em>'
+        return echapper(texte).replace("\n", "<br/>")
+
+    lignes = []
+    for question, avant, apres in changements or ():
+        lignes.append(
+            '<tr><td style="padding:4px 8px; border:1px solid #ddd; vertical-align:top;"><strong>'
+            + echapper(re.sub(r"\s+", " ", str(question or "")).strip()) + "</strong></td>"
+            + '<td style="padding:4px 8px; border:1px solid #ddd; vertical-align:top; color:#666;">' + cellule(avant) + "</td>"
+            + '<td style="padding:4px 8px; border:1px solid #ddd; vertical-align:top;">' + cellule(apres) + "</td></tr>"
+        )
+    if not lignes:
+        return ""
+    return (
+        '<table style="border-collapse:collapse; margin:0 0 16px 0; font-size:14px;"><tr>'
+        '<th style="padding:4px 8px; border:1px solid #ddd; text-align:left;">Question</th>'
+        '<th style="padding:4px 8px; border:1px solid #ddd; text-align:left;">Avant</th>'
+        '<th style="padding:4px 8px; border:1px solid #ddd; text-align:left;">Après</th></tr>'
+        + "".join(lignes) + "</table>"
+    )
+
+
 def html_resume_inscription(lignes):
     """HTML du bloc « Résumé de votre inscription » (v1.120.0), en tête du courriel de
     réponses. `lignes` = [(libellé, valeur)] ; une valeur vide est omise. Tout est échappé.
