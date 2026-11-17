@@ -42,7 +42,7 @@
 <div class="page">
 
 <h1>Guide utilisateur — Rapport de sondage</h1>
-<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.125.0</strong> — mis à jour le 2026-11-16.<br>
+<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.126.0</strong> — mis à jour le 2026-11-16.<br>
 Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 
 <p>Ce module produit un compte-rendu détaillé — à l'écran, en fichier HTML, en PDF ou en Excel — des réponses à un ou plusieurs sondages Odoo, notamment les sondages de satisfaction envoyés après chaque rencontre. Il aide à repérer ce qui va bien, ce qui se dégrade, et à suivre les actions entreprises d'une rencontre à l'autre.</p>
@@ -435,7 +435,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 <h3>Dates, heures et version affichées <span class="pastille">nouveau, v1.124</span></h3>
 <ul>
   <li>Toutes les dates et heures du bureau d'inscription et du tableau des bénévoles (inscription, arrivée, départ, présences par heure) sont en <strong>heure locale</strong>, jamais en UTC : le fuseau horaire est celui de votre navigateur (ou de vos préférences Odoo), sinon celui de l'événement, sinon America/Toronto.</li>
-  <li>Sous le sommaire et sous le tableau des bénévoles, une ligne indique le nom du module, sa version, puis la date et l'heure locales de l'affichage avec le fuseau, par exemple : <code>rlq_survey_report 18.0.1.124.0 - affiché le 2026-11-16 21:15:02 EST (heure locale, America/Toronto)</code>. Une capture d'écran dit ainsi quelle version l'a produite et quand.</li>
+  <li><strong>En haut</strong> du bureau d'inscription et du tableau des bénévoles (au-dessus du sommaire et du tableau, depuis la v1.126), une ligne indique le nom du module, sa version, puis la date et l'heure locales de l'affichage avec le fuseau, par exemple : <code>rlq_survey_report 18.0.1.124.0 - affiché le 2026-11-16 21:15:02 EST (heure locale, America/Toronto)</code>. Une capture d'écran dit ainsi quelle version l'a produite et quand.</li>
 </ul>
 
 <h3>Bénévoles <span class="pastille">v1.122, revu en v1.123</span></h3>
@@ -447,8 +447,21 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
   <li>Les autres questions cochées « Afficher au bureau d'inscription » dans ce sondage ajoutent chacune une colonne.</li>
   <li><strong>Trier par</strong>, <strong>Ordre décroissant</strong> et <strong>Sondage</strong> classent et filtrent le tableau. Il ne se trie pas en cliquant sur ses en-têtes : ses colonnes dépendent du sondage, ce qu'une liste Odoo ne permet pas.</li>
   <li>Le lien sur le nom ouvre la discussion directe avec la personne dans l'application Discussion si elle a un compte sur Odoo (interne ou portail) ; sinon il ouvre sa fiche de contact, d'où l'on peut lui écrire par courriel (« Envoyer un message »).</li>
-  <li>L'heure d'arrivée est celle du bouton <strong>Présent</strong> du bureau d'inscription, l'heure de départ celle du bouton <strong>Départ</strong>.</li>
+  <li><strong>Heure d'arrivée et heure de départ</strong> (v1.126) : ce sont les heures <strong>prévues</strong> par le bénévole, lues dans le sondage (question dont le titre parle d'« arrivée » et de « départ »). Si le sondage n'a pas ces questions, ce sont les heures enregistrées au bureau d'inscription (boutons <strong>Présent</strong> et <strong>Départ</strong>), et une note le dit au-dessus du tableau.</li>
 </ul>
+
+<h3>Exporter les bénévoles dans un chiffrier <span class="pastille">nouveau, v1.126</span></h3>
+<ol>
+  <li>Dans <strong>Événements → Bénévoles</strong>, vérifiez le <strong>mot de passe du chiffrier</strong> (pré-rempli avec le mot de passe par défaut des rapports de sondage ; mêmes règles : 12 caractères, minuscule, majuscule, chiffre, caractère spécial).</li>
+  <li>Cliquez <strong>Exporter dans un chiffrier</strong>. Vous recevez une archive ZIP chiffrée qui contient un fichier <code>.xlsx</code> (Excel, LibreOffice Calc). Le filtre « Sondage » et le tri de l'écran s'appliquent.</li>
+</ol>
+<p>Le fichier a trois feuilles, chacune prête pour un <strong>tableau croisé dynamique</strong> (une ligne d'en-têtes, noms de colonnes uniques, aucune cellule fusionnée) :</p>
+<ul>
+  <li><strong>Bénévoles</strong> : une ligne par bénévole, avec le courriel, le billet, une colonne par rôle et le nombre de rôles.</li>
+  <li><strong>Rôles</strong> : une ligne par bénévole et par rôle choisi. C'est la feuille à utiliser pour compter les rôles par type, par langue ou par état du sondage : sélectionnez la feuille, puis Insertion → Tableau croisé dynamique (Excel) ou Données → Table dynamique (LibreOffice), avec « Rôle » en lignes, « Type » en colonnes et « Bénévole » en nombre.</li>
+  <li><strong>Langues</strong> : une ligne par bénévole et par langue parlée.</li>
+</ul>
+<p>Le chiffrier contient des noms et des courriels : il n'est jamais livré sans mot de passe, et chaque export est inscrit dans l'historique d'accès des rapports.</p>
 
 <!-- ============================================================ 16 -->
 <h2 id="admin">16. Pour les administrateurs</h2>
@@ -484,7 +497,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
   <tr><td>Pas de Note globale pour une rencontre</td><td>Aucune des trois questions qui la composent n'a de réponse numérique pour cette rencontre.</td></tr>
   <tr><td>Un contour marqué ou un message de dérive</td><td>Ce sont des signaux à examiner (§&nbsp;6), pas forcément un problème confirmé.</td></tr>
   <tr><td>Un lien de date ouvre l'administration d'Odoo au lieu de défiler dans le rapport</td><td>Ce sondage ou événement n'est pas inclus dans ce rapport.</td></tr>
-  <tr><td>La génération du rapport est longue</td><td>Depuis la version 1.125, l'anonymisation ne relit plus tout le rapport pour chaque participant (c'était la cause principale pour un rapport de plusieurs centaines de participants). Si c'est encore long, réduisez le nombre de sondages ou la période, et demandez à l'administrateur la ligne du journal du serveur qui commence par « rlq_survey_report : rapport généré en » : elle donne la durée de chaque étape.</td></tr>
+  <tr><td>La génération du rapport est longue</td><td>Depuis la version 1.125, l'anonymisation ne relit plus tout le rapport pour chaque participant (c'était la cause principale pour un rapport de plusieurs centaines de participants). Si c'est encore long, réduisez le nombre de sondages ou la période, et regardez la ligne <strong>Durée de génération</strong> affichée sous le titre du formulaire après la génération (aussi au bas du rapport) : elle donne la durée de chaque étape (sondages, synthèse et participants, anonymisation, enregistrement). La même ligne est dans le journal du serveur, s'il est au niveau « info ».</td></tr>
   <tr><td>La génération d'un PDF échoue ou reste incomplète</td><td>Dans « Options PDF », décochez « Tableaux de réponses par participant » et/ou « Saut de page forcé par participant ».</td></tr>
   <tr><td>Un avertissement dit qu'une date n'a pas été reconnue</td><td>Le titre du sondage ne suit pas le format attendu (ex. « 4 août 2026 ») : le message cite le titre en cause.</td></tr>
   <tr><td>Le nom d'un fichier est coupé dans l'historique</td><td>Le nom complet passe à la ligne dans la colonne « Télécharger » ; si ce n'était pas le cas, faites actualiser la page (Ctrl+F5) après la mise à jour du module.</td></tr>

@@ -61,3 +61,12 @@ la commande `odoo-bin` exacte, utile pour la relancer à la main.
   corriger.
 - `ruff.toml` ne retient que les règles qui détectent de vrais bogues ; le style est laissé de côté.
 - Installer ruff : `pip install ruff`, ou indiquer un binaire avec `RUFF_BIN`.
+
+## Traductions françaises du bureau d'inscription et des bénévoles (build_fr_po.py)
+
+`python3 scripts/build_fr_po.py` reconstruit `i18n/fr.po` : les entrées des anciens écrans (`scripts/fr_base.po`) plus tous les
+libellés du bureau d'inscription et du tableau des bénévoles, extraits des sources. À lancer après avoir ajouté ou changé un
+libellé de ces écrans (ajouter d'abord sa traduction dans le dictionnaire `FR` du script, qui s'arrête en nommant tout libellé
+sans traduction). Raison d'être : Odoo ne charge une traduction que si son entrée porte la référence `#:` de la vue, du champ ou
+du menu, et le commentaire `#. odoo-python` pour un texte du code Python ; écrites à la main, ces lignes étaient oubliées.
+Outil de développement : pas d'option `--version` ni `--changelog`.

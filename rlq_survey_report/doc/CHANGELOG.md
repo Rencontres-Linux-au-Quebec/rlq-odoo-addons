@@ -1,5 +1,58 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.126.0
+
+**Short title:** volunteers' table exported to a spreadsheet (pivot tables); planned hours of arrival and departure read from the survey; program line at the top; generation time shown on screen.
+
+**Reason for the request:** (1) an option to export the volunteers' table to a spreadsheet and build pivot tables; (2) "why the hour of departure?"; (3) show the line "rlq_survey_report <version> - affiché le <date> ..." at the top of the latest screens; (4) the line of the server log with the generation time of the report is not visible.
+
+**Answers and reading taken:**
+
+- (2) The original request listed "heure d'arrivée, heure de départ" among the columns of the volunteers' table and said that the information comes from the survey. Version 1.122.0 read it as hours recorded at the registration desk and added a "Left" button there. That reading was wrong for the table: the columns now show the hours the volunteer PLANS, answered in the survey. The "Left" button and the "Left at" column of the registration desk are kept as they are: they are only used as a fallback when the survey has no such question. They can be removed on request.
+- (4) The log line is written at level "info" in the Odoo server log: it is invisible when the log level of the server is "warn" or higher, or without access to the log file. The time is now also shown on screen.
+
+**Changes:**
+
+- `models/registration_desk_report.py`: `find_volunteer_questions()` also returns `arrival` and `departure` (question whose title speaks of "arrivée" / "départ", never "département"); new `volunteer_export_sheets()` (content of the three sheets, plain values) and `_unique_labels()`.
+- `models/volunteer_coordinator.py`:
+  - `_rlq_table_data()` (rows, role groups, extra columns, notes) shared by the screen and the export; rows carry e-mail, ticket, registration date as a real local date, list of languages.
+  - Columns "Heure d'arrivée" and "Heure de départ": answers of the survey when the survey has such questions; otherwise the hours of the registration desk, and a note says so.
+  - New field `password` (pre-filled with the default password of the survey reports) and button "Export to a spreadsheet" (`action_export_excel()`): an .xlsx file in a ZIP archive encrypted with the password, entry in the access history of the reports.
+  - The program line comes first, above the table.
+- `models/event_registration_desk.py`: the program line comes first, above the summary.
+- `models/rlq_survey_report_wizard.py`: new field `duree_generation`; the generation time (total and per step) is shown in the form after a generation, in the success notification and at the bottom of the report (`JETON_DUREE`), in addition to the server log.
+- `views/event_registration_desk_views.xml`: button and password field on the volunteers' screen. `views/rlq_survey_report_views.xml`: line "Durée de génération".
+- `scripts/build_fr_po.py` and `scripts/fr_base.po` (new): rebuild `i18n/fr.po` from the sources of the registration desk and volunteers screens, with the references and the "odoo-python" comment that Odoo needs. Development helper: no `--version` / `--changelog` option.
+- `i18n/fr.po`: 8 new terms.
+- Tests: 3 new standalone tests (hours questions, content of the sheets, file written and read back with openpyxl); 2 new Odoo tests.
+- `__manifest__.py`: version `18.0.1.126.0`, description. Guide, `doc/CONTEXTE.md`, `doc/NOTES_VALIDATION.md` (section -80), `scripts/LISEZMOI.md`.
+
+**The spreadsheet:**
+
+- Sheet "Bénévoles": one line per volunteer (name, e-mail, ticket, registration date, survey, type, languages, hours, extra questions, one column per role, number of roles).
+- Sheet "Rôles": one line per volunteer and per role chosen ("(aucun rôle)" when none): for a pivot table of the roles by type, language or survey state.
+- Sheet "Langues": one line per volunteer and per language spoken.
+- Every sheet is a flat table: one header line, unique column names, no merged cell, filter and frozen header. The registration date is a real date (local time), so the spreadsheet can group it by day.
+- Same volunteers as the screen: the "Survey" filter and the order apply.
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:**
+
+- Personal data: the export is refused without a password, with the shipped marker "!CHANGE-MOI@", or with a password that does not meet the rules of the survey reports (12 characters, lower case, capital, digit, special character). The file is never delivered unencrypted.
+- "openpyxl" or "pyzipper" missing on the server: clear message, nothing is produced.
+- Two roles with the same name in two questions ("Autre"): the second column is named "Autre (2)".
+- A free-text role is written in the "Autre" column and counted in the number of roles.
+- The entry in the access history never blocks the export.
+- A survey with only one of the two hour questions: that hour comes from the survey, the other one from the registration desk.
+
+**Checks:**
+
+- `./run-all.sh --sans-odoo`: ruff, syntax and manifest, standalone tests: OK. The .xlsx content was written with openpyxl 3.1.5 and read back.
+- The Odoo code was NOT run: no Odoo instance here. The encryption of the ZIP (pyzipper) was not run either (library not installed here); it is the function already used by the Excel export of the reports.
+
+**Action required:** update the module on DEV (`-u rlq_survey_report`) and check the points of `doc/NOTES_VALIDATION.md`, section -80. Tell me if the "Left" button of the registration desk must be removed.
+
 ## 18.0.1.125.0
 
 **Short title:** faster generation of the HTML report: anonymisation in one reading of the HTML, answer lines grouped without quadratic unions, timing of each step in the log.

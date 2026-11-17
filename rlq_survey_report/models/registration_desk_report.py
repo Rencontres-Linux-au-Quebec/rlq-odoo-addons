@@ -22,6 +22,7 @@ run by run-all.sh):
   sort_key(text)                      -> sort key that ignores case and accents (« Élise » with the « e »).
   find_volunteer_questions(questions) -> the roles, languages and type questions of a volunteer survey, found by their wording.
   volunteer_table_html(rows, ...)     -> the table of the volunteers' coordinator (one column per role), everything escaped.
+  volunteer_export_sheets(rows, ...)  -> the three flat sheets of the volunteers' spreadsheet (pivot tables).
   program_footer(program, version...) -> « rlq_survey_report 18.0.1.124.0 - affiché le <local date and time> » under the screens.
 
 A row describes ONE registration (built by models/event_registration_desk.py):
@@ -31,6 +32,7 @@ A row describes ONE registration (built by models/event_registration_desk.py):
    "questions": 12, "answered": 8,
    "answers": [("Lunch", ["Yes"]), ("On site or online", [])]}
 """
+import re
 import unicodedata
 from html import escape
 
@@ -279,6 +281,8 @@ ON_SITE_WORDS = ("presentiel", "sur place", "en personne", "on site", "in person
 ONLINE_WORDS = ("virtuel", "en ligne", "a distance", "online", "remote")
 TYPE_WORDS = ON_SITE_WORDS + ONLINE_WORDS + ("hybride", "hybrid")
 OTHER_WORDS = ("autre", "other")
+ARRIVAL_PATTERN = re.compile(r"\b(arrivee|arrival|arriverez|arriveras|arrives?)\b")
+DEPARTURE_PATTERN = re.compile(r"\b(depart|departure|partirez|partiras|quitterez|quitteras|leave|leaving)\b")   # never « departement »
 SURVEY_RANK = {"done": 0, "in_progress": 1, "not_started": 2, "none": 3}
 VOLUNTEER_SORTS = ("name", "registered", "survey", "type", "languages", "arrived", "departed", "roles")
 
@@ -332,24 +336,30 @@ def find_volunteer_questions(questions):
     """Finds the questions of the volunteers' table in a survey.
 
     questions: [{"id": ..., "title": ..., "choices": [labels], "is_choice": bool}] in the order of the survey.
-    Returns {"roles": [ids], "languages": id or None, "type": id or None}:
+    Returns {"roles": [ids], "languages": id or None, "type": id or None, "arrival": id or None, "departure": id or None}:
+      - arrival / departure (v1.126.0): the first other question whose title speaks of the hour of arrival (« arrivée »)
+        or of departure (« départ », never « département »): the hours the volunteer PLANS, as answered in the survey;
       - roles: EVERY choice question whose title contains « rôle », the on-site one(s) first, then the order of the survey;
       - languages: the first other question whose title contains « langue »;
       - type: the first other choice question whose title or choices speak of on site / online (« virtuel », « présentiel »,
         « en ligne », « sur place »...). None when the survey has no such question (see deduced_type()).
     """
-    roles, languages, type_id = [], None, None
+    roles, languages, type_id, arrival, departure = [], None, None, None, None
     for question in questions or ():
         title = question.get("title")
         if question.get("is_choice") and _has_word(title, ROLE_WORDS):
             roles.append(question)
+        elif arrival is None and ARRIVAL_PATTERN.search(sort_key(title)):
+            arrival = question["id"]
+        elif departure is None and DEPARTURE_PATTERN.search(sort_key(title)):
+            departure = question["id"]
         elif languages is None and _has_word(title, LANGUAGE_WORDS):
             languages = question["id"]
         elif type_id is None and question.get("is_choice") and (
                 _has_word(title, TYPE_WORDS) or any(_has_word(choice, TYPE_WORDS) for choice in question.get("choices") or ())):
             type_id = question["id"]
     roles.sort(key=lambda q: 0 if role_kind(q.get("title")) == "on_site" else 1)          # stable: keeps the survey order
-    return {"roles": [q["id"] for q in roles], "languages": languages, "type": type_id}
+    return {"roles": [q["id"] for q in roles], "languages": languages, "type": type_id, "arrival": arrival, "departure": departure}
 
 
 def deduced_type(kinds, lang=DEFAULT_LANG):
@@ -397,6 +407,76 @@ def sort_volunteer_rows(rows, sort_by="name", descending=False):
     sort_by = sort_by if sort_by in VOLUNTEER_SORTS else "name"
     rows = sorted(rows or (), key=lambda row: (sort_key(row.get("name")), row.get("registered") or ""))
     return sorted(rows, key=lambda row: volunteer_sort_value(row, sort_by), reverse=bool(descending))      # stable
+
+
+def _unique_labels(labels):
+    """Column names of a spreadsheet must be unique for a pivot table: « Autre », « Autre » -> « Autre », « Autre (2) »."""
+    seen, result = {}, []
+    for label in labels:
+        label = " ".join(str(label or "").split()) or "?"
+        seen[label] = seen.get(label, 0) + 1
+        result.append(label if seen[label] == 1 else "%s (%d)" % (label, seen[label]))
+    return result
+
+
+def volunteer_export_sheets(rows, role_groups=(), lang=DEFAULT_LANG, extra_columns=()):
+    """Content of the spreadsheet of the volunteers (v1.126.0): [(sheet title, header, [lines])], plain values, no library.
+
+    Three sheets, each one a flat table (one header line, unique column names, no merged cell) so that a pivot table can be
+    built on it directly:
+      - « Bénévoles »: ONE line per volunteer, the same columns as the screen plus e-mail and ticket, one column per role
+        (« X » or the free text), and the number of roles;
+      - « Rôles »: ONE line per volunteer AND per role chosen (« (aucun rôle) » when none): the sheet for a pivot table of
+        the roles by type, by language, by survey state;
+      - « Langues »: ONE line per volunteer AND per language spoken (« (non précisé) » when none).
+    rows: the rows of volunteer_table_html(), with the optional keys « email », « ticket », « registered_at » (a datetime
+    in local time, written as a real date so that the spreadsheet can group by day) and « languages_list ».
+    """
+    labels = volunteer_texts(lang)
+    english = labels is VOLUNTEER_TEXTS["en"]
+    words = {"email": "E-mail" if english else "Courriel", "ticket": "Ticket" if english else "Billet",
+             "roles_count": "Number of roles" if english else "Nombre de rôles", "roles": "Roles" if english else "Rôles",
+             "question": "Question", "role": "Role" if english else "Rôle", "no_role": "(no role)" if english else "(aucun rôle)",
+             "languages_sheet": "Languages" if english else "Langues", "language": "Language" if english else "Langue",
+             "no_language": "(not specified)" if english else "(non précisé)"}
+    groups = [(index, group) for index, group in enumerate(role_groups or ()) if group.get("choices")]
+    role_labels = _unique_labels([choice for _i, group in groups for choice in group["choices"]])
+    header = _unique_labels([labels["name"], words["email"], words["ticket"], labels["registered"], labels["survey"], labels["type"],
+                             labels["languages"], labels["arrived"], labels["departed"]] + list(extra_columns)
+                            + role_labels + [words["roles_count"]])
+    wide, long_roles, long_languages = [], [], []
+    for row in rows or ():
+        name = " ".join(str(row.get("name") or "").split())
+        survey = labels.get(row.get("survey"), "")
+        base = [name, row.get("email") or "", row.get("ticket") or "", row.get("registered_at") or row.get("registered") or "",
+                survey, row.get("type") or "", row.get("languages") or "", row.get("arrived") or "", row.get("departed") or ""]
+        extra = list(row.get("extra") or ())
+        base += [extra[i] if i < len(extra) else "" for i in range(len(extra_columns))]
+        role_values = list(row.get("roles") or ())
+        cells, count = [], 0
+        for index, group in groups:
+            values = [v for v in (role_values[index] if index < len(role_values) else ()) if str(v or "").strip()]
+            cells += role_cells(group["choices"], values, labels["yes"])
+            count += len(values)
+            for value in values:
+                long_roles.append([name, row.get("email") or "", row.get("type") or "", row.get("languages") or "", survey,
+                                   group["title"], value])
+        if not count:
+            long_roles.append([name, row.get("email") or "", row.get("type") or "", row.get("languages") or "", survey, "",
+                               words["no_role"]])
+        wide.append(base + cells + [count])
+        languages = row.get("languages_list")
+        if languages is None:
+            languages = [part.strip() for part in str(row.get("languages") or "").split(",")]
+        languages = [language for language in languages if str(language or "").strip()] or [words["no_language"]]
+        for language in languages:
+            long_languages.append([name, row.get("type") or "", survey, language])
+    return [
+        (labels["title"], header, wide),
+        (words["roles"], [labels["name"], words["email"], labels["type"], labels["languages"], labels["survey"],
+                          words["question"], words["role"]], long_roles),
+        (words["languages_sheet"], [labels["name"], labels["type"], labels["survey"], words["language"]], long_languages),
+    ]
 
 
 def program_footer(program, version, shown_at="", zone="", lang=DEFAULT_LANG):

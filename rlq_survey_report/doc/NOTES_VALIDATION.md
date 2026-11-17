@@ -6,6 +6,17 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -80. Export des bénévoles dans un chiffrier, heures prévues, durée de génération à l'écran (v1.126.0)
+
+**Non vérifié sans instance, à confirmer :**
+1. Événements > Bénévoles > « Exporter dans un chiffrier » : une archive ZIP est téléchargée ; elle s'ouvre avec le mot de passe ; le fichier .xlsx a les feuilles « Bénévoles », « Rôles » et « Langues ». Le chiffrement (pyzipper) n'a pas été exécuté ici.
+2. Un tableau croisé dynamique se crée sur la feuille « Rôles » (Rôle en lignes, Type en colonnes, nombre de Bénévole), dans Excel et dans LibreOffice Calc.
+3. Sans mot de passe, avec « !CHANGE-MOI@ » ou avec un mot de passe faible : message d'erreur, aucun fichier.
+4. L'export apparaît dans l'historique d'accès des rapports (action « Exporté (Excel) », « Bénévoles : <événement> »).
+5. Colonnes « Heure d'arrivée » et « Heure de départ » du tableau des bénévoles : réponses du sondage si une question a « arrivée » / « départ » dans son titre ; sinon heures du bureau d'inscription et note au-dessus du tableau. Les titres réels des questions n'ont pas pu être vérifiés.
+6. La ligne « rlq_survey_report <version> - affiché le ... » est en haut du bureau d'inscription et du tableau des bénévoles.
+7. Rapport de sondage : après une génération, « Durée de génération : X s (...) » sous le titre du formulaire, dans la notification de succès et au bas du rapport.
+
 ## -79. Génération du rapport HTML plus rapide (v1.125.0)
 
 **Non vérifié sans instance, à confirmer :**

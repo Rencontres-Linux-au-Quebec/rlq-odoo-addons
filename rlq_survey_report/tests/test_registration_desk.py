@@ -224,3 +224,31 @@ class TestRlqRegistrationDesk(TransactionCase):
         coordinator.survey_filter = "not_started"
         self.assertIn("Paul Sans Sondage", coordinator.table_html)
         self.assertNotIn("Hélène Sur Place", coordinator.table_html)
+
+    def test_volunteers_hours_come_from_the_survey(self):
+        """v1.126.0: the planned hours answered in the survey replace the hours of the registration desk."""
+        self._volunteer_setup()
+        arrival = self.env["survey.question"].create({"survey_id": self.v_survey.id, "title": "Heure d'arrivée prévue",
+                                                      "question_type": "char_box", "sequence": 4})
+        registration = self._volunteer("Nadia Horaire", "nadia@example.com", "done")
+        user_input = self.env["survey.user_input"].search([("email", "=", "nadia@example.com")], limit=1)
+        self.env["survey.user_input.line"].create({"user_input_id": user_input.id, "question_id": arrival.id,
+                                                   "answer_type": "char_box", "value_char_box": "8 h 30"})
+        registration.action_rlq_desk_present()
+        rows, _groups, _extra, notes = self.env["rlq.volunteer.coordinator"].create({"event_id": self.event.id})._rlq_table_data()
+        row = next(r for r in rows if r["name"] == "Nadia Horaire")
+        self.assertEqual(row["arrived"], "8 h 30")                       # survey answer, not the time of « Present »
+        self.assertTrue(any("départ" in note or "departure" in note for note in notes))   # no departure question: a note
+
+    def test_volunteers_export_refuses_a_missing_or_weak_password(self):
+        from odoo.exceptions import UserError
+        self._volunteer_setup()
+        self._volunteer("Nadia Export", "nadia@example.com")
+        coordinator = self.env["rlq.volunteer.coordinator"].create({"event_id": self.event.id, "password": False})
+        for password in (False, "!CHANGE-MOI@", "trop-faible"):
+            coordinator.password = password
+            with self.assertRaises(UserError):
+                coordinator.action_export_excel()
+        sheets = rd.volunteer_export_sheets(*coordinator._rlq_table_data()[:2], self.env.lang)
+        self.assertEqual(len(sheets), 3)
+        self.assertIn("Nadia Export", [line[0] for line in sheets[0][2]])

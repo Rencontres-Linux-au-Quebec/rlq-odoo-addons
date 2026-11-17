@@ -452,8 +452,9 @@ class RlqRegistrationDesk(models.TransientModel):
     def _compute_desk(self):
         for wizard in self:
             registrations = wizard._rlq_all_registrations()
-            wizard.summary_html = (rd.desk_summary_html(registrations._rlq_desk_rows(), self.env.lang or rd.DEFAULT_LANG)
-                                   + program_stamp(self.env, wizard.event_id))
+            # v1.126.0: the program name, version, local date and time come FIRST, above the summary.
+            wizard.summary_html = (program_stamp(self.env, wizard.event_id)
+                                   + rd.desk_summary_html(registrations._rlq_desk_rows(), self.env.lang or rd.DEFAULT_LANG))
             listed = wizard._rlq_listed(registrations)
             wizard.registration_ids = listed
             wizard.registration_count = len(listed)

@@ -136,13 +136,83 @@ class TestRegistrationDeskReport(unittest.TestCase):
             {"id": 5, "title": "Comment participerez-vous ?", "choices": ["Sur place", "En ligne"], "is_choice": True},
         ]
         found = rd.find_volunteer_questions(questions)
-        self.assertEqual(found, {"roles": [4, 3], "languages": 2, "type": 5})                # the on-site roles first
+        none = {"arrival": None, "departure": None}
+        self.assertEqual(found, dict(none, roles=[4, 3], languages=2, type=5))               # the on-site roles first
         # A roles question that speaks of « virtuel » is never taken for the type question.
-        self.assertEqual(rd.find_volunteer_questions(questions[:4]), {"roles": [4, 3], "languages": 2, "type": None})
+        self.assertEqual(rd.find_volunteer_questions(questions[:4]), dict(none, roles=[4, 3], languages=2, type=None))
         # The type question can also be recognized by its title alone.
         by_title = rd.find_volunteer_questions([{"id": 9, "title": "En virtuel ou pas ?", "choices": ["Oui", "Non"], "is_choice": True}])
-        self.assertEqual(by_title, {"roles": [], "languages": None, "type": 9})
-        self.assertEqual(rd.find_volunteer_questions([]), {"roles": [], "languages": None, "type": None})
+        self.assertEqual(by_title, dict(none, roles=[], languages=None, type=9))
+        self.assertEqual(rd.find_volunteer_questions([]), dict(none, roles=[], languages=None, type=None))
+
+    def test_find_arrival_and_departure_questions(self):
+        def question(number, title, choices=()):
+            return {"id": number, "title": title, "choices": list(choices), "is_choice": bool(choices)}
+        found = rd.find_volunteer_questions([question(1, "Votre département"), question(2, "Heure d'arrivée prévue"),
+                                             question(3, "Heure de départ :"), question(4, "Langues parlées", ["Français"])])
+        self.assertEqual((found["arrival"], found["departure"], found["languages"]), (2, 3, 4))
+        found = rd.find_volunteer_questions([question(1, "À quelle heure arriverez-vous ?", ["8 h", "9 h"]),
+                                             question(2, "Quand partirez-vous ?", ["16 h", "17 h"])])
+        self.assertEqual((found["arrival"], found["departure"], found["type"]), (1, 2, None))
+        found = rd.find_volunteer_questions([question(1, "Votre département"), question(2, "Départements visités")])
+        self.assertEqual((found["arrival"], found["departure"]), (None, None))                # « département » is not « départ »
+
+    def test_volunteer_export_sheets(self):
+        import datetime
+        groups = [{"title": "Rôles (en présentiel)", "choices": ["Accueil", "Autre"]}, {"title": "Rôles (en virtuel)", "choices": ["Modérateur", "Autre"]}]
+        rows = [
+            {"name": "Zoé Tremblay", "email": "zoe@exemple.org", "ticket": "Bénévole", "registered": "2026-10-01 09:00",
+             "registered_at": datetime.datetime(2026, 10, 1, 9, 0), "survey": "done", "type": "Présentiel", "languages": "Français, Anglais",
+             "languages_list": ["Français", "Anglais"], "arrived": "8 h", "departed": "16 h",
+             "roles": [["Accueil", "Autre", "Photographe"], []], "extra": ["Oui"]},
+            {"name": "Éric Roy", "email": "", "ticket": "Bénévole", "registered": "2026-10-02 10:00", "survey": "not_started",
+             "type": "", "languages": "", "arrived": "", "departed": "", "roles": [[], []], "extra": []},
+        ]
+        sheets = rd.volunteer_export_sheets(rows, groups, "fr_CA", extra_columns=["Dîner"])
+        self.assertEqual([title for title, _header, _lines in sheets], ["Bénévoles", "Rôles", "Langues"])
+        _title, header, lines = sheets[0]
+        self.assertEqual(header, ["Bénévole", "Courriel", "Billet", "Inscrit le", "Sondage", "Type", "Langues parlées", "Heure d'arrivée",
+                                  "Heure de départ", "Dîner", "Accueil", "Autre", "Modérateur", "Autre (2)", "Nombre de rôles"])
+        self.assertEqual(len(set(header)), len(header))                                       # unique names: needed by a pivot table
+        self.assertEqual(lines[0], ["Zoé Tremblay", "zoe@exemple.org", "Bénévole", datetime.datetime(2026, 10, 1, 9, 0), "Complété",
+                                    "Présentiel", "Français, Anglais", "8 h", "16 h", "Oui", "X", "Photographe", "", "", 3])
+        self.assertEqual(lines[1][3], "2026-10-02 10:00")                                      # no datetime given: the text
+        self.assertEqual(lines[1][-5:], ["", "", "", "", 0])
+        self.assertTrue(all(len(line) == len(header) for line in lines))
+        _title, header, lines = sheets[1]
+        self.assertEqual(header, ["Bénévole", "Courriel", "Type", "Langues parlées", "Sondage", "Question", "Rôle"])
+        self.assertEqual([line[-2:] for line in lines], [["Rôles (en présentiel)", "Accueil"], ["Rôles (en présentiel)", "Autre"],
+                                                         ["Rôles (en présentiel)", "Photographe"], ["", "(aucun rôle)"]])
+        _title, header, lines = sheets[2]
+        self.assertEqual(lines, [["Zoé Tremblay", "Présentiel", "Complété", "Français"], ["Zoé Tremblay", "Présentiel", "Complété", "Anglais"],
+                                 ["Éric Roy", "", "Non commencé", "(non précisé)"]])
+        english = rd.volunteer_export_sheets(rows, groups, "en_US")
+        self.assertEqual([title for title, _header, _lines in english], ["Volunteers", "Roles", "Languages"])
+        self.assertEqual(rd.volunteer_export_sheets([], [], "fr")[0][2], [])
+
+    def test_volunteer_export_opens_in_a_spreadsheet(self):
+        """The sheets are written with openpyxl (as the module does) and read back: flat tables, real dates."""
+        try:
+            import openpyxl
+        except ImportError:
+            self.skipTest("openpyxl is not installed")
+        import datetime
+        import io
+        rows = [{"name": "Zoé", "registered_at": datetime.datetime(2026, 10, 1, 9, 0), "survey": "done", "roles": [["Accueil"]],
+                 "languages_list": ["Français"]}]
+        workbook = openpyxl.Workbook()
+        workbook.remove(workbook.active)
+        for title, header, lines in rd.volunteer_export_sheets(rows, [{"title": "Rôles", "choices": ["Accueil"]}], "fr"):
+            sheet = workbook.create_sheet(title[:31])
+            sheet.append(header)
+            for line in lines:
+                sheet.append(line)
+        buffer = io.BytesIO()
+        workbook.save(buffer)
+        again = openpyxl.load_workbook(io.BytesIO(buffer.getvalue()))
+        self.assertEqual(again.sheetnames, ["Bénévoles", "Rôles", "Langues"])
+        self.assertEqual(again["Bénévoles"]["D2"].value, datetime.datetime(2026, 10, 1, 9, 0))
+        self.assertEqual(again["Rôles"]["G2"].value, "Accueil")
 
     def test_role_kind_and_deduced_type(self):
         self.assertEqual(rd.role_kind("Rôles pendant l'événement (en présentiel) ?"), "on_site")

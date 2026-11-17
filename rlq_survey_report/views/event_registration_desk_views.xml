@@ -163,6 +163,7 @@
             <form string="Volunteers">
                 <header>
                     <button name="action_refresh" type="object" string="Refresh" icon="fa-refresh" class="btn-primary"/>
+                    <button name="action_export_excel" type="object" string="Export to a spreadsheet" icon="fa-file-excel-o"/>
                 </header>
                 <sheet>
                     <group>
@@ -173,6 +174,7 @@
                         <group>
                             <field name="sort_by"/>
                             <field name="sort_desc"/>
+                            <field name="password" password="True"/>
                         </group>
                     </group>
                     <field name="table_html" readonly="1" nolabel="1"/>

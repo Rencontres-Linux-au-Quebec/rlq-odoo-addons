@@ -24,17 +24,29 @@ answered (« (en présentiel) » / « (en virtuel) » in their titles). A note a
 The table is HTML (the role columns depend on the survey, which an Odoo list cannot do): it is sorted and filtered with the
 fields above it (« Sort by », « Descending », « Survey »), not by clicking the column headers.
 """
+import base64
+import io
 import logging
 
 from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 
 from . import registration_desk_report as rd
-from .event_registration_desk import LIST_STATES, local_time, program_stamp
+from . import report_builder as rb
+from .event_registration_desk import LIST_STATES, local_time, local_zone, program_stamp
+
+try:
+    import openpyxl
+    from openpyxl.styles import Font
+    from openpyxl.utils import get_column_letter
+except ImportError:  # pragma: no cover - reported to the user when the export is asked
+    openpyxl = None
 
 _logger = logging.getLogger(__name__)
 
 CHAT_URL = "/rlq_survey_report/chat/%d"
 CHOICE_TYPES = ("simple_choice", "multiple_choice")
+MARKER_PASSWORD = "!CHANGE-MOI@"          # the shipped marker of rlq_survey_report_wizard.py: never accepted as a password
 
 
 class RlqVolunteerCoordinator(models.TransientModel):
@@ -56,6 +68,11 @@ class RlqVolunteerCoordinator(models.TransientModel):
         string="Sort by", default="name", required=True,
         help="Order of the table. Case and accents are ignored (« Élise » sorts with the « e »); equal values are sorted by name.")
     sort_desc = fields.Boolean(string="Descending", default=False, help="Reverses the order of the table.")
+    password = fields.Char(
+        string="Password of the spreadsheet", default=lambda self: self._default_password(),
+        help="The spreadsheet contains names and e-mail addresses: it is delivered in a ZIP archive encrypted with this password "
+             "(same rules as the survey reports: at least 12 characters, with a lower-case letter, a capital letter, a digit "
+             "and a special character). Pre-filled with the default password of the survey reports.")
     table_html = fields.Html(string="Volunteers", compute="_compute_table", sanitize=False)
 
     @api.depends("event_id")
@@ -63,10 +80,18 @@ class RlqVolunteerCoordinator(models.TransientModel):
         for wizard in self:
             wizard.display_name = _("Volunteers: %(event)s", event=wizard.event_id.name) if wizard.event_id else _("Volunteers")
 
+    @api.model
+    def _default_password(self):
+        """The default password of the survey reports (system parameter), or nothing while it is still the shipped marker."""
+        report = self.env["rlq.survey.report.wizard"].sudo()
+        password = report._mot_de_passe_par_defaut()
+        return password if password and password != MARKER_PASSWORD else False
+
     @api.depends("event_id", "survey_filter", "sort_by", "sort_desc")
     def _compute_table(self):
         for wizard in self:
-            wizard.table_html = wizard._rlq_table_html() + program_stamp(self.env, wizard.event_id)
+            # v1.126.0: the program name, version, local date and time come FIRST, above the table.
+            wizard.table_html = program_stamp(self.env, wizard.event_id) + wizard._rlq_table_html()
 
     def action_refresh(self):
         """Button « Refresh »: the form is read again, so the table is computed again."""
@@ -85,7 +110,8 @@ class RlqVolunteerCoordinator(models.TransientModel):
         """The questions of one volunteer survey used by the table.
 
         Returns {"roles": [(question id, title, [choices])], "languages": id or None, "type": id or None,
-                 "extra": [(question id, label)]} (extra: the other questions checked « Show at the registration desk »).
+                 "arrival": id or None, "departure": id or None, "extra": [(question id, label)]}
+        (extra: the other questions checked « Show at the registration desk »).
         """
         domain = [("survey_id", "=", survey.id)]
         questions = self.env["survey.question"].sudo()
@@ -96,19 +122,26 @@ class RlqVolunteerCoordinator(models.TransientModel):
                       "choices": [a.value or "" for a in q.suggested_answer_ids]} for q in questions]
         found = rd.find_volunteer_questions(described)
         by_id = {q["id"]: q for q in described}
-        used = set(found["roles"]) | {found["languages"], found["type"]}
+        used = set(found["roles"]) | {found["languages"], found["type"], found["arrival"], found["departure"]}
         return {
             "roles": [(qid, by_id[qid]["title"], [c for c in by_id[qid]["choices"] if c]) for qid in found["roles"]],
             "languages": found["languages"], "type": found["type"],
+            "arrival": found["arrival"], "departure": found["departure"],
             "extra": [(q.id, q.rlq_desk_label or q.title or "") for q in questions if q.rlq_registration_desk and q.id not in used],
         }
 
     def _rlq_table_html(self):
         self.ensure_one()
+        rows, groups, extra_labels, notes = self._rlq_table_data()
+        return rd.volunteer_table_html(rows, groups, self.env.lang or rd.DEFAULT_LANG, extra_columns=extra_labels, notes=notes)
+
+    def _rlq_table_data(self):
+        """(rows, role groups, labels of the extra columns, notes) of the table: shared by the screen and the spreadsheet."""
+        self.ensure_one()
         lang = self.env.lang or rd.DEFAULT_LANG
         registrations = self._rlq_volunteer_registrations()
         if not registrations:
-            return rd.volunteer_table_html([], lang=lang)
+            return [], [], [], []
         # The survey of the volunteer TICKET only (never the survey of the event).
         empty = self.env["survey.survey"].sudo().browse()
         status = registrations._rlq_survey_status_map()
@@ -147,6 +180,9 @@ class RlqVolunteerCoordinator(models.TransientModel):
                                    "from the roles questions that the volunteer answered.", survey=survey.title))
                 else:
                     notes.append(_("No question about the type (on site or online) in the survey « %(survey)s ».", survey=survey.title))
+            if not layout["arrival"] or not layout["departure"]:
+                notes.append(_("The survey « %(survey)s » has no question about the hour of arrival or of departure: the hours shown "
+                               "are those recorded at the registration desk (« Present », « Left »).", survey=survey.title))
         if any(not status[r.id][0] for r in registrations):
             notes.append(_("Some volunteer tickets have no survey: their volunteers are listed without answers."))
 
@@ -155,7 +191,16 @@ class RlqVolunteerCoordinator(models.TransientModel):
             survey, state, _done = status[registration.id]
             layout = layouts.get(survey.id) if survey else None
             input_id = chosen.get(registration.id)
-            roles, extra, kinds, type_text, languages = [[] for _g in groups], [""] * len(extra_labels), [], "", ""
+            roles, extra, kinds, type_text, languages_list = [[] for _g in groups], [""] * len(extra_labels), [], "", []
+            # Hours: the ones the volunteer PLANS, answered in the survey (v1.126.0); without such a question in the survey,
+            # the hours recorded at the registration desk.
+            present = registration.state == "done"
+            arrived = local_time(registration, registration.date_closed, "%Y-%m-%d %H:%M") if present else ""
+            departed = local_time(registration, registration.rlq_departure, "%Y-%m-%d %H:%M")
+            if layout and layout["arrival"]:
+                arrived = ", ".join(values.get((input_id, layout["arrival"]), [])) if input_id else ""
+            if layout and layout["departure"]:
+                departed = ", ".join(values.get((input_id, layout["departure"]), [])) if input_id else ""
             if layout and input_id:
                 for qid, title, _choices in layout["roles"]:
                     answers = values.get((input_id, qid), [])
@@ -164,19 +209,82 @@ class RlqVolunteerCoordinator(models.TransientModel):
                         kinds.append(rd.role_kind(title))
                 for qid, label in layout["extra"]:
                     extra[extra_index[rd.sort_key(label)]] = ", ".join(values.get((input_id, qid), []))
-                languages = ", ".join(values.get((input_id, layout["languages"]), [])) if layout["languages"] else ""
+                languages_list = list(values.get((input_id, layout["languages"]), [])) if layout["languages"] else []
                 type_text = ", ".join(values.get((input_id, layout["type"]), [])) if layout["type"] else rd.deduced_type(kinds, lang)
             if self.survey_filter and self.survey_filter != "all" and state != self.survey_filter:
                 continue
-            present = registration.state == "done"
+            zone = local_zone(self.env, registration.event_id)
+            registered_at = fields.Datetime.context_timestamp(registration.with_context(tz=zone), registration.create_date) \
+                if registration.create_date else None
             rows.append({
                 "name": registration.name or registration.partner_id.name or "",
                 "chat_url": CHAT_URL % registration.partner_id.id if registration.partner_id else None,
-                "registered": local_time(registration, registration.create_date, "%Y-%m-%d %H:%M"),
-                "survey": state, "type": type_text, "languages": languages,
-                "arrived": local_time(registration, registration.date_closed, "%Y-%m-%d %H:%M") if present else "",
-                "departed": local_time(registration, registration.rlq_departure, "%Y-%m-%d %H:%M"),
-                "roles": roles, "extra": extra,
+                "registered": registered_at.strftime("%Y-%m-%d %H:%M") if registered_at else "",
+                "registered_at": registered_at.replace(tzinfo=None, second=0, microsecond=0) if registered_at else None,
+                "email": registration.email or registration.partner_id.email or "",
+                "ticket": registration.event_ticket_id.name or "",
+                "survey": state, "type": type_text, "languages": ", ".join(languages_list), "languages_list": languages_list,
+                "arrived": arrived, "departed": departed, "roles": roles, "extra": extra,
             })
         rows = rd.sort_volunteer_rows(rows, self.sort_by or "name", self.sort_desc)
-        return rd.volunteer_table_html(rows, groups, lang, extra_columns=extra_labels, notes=notes)
+        return rows, groups, extra_labels, notes
+
+    # ------------------------------------------------------------------ spreadsheet export (v1.126.0)
+
+    def _rlq_workbook(self, sheets):
+        """The .xlsx file (bytes) of [(title, header, lines)]: bold header, frozen first line, filter on every column."""
+        workbook = openpyxl.Workbook()
+        workbook.remove(workbook.active)
+        for title, header, lines in sheets:
+            sheet = workbook.create_sheet(title[:31])
+            sheet.append(header)
+            for line in lines:
+                sheet.append(line)
+            for cell in sheet[1]:
+                cell.font = Font(bold=True)
+            sheet.freeze_panes = "A2"
+            sheet.auto_filter.ref = sheet.dimensions
+            for index, label in enumerate(header, 1):
+                longest = max([len(str(label))] + [len(str(line[index - 1])) for line in lines if index <= len(line)])
+                sheet.column_dimensions[get_column_letter(index)].width = min(max(longest + 2, 10), 60)
+        buffer = io.BytesIO()
+        workbook.save(buffer)
+        return buffer.getvalue()
+
+    def action_export_excel(self):
+        """Button « Export to a spreadsheet »: the volunteers of the screen (same filter, same order) in an .xlsx file with
+        three flat sheets ready for pivot tables, delivered in a ZIP archive encrypted with the password (personal data)."""
+        self.ensure_one()
+        if openpyxl is None:
+            raise UserError(_("The spreadsheet export needs the Python library « openpyxl », which is not installed on this server "
+                              "(pip install openpyxl)."))
+        report = self.env["rlq.survey.report.wizard"].sudo().new({"mot_de_passe": self.password or ""})
+        if not self.password or self.password == MARKER_PASSWORD:
+            raise UserError(_("Enter the password of the spreadsheet first: it contains names and e-mail addresses."))
+        missing = report._criteres_manquants_mot_de_passe()
+        if missing:
+            raise UserError(_("The password is too weak, it lacks: %(criteria)s.", criteria=", ".join(missing)))
+        rows, groups, extra_labels, _notes = self._rlq_table_data()
+        if not rows:
+            raise UserError(_("No volunteer to export for this event."))
+        lang = self.env.lang or rd.DEFAULT_LANG
+        content = self._rlq_workbook(rd.volunteer_export_sheets(rows, groups, lang, extra_columns=extra_labels))
+        zone = local_zone(self.env, self.event_id)
+        stamp = fields.Datetime.context_timestamp(self.with_context(tz=zone), fields.Datetime.now()).strftime("%Y%m%d.%H%M%S")
+        name = "Benevoles-%s-%s" % (rb.slug(self.event_id.name)[:60], stamp)
+        archive = report._zipper_avec_mot_de_passe(name + ".xlsx", content)
+        attachment = self.env["ir.attachment"].create({
+            "name": name + ".zip", "type": "binary", "datas": base64.b64encode(archive),
+            "res_model": self._name, "res_id": self.id, "mimetype": "application/zip",
+        })
+        try:                                                    # traceability, like the survey reports; never blocks the export
+            self.env["rlq.survey.report.acces"].sudo().create({
+                "user_id": self.env.user.id, "action": "excel", "nom_fichier": name + ".zip", "attachment_id": attachment.id,
+                "fichier_telecharger": attachment.sudo().datas, "anonymise": False, "nb_sondages": 0,
+                "resume_sondages": (_("Volunteers: %(event)s", event=self.event_id.name) or "")[:250],
+            })
+        except Exception:  # noqa: BLE001
+            _logger.warning("rlq_survey_report: access log entry not written for %s", name, exc_info=True)
+        _logger.info("rlq_survey_report: volunteers spreadsheet %s exported by user %s (%d volunteers)", name, self.env.uid, len(rows))
+        return {"type": "ir.actions.act_url", "url": "/web/content/%d?download=true&filename=%s.zip" % (attachment.id, name),
+                "target": "self"}

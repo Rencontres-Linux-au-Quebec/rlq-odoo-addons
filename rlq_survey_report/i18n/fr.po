@@ -583,6 +583,11 @@ msgid "Volunteers"
 msgstr "Bénévoles"
 
 #. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_form
+msgid "Export to a spreadsheet"
+msgstr "Exporter dans un chiffrier"
+
+#. module: rlq_survey_report
 #: model:ir.actions.act_url,name:rlq_survey_report.action_rlq_guide_events
 #: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_guide_events
 msgid "User guide"
@@ -738,6 +743,30 @@ msgstr "Certains billets bénévoles n'ont pas de sondage : leurs bénévoles so
 #. module: rlq_survey_report
 #. odoo-python
 #: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
+msgid "The spreadsheet export needs the Python library « openpyxl », which is not installed on this server (pip install openpyxl)."
+msgstr "L'export dans un chiffrier nécessite la bibliothèque Python « openpyxl », qui n'est pas installée sur ce serveur (pip install openpyxl)."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
+msgid "Enter the password of the spreadsheet first: it contains names and e-mail addresses."
+msgstr "Saisissez d'abord le mot de passe du chiffrier : il contient des noms et des adresses courriel."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
+msgid "The password is too weak, it lacks: %(criteria)s."
+msgstr "Le mot de passe est trop faible, il lui manque : %(criteria)s."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
+msgid "No volunteer to export for this event."
+msgstr "Aucun bénévole à exporter pour cet événement."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
 msgid "No question about the roles (title containing « rôle ») in the survey « %(survey)s »."
 msgstr "Aucune question sur les rôles (titre contenant « rôle ») dans le sondage « %(survey)s »."
 
@@ -746,6 +775,12 @@ msgstr "Aucune question sur les rôles (titre contenant « rôle ») dans le son
 #: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
 msgid "No question about the languages (title containing « langue ») in the survey « %(survey)s »."
 msgstr "Aucune question sur les langues (titre contenant « langue ») dans le sondage « %(survey)s »."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
+msgid "The survey « %(survey)s » has no question about the hour of arrival or of departure: the hours shown are those recorded at the registration desk (« Present », « Left »)."
+msgstr "Le sondage « %(survey)s » n'a pas de question sur l'heure d'arrivée ou de départ : les heures affichées sont celles enregistrées au bureau d'inscription (« Présent », « Départ »)."
 
 #. module: rlq_survey_report
 #. odoo-python
@@ -788,3 +823,13 @@ msgstr "Nombre de rôles"
 #: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_coordinator__sort_desc
 msgid "Reverses the order of the table."
 msgstr "Inverse l'ordre du tableau."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_coordinator__password
+msgid "Password of the spreadsheet"
+msgstr "Mot de passe du chiffrier"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_coordinator__password
+msgid "The spreadsheet contains names and e-mail addresses: it is delivered in a ZIP archive encrypted with this password (same rules as the survey reports: at least 12 characters, with a lower-case letter, a capital letter, a digit and a special character). Pre-filled with the default password of the survey reports."
+msgstr "Le chiffrier contient des noms et des adresses courriel : il est livré dans une archive ZIP chiffrée avec ce mot de passe (mêmes règles que les rapports de sondage : au moins 12 caractères, avec une minuscule, une majuscule, un chiffre et un caractère spécial). Pré-rempli avec le mot de passe par défaut des rapports de sondage."

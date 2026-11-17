@@ -194,6 +194,10 @@
                         <field name="debug_info" readonly="1" nolabel="1" class="text-muted"
                                style="font-weight:normal;font-size:.85rem;"/>
                     </div>
+                    <!-- v1.126.0 : durée de la dernière génération, au total et par étape (aussi au bas du rapport et dans le journal). -->
+                    <div class="text-muted" style="font-size:.85rem;" invisible="not duree_generation">
+                        Durée de génération : <field name="duree_generation" readonly="1" nolabel="1" class="oe_inline"/>
+                    </div>
                     <group invisible="state != 'draft'">
                         <!-- Colonnes détaillées dans view_survey_survey_list_rlq ci-dessus
                              (référencée via le contexte pour aussi gouverner la fenêtre

@@ -110,6 +110,7 @@ except ImportError:  # pragma: no cover - selon la version installée sur l'inst
 from . import report_builder as rb  # noqa: E402 - placé après le bloc try/except des bibliothèques optionnelles
 
 CLE_CACHE_NOMS = "rlq_survey_report.noms_repondants"   # cache par transaction de _respondent_nom() (v1.125.0)
+JETON_DUREE = "\u27e6RLQ-DUREE\u27e7"                   # remplacé à la fin par la durée de génération (v1.126.0)
 
 MOIS_FR = {
     "janvier": 1, "janv": 1, "jan": 1,
@@ -672,6 +673,12 @@ class RlqSurveyReportWizard(models.TransientModel):
     state = fields.Selection([("draft", "Paramètres"), ("done", "Rapport généré")], default="draft")
     report_html = fields.Html(string="Rapport", sanitize=False, readonly=True)
     menu_origine = fields.Char(string="Sous-menu utilisé", readonly=True)
+    duree_generation = fields.Char(
+        string="Durée de génération", readonly=True,
+        help="Temps pris par la dernière génération du rapport, au total et pour chaque étape (sondages : lecture des réponses "
+             "dans Odoo ; synthèse et participants : construction du rapport ; anonymisation ; enregistrement : copie du rapport "
+             "et historique d'accès). La même ligne est écrite dans le journal du serveur.",
+    )
     debug_info = fields.Char(
         string="Version du module", default=lambda self: self._default_debug_info(),
     )
@@ -1600,6 +1607,8 @@ class RlqSurveyReportWizard(models.TransientModel):
             type_notif = "warning"
         else:
             apercu = _("Le rapport a été généré avec succès.")
+            if self.duree_generation:
+                apercu += " " + _("Durée : %(duree)s") % {"duree": self.duree_generation}
             titre_notif = _("Rapport généré")
             type_notif = "success"
 
@@ -1834,6 +1843,7 @@ class RlqSurveyReportWizard(models.TransientModel):
         self.ensure_one()
         chrono = [("début", time.perf_counter())]            # v1.125.0 : durée de chaque étape, écrite dans le journal
         self.env.cr.cache.pop(CLE_CACHE_NOMS, None)
+        self.duree_generation = False
 
         emails = {}  # nom normalisé -> courriel
         # Accumulateurs pour la synthèse (fusion par titre de question / de ligne)
@@ -2881,6 +2891,7 @@ class RlqSurveyReportWizard(models.TransientModel):
         pied_de_page = (
             "<p style='text-align:center;color:var(--texte-attenue);font-size:.8rem;"
             f"margin-top:2rem;'>Généré par le module {self._default_debug_info()}"
+            f"<br>{JETON_DUREE}"
             "<br>© 2026 Services-Conseils Linux Inc. (contact@exemple.org) · Rencontres Linux au Québec contributors"
             "<br>rlq_survey_report est distribué sous licence "
             "<a href='https://www.gnu.org/licenses/why-affero-gpl.fr.html' target='_blank' "
@@ -2934,11 +2945,18 @@ class RlqSurveyReportWizard(models.TransientModel):
         # pseudonyme ci-dessus ; il ne doit jamais laisser un jeton
         # visible tel quel dans le rapport livré.
         html = self._resoudre_jetons_presentateurs(html, donnees_presentateurs.keys())
+        # v1.126.0 : la durée de génération est AUSSI écrite au bas du rapport (et dans le formulaire, voir plus bas) : la
+        # ligne du journal du serveur n'est visible que si le journal est au niveau « info » et qu'on y a accès.
+        html = html.replace(JETON_DUREE, "Durée de génération : %.1f s (%s)" % (
+            chrono[-1][1] - chrono[0][1], rb.echapper(rb.texte_chrono(chrono))))
         self.report_html = html
         self.state = "done"
         attachment_ecran = self._sauvegarder_copie_ecran(html)
         self._journaliser_acces("ecran", attachment_ecran.name if attachment_ecran else None, attachment_ecran)
         chrono.append(("enregistrement", time.perf_counter()))
+        self.duree_generation = "%.1f s (%s) - %d sondage(s), %d réponse(s), %d participant(s), %.1f Mo" % (
+            chrono[-1][1] - chrono[0][1], rb.texte_chrono(chrono), nb_total_a_traiter, nb_reponses_trouvees,
+            len(participants), len(html) / 1e6)
         _logger.info(
             "rlq_survey_report : rapport généré en %.1f s (%s) - %d sondage(s), %d réponse(s), %d participant(s), %.1f Mo",
             chrono[-1][1] - chrono[0][1], rb.texte_chrono(chrono), nb_total_a_traiter, nb_reponses_trouvees,
