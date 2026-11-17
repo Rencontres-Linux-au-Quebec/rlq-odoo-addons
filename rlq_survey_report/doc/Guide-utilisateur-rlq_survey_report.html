@@ -42,7 +42,7 @@
 <div class="page">
 
 <h1>Guide utilisateur — Rapport de sondage</h1>
-<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.130.0</strong> — mis à jour le 2026-11-16.<br>
+<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.131.0</strong> — mis à jour le 2026-11-17.<br>
 Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 
 <p>Ce module produit un compte-rendu détaillé — à l'écran, en fichier HTML, en PDF ou en Excel — des réponses à un ou plusieurs sondages Odoo, notamment les sondages de satisfaction envoyés après chaque rencontre. Il aide à repérer ce qui va bien, ce qui se dégrade, et à suivre les actions entreprises d'une rencontre à l'autre.</p>
@@ -91,7 +91,6 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 <!-- ============================================================ 2 -->
 <h2 id="generer">2. Générer un rapport, pas à pas</h2>
 <ol>
-  <li><strong>Cochez la confirmation</strong> en haut du formulaire (« Je confirme être responsable des renseignements personnels de ce rapport »). Le bouton Générer refuse de fonctionner sans elle, et elle est à recocher à chaque génération.</li>
   <li><strong>Choisissez les sondages</strong> (les « rencontres »), de l'une de ces trois façons :
     <ul>
       <li>à la main : <em>Ajouter une ligne</em> dans « Sondages (rencontres) à inclure » ;</li>
@@ -101,10 +100,10 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
     Une ligne « Ampleur de la génération » indique combien de sondages et de réponses seront traités.</li>
   <li><strong>Ajustez les filtres</strong> à gauche (exclusions, plage de dates…) et les <strong>options</strong> à droite (§&nbsp;3).</li>
   <li><strong>Décidez de l'anonymisation</strong> : la case « Anonymiser les participants » est cochée par défaut (§&nbsp;4). Elle détermine aussi si un mot de passe sera demandé (§&nbsp;5).</li>
-  <li><strong>Choisissez le format de sortie</strong> — à l'écran, fichier HTML ou fichier PDF — puis cliquez sur <strong>Générer</strong>.</li>
+  <li><strong>Choisissez le format de sortie</strong> — à l'écran, fichier HTML ou fichier PDF — puis cliquez sur <strong>Générer</strong>. Une fenêtre <strong>Confirmation</strong> s'ouvre : cochez « Ce rapport contient des renseignements personnels… Je confirme être responsable de leur confidentialité… », puis <strong>Continuer</strong>. Si un mot de passe est requis (§&nbsp;5), il est dans la même fenêtre, pré-rempli. La confirmation est demandée une fois par fenêtre de rapport : les téléchargements et l'export Excel qui suivent ne la redemandent pas.</li>
   <li>Une fois le rapport affiché, vous pouvez le <strong>télécharger</strong> (HTML, PDF), l'<strong>exporter en Excel</strong>, ou <strong>Modifier les paramètres</strong> pour recommencer sans tout ressaisir.</li>
 </ol>
-<figure class="capture"><b>Capture à ajouter — <code>03-formulaire-complet.png</code></b><br>Le formulaire en entier, de la confirmation jusqu'aux boutons.</figure>
+<figure class="capture"><b>Capture à ajouter — <code>03-formulaire-complet.png</code></b><br>Le formulaire en entier, des sondages jusqu'aux boutons, puis la fenêtre « Confirmation ».</figure>
 
 <!-- ============================================================ 3 -->
 <h2 id="formulaire">3. Le formulaire en détail</h2>
@@ -512,7 +511,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 <h2 id="depannage">18. Dépannage</h2>
 <table>
   <tr><th>Symptôme</th><th>Cause probable / solution</th></tr>
-  <tr><td>Le bouton Générer ne fait rien</td><td>Vérifiez qu'au moins un sondage est sélectionné et que la case de confirmation est cochée.</td></tr>
+  <tr><td>Le bouton Générer ne fait rien</td><td>Vérifiez qu'au moins un sondage est sélectionné. La case de confirmation est dans la fenêtre « Confirmation » qui s'ouvre après le clic : sans elle, « Continuer » affiche un message et rien n'est généré.</td></tr>
   <tr><td>Le mot de passe par défaut est redevenu « !CHANGE-MOI@ »</td><td>Avec une version antérieure à la 1.93, une réinstallation du module pouvait remplacer la valeur définie. Redéfinissez-la une fois (§&nbsp;15) : elle n'est plus jamais écrasée ensuite.</td></tr>
   <tr><td>« Le mot de passe par défaut n'a pas encore été personnalisé »</td><td>Le mot de passe pré-rempli est encore le marqueur livré. Saisissez le vôtre dans les deux champs, ou demandez à un administrateur de définir le mot de passe par défaut (§&nbsp;15).</td></tr>
   <tr><td>On me demande un mot de passe pour un rapport anonymisé</td><td>Vérifiez que « Anonymiser les participants » est bien coché : sans anonymisation, un mot de passe est requis, même à l'écran. L'export Excel en exige toujours un.</td></tr>
@@ -521,7 +520,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
   <tr><td>Pas de Note globale pour une rencontre</td><td>Aucune des trois questions qui la composent n'a de réponse numérique pour cette rencontre.</td></tr>
   <tr><td>Un contour marqué ou un message de dérive</td><td>Ce sont des signaux à examiner (§&nbsp;6), pas forcément un problème confirmé.</td></tr>
   <tr><td>Un lien de date ouvre l'administration d'Odoo au lieu de défiler dans le rapport</td><td>Ce sondage ou événement n'est pas inclus dans ce rapport.</td></tr>
-  <tr><td>La génération du rapport est longue</td><td>Depuis la version 1.125, l'anonymisation ne relit plus tout le rapport pour chaque participant (c'était la cause principale pour un rapport de plusieurs centaines de participants). Si c'est encore long, réduisez le nombre de sondages ou la période, et regardez la ligne <strong>Durée de génération</strong> affichée sous le titre du formulaire après la génération (aussi au bas du rapport) : elle donne la durée de chaque étape (sondages, synthèse et participants, anonymisation, enregistrement). La même ligne est dans le journal du serveur, s'il est au niveau « info ».</td></tr>
+  <tr><td>La génération du rapport ou du fichier HTML/PDF est longue</td><td>Regardez la ligne <strong>Durée de génération</strong> sous le titre du formulaire (aussi au bas du rapport et dans le journal du serveur) : elle donne la durée de chaque étape du rapport (sondages, synthèse et participants, anonymisation, enregistrement) puis, depuis la version 1.131, celle du fichier (« Fichier HTML » : chiffrement, enregistrement ; « Fichier PDF » : moteur PDF, chiffrement, enregistrement). Envoyez cette ligne au responsable du module : elle dit où va le temps. Si « moteur PDF » domine, un administrateur peut définir le paramètre système <code>report.url</code> à l'adresse locale d'Odoo (ex. <code>http://127.0.0.1:8069</code>) : wkhtmltopdf lit alors les styles du rapport sans passer par l'adresse publique du site. Sinon, réduisez le nombre de sondages ou la période, et pour un PDF, décochez dans « Options PDF » les tableaux de réponses par participant.</td></tr>
   <tr><td>La génération d'un PDF échoue ou reste incomplète</td><td>Dans « Options PDF », décochez « Tableaux de réponses par participant » et/ou « Saut de page forcé par participant ».</td></tr>
   <tr><td>Un avertissement dit qu'une date n'a pas été reconnue</td><td>Le titre du sondage ne suit pas le format attendu (ex. « 4 août 2026 ») : le message cite le titre en cause.</td></tr>
   <tr><td>Le nom d'un fichier est coupé dans l'historique</td><td>Le nom complet passe à la ligne dans la colonne « Télécharger » ; si ce n'était pas le cas, faites actualiser la page (Ctrl+F5) après la mise à jour du module.</td></tr>

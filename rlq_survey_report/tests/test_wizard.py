@@ -468,7 +468,69 @@ class TestRlqSurveyReportWizard(TransactionCase):
         )
         resultat = wizard.action_generate()
         self.assertEqual(resultat.get("res_model"), "rlq.survey.report.wizard")
-        self.assertIn("password", resultat.get("views", [[None, ""]])[0][1] or "")
+        self.assertEqual(
+            resultat["views"][0][0], self.env.ref("rlq_survey_report.view_rlq_survey_report_wizard_form_password").id
+        )
+
+    # ------------------------------------------------------------------
+    # v1.131.0 : confirmation about personal information in a window
+    # ------------------------------------------------------------------
+
+    def test_confirmation_absente_ouvre_la_fenetre_de_confirmation(self):
+        """Anonymised report on screen: no password, but the confirmation window opens; nothing is generated."""
+        wizard = self._wizard(output_format="screen", anonymiser=True, confirmation_renseignements_personnels=False)
+        resultat = wizard.action_generate()
+        self.assertEqual(
+            resultat["views"][0][0],
+            self.env.ref("rlq_survey_report.view_rlq_survey_report_wizard_form_confirmation").id,
+        )
+        self.assertEqual(resultat["context"]["rlq_action_apres_mot_de_passe"], "action_generate")
+        self.assertEqual(wizard.state, "draft")
+
+    def test_confirmation_absente_avec_mot_de_passe_requis_ouvre_la_fenetre_du_mot_de_passe(self):
+        """Report with the real names: the same window asks for the confirmation and shows the password."""
+        wizard = self._wizard(output_format="html", anonymiser=False, confirmation_renseignements_personnels=False)
+        resultat = wizard.action_generate()
+        self.assertEqual(
+            resultat["views"][0][0], self.env.ref("rlq_survey_report.view_rlq_survey_report_wizard_form_password").id
+        )
+        self.assertEqual(wizard.state, "draft")
+
+    def test_continuer_sans_cocher_leve_une_erreur(self):
+        wizard = self._wizard(output_format="screen", confirmation_renseignements_personnels=False)
+        with self.assertRaises(UserError):
+            wizard.with_context(rlq_action_apres_mot_de_passe="action_generate").action_continuer_apres_mot_de_passe()
+        self.assertEqual(wizard.state, "draft")
+
+    def test_continuer_apres_avoir_coche_genere_le_rapport(self):
+        wizard = self._wizard(output_format="screen", confirmation_renseignements_personnels=False)
+        wizard.confirmation_renseignements_personnels = True
+        wizard.with_context(rlq_action_apres_mot_de_passe="action_generate").action_continuer_apres_mot_de_passe()
+        self.assertEqual(wizard.state, "done")
+
+    def test_case_de_confirmation_absente_du_formulaire_principal(self):
+        arch = self.env["rlq.survey.report.wizard"].get_view(
+            self.env.ref("rlq_survey_report.view_rlq_survey_report_wizard_form").id, "form"
+        )["arch"]
+        self.assertNotIn("confirmation_renseignements_personnels", arch)
+
+    def test_fichier_html_direct_sans_copie_ecran(self):
+        """v1.131.0 : "Générer" in HTML keeps the HTML file only (no second screen copy), with its timing."""
+        Acces = self.env["rlq.survey.report.acces"]
+        dernier_id = Acces.search([], order="id desc", limit=1).id or 0
+        wizard = self._wizard(output_format="html", anonymiser=True)
+        wizard.action_generate()
+        nouveaux = Acces.search([("id", ">", dernier_id)])
+        self.assertEqual(nouveaux.mapped("action"), ["html"])
+        self.assertIn("Fichier HTML", wizard.duree_generation)
+
+    def test_lecture_groupee_des_participations(self):
+        """v1.131.0 : one search for every survey gives the same participations as one search per survey."""
+        autre = self.Survey.create({"title": "Rencontre du 2 juin 2026", "access_mode": "public"})
+        wizard = self._wizard(survey_ids=[(6, 0, (self.survey | autre).ids)])
+        groupes = wizard._user_inputs_par_sondage(self.survey | autre)
+        self.assertEqual(groupes[self.survey.id], wizard._user_inputs(self.survey))
+        self.assertNotIn(autre.id, groupes)
 
     def test_mot_de_passe_faible_leve_une_erreur(self):
         wizard = self._wizard(

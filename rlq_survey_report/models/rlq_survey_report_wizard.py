@@ -1348,7 +1348,25 @@ class RlqSurveyReportWizard(models.TransientModel):
         return rows.sorted("sequence") if rows else question.env[self._answer_model_name()]
 
     def _user_inputs(self, survey):
-        domain = [("survey_id", "=", survey.id)]
+        return self.env["survey.user_input"].search(self._domaine_user_inputs([survey.id]))
+
+    def _user_inputs_par_sondage(self, surveys):
+        """v1.131.0 : the retained participations of ALL the surveys of the report, read with ONE search instead of
+        one per survey, returned as {survey_id: recordset}. Every recordset shares the prefetch set of the whole search,
+        so the answer lines, the contacts and the answers chosen are then read in batches for the whole report (a few
+        queries) instead of again for each survey. Same order inside a survey as _user_inputs() (default order)."""
+        tous = self.env["survey.user_input"].search(self._domaine_user_inputs(surveys.ids))
+        ids_par_sondage = defaultdict(list)
+        for ui in tous:
+            ids_par_sondage[ui.survey_id.id].append(ui.id)
+        modele = self.env["survey.user_input"]
+        return {
+            survey_id: modele.browse(ids).with_prefetch(tous._prefetch_ids)
+            for survey_id, ids in ids_par_sondage.items()
+        }
+
+    def _domaine_user_inputs(self, survey_ids):
+        domain = [("survey_id", "in", list(survey_ids))]
         if self.include_partial:
             # "Réponses partielles" = commencées mais non terminées
             # (state='in_progress') - jamais les invitations jamais ouvertes
@@ -1367,7 +1385,7 @@ class RlqSurveyReportWizard(models.TransientModel):
             domain.append(("partner_id", "not in", self.exclude_partner_ids.ids))
         if self.exclude_tag_ids:
             domain.append(("partner_id.category_id", "not in", self.exclude_tag_ids.ids))
-        return self.env["survey.user_input"].search(domain)
+        return domain
 
     def _detecter_champ_et_modele_lignes(self):
         """Détecte dynamiquement le champ One2many de survey.user_input vers
@@ -1426,12 +1444,25 @@ class RlqSurveyReportWizard(models.TransientModel):
         la BONNE action d'origine (voir action_continuer_apres_mot_de_passe
         ci-dessous) - le bouton "Télécharger en HTML/PDF" n'a pas le même
         effet que "Générer" et ne doit pas être confondu avec lui."""
+        # v1.131.0 : two views rather than one with a field hidden by a condition (a password field hidden by a
+        # condition has already disappeared from a form of this module): with the password fields when the action
+        # needs a password, otherwise only the confirmation about personal information.
+        format_fichier = {
+            "action_download_html": "html",
+            "action_download_pdf": "pdf",
+            "action_export_excel": "excel",
+        }.get(action_suivante, self.output_format)
+        vue = (
+            "rlq_survey_report.view_rlq_survey_report_wizard_form_password"
+            if self._mot_de_passe_requis(format_fichier)
+            else "rlq_survey_report.view_rlq_survey_report_wizard_form_confirmation"
+        )
         return {
             "type": "ir.actions.act_window",
             "res_model": self._name,
             "res_id": self.id,
             "view_mode": "form",
-            "views": [[self.env.ref("rlq_survey_report.view_rlq_survey_report_wizard_form_password").id, "form"]],
+            "views": [[self.env.ref(vue).id, "form"]],
             "target": "new",
             "context": {"rlq_action_apres_mot_de_passe": action_suivante},
         }
@@ -1449,6 +1480,14 @@ class RlqSurveyReportWizard(models.TransientModel):
         )
         if nom_methode not in actions_permises:
             nom_methode = "action_generate"  # repli sûr si le contexte contient autre chose d'inattendu
+        if not self.confirmation_renseignements_personnels:
+            # v1.131.0 : shown over the confirmation window, which stays open to check the box.
+            raise UserError(
+                _(
+                    "Cochez la case de confirmation concernant les renseignements "
+                    "personnels pour continuer."
+                )
+            )
         return getattr(self, nom_methode)()
 
     def action_annuler_mot_de_passe(self):
@@ -1520,28 +1559,22 @@ class RlqSurveyReportWizard(models.TransientModel):
         self.ensure_one()
         if not self.survey_ids:
             raise UserError(_("Sélectionnez au moins un sondage."))
-        if not self.confirmation_renseignements_personnels:
-            raise UserError(
-                _(
-                    "Cochez la case de confirmation concernant les renseignements "
-                    "personnels avant de générer ce rapport."
-                )
-            )
-        if self.output_format != "screen" or not self.anonymiser:
-            # Plutôt qu'un simple message d'erreur, on rouvre le même
-            # enregistrement avec une petite vue dédiée demandant
-            # directement le mot de passe, à ce moment précis - aucun
-            # autre paramètre déjà choisi n'est perdu, puisque c'est le
-            # même enregistrement qui est simplement réaffiché autrement.
-            # `not self.anonymiser` (v1.77.0) : un rapport affichant les
-            # vrais noms des participants exige un mot de passe même pour
-            # un simple affichage à l'écran, pas seulement pour un
-            # téléchargement - sur demande, pour que la protection ne
-            # dépende jamais du format choisi quand l'anonymisation est
-            # désactivée.
-            resultat = self._verifier_mot_de_passe_ou_demander("action_generate")
-            if resultat:
-                return resultat
+        # v1.131.0 : the confirmation about personal information is asked in a window that opens here (with the
+        # password when one is required), no longer as a box of the main form - see _verifier_mot_de_passe_ou_demander().
+        # Plutôt qu'un simple message d'erreur, on rouvre le même
+        # enregistrement avec une petite vue dédiée demandant
+        # directement le mot de passe, à ce moment précis - aucun
+        # autre paramètre déjà choisi n'est perdu, puisque c'est le
+        # même enregistrement qui est simplement réaffiché autrement.
+        # `not self.anonymiser` (v1.77.0) : un rapport affichant les
+        # vrais noms des participants exige un mot de passe même pour
+        # un simple affichage à l'écran, pas seulement pour un
+        # téléchargement - sur demande, pour que la protection ne
+        # dépende jamais du format choisi quand l'anonymisation est
+        # désactivée.
+        resultat = self._verifier_mot_de_passe_ou_demander("action_generate")
+        if resultat:
+            return resultat
 
         try:
             diagnostics = self._compute_report()
@@ -1614,11 +1647,19 @@ class RlqSurveyReportWizard(models.TransientModel):
 
         if self.output_format == "html":
             resultat = self.action_download_html()
-            self._envoyer_notification(_("Rapport généré"), _("Le fichier HTML est prêt."), "success")
+            self._envoyer_notification(
+                _("Rapport généré"),
+                _("Le fichier HTML est prêt.") + " " + _("Durée : %(duree)s") % {"duree": self.duree_generation or ""},
+                "success",
+            )
             return resultat
         if self.output_format == "pdf":
             resultat = self.action_download_pdf()
-            self._envoyer_notification(_("Rapport généré"), _("Le fichier PDF est prêt."), "success")
+            self._envoyer_notification(
+                _("Rapport généré"),
+                _("Le fichier PDF est prêt.") + " " + _("Durée : %(duree)s") % {"duree": self.duree_generation or ""},
+                "success",
+            )
             return resultat
 
         return {
@@ -1892,6 +1933,16 @@ class RlqSurveyReportWizard(models.TransientModel):
             surveys_a_traiter -= surveys_exclus
 
         nb_total_a_traiter = len(surveys_a_traiter)
+        # v1.131.0 : one search for the participations of every survey (and one for the people who did not answer),
+        # instead of one or two per survey - see _user_inputs_par_sondage().
+        user_inputs_par_sondage = self._user_inputs_par_sondage(surveys_a_traiter)
+        non_repondants_par_sondage = defaultdict(list)
+        if self.voir_non_repondants and surveys_a_traiter:
+            for ui in self.env["survey.user_input"].search([
+                ("survey_id", "in", surveys_a_traiter.ids), ("state", "=", "new"),
+            ]):
+                non_repondants_par_sondage[ui.survey_id.id].append(ui)
+        modele_user_input = self.env["survey.user_input"]
         heure_dernier_avis = time.time()
         for i, survey in enumerate(surveys_a_traiter.sorted(lambda s: s.id), 1):
             if nb_total_a_traiter > 1 and time.time() - heure_dernier_avis >= 3:
@@ -1899,7 +1950,7 @@ class RlqSurveyReportWizard(models.TransientModel):
                     _("%(i)s / %(total)s sondages traités…") % {"i": i - 1, "total": nb_total_a_traiter}
                 )
                 heure_dernier_avis = time.time()
-            user_inputs = self._user_inputs(survey)
+            user_inputs = user_inputs_par_sondage.get(survey.id, modele_user_input)
             if not user_inputs:
                 # Signalé (v1.66.0) : si un seuil minimum de participants est
                 # actif (>= 1), un sondage à 0 réponse "retenue" ici (après
@@ -2177,9 +2228,7 @@ class RlqSurveyReportWizard(models.TransientModel):
                 )
 
             if self.voir_non_repondants:
-                non_repondants = self.env["survey.user_input"].search([
-                    ("survey_id", "=", survey.id), ("state", "=", "new"),
-                ])
+                non_repondants = non_repondants_par_sondage.get(survey.id, [])
                 if non_repondants:
                     noms_nr = sorted(
                         {self._respondent_nom(ui) for ui in non_repondants}, key=rb.normaliser_nom
@@ -2951,8 +3000,14 @@ class RlqSurveyReportWizard(models.TransientModel):
             chrono[-1][1] - chrono[0][1], rb.echapper(rb.texte_chrono(chrono))))
         self.report_html = html
         self.state = "done"
-        attachment_ecran = self._sauvegarder_copie_ecran(html)
-        self._journaliser_acces("ecran", attachment_ecran.name if attachment_ecran else None, attachment_ecran)
+        # v1.131.0 : when "Générer" goes straight to an HTML or PDF file, the file itself is kept in "Fichiers déjà
+        # générés" and in the access history; the screen copy (a second encryption and two more copies of several MB)
+        # is then skipped.
+        if self.output_format == "screen":
+            attachment_ecran, contenu_ecran = self._sauvegarder_copie_ecran(html)
+            self._journaliser_acces(
+                "ecran", attachment_ecran.name if attachment_ecran else None, attachment_ecran, contenu_b64=contenu_ecran,
+            )
         chrono.append(("enregistrement", time.perf_counter()))
         self.duree_generation = "%.1f s (%s) - %d sondage(s), %d réponse(s), %d participant(s), %.1f Mo" % (
             chrono[-1][1] - chrono[0][1], rb.texte_chrono(chrono), nb_total_a_traiter, nb_reponses_trouvees,
@@ -2981,7 +3036,7 @@ class RlqSurveyReportWizard(models.TransientModel):
 
         Ne lève jamais d'erreur : un problème de sauvegarde de la copie
         ne doit jamais empêcher l'affichage du rapport lui-même - retourne
-        None dans ce cas (log de l'erreur, _journaliser_acces gère déjà
+        (None, None) dans ce cas (log de l'erreur, _journaliser_acces gère déjà
         une pièce jointe absente)."""
         try:
             document = (
@@ -3001,17 +3056,19 @@ class RlqSurveyReportWizard(models.TransientModel):
                 f"{plage_dates + '-' if plage_dates else ''}"
                 f"{horodatage_local.strftime('%Y%m%d.%H%M%S')}.html"
             )
-            return self.env["ir.attachment"].sudo().create({
+            contenu_b64 = base64.b64encode(document.encode("utf-8"))
+            attachment = self.env["ir.attachment"].sudo().create({
                 "name": nom_fichier,
                 "type": "binary",
-                "datas": base64.b64encode(document.encode("utf-8")),
+                "datas": contenu_b64,
                 "res_model": self._name,
                 "res_id": self.id,
                 "mimetype": "text/html",
             })
+            return attachment, contenu_b64
         except Exception:  # noqa: BLE001 - ne doit jamais empêcher l'affichage du rapport
             _logger.exception("Échec de la sauvegarde de la copie persistante du rapport affiché à l'écran")
-            return None
+            return None, None
 
     def _resoudre_jetons_presentateurs(self, html, noms_presentateurs):
         """Remplace chaque jeton produit par rb.jeton_presentateur(nom) par
@@ -3026,7 +3083,7 @@ class RlqSurveyReportWizard(models.TransientModel):
             html = html.replace(rb.jeton_presentateur(nom), rb.echapper(nom))
         return html
 
-    def _journaliser_acces(self, action, nom_fichier=None, attachment=None):
+    def _journaliser_acces(self, action, nom_fichier=None, attachment=None, contenu_b64=None):
         """Ajoute une entrée à l'historique d'accès (rlq.survey.report.acces)
         - qui, quand, quelle action, quel fichier le cas échéant - à appeler
         SEULEMENT après le succès réel de l'action (jamais avant, ni en cas
@@ -3076,7 +3133,8 @@ class RlqSurveyReportWizard(models.TransientModel):
             # rapport a forcément accès à SA PROPRE pièce jointe fraîchement
             # créée, mais sudo() élimine tout risque de coincidence de
             # droits pour autant - cette copie doit toujours réussir.
-            "fichier_telecharger": attachment.sudo().datas if attachment else False,
+            # v1.131.0 : `contenu_b64`, the content already in memory, avoids reading back the file just written.
+            "fichier_telecharger": (contenu_b64 or attachment.sudo().datas) if attachment else False,
             "anonymise": self.anonymiser,
             "nb_sondages": len(self.survey_ids),
             "resume_sondages": resume[:250],
@@ -3253,6 +3311,11 @@ class RlqSurveyReportWizard(models.TransientModel):
             "action_download_pdf": "pdf",
             "action_export_excel": "excel",
         }.get(action_suivante, self.output_format)
+        # v1.131.0 : the box "Je confirme être responsable..." is no longer in the main form; it is in the window
+        # opened here, together with the password when one is required. Asked once per report window: once checked,
+        # the next actions (download in HTML or PDF, Excel export) do not ask again.
+        if not self.confirmation_renseignements_personnels:
+            return self._action_demander_mot_de_passe(action_suivante)
         if not self._mot_de_passe_requis(format_fichier):
             return None
         if not self.mot_de_passe or not self.mot_de_passe_confirmation:
@@ -3303,9 +3366,11 @@ class RlqSurveyReportWizard(models.TransientModel):
         resultat = self._verifier_mot_de_passe_ou_demander("action_download_html")
         if resultat:
             return resultat
+        chrono = [("début", time.perf_counter())]
         mdp_html = self._mot_de_passe_effectif("html")
         if mdp_html:
             document = self._html_protege_par_mot_de_passe(document, mdp_html)
+        chrono.append(("chiffrement", time.perf_counter()))
         plage_dates = self._suffixe_plage_dates_nom_fichier()
         horodatage_local = fields.Datetime.context_timestamp(self, fields.Datetime.now())
         nom_fichier = (
@@ -3313,14 +3378,19 @@ class RlqSurveyReportWizard(models.TransientModel):
             f"{plage_dates + '-' if plage_dates else ''}"
             f"{horodatage_local.strftime('%Y%m%d.%H%M%S')}.html"
         )
+        octets = document.encode("utf-8")
+        contenu_b64 = base64.b64encode(octets)
         attachment = self.env["ir.attachment"].create({
             "name": nom_fichier,
             "type": "binary",
-            "datas": base64.b64encode(document.encode("utf-8")),
+            "datas": contenu_b64,
             "res_model": self._name,
             "res_id": self.id,
             "mimetype": "text/html",
         })
+        self._journaliser_acces("html", nom_fichier, attachment, contenu_b64=contenu_b64)
+        chrono.append(("enregistrement", time.perf_counter()))
+        self._ajouter_duree_fichier("HTML", chrono, len(octets))
         self._envoyer_notification(
             _("Fichier prêt"),
             _(
@@ -3332,12 +3402,32 @@ class RlqSurveyReportWizard(models.TransientModel):
             "success",
             sticky=True,
         )
-        self._journaliser_acces("html", nom_fichier, attachment)
         return {
             "type": "ir.actions.act_url",
             "url": f"/web/content/{attachment.id}?download=true&filename={nom_fichier}",
             "target": "self",
         }
+
+    def _ajouter_duree_fichier(self, format_fichier, chrono, taille_octets):
+        """v1.131.0 : time taken to produce the HTML or PDF FILE (after the report itself), step by step: added to
+        "Durée de génération" in the form and written in the server log, so that the slow step can be named (for a
+        PDF, "moteur PDF" is Odoo's QWeb + wkhtmltopdf)."""
+        total = chrono[-1][1] - chrono[0][1]
+        texte = "%.1f s (%s), %.1f Mo" % (total, rb.texte_chrono(chrono), taille_octets / 1e6)
+        base = (self.duree_generation or "").split(" | ")[0]
+        self.duree_generation = (base + " | " if base else "") + _("Fichier %(format)s : %(detail)s") % {
+            "format": format_fichier, "detail": texte,
+        }
+        _logger.info("rlq_survey_report : fichier %s produit en %s", format_fichier, texte)
+        if format_fichier == "PDF" and not self.env["ir.config_parameter"].sudo().get_param("report.url"):
+            # wkhtmltopdf reads the styles of the report through the address of the server: without "report.url",
+            # Odoo gives it web.base.url (often the public address, through the proxy), which can slow it down a lot.
+            _logger.info(
+                "rlq_survey_report : paramètre système report.url absent ; wkhtmltopdf passe par web.base.url (%s). "
+                "Si le moteur PDF est lent, définir report.url à l'adresse locale d'Odoo (ex. http://127.0.0.1:8069).",
+                self.env["ir.config_parameter"].sudo().get_param("web.base.url"),
+            )
+        return total
 
     def _html_protege_par_mot_de_passe(self, document, mot_de_passe):
         """Chiffre `document` (AES-256-GCM, clé dérivée du mot de passe via
@@ -3603,8 +3693,10 @@ document.getElementById("mdp").addEventListener("keydown", function(e) {{
                 )
             )
 
+        chrono = [("début", time.perf_counter())]
         rapport = self.env.ref("rlq_survey_report.action_report_rlq_survey")
         pdf_content, _content_type = self.env["ir.actions.report"]._render_qweb_pdf(rapport, self.ids)
+        chrono.append(("moteur PDF", time.perf_counter()))
 
         if mdp_pdf:
             lecteur = PdfReader(io.BytesIO(pdf_content))
@@ -3636,6 +3728,7 @@ document.getElementById("mdp").addEventListener("keydown", function(e) {{
         else:
             # Rapport anonymisé : PDF livré tel quel, sans chiffrement.
             pdf_chiffre = pdf_content
+        chrono.append(("chiffrement", time.perf_counter()))
 
         plage_dates = self._suffixe_plage_dates_nom_fichier()
         horodatage_local = fields.Datetime.context_timestamp(self, fields.Datetime.now())
@@ -3644,14 +3737,18 @@ document.getElementById("mdp").addEventListener("keydown", function(e) {{
             f"{plage_dates + '-' if plage_dates else ''}"
             f"{horodatage_local.strftime('%Y%m%d.%H%M%S')}.pdf"
         )
+        contenu_b64 = base64.b64encode(pdf_chiffre)
         attachment = self.env["ir.attachment"].create({
             "name": nom_fichier,
             "type": "binary",
-            "datas": base64.b64encode(pdf_chiffre),
+            "datas": contenu_b64,
             "res_model": self._name,
             "res_id": self.id,
             "mimetype": "application/pdf",
         })
+        self._journaliser_acces("pdf", nom_fichier, attachment, contenu_b64=contenu_b64)
+        chrono.append(("enregistrement", time.perf_counter()))
+        self._ajouter_duree_fichier("PDF", chrono, len(pdf_chiffre))
         self._envoyer_notification(
             _("Fichier prêt"),
             _(
@@ -3663,7 +3760,6 @@ document.getElementById("mdp").addEventListener("keydown", function(e) {{
             "success",
             sticky=True,
         )
-        self._journaliser_acces("pdf", nom_fichier, attachment)
         return {
             "type": "ir.actions.act_url",
             "url": f"/web/content/{attachment.id}?download=true&filename={nom_fichier}",
@@ -3816,8 +3912,10 @@ document.getElementById("mdp").addEventListener("keydown", function(e) {{
         # questions matricielles.
         valeurs_note_globale_par_survey = defaultdict(list)
         dates_par_survey = {}
+        user_inputs_par_sondage = self._user_inputs_par_sondage(self.survey_ids)  # v1.131.0 : one search
+        modele_user_input = self.env["survey.user_input"]
         for survey in self.survey_ids.sorted(lambda s: s.id):
-            user_inputs = self._user_inputs(survey)
+            user_inputs = user_inputs_par_sondage.get(survey.id, modele_user_input)
             if not user_inputs:
                 continue
             date_rencontre = self._rencontre_date(survey, user_inputs)
@@ -3835,8 +3933,16 @@ document.getElementById("mdp").addEventListener("keydown", function(e) {{
                 ])
 
             toutes_lignes = user_inputs.mapped(champ_lignes)
+            # v1.131.0 : lines grouped per question in one pass (before: one filtered() over every line of the survey
+            # for each question).
+            ids_lignes_par_question = defaultdict(list)
+            for ligne_ in toutes_lignes:
+                ids_lignes_par_question[ligne_.question_id.id].append(ligne_.id)
+            modele_lignes = self.env[toutes_lignes._name]
             for question in survey.question_and_page_ids.filtered(lambda q: q.question_type):
-                lignes_question = toutes_lignes.filtered(lambda ligne_: ligne_.question_id == question)  # noqa: B023 - exécutée immédiatement par filtered(), dans la même itération
+                lignes_question = modele_lignes.browse(ids_lignes_par_question.get(question.id, [])).with_prefetch(
+                    toutes_lignes._prefetch_ids
+                )
                 est_note_globale = any(
                     mot in (question.title or "").lower() for mot in MOTS_CLES_NOTE_GLOBALE
                 )
