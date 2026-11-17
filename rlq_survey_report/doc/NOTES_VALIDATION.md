@@ -6,6 +6,13 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -78. Heure locale, date et heure sous les écrans, guide dans le menu Événements (v1.124.0)
+
+**Non vérifié sans instance, à confirmer :**
+1. Sous le sommaire du bureau d'inscription et sous le tableau des bénévoles : « rlq_survey_report 18.0.1.124.0 - affiché le <date> <heure> EST (heure locale, America/Toronto) », à l'heure de votre montre.
+2. Les heures d'inscription, d'arrivée et de départ du tableau des bénévoles et les heures du tableau « par heure » correspondent à l'heure locale. Le fuseau vient du navigateur (clé `tz` du contexte envoyé par le client web), sinon des préférences de l'utilisateur, sinon de l'événement, sinon America/Toronto. Avant la 1.124 c'était d'abord le fuseau de l'événement : un événement créé avec le fuseau UTC affichait donc des heures UTC.
+3. Menu Événements > « Guide d'utilisation » : ouvre le guide dans un nouvel onglet, à la section 15, pour un utilisateur de l'application Événements sans accès aux sondages.
+
 ## -77. Traductions, tri par en-tête, filtre par sondage, tableau des bénévoles revu (v1.123.0)
 
 **Vérifié dans le code source d'Odoo 18.0 (dépôt odoo/odoo, branche 18.0), sans exécution :**

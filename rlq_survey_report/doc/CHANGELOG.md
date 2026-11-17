@@ -1,5 +1,45 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.124.0
+
+**Short title:** local date and time (never UTC) on the registration desk and volunteers screens; user guide updated and added to the Events menu.
+
+**Reason for the request:** "add the local date and time (not UTC), and update the documentation (it must be in a menu)". Reading taken: (1) next to the program name and version shown under the screens since 1.123.0, show the date and time of the display, in local time; (2) every date and hour of these screens must be local time, not UTC; (3) the user guide must describe the new screens and be reachable from a menu by the people who use them.
+
+**Changes:**
+
+- `models/event_registration_desk.py`: new `local_zone(env, event)`: time zone of the user (the one of the browser, sent by the web client in the context, otherwise the one of the user's preferences), otherwise the time zone of the event, otherwise America/Toronto. `local_time()` uses it (before: the time zone of the event first). New `program_stamp(env, event)`: footer with program name, installed version, local date and time of the display, time zone.
+- `models/registration_desk_report.py`: `program_footer(program, version, shown_at, zone, lang)`: "rlq_survey_report 18.0.1.124.0 - affiché le 2026-11-16 21:15:02 EST (heure locale, America/Toronto)", in French or English.
+- `models/volunteer_coordinator.py`: same footer under the volunteers' table.
+- `views/event_registration_desk_views.xml`: action `action_rlq_guide_events` and menu Events > "User guide" (French: "Guide d'utilisation"), sequence 47, opens `/rlq_survey_report/aide#bureau-inscription` in a new tab.
+- `controllers/aide.py`: the guide is served to the users of the Events application too (before: Surveys users only).
+- `doc/Guide-utilisateur-rlq_survey_report.html`: header (version 18.0.1.124.0, 2026-11-16); section 15: where to open the guide, new subsection "Dates, heures et version affichées", hours of the summary described as local time.
+- `i18n/fr.po`: "User guide" -> "Guide d'utilisation".
+- `tests/test_registration_desk_report.py`: footer with date, time and zone (French, English, escaping). `tests/test_registration_desk.py`: new Odoo test `test_times_are_local_not_utc`.
+- `__manifest__.py`: version `18.0.1.124.0`. `doc/CONTEXTE.md`, `doc/NOTES_VALIDATION.md` (section -78).
+
+**Bugs fixed:**
+
+- Symptom: hours shown in UTC on the desk summary and the volunteers' table for some events.
+- Diagnosis: `local_time()` used the time zone of the EVENT first; an event whose time zone field is UTC therefore showed UTC hours, whatever the time zone of the person looking at the screen. Not confirmed on the instance (the time zone of the events was not checked).
+- Fix: the time zone of the user comes first (see `local_zone()`).
+
+**Safeguards and edge cases:**
+
+- The columns of the Odoo lists (registration date, arrival, departure) were already shown in the time zone of the browser by Odoo: unchanged.
+- The daily report by e-mail keeps the time zone of the event (it has no browser): unchanged.
+- No time zone anywhere (user without time zone, event without time zone): America/Toronto.
+- The footer shows the abbreviation of the zone (EST or EDT) and its name, so daylight saving time is unambiguous. Everything in it is escaped.
+- The guide stays restricted to connected internal users: Surveys users or Events users; anyone else gets "not found".
+
+**Checks:**
+
+- `./run-all.sh --sans-odoo`: ruff, syntax and manifest, standalone tests: OK.
+- XML of the view file parsed; `i18n/fr.po` rebuilt from the sources.
+- The Odoo code was NOT run: no Odoo instance here. The Odoo tests were not run.
+
+**Action required:** update the module on DEV (`-u rlq_survey_report`) and check the 3 points of `doc/NOTES_VALIDATION.md`, section -78.
+
 ## 18.0.1.123.0
 
 **Short title:** registration desk and volunteers: French labels, sorting by any column, survey filter, most recent event first, version shown, volunteers' table fixed.

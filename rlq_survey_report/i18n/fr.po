@@ -583,6 +583,12 @@ msgid "Volunteers"
 msgstr "Bénévoles"
 
 #. module: rlq_survey_report
+#: model:ir.actions.act_url,name:rlq_survey_report.action_rlq_guide_events
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_guide_events
+msgid "User guide"
+msgstr "Guide d'utilisation"
+
+#. module: rlq_survey_report
 #. odoo-python
 #: code:addons/rlq_survey_report/models/event_registration_desk.py:0
 msgid "Registration desk: %(event)s"

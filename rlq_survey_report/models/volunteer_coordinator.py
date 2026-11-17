@@ -29,7 +29,7 @@ import logging
 from odoo import _, api, fields, models
 
 from . import registration_desk_report as rd
-from .event_registration_desk import LIST_STATES, PROGRAM, local_time, program_version
+from .event_registration_desk import LIST_STATES, local_time, program_stamp
 
 _logger = logging.getLogger(__name__)
 
@@ -65,9 +65,8 @@ class RlqVolunteerCoordinator(models.TransientModel):
 
     @api.depends("event_id", "survey_filter", "sort_by", "sort_desc")
     def _compute_table(self):
-        footer = rd.program_footer(PROGRAM, program_version(self.env))
         for wizard in self:
-            wizard.table_html = wizard._rlq_table_html() + footer
+            wizard.table_html = wizard._rlq_table_html() + program_stamp(self.env, wizard.event_id)
 
     def action_refresh(self):
         """Button « Refresh »: the form is read again, so the table is computed again."""

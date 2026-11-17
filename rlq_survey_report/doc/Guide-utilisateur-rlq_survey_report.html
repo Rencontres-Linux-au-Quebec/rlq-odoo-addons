@@ -42,7 +42,7 @@
 <div class="page">
 
 <h1>Guide utilisateur — Rapport de sondage</h1>
-<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.118.0</strong> — mis à jour le 2026-10-22.<br>
+<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.124.0</strong> — mis à jour le 2026-11-16.<br>
 Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 
 <p>Ce module produit un compte-rendu détaillé — à l'écran, en fichier HTML, en PDF ou en Excel — des réponses à un ou plusieurs sondages Odoo, notamment les sondages de satisfaction envoyés après chaque rencontre. Il aide à repérer ce qui va bien, ce qui se dégrade, et à suivre les actions entreprises d'une rencontre à l'autre.</p>
@@ -400,7 +400,8 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 <p>Aucune adresse courriel d'inscrit n'y figure (Loi 25) : la liste à relancer reste dans Odoo. Le bouton <strong>Envoyer le rapport quotidien maintenant</strong> l'envoie tout de suite (pour l'essayer). Pour changer l'heure : Paramètres → Technique → Tâches planifiées (l'heure choisie est conservée par les mises à jour du module).</p>
 
 <!-- ============================================================ 15 -->
-<h2 id="bureau-inscription">15. Bureau d'inscription <span class="pastille">nouveau, v1.121</span></h2>
+<h2 id="bureau-inscription">15. Bureau d'inscription <span class="pastille">nouveau, v1.121 à v1.124</span></h2>
+<div class="encadre"><p>Ce guide s'ouvre aussi depuis l'application Événements : <strong>Événements → Guide d'utilisation</strong> (il s'ouvre directement à cette section). Les utilisateurs des sondages le trouvent toujours dans <strong>Sondage → Rapports détaillés → Guide d'utilisation</strong>.</p></div>
 <p>Un seul écran pour les bénévoles qui accueillent les gens le jour de l'événement : qui est inscrit, qui est arrivé, qui a rempli son sondage, et ce que chacun a répondu aux questions utiles sur place (en ligne ou sur place, présent pour le dîner, etc.).</p>
 <h3>Préparer : choisir les questions à afficher</h3>
 <ol>
@@ -418,7 +419,7 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
 <h3>Le sommaire</h3>
 <ul>
   <li><strong>Par type de billet et au total</strong> : inscrits, présents, sondages complétés, commencés et non commencés, questions répondues et non répondues.</li>
-  <li><strong>Personnes marquées présentes, par heure</strong> : une ligne par heure (fuseau de l'événement), une colonne par billet, et le total.</li>
+  <li><strong>Personnes marquées présentes, par heure</strong> : une ligne par heure, en <strong>heure locale</strong>, une colonne par billet, et le total.</li>
   <li><strong>Réponses aux questions affichées</strong> : pour chaque réponse, le nombre de personnes par billet, le total et « dont présents » (par exemple, combien de dîners prévoir).</li>
 </ul>
 <p>« Présent » est l'état natif d'Odoo : le bureau d'inscription d'Odoo et ses statistiques voient la même chose. Les inscriptions annulées ne sont ni listées ni comptées. Une question conditionnelle que la personne n'a jamais vue compte comme non répondue. Un sondage est rattaché à une inscription par le même contact ou la même adresse courriel : si une personne a inscrit plusieurs participants avec son propre contact, ils montrent tous les mêmes réponses.</p>
@@ -428,7 +429,13 @@ Ce guide remplace celui du 10 septembre (module 18.0.1.32.0).</p>
   <li><strong>Dans le bureau d'inscription</strong> : <strong>Trier par</strong> (billet, nom, date d'inscription, statut, arrivée, départ, sondage, questions répondues, réponses) et <strong>Ordre décroissant</strong> classent la liste ; <strong>Sondage</strong> ne garde que les sondages complétés, commencés, non commencés ou les inscriptions sans sondage. Les majuscules et les accents sont ignorés : « Élise » est classée avec les « e ».</li>
   <li><strong>Dans « Ouvrir en liste »</strong> : cliquez sur le nom d'une colonne pour trier, y compris Sondage, Questions répondues et Réponses, toujours sans tenir compte des majuscules ni des accents. Les filtres (Présent, Pas encore présent, Sondage complété, commencé, non commencé, Aucun sondage) et le regroupement par billet ou par statut sont dans la barre de recherche.</li>
   <li>Cliquer sur un en-tête de la liste du bureau d'inscription lui-même trie aussi, mais avec le tri brut d'Odoo (majuscules d'abord, lettres accentuées à la fin) : préférez <strong>Trier par</strong>.</li>
-  <li>Dans les sélecteurs d'événement du module, les événements les plus récents sont en premier. Le nom du module et sa version sont affichés sous le sommaire et sous le tableau des bénévoles.</li>
+  <li>Dans les sélecteurs d'événement du module, les événements les plus récents sont en premier.</li>
+</ul>
+
+<h3>Dates, heures et version affichées <span class="pastille">nouveau, v1.124</span></h3>
+<ul>
+  <li>Toutes les dates et heures du bureau d'inscription et du tableau des bénévoles (inscription, arrivée, départ, présences par heure) sont en <strong>heure locale</strong>, jamais en UTC : le fuseau horaire est celui de votre navigateur (ou de vos préférences Odoo), sinon celui de l'événement, sinon America/Toronto.</li>
+  <li>Sous le sommaire et sous le tableau des bénévoles, une ligne indique le nom du module, sa version, puis la date et l'heure locales de l'affichage avec le fuseau, par exemple : <code>rlq_survey_report 18.0.1.124.0 - affiché le 2026-11-16 21:15:02 EST (heure locale, America/Toronto)</code>. Une capture d'écran dit ainsi quelle version l'a produite et quand.</li>
 </ul>
 
 <h3>Bénévoles <span class="pastille">v1.122, revu en v1.123</span></h3>

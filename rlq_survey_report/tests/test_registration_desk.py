@@ -100,6 +100,19 @@ class TestRlqRegistrationDesk(TransactionCase):
         self.assertEqual(desk.registration_ids, paul)
         self.assertEqual(desk.registration_count, 1)
 
+    def test_times_are_local_not_utc(self):
+        """21:30 UTC is 16:30 in Toronto (EST): the desk shows the local hour of the user, never the UTC hour of the database."""
+        registration = self._registration("Heure Locale", "heure@example.com")
+        registration.write({"state": "done", "date_closed": "2030-11-16 21:30:00"})
+        toronto = registration.with_context(tz="America/Toronto")
+        self.assertEqual(toronto._rlq_desk_rows()[0]["hour"], "2030-11-16 16")
+        self.assertEqual(toronto._rlq_desk_rows()[0]["arrived"], "2030-11-16 16:30")
+        paris = registration.with_context(tz="Europe/Paris")
+        self.assertEqual(paris._rlq_desk_rows()[0]["arrived"], "2030-11-16 22:30")
+        desk = self.env["rlq.registration.desk"].with_context(tz="America/Toronto").create({"event_id": self.event.id})
+        self.assertIn("America/Toronto", desk.summary_html)
+        self.assertIn("16 h", desk.summary_html)
+
     def test_departure_recorded_once_and_cleared(self):
         registration = self._registration("Julie", "julie@example.com")
         registration.action_rlq_desk_present()

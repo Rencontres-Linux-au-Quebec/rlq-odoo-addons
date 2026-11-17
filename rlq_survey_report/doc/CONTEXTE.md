@@ -51,7 +51,7 @@ rlq_survey_report/
 │   ├── registration_desk_report.py    Fonctions pures du bureau d'inscription (décomptes, sommaire HTML français ou anglais), testées sans Odoo
 │   ├── volunteer_coordinator.py       Tableau des bénévoles (v1.122, revu v1.123) : billets « bénévole » seulement, questions reconnues par leur texte (rôles, langues, type), tri et filtre
 │   └── rlq_survey_report_acces.py     Historique d'accès aux rapports (qui, quand, quelle action)
-├── controllers/aide.py                Page /rlq_survey_report/aide : sert le guide utilisateur dans Odoo (v1.106)
+├── controllers/aide.py                Page /rlq_survey_report/aide : sert le guide utilisateur dans Odoo (v1.106) ; menus Sondage > Rapports détaillés et Événements (v1.124) > Guide d'utilisation
 ├── controllers/chat.py                Page /rlq_survey_report/chat/<contact> : ouvre la discussion directe avec un bénévole, sinon sa fiche de contact (v1.123)
 ├── views/                             Formulaire de l'assistant, menus, gabarit PDF, billets
 ├── data/                              URL d'aide, purge des pièces jointes, mot de passe par défaut, modèle du courriel de réponses

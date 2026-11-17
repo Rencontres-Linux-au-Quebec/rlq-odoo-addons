@@ -195,4 +195,18 @@
               sequence="45"
               groups="event.group_event_user"/>
 
+    <!-- v1.124.0 - The user guide in the Events menu too (controllers/aide.py), opened at the registration desk section. -->
+    <record id="action_rlq_guide_events" model="ir.actions.act_url">
+        <field name="name">User guide</field>
+        <field name="url">/rlq_survey_report/aide#bureau-inscription</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_rlq_guide_events"
+              name="User guide"
+              parent="event.event_main_menu"
+              action="action_rlq_guide_events"
+              sequence="47"
+              groups="event.group_event_user"/>
+
 </odoo>

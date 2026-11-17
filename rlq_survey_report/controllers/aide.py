@@ -11,6 +11,8 @@ aide.py — page d'aide du module DANS Odoo (v1.106.0)
 Sert le guide utilisateur (doc/Guide-utilisateur-rlq_survey_report.html) à l'adresse /rlq_survey_report/aide, pour les utilisateurs internes connectés
 seulement (auth="user" + groupe « Sondage : Utilisateur »). Le menu Sondages > Rapports détaillés > « Guide d'utilisation » l'ouvre dans un nouvel onglet.
 Une seule source : le guide du dossier doc/ (aucune copie à tenir à jour). Aucune dépendance au module « Site web ».
+v1.124.0 : aussi pour les utilisateurs de l'application Événements (menu Événements > « Guide d'utilisation », ouvert à la section du bureau
+d'inscription), car le bureau d'inscription et le tableau des bénévoles sont utilisés par des bénévoles sans accès aux sondages.
 """
 import logging
 
@@ -27,7 +29,8 @@ class RlqSurveyReportAide(http.Controller):
 
     @http.route("/rlq_survey_report/aide", type="http", auth="user", methods=["GET"])
     def aide(self, **kwargs):
-        if not request.env.user.has_group("survey.group_survey_user"):
+        user = request.env.user
+        if not (user.has_group("survey.group_survey_user") or user.has_group("event.group_event_user")):
             return request.not_found()
         try:
             with file_open(CHEMIN_GUIDE, "rb") as f:

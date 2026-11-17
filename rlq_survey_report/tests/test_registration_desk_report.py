@@ -216,6 +216,12 @@ class TestRegistrationDeskReport(unittest.TestCase):
         self.assertEqual(rd.program_footer("rlq_survey_report", "18.0.1.123.0"),
                          '<p class="text-muted small">rlq_survey_report 18.0.1.123.0</p>')
         self.assertIn("rlq_survey_report ?", rd.program_footer("rlq_survey_report", None))
+        french = rd.program_footer("rlq_survey_report", "18.0.1.124.0", "2026-11-16 21:15:02 EST", "America/Toronto")
+        self.assertEqual(french, '<p class="text-muted small">rlq_survey_report 18.0.1.124.0 - affiché le 2026-11-16 21:15:02 EST '
+                                 '(heure locale, America/Toronto)</p>')
+        english = rd.program_footer("rlq_survey_report", "18.0.1.124.0", "2026-11-16 21:15:02 EST", "", "en_US")
+        self.assertIn("shown on 2026-11-16 21:15:02 EST (local time)", english)
+        self.assertNotIn("<b>", rd.program_footer("p", "v", "<b>x</b>", "<b>z</b>"))
 
 
 if __name__ == "__main__":

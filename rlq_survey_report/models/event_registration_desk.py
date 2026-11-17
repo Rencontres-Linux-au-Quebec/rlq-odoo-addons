@@ -14,7 +14,7 @@ volunteers who welcome people on the day of the event.
   - Summary at the top (models/registration_desk_report.py, pure functions):
       * per ticket type and in total: registered, present, surveys completed / started / not started, questions answered and
         not answered;
-      * people marked present per hour (time zone of the event), per ticket and in total;
+      * people marked present per hour (LOCAL time, see local_zone()), per ticket and in total;
       * counts of the answers to the survey questions checked « Show at the registration desk » (online or on site, lunch...).
   - List of the registrations (not cancelled), sorted by ticket then name, with the state of the survey, « 8/12 » questions
     answered, the answers to the checked questions, and the buttons « Present » and « Undo ».
@@ -55,6 +55,7 @@ PROGRAM = "rlq_survey_report"
 COMPUTED_SORTS = ("rlq_survey_state", "rlq_desk_progress", "rlq_desk_answers")
 STATE_ORDER = {"draft": 0, "open": 1, "done": 2, "cancel": 3}
 RECENT_EVENTS_FIRST = "date_begin desc, id desc"
+DEFAULT_ZONE = "America/Toronto"
 
 
 def program_version(env):
@@ -78,12 +79,26 @@ class SurveyQuestionRegistrationDesk(models.Model):
     )
 
 
+def local_zone(env, event=None):
+    """Name of the LOCAL time zone used by the desk and the volunteers' table (v1.124.0): the time zone of the user (the one of
+    the browser, sent by the web client in the context, otherwise the one of the user's preferences), otherwise the time zone
+    of the event, otherwise America/Toronto. Never UTC by default: the database stores UTC, people read local time."""
+    return env.context.get("tz") or env.user.tz or (event.date_tz if event else False) or DEFAULT_ZONE
+
+
 def local_time(registration, value, pattern):
-    """Formats a UTC datetime in the time zone of the event (otherwise of the user, otherwise America/Toronto); « » when empty."""
+    """Formats a UTC datetime of the database in local time (see local_zone()); « » when empty."""
     if not value:
         return ""
-    zone = registration.event_id.date_tz or registration.env.user.tz or "America/Toronto"
+    zone = local_zone(registration.env, registration.event_id)
     return fields.Datetime.context_timestamp(registration.with_context(tz=zone), value).strftime(pattern)
+
+
+def program_stamp(env, event=None):
+    """Footer of the screens: program name, installed version, local date and time of the display, with the time zone."""
+    zone = local_zone(env, event)
+    now = fields.Datetime.context_timestamp(env["res.users"].with_context(tz=zone), fields.Datetime.now())
+    return rd.program_footer(PROGRAM, program_version(env), now.strftime("%Y-%m-%d %H:%M:%S %Z"), zone, env.lang or rd.DEFAULT_LANG)
 
 
 class EventRegistrationDesk(models.Model):
@@ -220,7 +235,7 @@ class EventRegistrationDesk(models.Model):
         return result
 
     def _rlq_desk_rows(self):
-        """Rows of registration_desk_report (one per registration); the hour of the check-in is in the time zone of the event."""
+        """Rows of registration_desk_report (one per registration); every date and hour is in LOCAL time (local_zone()), never UTC."""
         data = self._rlq_desk_map()
         rows = []
         for registration in self.sudo().filtered("id"):
@@ -435,10 +450,10 @@ class RlqRegistrationDesk(models.TransientModel):
 
     @api.depends("event_id", "search_text", "hide_present", "survey_filter", "sort_by", "sort_desc")
     def _compute_desk(self):
-        footer = rd.program_footer(PROGRAM, program_version(self.env))
         for wizard in self:
             registrations = wizard._rlq_all_registrations()
-            wizard.summary_html = rd.desk_summary_html(registrations._rlq_desk_rows(), self.env.lang or rd.DEFAULT_LANG) + footer
+            wizard.summary_html = (rd.desk_summary_html(registrations._rlq_desk_rows(), self.env.lang or rd.DEFAULT_LANG)
+                                   + program_stamp(self.env, wizard.event_id))
             listed = wizard._rlq_listed(registrations)
             wizard.registration_ids = listed
             wizard.registration_count = len(listed)

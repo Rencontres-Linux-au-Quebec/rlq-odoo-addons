@@ -16,12 +16,13 @@ run by run-all.sh):
   answers_text(answers)               -> « Lunch: Yes | On site: No » from [(label, [values])]; questions without answer left out.
   ticket_summary(rows)                -> one line per ticket + the total line (registered, present, surveys, questions).
   hourly_attendance(rows)             -> (hours, tickets, counts, totals per hour, totals per ticket, total) of the people present.
+                                         Hours are LOCAL hours, formatted by the caller (never UTC).
   answers_breakdown(rows)             -> per question shown at the desk, per answer: count per ticket, total, of which present.
   desk_summary_html(rows, lang)       -> the three tables above, in ONE language (French or English), everything escaped.
   sort_key(text)                      -> sort key that ignores case and accents (« Élise » with the « e »).
   find_volunteer_questions(questions) -> the roles, languages and type questions of a volunteer survey, found by their wording.
   volunteer_table_html(rows, ...)     -> the table of the volunteers' coordinator (one column per role), everything escaped.
-  program_footer(program, version)    -> « rlq_survey_report 18.0.1.123.0 » shown under the screens.
+  program_footer(program, version...) -> « rlq_survey_report 18.0.1.124.0 - affiché le <local date and time> » under the screens.
 
 A row describes ONE registration (built by models/event_registration_desk.py):
 
@@ -398,9 +399,15 @@ def sort_volunteer_rows(rows, sort_by="name", descending=False):
     return sorted(rows, key=lambda row: volunteer_sort_value(row, sort_by), reverse=bool(descending))      # stable
 
 
-def program_footer(program, version):
-    """« rlq_survey_report 18.0.1.123.0 » under a screen, so that a screenshot says which version produced it."""
-    return '<p class="text-muted small">%s %s</p>' % (_clean(program), _clean(version or "?"))
+def program_footer(program, version, shown_at="", zone="", lang=DEFAULT_LANG):
+    """« rlq_survey_report 18.0.1.124.0 - affiché le 2026-11-16 21:15:02 EST (heure locale, America/Toronto) » under a screen,
+    so that a screenshot says which version produced it and when. shown_at is already formatted in LOCAL time, never UTC."""
+    text = "%s %s" % (_clean(program), _clean(version or "?"))
+    if shown_at:
+        english = texts(lang) is TEXTS["en"]
+        local = ("local time, %s" if english else "heure locale, %s") % _clean(zone) if zone else ("local time" if english else "heure locale")
+        text += " - %s %s (%s)" % ("shown on" if english else "affiché le", _clean(shown_at), local)
+    return '<p class="text-muted small">%s</p>' % text
 
 
 def volunteer_table_html(rows, role_groups=(), lang=DEFAULT_LANG, extra_columns=(), notes=()):
