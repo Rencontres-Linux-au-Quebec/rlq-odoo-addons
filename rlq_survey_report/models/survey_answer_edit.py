@@ -276,7 +276,9 @@ class RlqSurveyAnswerEditLine(models.TransientModel):
     sequence = fields.Integer(string="Sequence")
     question_id = fields.Many2one("survey.question", string="Question", required=True, readonly=True)
     question_type = fields.Selection(related="question_id.question_type", string="Type of question")
-    question_text = fields.Text(string="Question", related="question_id.title",
+    # v1.130.0: COMPUTED, not related: survey.question.title is a Char field, and a related field must have the type of its
+    # target; « fields.Text(related="question_id.title") » made Odoo refuse to load the database (TypeError, site down).
+    question_text = fields.Text(string="Question", compute="_compute_question_text",
                                 help="Title of the question, on several lines when it is long.")
     question_type_label = fields.Char(string="Type of question", compute="_compute_question_type_label",
                                       help="Label of the type, as translated by the Surveys application.")
@@ -298,6 +300,11 @@ class RlqSurveyAnswerEditLine(models.TransientModel):
     change_display = fields.Text(string="New answer (text)", compute="_compute_new_display",
                                  help="The new answer, only for the questions changed; empty when the answer is unchanged.")
     changed = fields.Boolean(string="Changed", compute="_compute_new_display")
+
+    @api.depends("question_id.title")
+    def _compute_question_text(self):
+        for line in self:
+            line.question_text = line.question_id.title or ""
 
     @api.depends("question_id")
     def _compute_question_type_label(self):

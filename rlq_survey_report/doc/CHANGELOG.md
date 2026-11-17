@@ -1,5 +1,32 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.130.0
+
+**Short title:** urgent fix: Odoo could not load the database with 18.0.1.129.0.
+
+**Reason for the request:** after the installation of 18.0.1.129.0, Odoo refused to load the database (`Failed to initialize database`, site down): `TypeError: Type of related field rlq.survey.answer.edit.line.question_text is inconsistent with survey.question.title`.
+
+**Bugs fixed:**
+
+- Symptom: "Failed to load registry", "Failed to initialize database", errors 500 and the site down after the files of 18.0.1.129.0 were put in place, for every database whose module is loaded from that folder.
+- Diagnosis: 18.0.1.129.0 added `question_text = fields.Text(related="question_id.title")`; `survey.question.title` is a Char field, and Odoo refuses a related field whose type differs from its target, while building the registry, before any module update. Not caught before delivery: the Odoo code is not run here, and no test looked at the type of the related fields.
+- Fix: `question_text` is now a computed Text field (`_compute_question_text()`), same display (long questions on several lines).
+
+**Changes:**
+
+- `models/survey_answer_edit.py`: `question_text` computed.
+- `tests/test_related_fields.py` (new, run by `run-all.sh` 1.5): every related field of `models/*.py` must have the type of its target, declared in a table checked against the source of Odoo 18.0; a new related field without an entry fails the test. Checked: the test fails on 18.0.1.129.0 and passes on 18.0.1.130.0.
+- `__manifest__.py`: version `18.0.1.130.0`. `doc/NOTES_VALIDATION.md` (section -84), guide header.
+
+**Safeguards and edge cases:** the other related fields of the module (7) have the type of their target (checked in the source of Odoo 18.0).
+
+**Checks:**
+
+- `./run-all.sh --sans-odoo`: ruff, syntax and manifest, standalone tests: OK.
+- The Odoo code was NOT run: no Odoo instance here.
+
+**Action required:** install 18.0.1.130.0 at once in place of 18.0.1.129.0 (the files are enough for Odoo to load the database again), then update the module (`-u rlq_survey_report`, with `--i18n-overwrite` for the French translations of 18.0.1.129.0).
+
 ## 18.0.1.129.0
 
 **Short title:** "Modifier les réponses" window: explanation text in French, question titles on several lines; translation check added to the tests.

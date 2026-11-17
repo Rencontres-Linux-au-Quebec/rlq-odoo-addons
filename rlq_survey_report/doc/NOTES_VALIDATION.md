@@ -6,6 +6,13 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -84. Correctif urgent : base non chargée avec la 1.129 (v1.130.0)
+
+**À confirmer :**
+1. Avec les fichiers de la 1.130.0 en place, Odoo démarre et charge la base (plus de « Type of related field ... question_text is inconsistent »).
+2. Fenêtre « Modifier les réponses » : la colonne Question affiche le titre, sur plusieurs lignes s'il est long.
+3. **Ne jamais installer la 1.129.0** : elle empêche Odoo de charger toute base où le module est installé.
+
 ## -83. Fenêtre « Modifier les réponses » en français (v1.129.0)
 
 **À confirmer après `-u rlq_survey_report --i18n-overwrite` :**
