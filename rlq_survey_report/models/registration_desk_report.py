@@ -633,15 +633,46 @@ def topics_breakdown(people, questions):
 
 
 ANSWERS_PAGE_TEXTS = {
-    "fr": {"title": "Réponses de %(name)s", "survey": "Sondage", "state": "État", "submitted": "Soumis le",
+    "fr": {"title": "Réponses de %(name)s", "survey": "Sondage", "state": "État", "submitted": "Soumis le", "device": "Appareil",
            "no_answer": "(sans réponse)", "print": "Version imprimable d'Odoo", "confidential":
            "Renseignements personnels : ne pas partager cette page en dehors des personnes autorisées.",
            "done": "Complété", "in_progress": "Commencé", "new": "Non commencé"},
-    "en": {"title": "Answers of %(name)s", "survey": "Survey", "state": "State", "submitted": "Submitted on",
+    "en": {"title": "Answers of %(name)s", "survey": "Survey", "state": "State", "submitted": "Submitted on", "device": "Device",
            "no_answer": "(no answer)", "print": "Printable version of Odoo", "confidential":
            "Personal information: do not share this page outside the authorized people.",
            "done": "Completed", "in_progress": "Started", "new": "Not started"},
 }
+
+
+_UA_OS = (
+    (r"Android\s+([\d.]+)", "Android %s"), (r"Android", "Android"),
+    (r"(?:iPhone|CPU) OS ([\d_]+)", "iOS %s"), (r"iPad.*OS ([\d_]+)", "iPadOS %s"), (r"iPhone|iPad|iPod", "iOS"),
+    (r"CrOS", "ChromeOS"), (r"Windows NT 10", "Windows 10/11"), (r"Windows NT ([\d.]+)", "Windows NT %s"), (r"Windows", "Windows"),
+    (r"Mac OS X ([\d_]+)", "macOS %s"), (r"Macintosh", "macOS"), (r"Ubuntu", "Ubuntu"), (r"Fedora", "Fedora"),
+    (r"Linux", "Linux"),
+)
+_UA_BROWSER = (                     # order matters: Edge and Samsung say « Chrome » too, Chrome says « Safari » too
+    (r"EdgA?/([\d]+)", "Edge %s"), (r"SamsungBrowser/([\d]+)", "Samsung Internet %s"), (r"OPR/([\d]+)", "Opera %s"),
+    (r"FxiOS/([\d]+)", "Firefox iOS %s"), (r"Focus/([\d]+)", "Firefox Focus %s"), (r"Firefox/([\d]+)", "Firefox %s"),
+    (r"CriOS/([\d]+)", "Chrome iOS %s"), (r"; wv\)", "Android WebView"), (r"Chrome/([\d]+)", "Chrome %s"),
+    (r"Version/([\d]+).*Safari", "Safari %s"), (r"Safari", "Safari"),
+)
+
+
+def parse_user_agent(user_agent):
+    """v1.140.0: (« Android 14 », « Firefox 145 ») from the User-Agent of the browser of a participant; (« », « ») when
+    unknown. Kept simple on purpose (no library): enough to compare the devices that get stuck in a survey."""
+    text = str(user_agent or "")
+    found = []
+    for patterns in (_UA_OS, _UA_BROWSER):
+        value = ""
+        for pattern, label in patterns:
+            match = re.search(pattern, text)
+            if match:
+                value = label % match.group(1).replace("_", ".") if "%s" in label else label
+                break
+        found.append(value)
+    return found[0], found[1]
 
 
 def answer_matches(answers, question_key, answer_key):
@@ -657,7 +688,7 @@ def answer_matches(answers, question_key, answer_key):
     return False
 
 
-def answers_page_html(name, survey_title, state="", submitted="", sections=(), print_url=None, lang=DEFAULT_LANG):
+def answers_page_html(name, survey_title, state="", submitted="", sections=(), print_url=None, lang=DEFAULT_LANG, device=""):
     """v1.139.0: the page « See the answers » of one participant: the NAME of the person in the title of the browser tab and
     at the top (the page « print » of Odoo does not show it), the survey, its state and date, then every question with its
     answers, section by section. sections: [{"title": page title or "", "questions": [{"title", "values": [texts]}]}].
@@ -680,6 +711,8 @@ def answers_page_html(name, survey_title, state="", submitted="", sections=(), p
         html.append('<p class="meta"><strong>%s :</strong> %s</p>' % (_clean(labels["state"]), _clean(labels.get(state, state))))
     if submitted:
         html.append('<p class="meta"><strong>%s :</strong> %s</p>' % (_clean(labels["submitted"]), _clean(submitted)))
+    if device:                                          # v1.140.0: operating system and browser of the participation
+        html.append('<p class="meta"><strong>%s :</strong> %s</p>' % (_clean(labels["device"]), _clean(device)))
     html.append('<p class="warn">%s</p></header>' % _clean(labels["confidential"]))
     for section in sections or ():
         if section.get("title"):

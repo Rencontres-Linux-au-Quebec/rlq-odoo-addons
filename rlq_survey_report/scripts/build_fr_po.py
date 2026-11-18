@@ -100,6 +100,25 @@ FR = {
     "Group By": "Regrouper par",
     "User guide": "Guide d'utilisation",
     "Help for this page": "Aide de cette page",                      # v1.134.0: button of the desk and the volunteers
+    # v1.140.0: device of the participations, survey reminders
+    "Send a reminder": "Envoyer un rappel",
+    "Send the invitation e-mail of their survey again to every person listed (each one receives their own link)?":
+        "Renvoyer le courriel d'invitation de leur sondage à toutes les personnes listées (chacune reçoit son propre lien) ?",
+    "Customize the reminder": "Personnaliser le rappel",
+    "Device": "Appareil",
+    "Operating system": "Système d'exploitation",
+    "Operating system of the device that last answered the survey of this person.":
+        "Système d'exploitation de l'appareil qui a répondu en dernier au sondage de cette personne.",
+    "Browser": "Navigateur",
+    "Browser that last answered the survey of this person (for example « Firefox 145 »).":
+        "Navigateur qui a répondu en dernier au sondage de cette personne (par exemple « Firefox 145 »).",
+    "User-Agent": "User-Agent",
+    "User-Agent of the browser that last answered this participation (public survey pages).":
+        "User-Agent du navigateur qui a répondu en dernier à cette participation (pages publiques du sondage).",
+    "Operating system of the device that last answered this participation, read from its User-Agent.":
+        "Système d'exploitation de l'appareil qui a répondu en dernier à cette participation, lu dans son User-Agent.",
+    "Browser that last answered this participation, read from its User-Agent.":
+        "Navigateur qui a répondu en dernier à cette participation, lu dans son User-Agent.",
     # v1.139.0: more tickets in « Topics of interest », filter « Answer » of the desk, last event displayed
     "(no answer)": "(sans réponse)",
     "Last event displayed": "Dernier événement affiché",
@@ -385,7 +404,7 @@ def add(msgid, ref, python=False):
 
 # 1. views
 VIEW_FILES = ("views/event_registration_desk_views.xml", "views/survey_answer_edit_views.xml", "views/event_survey_followup_views.xml")
-MODEL_FILES = ("event_registration_desk.py", "volunteer_coordinator.py", "survey_answer_edit.py", "volunteer_expertise.py", "audience_topics.py")
+MODEL_FILES = ("event_registration_desk.py", "volunteer_coordinator.py", "survey_answer_edit.py", "volunteer_expertise.py", "audience_topics.py", "survey_device.py")
 records = [record for view_file in VIEW_FILES for record in ET.parse("%s/%s" % (root_dir, view_file)).getroot()]
 for record in records:
     xmlid = record.get("id")

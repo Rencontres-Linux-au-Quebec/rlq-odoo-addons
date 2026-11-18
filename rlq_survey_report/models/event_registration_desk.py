@@ -207,6 +207,11 @@ class EventRegistrationDesk(models.Model):
         help="The participation of this person to the expected survey (the most advanced one, the most recent among equals).",
     )
     rlq_desk_can_edit_answers = fields.Boolean(string="Can edit the answers", compute="_compute_rlq_desk")
+    # v1.140.0: device of the participation (survey_device.py), to understand a survey that blocks on some browsers.
+    rlq_survey_os = fields.Char(string="Operating system", compute="_compute_rlq_desk",
+                                help="Operating system of the device that last answered the survey of this person.")
+    rlq_survey_browser = fields.Char(string="Browser", compute="_compute_rlq_desk",
+                                     help="Browser that last answered the survey of this person (for example « Firefox 145 »).")
     rlq_desk_person = fields.Html(
         string="Participant name", compute="_compute_rlq_desk_person", sanitize=False,
         help="Name of the participant. Click it to send a message to this person in Odoo (Discuss). Sorting by this column "
@@ -224,6 +229,13 @@ class EventRegistrationDesk(models.Model):
     def _compute_rlq_desk(self):
         data = self._origin._rlq_desk_map()                     # v1.133.0: _origin, see _compute_rlq_survey_state()
         can_edit = self.env.user.has_group(SURVEY_MANAGER_GROUP)
+        input_ids = {item.get("input") for item in data.values() if item.get("input")}
+        devices = {}
+        if input_ids:
+            inputs = self.env["survey.user_input"].sudo().browse(sorted(input_ids))
+            if "rlq_os" in inputs._fields:
+                devices = {row["id"]: (row["rlq_os"] or False, row["rlq_browser"] or False)
+                           for row in inputs.read(["rlq_os", "rlq_browser"])}
         for registration in self:
             item = data.get(registration._origin.id) or {}
             text = rd.answers_text(item.get("answers"))
@@ -234,6 +246,7 @@ class EventRegistrationDesk(models.Model):
             # v1.135.0: the answers are a link to the survey filled in by the person (see action_rlq_desk_view_answers).
             registration.rlq_desk_answers_html = rd.answers_cell_html(text, ANSWERS_URL % input_id if input_id else None)
             registration.rlq_desk_can_edit_answers = bool(can_edit and input_id)
+            registration.rlq_survey_os, registration.rlq_survey_browser = devices.get(input_id, (False, False))
 
     @api.model
     def _search_rlq_desk_answers(self, operator, value):

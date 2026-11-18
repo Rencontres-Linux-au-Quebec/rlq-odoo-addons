@@ -429,3 +429,39 @@ msgstr "Tableau croisé : %s"
 #: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_reports_events
 msgid "RLQ reports"
 msgstr "Rapports RLQ"
+
+#. module: rlq_survey_report
+#: code:addons/rlq_survey_report/models/event_survey_followup.py:0
+#, python-format
+msgid "Reminder sent to %(count)d people."
+msgstr "Rappel envoyé à %(count)d personnes."
+
+#. module: rlq_survey_report
+#: code:addons/rlq_survey_report/models/event_survey_followup.py:0
+#, python-format
+msgid "Survey reminder"
+msgstr "Rappel du sondage"
+
+#. module: rlq_survey_report
+#: code:addons/rlq_survey_report/models/event_survey_followup.py:0
+#, python-format
+msgid "Survey reminders"
+msgstr "Rappels des sondages"
+
+#. module: rlq_survey_report
+#: code:addons/rlq_survey_report/models/event_survey_followup.py:0
+#, python-format
+msgid "Only the administrators of the surveys or of the events may send reminders."
+msgstr "Seuls les administrateurs des sondages ou des événements peuvent envoyer des rappels."
+
+#. module: rlq_survey_report
+#: code:addons/rlq_survey_report/models/event_survey_followup.py:0
+#, python-format
+msgid "Not sent: %(surveys)s"
+msgstr "Non envoyé : %(surveys)s"
+
+#. module: rlq_survey_report
+#: code:addons/rlq_survey_report/models/event_survey_followup.py:0
+#, python-format
+msgid "The people listed expect %(count)d different surveys: choose one event (or use « Send a reminder », which sends each person the invitation of their own survey)."
+msgstr "Les personnes listées attendent %(count)d sondages différents : choisissez un seul événement (ou utilisez « Envoyer un rappel », qui envoie à chaque personne l'invitation de son propre sondage)."
