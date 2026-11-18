@@ -16,7 +16,6 @@
                 <field name="event_ticket_id"/>
                 <!-- v1.131.0: the name is a link to send a message in Odoo; sorted without case or accents (allow_order). -->
                 <field name="rlq_desk_person" options="{'allow_order': True}"/>
-                <field name="name" optional="hide"/>
                 <field name="email" optional="hide"/>
                 <field name="phone" optional="hide"/>
                 <field name="create_date" string="Registered on" optional="show" width="150px"/>
@@ -25,7 +24,7 @@
                 <field name="rlq_present_by" optional="show"/>
                 <!-- v1.133.0: the hour of departure is hidden by default (optional column, still in the list menu). -->
                 <field name="rlq_departure" string="Left at" optional="hide" width="150px"/>
-                <field name="rlq_survey_state" options="{'allow_order': True}"/>
+                <field name="rlq_survey_state" options="{'allow_order': True}" widget="badge" decoration-danger="rlq_survey_state == 'not_started'" decoration-warning="rlq_survey_state == 'in_progress'" decoration-success="rlq_survey_state == 'done'"/>
                 <field name="rlq_survey_done_date" options="{'allow_order': True}" optional="show" width="150px"/>
                 <field name="rlq_survey_os" optional="hide"/>
                 <field name="rlq_survey_browser" optional="hide"/>
@@ -122,7 +121,7 @@
                             <field name="date_closed" string="Arrived at" width="150px"/>
                             <field name="rlq_present_by" optional="show"/>
                             <field name="rlq_departure" string="Left at" optional="hide" width="150px"/>
-                            <field name="rlq_survey_state" options="{'allow_order': True}"/>
+                            <field name="rlq_survey_state" options="{'allow_order': True}" widget="badge" decoration-danger="rlq_survey_state == 'not_started'" decoration-warning="rlq_survey_state == 'in_progress'" decoration-success="rlq_survey_state == 'done'"/>
                             <field name="rlq_survey_done_date" options="{'allow_order': True}" optional="show" width="150px"/>
                             <field name="rlq_survey_os" optional="hide"/>
                             <field name="rlq_survey_browser" optional="hide"/>

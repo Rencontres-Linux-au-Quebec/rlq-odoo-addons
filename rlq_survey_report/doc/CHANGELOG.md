@@ -1,5 +1,36 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.142.0
+
+**Short title:** "End Live Session" of Odoo made safe for event surveys, "Sondage" column in colour, duplicate "Nom du participant" column removed.
+
+**Reason for the request:** [1] on /odoo/surveys, the button "Terminer la session en direct" of Odoo is shown, not the new safe button (which is on the survey form only); [2] at the RLQ registration desk, the column "Sondage" in red for "Non commencé" and in orange for "Commencé"; [3] in "Gestion des bénévoles" (list "Ouvrir en liste"), two columns "Nom du participant": remove the hidden one.
+
+**Concurrent changes:** checked before the work and before pushing: PR #27 (18.0.1.141.0) open and not merged, no other branch moved, `18.0` unchanged since PR #26. This branch starts from PR #27: merging it also brings #27.
+
+**Changes:**
+
+- [1] `models/survey_live_session.py`: `survey.survey.action_end_session()` overridden: for a survey used by an event ticket or an event, it does `action_rlq_close_live_session()` (session closed, stuck participations released, nothing marked completed); for the other surveys (a real quiz), the behaviour of Odoo is kept. So the button on the cards of Surveys > Surveys, which cannot be changed safely by a view (its xpath could not be checked without an instance), is safe too.
+- [2] `views/event_registration_desk_views.xml`, `views/event_survey_followup_views.xml`: `rlq_survey_state` shown as a badge: red (`decoration-danger`) "Non commencé", orange (`decoration-warning`) "Commencé", green (`decoration-success`) "Complété"; in the desk, "Ouvrir en liste" and both lists of "Sondages non complétés".
+- [3] `views/event_registration_desk_views.xml`: the hidden column `name` removed from "Ouvrir en liste" (used by the desk, "Gestion des bénévoles" and "Expertises des bénévoles"): the visible column "Nom du participant" (`rlq_desk_person`, with the link to Discuss) is the only one; the search "Personne" still searches the name and the e-mail.
+- `release.py`; guide (news v1.142, v1.141, v1.140; desk colours; troubleshooting).
+
+**Bugs fixed:**
+
+- Two columns with the same title "Nom du participant" in the column menu: the Odoo field `name` (hidden) and the computed column of the module; the first one is removed.
+
+**Safeguards and edge cases:**
+
+- A survey not linked to an event keeps the Odoo end of session (marks the participations completed, as Odoo intends for a quiz).
+- Badge colours do not change the sorting by the column "Sondage".
+
+**Checks performed:**
+
+- Standalone tests of run-all.sh: all [OK]; ruff: OK; `scripts/build_fr_po.py`: all terms translated; view XML parsed.
+- Odoo test extended (not run here, no Odoo instance): "End Live Session" on an event survey releases the participation without marking it completed.
+
+**Action required from the user:** `-u rlq_survey_report`. If a survey is still in red, either button now closes its session safely. Points "v1.142.0" of `doc/NOTES_VALIDATION.md`.
+
 ## 18.0.1.141.0
 
 **Short title:** participants blocked on the first question ("wait for the host"): cause found (live session left open), warning, safe repair, prevention.
