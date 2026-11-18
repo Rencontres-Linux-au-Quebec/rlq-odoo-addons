@@ -75,8 +75,10 @@ extension-ci, elle, cible directement le modèle event.event.ticket : elle
 exige donc que le module Événements soit installé.
 """
 
-from odoo import api, fields, models
 import logging
+from urllib.parse import quote
+
+from odoo import api, fields, models
 
 _logger = logging.getLogger(__name__)
 
@@ -104,6 +106,19 @@ class EventEventTicket(models.Model):
     )
 
 
+def avec_courriel(lien, courriel):
+    """v1.143.0 : ajoute « email=<adresse de l'inscription> » au lien du sondage du billet.
+
+    La route d'Odoo 18 /survey/start/<jeton> accepte ce paramètre et le passe à _create_answer(email=...) : la participation
+    créée par une personne NON connectée connaît alors son adresse. Sans lui, la participation était anonyme : le courriel
+    « Vos réponses » n'avait aucun destinataire (non-envoi silencieux) et le bureau d'inscription ne pouvait pas relier le
+    sondage à l'inscription."""
+    adresse = (courriel or "").strip()
+    if not lien or not adresse:
+        return lien
+    return "%s%semail=%s" % (lien, "&" if "?" in lien else "?", quote(adresse, safe="@"))
+
+
 class EventRegistration(models.Model):
     _inherit = "event.registration"
 
@@ -120,7 +135,7 @@ class EventRegistration(models.Model):
              "ce champ par son nom affiché ci-dessus).",
     )
 
-    @api.depends("event_ticket_id", "event_ticket_id.rlq_survey_id")
+    @api.depends("event_ticket_id", "event_ticket_id.rlq_survey_id", "email")
     def _compute_rlq_lien_sondage_billet(self):
         for registration in self:
             ticket = registration.event_ticket_id if "event_ticket_id" in registration._fields else False
@@ -141,13 +156,12 @@ class EventRegistration(models.Model):
             # `access_token` si `get_start_url()` échoue ou n'existe pas,
             # jamais sur `id`.
             try:
-                registration.rlq_lien_sondage_billet = survey.get_start_url()
+                registration.rlq_lien_sondage_billet = avec_courriel(survey.get_start_url(), registration.email)
             except Exception:  # noqa: BLE001 - ne doit jamais faire échouer le calcul du champ
                 _logger.warning(
                     "get_start_url() a échoué pour le sondage %s - repli sur access_token",
                     survey.id, exc_info=True,
                 )
                 base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url", "") or ""
-                registration.rlq_lien_sondage_billet = (
-                    f"{base_url}/survey/start/{survey.access_token}" if survey.access_token else False
-                )
+                registration.rlq_lien_sondage_billet = avec_courriel(
+                    f"{base_url}/survey/start/{survey.access_token}", registration.email) if survey.access_token else False
