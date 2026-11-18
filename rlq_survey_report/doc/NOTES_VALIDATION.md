@@ -6,6 +6,14 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -93. Nom dans les réponses, billets des sujets d'intérêt, filtre Réponse, dernier événement (v1.139.0)
+
+**À confirmer après `-u rlq_survey_report --i18n-overwrite` :**
+1. « Voir les réponses » : l'onglet s'intitule « Réponses de <nom> - <sondage> » et le nom est en haut ; toutes les questions et réponses ; le lien « Version imprimable d'Odoo » fonctionne.
+2. Sujets d'intérêt : « Billets » offre bénévoles, commanditaires et « Billets choisis un par un » (le champ des billets apparaît alors).
+3. Bureau : la colonne « Questions répondues » n'apparaît plus ; le filtre « Réponse » propose « Serez-vous présent à l'ÉTS ? : Oui » (si la question est cochée « Afficher au bureau d'inscription ») et ne liste que ces personnes.
+4. Choisir un autre événement, cliquer « Actualiser », quitter, rouvrir le bureau (ou une autre page Rapports RLQ) : c'est le même événement. Le bouton « Bureau d'inscription RLQ » d'un événement ouvre toujours celui-là.
+
 ## -92. Contacter réservé aux administrateurs, Sujets d'intérêt (v1.138.0)
 
 **À confirmer après `-u rlq_survey_report --i18n-overwrite` :**

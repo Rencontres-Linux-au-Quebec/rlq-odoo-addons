@@ -39,7 +39,7 @@ class SurveyQuestionVolunteerExpertise(models.Model):
 
 class RlqVolunteerExpertise(models.TransientModel):
     _name = "rlq.volunteer.expertise"
-    _inherit = ["rlq.pi.confirmation.mixin"]
+    _inherit = ["rlq.pi.confirmation.mixin", "rlq.last.event.mixin"]
     _description = "Volunteer expertise"
 
     @api.model

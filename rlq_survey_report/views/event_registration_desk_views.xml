@@ -102,6 +102,8 @@
                         <group>
                             <field name="search_text" placeholder="Name, e-mail, company, phone, ticket or answer"/>
                             <field name="survey_filter"/>
+                            <!-- v1.139.0: one answer of a question shown at the desk -->
+                            <field name="answer_filter"/>
                             <field name="hide_present"/>
                             <field name="registration_count"/>
                         </group>
@@ -120,7 +122,9 @@
                             <field name="rlq_departure" string="Left at" optional="hide" width="150px"/>
                             <field name="rlq_survey_state" options="{'allow_order': True}"/>
                             <field name="rlq_survey_done_date" options="{'allow_order': True}" optional="show" width="150px"/>
-                            <field name="rlq_desk_progress" options="{'allow_order': True}" optional="hide"/>
+                            <!-- v1.139.0: hidden in the desk (optional="hide" was not enough: Odoo keeps in the browser the
+                                 columns a user showed once); still in « Open as a list » and in « Sort by ». -->
+                            <field name="rlq_desk_progress" column_invisible="1"/>
                             <!-- v1.135.0: the answers are a link to every answer of the survey of the person -->
                             <field name="rlq_desk_answers_html" options="{'allow_order': True}"/>
                             <field name="rlq_desk_user_input_id" column_invisible="1"/>
@@ -412,6 +416,9 @@
                         </group>
                         <group>
                             <field name="scope"/>
+                            <!-- v1.139.0: any ticket of the event, chosen one by one -->
+                            <field name="ticket_ids" widget="many2many_tags" options="{'no_create': True}"
+                                   invisible="scope != 'tickets'"/>
                         </group>
                     </group>
                     <field name="table_html" readonly="1" nolabel="1"/>

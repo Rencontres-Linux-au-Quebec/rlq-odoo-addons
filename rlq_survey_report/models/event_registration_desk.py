@@ -625,17 +625,51 @@ class RlqPersonalInformationConfirmation(models.AbstractModel):
         return result
 
 
+LAST_EVENT_KEY = "rlq_survey_report.last_event_id.user_%d"                   # ir.config_parameter, one per user
+
+
+class RlqLastEvent(models.AbstractModel):
+    """v1.139.0: the pages of the events open on the LAST event the user displayed (on any of these pages), instead of the
+    event in progress each time. Stored per user in a system parameter (no change of the database structure); an event that
+    no longer exists falls back on the event in progress."""
+    _name = "rlq.last.event.mixin"
+    _description = "Last event displayed"
+
+    def _rlq_remember_event(self):
+        for page in self:
+            if page.event_id:
+                self.env["ir.config_parameter"].sudo().set_param(LAST_EVENT_KEY % self.env.uid, str(page.event_id.id))
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        pages = super().create(vals_list)
+        pages._rlq_remember_event()
+        return pages
+
+    def write(self, vals):
+        result = super().write(vals)
+        if "event_id" in vals:
+            self._rlq_remember_event()
+        return result
+
+
 class RlqRegistrationDesk(models.TransientModel):
     _name = "rlq.registration.desk"
-    _inherit = ["rlq.pi.confirmation.mixin"]
+    _inherit = ["rlq.pi.confirmation.mixin", "rlq.last.event.mixin"]
     _description = "RLQ registration desk"
 
     @api.model
     def _default_event_id(self):
-        """The event of the context, otherwise the event in progress or the next one, otherwise the most recent one."""
+        """The event of the context, otherwise (v1.139.0) the last event this user displayed on a page of the events,
+        otherwise the event in progress or the next one, otherwise the most recent one."""
         if self.env.context.get("active_model") == "event.event" and self.env.context.get("active_id"):
             return self.env.context["active_id"]
         events = self.env["event.event"]
+        last = self.env["ir.config_parameter"].sudo().get_param(LAST_EVENT_KEY % self.env.uid)
+        if last and last.isdigit():
+            event = events.browse(int(last)).exists()
+            if event and event.has_access("read"):
+                return event.id
         event = events.search([("date_end", ">=", fields.Datetime.now())], order="date_begin, id", limit=1)
         return (event or events.search([], order="date_begin desc, id desc", limit=1)).id or False
 
@@ -646,6 +680,11 @@ class RlqRegistrationDesk(models.TransientModel):
                                    "the matching registrations are listed (case and accents ignored). The summary always counts "
                                    "the whole event.")
     hide_present = fields.Boolean(string="Hide the people already present", default=False)
+    # v1.139.0: filter on one answer of a question shown at the desk (« Serez-vous présent à l'ÉTS ? » = « Oui »...).
+    answer_filter = fields.Selection(
+        selection="_answer_filter_selection", string="Answer",
+        help="Lists only the registrations that gave this answer (or no answer) to a question checked « Show at the "
+             "registration desk ». The questions of the same title in several surveys are taken together.")
     survey_filter = fields.Selection(
         [("all", "All"), ("done", "Survey completed"), ("in_progress", "Survey started"),
          ("not_started", "Survey not started"), ("none", "No survey")],
@@ -722,6 +761,10 @@ class RlqRegistrationDesk(models.TransientModel):
         if self.survey_filter and self.survey_filter != "all":
             status = listed._rlq_survey_status_map()
             listed = listed.filtered(lambda r: status.get(r.id, (None, "none"))[1] == self.survey_filter)
+        if self.answer_filter and "|" in self.answer_filter:
+            question_key, answer_key = self.answer_filter.split("|", 1)
+            data = listed._rlq_desk_map()
+            listed = listed.filtered(lambda r: rd.answer_matches((data.get(r.id) or {}).get("answers"), question_key, answer_key))
         needle = sort_key(" ".join((self.search_text or "").split()))
         if needle:
             data = listed._rlq_desk_map()
@@ -729,7 +772,28 @@ class RlqRegistrationDesk(models.TransientModel):
                 r, rd.answers_text((data.get(r.id) or {}).get("answers")))))
         return listed._rlq_desk_sorted(self.sort_by or "event_ticket_id", self.sort_desc)
 
-    @api.depends("event_id", "search_text", "hide_present", "survey_filter", "sort_by", "sort_desc")
+    @api.model
+    def _answer_filter_selection(self):
+        """« Question : answer » for every choice question checked « Show at the registration desk », plus « (no answer) »;
+        key « <question key>|<answer key> » (case and accents ignored), so that the same question in several surveys (one
+        per event) is ONE entry. Read with sudo(): a volunteer of the desk may not have the rights of the Surveys app."""
+        questions = self.env["survey.question"].sudo().search(
+            [("rlq_registration_desk", "=", True), ("question_type", "in", ["simple_choice", "multiple_choice"])])
+        no_answer = _("(no answer)")
+        options = {}
+        for question in questions:
+            label = " ".join((question.rlq_desk_label or question.title or "").split())
+            if not label:
+                continue
+            key = sort_key(label)
+            for answer in question.suggested_answer_ids:
+                value = " ".join((answer.value or "").split())
+                if value:
+                    options.setdefault("%s|%s" % (key, sort_key(value)), "%s : %s" % (label, value))
+            options.setdefault("%s|" % key, "%s : %s" % (label, no_answer))
+        return sorted(options.items(), key=lambda item: (item[0].split("|")[0], item[0].endswith("|"), sort_key(item[1])))
+
+    @api.depends("event_id", "search_text", "hide_present", "survey_filter", "answer_filter", "sort_by", "sort_desc")
     def _compute_desk(self):
         for wizard in self:
             registrations = wizard._rlq_all_registrations()
