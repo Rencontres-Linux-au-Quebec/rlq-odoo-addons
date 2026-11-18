@@ -100,6 +100,22 @@ FR = {
     "Group By": "Regrouper par",
     "User guide": "Guide d'utilisation",
     "Help for this page": "Aide de cette page",                      # v1.134.0: button of the desk and the volunteers
+    # v1.139.0: more tickets in « Topics of interest », filter « Answer » of the desk, last event displayed
+    "(no answer)": "(sans réponse)",
+    "Last event displayed": "Dernier événement affiché",
+    "Answer": "Réponse",
+    "Lists only the registrations that gave this answer (or no answer) to a question checked « Show at the registration desk ». The questions of the same title in several surveys are taken together.":
+        "N'affiche que les inscriptions qui ont donné cette réponse (ou aucune réponse) à une question cochée « Afficher au bureau d'inscription ». Les questions de même titre dans plusieurs sondages sont prises ensemble.",
+    "Topics of interest of the volunteers": "Sujets d'intérêt des bénévoles",
+    "Topics of interest of the sponsors": "Sujets d'intérêt des commanditaires",
+    "Which registrations are counted, by the name of their ticket (case and accents ignored): « visiteur » / « visitor », « bénévole », « commanditaire » / « sponsor » / « partenaire », or the tickets chosen below.":
+        "Quelles inscriptions sont comptées, selon le nom de leur billet (sans tenir compte des majuscules ni des accents) : « visiteur » / « visitor », « bénévole », « commanditaire » / « sponsor » / « partenaire », ou les billets choisis ci-dessous.",
+    "Volunteer tickets": "Billets bénévoles",
+    "Sponsor tickets": "Billets commanditaires",
+    "Tickets chosen one by one": "Billets choisis un par un",
+    "Tickets chosen": "Billets choisis",
+    "With « Tickets chosen one by one »: only the registrations to these tickets.":
+        "Avec « Billets choisis un par un » : seulement les inscriptions à ces billets.",
     # v1.138.0: « Topics of interest », « Contact the participants » for the administrators only
     "Topics of interest": "Sujets d'intérêt",
     "Topics of interest of the audience": "Sujets d'intérêt de l'audience",
@@ -113,8 +129,6 @@ FR = {
     "If checked, the answers to this question are counted in the page « Topics of interest » (Rapports RLQ): each topic chosen or written, with the number of people and the percentage of the respondents, per ticket. Useful for questions such as « Which topics would you like at a next meeting? ». No name or e-mail address is shown.":
         "Si cochée, les réponses à cette question sont comptées dans la page « Sujets d'intérêt » (Rapports RLQ) : chaque sujet choisi ou écrit, avec le nombre de personnes et le pourcentage des répondants, par billet. Utile pour des questions comme « Quels sujets aimeriez-vous lors d'une prochaine rencontre ? ». Aucun nom ni courriel n'est affiché.",
     "Tickets": "Billets",
-    "« Visitor tickets »: only the tickets whose name says « visiteur » or « visitor » (case and accents ignored).":
-        "« Billets visiteurs » : seulement les billets dont le nom contient « visiteur » ou « visitor » (sans tenir compte des majuscules ni des accents).",
     "Every ticket": "Tous les billets",
     "Visitor tickets": "Billets visiteurs",
     # v1.137.0: « Volunteer expertise », menu « Volunteer management », contact by mailing

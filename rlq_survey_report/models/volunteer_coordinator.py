@@ -74,7 +74,7 @@ def download_xlsx(page, content, prefix, summary, count):
 
 class RlqVolunteerCoordinator(models.TransientModel):
     _name = "rlq.volunteer.coordinator"
-    _inherit = ["rlq.pi.confirmation.mixin"]                              # v1.136.0: confirmation once per page
+    _inherit = ["rlq.pi.confirmation.mixin", "rlq.last.event.mixin"]     # v1.136.0 confirmation, v1.139.0 last event
     _description = "Volunteers"
 
     @api.model

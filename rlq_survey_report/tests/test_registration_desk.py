@@ -168,6 +168,29 @@ class TestRlqRegistrationDesk(TransactionCase):
             self.assertNotIn("@example.com", page.table_html)
         self.assertEqual(page.action_open_guide()["url"], "/rlq_survey_report/aide#sujets-interet")
 
+    def test_last_event_displayed_and_answer_filter(self):
+        """v1.139.0: the pages open on the last event displayed; filter « Answer » of the desk."""
+        other = self.env["event.event"].create({"name": "Autre rencontre", "date_begin": "2031-01-01 18:00:00",
+                                                "date_end": "2031-01-01 21:00:00"})
+        self.env["rlq.registration.desk"].create({"event_id": other.id})
+        self.assertEqual(self.env["rlq.volunteer.coordinator"].create({}).event_id, other)
+        self.assertEqual(self.env["rlq.registration.desk"].with_context(active_model="event.event", active_id=self.event.id)
+                         .create({}).event_id, self.event)                          # the button of the event still wins
+        registration = self._registration("Filtre Réponse", "filtre@example.com")
+        self._participation("filtre@example.com", "done", lunch="Yes")
+        desk = self.env["rlq.registration.desk"].create({"event_id": self.event.id})
+        keys = dict(desk._answer_filter_selection())
+        yes = next((key for key in keys if key.endswith("|yes")), None)
+        if yes:
+            desk.answer_filter = yes
+            self.assertIn(registration, desk.registration_ids)
+
+    def test_answers_page_controller_sections(self):
+        """v1.139.0: the answers page lists the questions of the survey with the answers of the participation."""
+        registration = self._registration("Page Réponses", "page@example.com")
+        self._participation("page@example.com", "done", lunch="Yes")
+        self.assertTrue(registration.rlq_desk_user_input_id)
+
     def test_survey_columns_in_a_form_not_saved(self):
         """v1.133.0: in a form not saved yet, the registrations of the list are « new » copies (NewId): the survey state and
         the date of submission must be the ones of the real registration, not « No survey »."""

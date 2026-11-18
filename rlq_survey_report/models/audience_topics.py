@@ -37,6 +37,7 @@ class SurveyQuestionAudienceTopics(models.Model):
 
 class RlqAudienceTopics(models.TransientModel):
     _name = "rlq.audience.topics"
+    _inherit = ["rlq.last.event.mixin"]                                   # v1.139.0
     _description = "Topics of interest"
 
     @api.model
@@ -46,17 +47,30 @@ class RlqAudienceTopics(models.TransientModel):
     event_id = fields.Many2one("event.event", string="Event", required=True, default=_default_event_id,
                                help="By default: the event in progress, otherwise the next one.")
     scope = fields.Selection(
-        [("all", "Every ticket"), ("visitors", "Visitor tickets")], string="Tickets", default="all", required=True,
-        help="« Visitor tickets »: only the tickets whose name says « visiteur » or « visitor » (case and accents ignored).")
+        [("all", "Every ticket"), ("visitors", "Visitor tickets"), ("volunteers", "Volunteer tickets"),
+         ("sponsors", "Sponsor tickets"), ("tickets", "Tickets chosen one by one")],
+        string="Tickets", default="all", required=True,
+        help="Which registrations are counted, by the name of their ticket (case and accents ignored): « visiteur » / "
+             "« visitor », « bénévole », « commanditaire » / « sponsor » / « partenaire », or the tickets chosen below.")
+    # v1.139.0: the volunteers, the sponsors, or any ticket chosen one by one.
+    ticket_ids = fields.Many2many("event.event.ticket", string="Tickets chosen",
+                                  domain="[('event_id', '=', event_id)]",
+                                  help="With « Tickets chosen one by one »: only the registrations to these tickets.")
     table_html = fields.Html(string="Topics of interest", compute="_compute_table", sanitize=False)
 
     @api.depends("event_id", "scope")
     def _compute_display_name(self):
+        titles = {"visitors": _("Topics of interest of the visitors"), "volunteers": _("Topics of interest of the volunteers"),
+                  "sponsors": _("Topics of interest of the sponsors")}
         for page in self:
-            title = _("Topics of interest of the visitors") if page.scope == "visitors" else _("Topics of interest of the audience")
+            title = titles.get(page.scope) or _("Topics of interest of the audience")
             page.display_name = "%s: %s" % (title, page.event_id.name) if page.event_id else title
 
-    @api.depends("event_id", "scope")
+    @api.onchange("event_id")
+    def _onchange_event_id(self):
+        self.ticket_ids = self.ticket_ids.filtered(lambda ticket: ticket.event_id == self.event_id)
+
+    @api.depends("event_id", "scope", "ticket_ids")
     def _compute_table(self):
         for page in self:
             breakdown, tickets, notes = page._rlq_topics_data()
@@ -64,15 +78,17 @@ class RlqAudienceTopics(models.TransientModel):
                 breakdown, tickets, self.env.lang or rd.DEFAULT_LANG, page.scope, notes)
 
     def _rlq_registrations(self):
-        """The registrations (confirmed or present) of the event, of the visitor tickets only when scope is « visitors »."""
+        """The registrations (confirmed or present) of the event, limited to the tickets of the scope."""
         self.ensure_one()
         registrations = self.env["event.registration"].sudo()
         if not self.event_id:
             return registrations
         registrations = registrations.search([("event_id", "=", self.event_id.id), ("state", "in", list(LIST_STATES))])
-        if self.scope == "visitors":
+        if self.scope == "tickets":
+            return registrations.filtered(lambda r: r.event_ticket_id in self.ticket_ids._origin)
+        if self.scope in ("visitors", "volunteers", "sponsors"):
             registrations = registrations.filtered(
-                lambda r: "event_ticket_id" in r._fields and r.event_ticket_id and rd.is_visitor_ticket(r.event_ticket_id.name))
+                lambda r: r.event_ticket_id and rd.ticket_in_scope(r.event_ticket_id.name, self.scope))
         return registrations
 
     def _rlq_topics_data(self):

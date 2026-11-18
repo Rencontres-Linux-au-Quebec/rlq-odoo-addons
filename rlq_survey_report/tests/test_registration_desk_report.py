@@ -435,6 +435,43 @@ class TestRegistrationDeskReport(unittest.TestCase):
         self.assertIn("No registration", rd.topics_html(None, [], "en"))
         self.assertIn("Topics of interest of the audience", rd.topics_html([first], ["V"], "en"))
 
+    def test_ticket_scopes_of_topics(self):
+        """v1.139.0: visitors, volunteers and sponsors tickets for « Topics of interest »."""
+        self.assertTrue(rd.ticket_in_scope("Bénévoles", "volunteers"))
+        self.assertTrue(rd.ticket_in_scope("Commanditaire Or", "sponsors"))
+        self.assertTrue(rd.ticket_in_scope("Sponsor", "sponsors"))
+        self.assertFalse(rd.ticket_in_scope("Visiteur", "sponsors"))
+        self.assertTrue(rd.ticket_in_scope("Visiteur", "visitors"))
+        self.assertTrue(rd.ticket_in_scope("Tout", "all"))
+        for scope, title in (("volunteers", "Sujets d&#x27;intérêt des bénévoles"), ("sponsors", "commanditaires"),
+                             ("tickets", "billets choisis")):
+            self.assertIn(title, rd.topics_html([], [], "fr", scope))
+
+    def test_answer_filter_of_the_desk(self):
+        """v1.139.0: filter « Answer »: one answer of a desk question, or « (no answer) », accents and case ignored."""
+        answers = [("Serez-vous présent à l'ÉTS ?", ["Oui"]), ("Dîner", [])]
+        self.assertTrue(rd.answer_matches(answers, rd.sort_key("Serez-vous présent à l'ETS ?"), "oui"))
+        self.assertFalse(rd.answer_matches(answers, rd.sort_key("Serez-vous présent à l'ÉTS ?"), "non"))
+        self.assertTrue(rd.answer_matches(answers, rd.sort_key("Dîner"), ""))                 # (no answer)
+        self.assertFalse(rd.answer_matches(answers, rd.sort_key("Autre question"), ""))       # not in the survey
+        self.assertFalse(rd.answer_matches([], "x", ""))
+
+    def test_answers_page_shows_the_name(self):
+        """v1.139.0: « See the answers »: the name in the title of the tab and at the top, sections, escaped."""
+        html = rd.answers_page_html("Zoé <b>Tremblay</b>", "Sondage visiteurs", "done", "2026-11-17 20:10 HNE",
+                                    [{"title": "Page 1", "questions": [{"title": "Dîner ?", "values": ["Oui"]},
+                                                                       {"title": "Commentaire", "values": ["ligne 1\nligne 2"]},
+                                                                       {"title": "Vide", "values": []}]}],
+                                    "/survey/print/a?answer_token=b", "fr")
+        self.assertTrue(html.startswith("<!DOCTYPE html>"))
+        self.assertIn("<title>Réponses de Zoé &lt;b&gt;Tremblay&lt;/b&gt; - Sondage visiteurs</title>", html)
+        self.assertIn("<h1>Réponses de Zoé &lt;b&gt;Tremblay&lt;/b&gt;</h1>", html)
+        for text in ("Complété", "Soumis le", "2026-11-17 20:10 HNE", "<h2>Page 1</h2>", "<li>Oui</li>", "ligne 1<br/>ligne 2",
+                     "(sans réponse)", 'href="/survey/print/a?answer_token=b"', "Renseignements personnels"):
+            self.assertIn(text, html)
+        self.assertNotIn("<b>Tremblay", html)
+        self.assertIn("<title>Answers of A - S</title>", rd.answers_page_html("A", "S", lang="en"))
+
     def test_expertise_table_and_export(self):
         """v1.137.0: « Expertises des bénévoles »: one column per choice (1), a text column, totals, free text of « Autre »."""
         columns = [{"title": "Expertises", "choices": ["Python", "Réseau", "Autre"]}, {"title": "Commentaire", "choices": []}]

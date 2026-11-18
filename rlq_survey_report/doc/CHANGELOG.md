@@ -1,5 +1,37 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.139.0
+
+**Short title:** "Voir les réponses" shows the name of the person; volunteer, sponsor or chosen tickets in "Sujets d'intérêt"; desk: filter "Réponse", "Questions répondues" hidden, last event displayed kept.
+
+**Reason for the request:** [1] in "Sujets d'intérêt de l'audience", the volunteer and sponsor tickets could not be chosen; [2] "Voir les réponses" opens a new tab but the name of the person is not shown: it must be at the top or in the title of the tab; [3] at the RLQ registration desk, hide the column "Questions répondues", add a filter on "Serez-vous présent à l'ÉTS", and keep the last event displayed (it always showed one event and had to be changed every time).
+
+**Concurrent changes:** checked before the work and before pushing: PR #23 and #24 open and not merged, no other branch moved, `18.0` unchanged since PR #22. This branch starts from PR #24: merging it also brings #23 and #24.
+
+**Changes:**
+
+- [1] `models/audience_topics.py`: "Billets" now offers "Billets bénévoles", "Billets commanditaires" and "Billets choisis un par un" (new field `ticket_ids`, tickets of the event, `many2many_tags`); `registration_desk_report.py`: `SPONSOR_WORDS`, `is_sponsor_ticket()`, `ticket_in_scope()`, titles of the new scopes.
+- [2] `controllers/answers.py`: the page is built by the module (`registration_desk_report.answers_page_html()`) instead of a redirect to `/survey/print`: title of the tab "Réponses de <name> - <survey>", the name at the top, survey, state, date of submission (local time), every question with its answers page by page (same texts as the desk, `_rlq_desk_value()`), a link to the printable version of Odoo, a notice about personal information; `Cache-Control: no-store`, `X-Robots-Tag: noindex`.
+- [3] `models/event_registration_desk.py`: field `answer_filter` ("Réponse", dynamic selection `_answer_filter_selection()`: "<question> : <answer>" and "<question> : (sans réponse)" for every choice question checked "Afficher au bureau d'inscription", the same question of several surveys merged by its label); `_rlq_listed()` applies it (`registration_desk_report.answer_matches()`). New abstract model `rlq.last.event.mixin` (stores the event of the page per user in the system parameter `rlq_survey_report.last_event_id.user_<id>` on create and write), inherited by the desk, "Gestion des bénévoles", "Expertises des bénévoles" and "Sujets d'intérêt"; `_default_event_id()`: event of the context (button of an event), then the last event displayed (if it still exists and can be read), then the event in progress. `views/event_registration_desk_views.xml`: filter "Réponse"; column "Questions répondues" `column_invisible` in the desk (still optional in "Ouvrir en liste").
+- `scripts/build_fr_po.py`, `i18n/fr.po` (rebuilt); `release.py`; guide (news v1.139, v1.138, v1.137; desk, answers page, topics).
+
+**Bugs fixed:**
+
+- "Questions répondues" stayed visible although `optional="hide"` since v1.134.0. Diagnosis: Odoo keeps in the browser the optional columns a user showed once; the default applies only to a user who never touched them. Fix: the column is no longer in the desk list.
+
+**Safeguards and edge cases:**
+
+- The answers page stays for the Events users only; test participations refused; the page is not cached nor indexed.
+- Filter "Réponse": a person whose survey does not contain the question is never listed, not even with "(sans réponse)". Only questions checked "Afficher au bureau d'inscription" are offered: "Serez-vous présent à l'ÉTS ?" must be checked for the filter to show it.
+- Last event: an event deleted or no longer readable is ignored; the button "Bureau d'inscription RLQ" of an event always opens that event.
+
+**Checks performed:**
+
+- Standalone tests of run-all.sh: all [OK] (new: ticket scopes, filter "Réponse", answers page with the name); ruff: OK; `scripts/build_fr_po.py`: all terms translated; view XML parsed.
+- Odoo tests added (not run here, no Odoo instance): last event displayed, button of the event, filter "Réponse".
+
+**Action required from the user:** `-u rlq_survey_report --i18n-overwrite`; check "Afficher au bureau d'inscription" on "Serez-vous présent à l'ÉTS ?" if it is not already; then the points "v1.139.0" of `doc/NOTES_VALIDATION.md`.
+
 ## 18.0.1.138.0
 
 **Short title:** "Contacter les participants" for the administrators of the surveys or the events only; new pages "Sujets d'intérêt de l'audience" and "Sujets d'intérêt des visiteurs".

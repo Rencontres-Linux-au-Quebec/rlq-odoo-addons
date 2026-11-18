@@ -852,6 +852,12 @@ msgstr "Date de l'événement"
 #. module: rlq_survey_report
 #. odoo-python
 #: code:addons/rlq_survey_report/models/event_registration_desk.py:0
+msgid "(no answer)"
+msgstr "(sans réponse)"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/event_registration_desk.py:0
 #: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
 #: code:addons/rlq_survey_report/models/volunteer_expertise.py:0
 msgid "Only the administrators of the surveys or of the events may contact the participants."
@@ -991,6 +997,11 @@ msgid "This page shows personal information about the participants (names, e-mai
 msgstr "Cette page contient des renseignements personnels sur les participants (noms, courriels, téléphones). En cochant cette case, vous confirmez être conscient(e) de cette responsabilité et vous engager à ne les partager qu'avec les personnes autorisées (Loi 25 au Québec, RGPD en Europe)."
 
 #. module: rlq_survey_report
+#: model:ir.model,name:rlq_survey_report.model_rlq_last_event_mixin
+msgid "Last event displayed"
+msgstr "Dernier événement affiché"
+
+#. module: rlq_survey_report
 #: model:ir.model.fields,help:rlq_survey_report.field_rlq_registration_desk__event_id
 #: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_coordinator__event_id
 #: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_expertise__event_id
@@ -1012,6 +1023,16 @@ msgstr "Une partie d'un nom, d'une adresse courriel, d'une entreprise, d'un num�
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__hide_present
 msgid "Hide the people already present"
 msgstr "Masquer les personnes déjà présentes"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__answer_filter
+msgid "Answer"
+msgstr "Réponse"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_registration_desk__answer_filter
+msgid "Lists only the registrations that gave this answer (or no answer) to a question checked « Show at the registration desk ». The questions of the same title in several surveys are taken together."
+msgstr "N'affiche que les inscriptions qui ont donné cette réponse (ou aucune réponse) à une question cochée « Afficher au bureau d'inscription ». Les questions de même titre dans plusieurs sondages sont prises ensemble."
 
 #. module: rlq_survey_report
 #: model:ir.model.fields,help:rlq_survey_report.field_rlq_registration_desk__survey_filter
@@ -1496,6 +1517,18 @@ msgstr "Ordre du tableau. Les majuscules et les accents sont ignorés ; à égal
 #. module: rlq_survey_report
 #. odoo-python
 #: code:addons/rlq_survey_report/models/audience_topics.py:0
+msgid "Topics of interest of the volunteers"
+msgstr "Sujets d'intérêt des bénévoles"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/audience_topics.py:0
+msgid "Topics of interest of the sponsors"
+msgstr "Sujets d'intérêt des commanditaires"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/audience_topics.py:0
 msgid "No question checked « Show in Topics of interest » in the survey « %(survey)s »."
 msgstr "Aucune question cochée « Afficher dans « Sujets d'intérêt » » dans le sondage « %(survey)s »."
 
@@ -1516,8 +1549,8 @@ msgstr "Billets"
 
 #. module: rlq_survey_report
 #: model:ir.model.fields,help:rlq_survey_report.field_rlq_audience_topics__scope
-msgid "« Visitor tickets »: only the tickets whose name says « visiteur » or « visitor » (case and accents ignored)."
-msgstr "« Billets visiteurs » : seulement les billets dont le nom contient « visiteur » ou « visitor » (sans tenir compte des majuscules ni des accents)."
+msgid "Which registrations are counted, by the name of their ticket (case and accents ignored): « visiteur » / « visitor », « bénévole », « commanditaire » / « sponsor » / « partenaire », or the tickets chosen below."
+msgstr "Quelles inscriptions sont comptées, selon le nom de leur billet (sans tenir compte des majuscules ni des accents) : « visiteur » / « visitor », « bénévole », « commanditaire » / « sponsor » / « partenaire », ou les billets choisis ci-dessous."
 
 #. module: rlq_survey_report
 #: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_audience_topics__scope__all
@@ -1528,3 +1561,28 @@ msgstr "Tous les billets"
 #: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_audience_topics__scope__visitors
 msgid "Visitor tickets"
 msgstr "Billets visiteurs"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_audience_topics__scope__volunteers
+msgid "Volunteer tickets"
+msgstr "Billets bénévoles"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_audience_topics__scope__sponsors
+msgid "Sponsor tickets"
+msgstr "Billets commanditaires"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_audience_topics__scope__tickets
+msgid "Tickets chosen one by one"
+msgstr "Billets choisis un par un"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_audience_topics__ticket_ids
+msgid "Tickets chosen"
+msgstr "Billets choisis"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_audience_topics__ticket_ids
+msgid "With « Tickets chosen one by one »: only the registrations to these tickets."
+msgstr "Avec « Billets choisis un par un » : seulement les inscriptions à ces billets."

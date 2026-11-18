@@ -543,9 +543,12 @@ def _has_word(text, words):
 
 
 VISITOR_WORDS = ("visiteur", "visitor")   # v1.138.0: « Visiteur », « Visiteurs », « Visitor » once accents and case are ignored
+SPONSOR_WORDS = ("commandit", "sponsor", "partenaire", "partner")   # v1.139.0: « Commanditaire », « Sponsor », « Partenaire »
 
 TOPICS_TEXTS = {
-    "fr": {"all": "Sujets d'intérêt de l'audience", "visitors": "Sujets d'intérêt des visiteurs", "topic": "Sujet",
+    "fr": {"all": "Sujets d'intérêt de l'audience", "visitors": "Sujets d'intérêt des visiteurs",
+           "volunteers": "Sujets d'intérêt des bénévoles", "sponsors": "Sujets d'intérêt des commanditaires",
+           "tickets": "Sujets d'intérêt : billets choisis", "topic": "Sujet",
            "total": "Total", "pct": "% des répondants", "free": "texte libre",
            "respondents": "Répondants : %(respondents)d sur %(concerned)d personnes concernées par la question",
            "no_question": "Aucune question de sondage n'est cochée « Afficher dans « Sujets d'intérêt » » : ouvrez le sondage "
@@ -555,7 +558,9 @@ TOPICS_TEXTS = {
            "note": "Seuls des nombres sont affichés : aucun nom ni courriel. Une personne peut choisir plusieurs sujets. Les "
                    "réponses libres (« Autre », questions texte) sont regroupées quand elles sont identiques, sans tenir "
                    "compte des majuscules ni des accents."},
-    "en": {"all": "Topics of interest of the audience", "visitors": "Topics of interest of the visitors", "topic": "Topic",
+    "en": {"all": "Topics of interest of the audience", "visitors": "Topics of interest of the visitors",
+           "volunteers": "Topics of interest of the volunteers", "sponsors": "Topics of interest of the sponsors",
+           "tickets": "Topics of interest: chosen tickets", "topic": "Topic",
            "total": "Total", "pct": "% of respondents", "free": "free text",
            "respondents": "Respondents: %(respondents)d of %(concerned)d people concerned by the question",
            "no_question": "No survey question is checked « Show in « Topics of interest » »: open the survey of the ticket (or "
@@ -571,6 +576,24 @@ def is_visitor_ticket(ticket_name):
     """v1.138.0: True for a ticket whose name says « visiteur » / « visitor » (any case, with or without accents)."""
     key = sort_key(ticket_name)
     return any(word in key for word in VISITOR_WORDS)
+
+
+def is_sponsor_ticket(ticket_name):
+    """v1.139.0: True for a ticket whose name says « commanditaire », « sponsor » or « partenaire » (case and accents ignored)."""
+    key = sort_key(ticket_name)
+    return any(word in key for word in SPONSOR_WORDS)
+
+
+def ticket_in_scope(ticket_name, scope):
+    """v1.139.0: does a ticket belong to the scope of « Topics of interest »: all, visitors, volunteers, sponsors? (The scope
+    « tickets », chosen one by one, is decided by the page.)"""
+    if scope == "visitors":
+        return is_visitor_ticket(ticket_name)
+    if scope == "volunteers":
+        return is_volunteer_ticket(ticket_name)
+    if scope == "sponsors":
+        return is_sponsor_ticket(ticket_name)
+    return True
 
 
 def topics_breakdown(people, questions):
@@ -609,13 +632,78 @@ def topics_breakdown(people, questions):
     return result
 
 
+ANSWERS_PAGE_TEXTS = {
+    "fr": {"title": "Réponses de %(name)s", "survey": "Sondage", "state": "État", "submitted": "Soumis le",
+           "no_answer": "(sans réponse)", "print": "Version imprimable d'Odoo", "confidential":
+           "Renseignements personnels : ne pas partager cette page en dehors des personnes autorisées.",
+           "done": "Complété", "in_progress": "Commencé", "new": "Non commencé"},
+    "en": {"title": "Answers of %(name)s", "survey": "Survey", "state": "State", "submitted": "Submitted on",
+           "no_answer": "(no answer)", "print": "Printable version of Odoo", "confidential":
+           "Personal information: do not share this page outside the authorized people.",
+           "done": "Completed", "in_progress": "Started", "new": "Not started"},
+}
+
+
+def answer_matches(answers, question_key, answer_key):
+    """v1.139.0: filter « Answer » of the desk. answers: [(label, [values])] of one registration (_rlq_desk_map). True when the
+    question (key of its label, case and accents ignored) has the answer `answer_key`, or, when answer_key is empty, when the
+    question is in the survey of the person but has no answer. A person whose survey has not that question never matches."""
+    for label, values in answers or ():
+        if sort_key(" ".join(str(label or "").split())) != question_key:
+            continue
+        keys = {sort_key(" ".join(str(v or "").split())) for v in values or () if str(v or "").strip()}
+        if (answer_key and answer_key in keys) or (not answer_key and not keys):
+            return True
+    return False
+
+
+def answers_page_html(name, survey_title, state="", submitted="", sections=(), print_url=None, lang=DEFAULT_LANG):
+    """v1.139.0: the page « See the answers » of one participant: the NAME of the person in the title of the browser tab and
+    at the top (the page « print » of Odoo does not show it), the survey, its state and date, then every question with its
+    answers, section by section. sections: [{"title": page title or "", "questions": [{"title", "values": [texts]}]}].
+    A complete HTML document; everything is escaped."""
+    labels = ANSWERS_PAGE_TEXTS["en"] if texts(lang) is TEXTS["en"] else ANSWERS_PAGE_TEXTS["fr"]
+    title = labels["title"] % {"name": name or "?"}
+    html = ['<!DOCTYPE html><html lang="%s"><head><meta charset="utf-8"/>' % ("en" if labels is ANSWERS_PAGE_TEXTS["en"] else "fr"),
+            "<title>%s - %s</title>" % (_clean(title), _clean(survey_title)),
+            '<meta name="viewport" content="width=device-width, initial-scale=1"/>',
+            "<style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:60rem;margin:1.5rem auto;"
+            "padding:0 1rem;color:#1f2933;line-height:1.45}h1{font-size:1.6rem;margin:0 0 .3rem}"
+            "header{border-bottom:3px solid %s;padding-bottom:.6rem;margin-bottom:1rem}"
+            ".meta{color:#52606d;margin:.1rem 0}h2{font-size:1.15rem;background:%s;color:%s;padding:.3rem .6rem;"
+            "margin:1.4rem 0 .6rem}h3{font-size:1rem;margin:.9rem 0 .2rem}ul{margin:.1rem 0 .4rem 1.2rem;padding:0}"
+            ".none{color:#7b8794;font-style:italic}.warn{color:#8a5a00;font-size:.85rem}</style></head><body>"
+            % (HEAD_BG, HEAD_BG, HEAD_FG),
+            "<header><h1>%s</h1>" % _clean(title),
+            '<p class="meta"><strong>%s :</strong> %s</p>' % (_clean(labels["survey"]), _clean(survey_title))]
+    if state:
+        html.append('<p class="meta"><strong>%s :</strong> %s</p>' % (_clean(labels["state"]), _clean(labels.get(state, state))))
+    if submitted:
+        html.append('<p class="meta"><strong>%s :</strong> %s</p>' % (_clean(labels["submitted"]), _clean(submitted)))
+    html.append('<p class="warn">%s</p></header>' % _clean(labels["confidential"]))
+    for section in sections or ():
+        if section.get("title"):
+            html.append("<h2>%s</h2>" % _clean(section["title"]))
+        for question in section.get("questions") or ():
+            html.append("<h3>%s</h3>" % _clean(question.get("title")))
+            values = [v for v in question.get("values") or () if str(v or "").strip()]
+            if values:
+                html.append("<ul>%s</ul>" % "".join("<li>%s</li>" % escape(str(v).strip()).replace("\n", "<br/>") for v in values))
+            else:
+                html.append('<p class="none">%s</p>' % _clean(labels["no_answer"]))
+    if print_url:
+        html.append('<p style="margin-top:2rem"><a href="%s">%s</a></p>' % (escape(str(print_url), quote=True), _clean(labels["print"])))
+    html.append("</body></html>")
+    return "".join(html)
+
+
 def topics_html(breakdown, tickets=(), lang=DEFAULT_LANG, scope="all", notes=()):
     """v1.138.0: page « Sujets d'intérêt »: one table per question (topic, one column per ticket when there are several,
     total, % of respondents). Only numbers: no personal information. Everything is escaped."""
     labels = TOPICS_TEXTS["en"] if texts(lang) is TEXTS["en"] else TOPICS_TEXTS["fr"]
     tickets = list(tickets or ())
     per_ticket = len(tickets) > 1
-    html = ["<h4>%s</h4>" % _clean(labels["visitors" if scope == "visitors" else "all"])]
+    html = ["<h4>%s</h4>" % _clean(labels[scope if scope in ("visitors", "volunteers", "sponsors", "tickets") else "all"])]
     html += ['<p class="text-muted small">%s</p>' % _clean(note) for note in notes or ()]
     if breakdown is None:
         html.append("<p>%s</p>" % _clean(labels["nobody"]))
