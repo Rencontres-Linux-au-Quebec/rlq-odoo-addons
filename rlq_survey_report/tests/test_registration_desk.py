@@ -11,7 +11,8 @@
     odoo-bin -d TEST_DB -i rlq_survey_report --test-enable --test-tags rlq_survey_report --stop-after-init
 """
 from odoo.addons.rlq_survey_report.models import registration_desk_report as rd
-from odoo.exceptions import UserError
+from odoo.addons.rlq_survey_report.models.event_registration_desk import can_contact
+from odoo.exceptions import AccessError, UserError
 from odoo.tests.common import TransactionCase
 
 
@@ -126,6 +127,10 @@ class TestRlqRegistrationDesk(TransactionCase):
         self.assertNotIn(other, registrations.search([("rlq_desk_answers", "ilike", "vegetarien")]))
         desk = self.env["rlq.registration.desk"].create({"event_id": self.event.id, "search_text": "végé"})
         self.assertEqual(desk.registration_ids, registration)
+        if not can_contact(self.env):                                                 # v1.138.0: managers only
+            with self.assertRaises(AccessError):
+                desk.action_contact()
+            return
         action = desk.action_contact()
         # v1.136.0: first the confirmation about personal information, once per page.
         self.assertEqual(action["context"]["rlq_pi_next"], "action_contact")
@@ -154,6 +159,14 @@ class TestRlqRegistrationDesk(TransactionCase):
                       page.table_html)
         self.assertEqual(page.action_open_guide()["url"], "/rlq_survey_report/aide#expertises-benevoles")
         self.assertEqual(page.action_export_excel()["context"]["rlq_pi_next"], "action_export_excel")
+
+    def test_audience_topics_page(self):
+        """v1.138.0: « Sujets d'intérêt »: the page opens for every ticket and for the visitor tickets; no personal data."""
+        for scope in ("all", "visitors"):
+            page = self.env["rlq.audience.topics"].create({"event_id": self.event.id, "scope": scope})
+            self.assertTrue(page.table_html)
+            self.assertNotIn("@example.com", page.table_html)
+        self.assertEqual(page.action_open_guide()["url"], "/rlq_survey_report/aide#sujets-interet")
 
     def test_survey_columns_in_a_form_not_saved(self):
         """v1.133.0: in a form not saved yet, the registrations of the list are « new » copies (NewId): the survey state and

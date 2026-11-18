@@ -42,16 +42,16 @@
 <div class="page">
 
 <h1>Guide utilisateur — Rapport de sondage</h1>
-<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.137.0</strong> du 2026-11-17 à 19 h 29 (heure locale, HNE).</p>
+<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.138.0</strong> du 2026-11-17 à 20 h 04 (heure locale, HNE).</p>
 
 <p>Ce module produit un compte-rendu détaillé — à l'écran, en fichier HTML, en PDF ou en Excel — des réponses à un ou plusieurs sondages Odoo, notamment les sondages de satisfaction envoyés après chaque rencontre. Il aide à repérer ce qui va bien, ce qui se dégrade, et à suivre les actions entreprises d'une rencontre à l'autre.</p>
 
 <div class="encadre">
   <p><strong>Nouveautés des trois dernières versions :</strong></p>
   <ul>
+    <li><strong>v1.138</strong> : nouvelles pages <em>Sujets d'intérêt de l'audience</em> et <em>Sujets d'intérêt des visiteurs</em> (§&nbsp;15) ; <em>Contacter les participants</em> réservé aux administrateurs des sondages ou des événements.</li>
     <li><strong>v1.137</strong> : nouvelle page <em>Expertises des bénévoles</em> (§&nbsp;15) ; le menu « Bénévoles » devient <em>Gestion des bénévoles</em> ; <em>Contacter les participants</em> ouvre un publipostage du Marketing par courriel (modèles de type infolettre, éditeur, essai, planification) ; l'en-tête des pages indique l'heure de la dernière modification du module.</li>
     <li><strong>v1.136</strong> : participants uniques (selon le courriel) ; colonne <em>Présentiel</em> des bénévoles ; des 1 au lieu des X ; confirmation des renseignements personnels une fois par page ; tous les menus du module dans un sous-menu <em>Rapports RLQ</em>.</li>
-    <li><strong>v1.135</strong> : voir et modifier les réponses d'un participant en un clic ; <em>Contacter les participants</em> ; <em>Ouvrir en liste</em> pour les bénévoles ; recherche dans plus de colonnes ; colonne Téléphone ; des 1 dans le chiffrier des bénévoles.</li>
   </ul>
   <p>Le détail de chaque version est dans <code>doc/CHANGELOG.md</code>.</p>
 </div>
@@ -434,10 +434,10 @@
 <ul>
   <li>Un clic sur les <strong>réponses</strong> d'un participant, ou le bouton <strong>Voir les réponses</strong> de sa ligne, ouvre dans un nouvel onglet toutes les réponses du sondage qu'il a rempli, sans passer par l'application Sondages.</li>
   <li><strong>Modifier les réponses</strong> : bouton visible seulement pour les administrateurs des sondages ; il ouvre la fenêtre de modification des réponses (§&nbsp;16).</li>
-  <li><strong>Contacter les participants</strong> (en haut) : pour écrire aux inscriptions <strong>listées</strong> (mêmes filtres et même recherche). Depuis la v1.137, quand l'application <strong>Marketing par courriel</strong> est installée, le bouton ouvre un <strong>nouveau publipostage</strong>, le même écran que le bouton « Contacter les participants » de l'événement : choix d'un modèle (infolettre, annonce, texte simple…), éditeur visuel, courriel d'essai, envoi planifié et statistiques. Les destinataires sont déjà choisis (onglet <em>Destinataires</em> : « ID est dans… ») ; ne les modifiez pas. Sans cette application, c'est la fenêtre de courriel d'Odoo. Chaque personne reçoit son propre courriel ; les inscriptions sans adresse sont laissées de côté.</li>
+  <li><strong>Contacter les participants</strong> (en haut ; depuis la v1.138, visible seulement pour les <strong>administrateurs des sondages ou des événements</strong>) : pour écrire aux inscriptions <strong>listées</strong> (mêmes filtres et même recherche). Depuis la v1.137, quand l'application <strong>Marketing par courriel</strong> est installée, le bouton ouvre un <strong>nouveau publipostage</strong>, le même écran que le bouton « Contacter les participants » de l'événement : choix d'un modèle (infolettre, annonce, texte simple…), éditeur visuel, courriel d'essai, envoi planifié et statistiques. Les destinataires sont déjà choisis (onglet <em>Destinataires</em> : « ID est dans… ») ; ne les modifiez pas. Sans cette application, c'est la fenêtre de courriel d'Odoo. Chaque personne reçoit son propre courriel ; les inscriptions sans adresse sont laissées de côté.</li>
   <li><strong>Téléphone</strong> : colonne cachée par défaut, à afficher avec le menu des colonnes.</li>
   <li><strong>Filtrer sur un texte</strong> : dans le bureau, <strong>Recherche</strong> cherche dans le nom, le courriel, l'entreprise, le téléphone, le billet et les réponses, sans tenir compte des majuscules ni des accents (« vege » trouve « Végétarien »). Dans <strong>Ouvrir en liste</strong>, tapez le texte dans la barre de recherche et choisissez la colonne dans la liste qui apparaît : Personne, Billet, Réponses, Téléphone, Courriel, Entreprise. Plusieurs critères se combinent.</li>
-  <li><strong>Menus</strong> (v1.136) : tous les menus ajoutés par ce module sont dans un sous-menu <strong>Rapports RLQ</strong>, dans l'application Événements (bureau d'inscription, sondages non complétés, gestion des bénévoles, expertises des bénévoles, courriels invalides, guide) comme dans l'application Sondages (ancien nom : « Rapports détaillés »). Le bureau d'inscription et les bénévoles sont dans les deux.</li>
+  <li><strong>Menus</strong> (v1.136) : tous les menus ajoutés par ce module sont dans un sous-menu <strong>Rapports RLQ</strong>, dans l'application Événements (bureau d'inscription, sondages non complétés, gestion des bénévoles, expertises des bénévoles, sujets d'intérêt de l'audience et des visiteurs, courriels invalides, guide) comme dans l'application Sondages (ancien nom : « Rapports détaillés »). Le bureau d'inscription et les bénévoles sont dans les deux.</li>
   <li><strong>Renseignements personnels</strong> (v1.136) : avant <strong>Ouvrir en liste</strong>, <strong>Contacter les participants</strong> et <strong>Exporter dans un chiffrier</strong>, qui montrent des courriels et des téléphones, une fenêtre demande de cocher la case de confirmation. Elle n'est demandée qu'<strong>une fois par page</strong> : elle revient seulement quand la page est rouverte par le menu.</li>
 </ul>
 <p>Tous les tableaux de ces pages ont le même aspect (v1.134) : en-tête foncé à texte blanc, une ligne sur deux en gris pâle, lignes de total en gris moyen ; dans le tableau des réponses, chaque question est encadrée avec toutes ses réponses.</p>
@@ -490,6 +490,14 @@
   <li><strong>Boutons</strong> : Actualiser, Exporter dans un chiffrier (une colonne par choix avec des 1, prêtes pour =SOMME et les tableaux croisés ; le texte libre d'un choix « Autre » dans sa propre colonne), Ouvrir en liste, Contacter les participants, Aide de cette page. Les trois boutons qui montrent des courriels demandent la confirmation des renseignements personnels, une fois par page.</li>
 </ol>
 <p>Seul le sondage du <strong>billet bénévole</strong> est lu, comme dans « Gestion des bénévoles ». Sans question cochée, la page le dit et explique où cocher.</p>
+
+<h3 id="sujets-interet">Sujets d'intérêt de l'audience et des visiteurs <span class="pastille">nouveau, v1.138</span></h3>
+<p>Événements (ou Sondages) &rarr; Rapports RLQ &rarr; <strong>Sujets d'intérêt de l'audience</strong> (tous les billets) ou <strong>Sujets d'intérêt des visiteurs</strong> (seulement les billets dont le nom contient « visiteur » ou « visitor ») : les sujets qui pourraient intéresser le public, pour préparer les prochaines rencontres. Le champ <strong>Billets</strong> passe de l'un à l'autre.</p>
+<ol>
+  <li><strong>Choisir les questions</strong> : dans le sondage du billet (ou de l'événement), ouvrez la question, par exemple « Quels sujets aimeriez-vous voir lors d'une prochaine rencontre ? », et cochez en bas de sa fiche <strong>Afficher dans « Sujets d'intérêt »</strong>. Le <em>Libellé court</em> sert de titre.</li>
+  <li><strong>Lire la page</strong> : pour chaque question, le nombre de répondants, puis un tableau des sujets, du plus demandé au moins demandé : le nombre de personnes par billet, le total et le pourcentage des répondants. Les réponses libres (choix « Autre », questions texte) sont des sujets à part, marqués « texte libre » ; deux réponses identiques (sans tenir compte des majuscules ni des accents) sont comptées ensemble.</li>
+</ol>
+<p>La page ne montre <strong>que des nombres</strong> : aucun nom ni courriel. Elle n'a donc pas de bouton d'export ni de contact, et ne demande pas la confirmation des renseignements personnels.</p>
 
 <h3>Exporter les bénévoles dans un chiffrier <span class="pastille">nouveau, v1.126</span></h3>
 <ol>

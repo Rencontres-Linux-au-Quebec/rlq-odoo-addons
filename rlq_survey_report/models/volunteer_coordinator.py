@@ -29,11 +29,11 @@ import io
 import logging
 
 from odoo import _, api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import AccessError, UserError
 
 from . import registration_desk_report as rd
 from . import report_builder as rb
-from .event_registration_desk import (ANSWERS_URL, LIST_STATES, contact_action, guide_action, local_time, local_zone,
+from .event_registration_desk import (ANSWERS_URL, LIST_STATES, can_contact, contact_action, guide_action, local_time, local_zone,
                                       program_stamp, registration_list_action)
 
 try:
@@ -132,6 +132,8 @@ class RlqVolunteerCoordinator(models.TransientModel):
     def action_contact(self):
         """v1.135.0: button « Contact the participants »: an e-mail to each volunteer of the table."""
         self.ensure_one()
+        if not can_contact(self.env):                                    # v1.138.0: before the confirmation window
+            raise AccessError(_("Only the administrators of the surveys or of the events may contact the participants."))
         guard = self._rlq_pi_guard("action_contact")
         if guard:
             return guard

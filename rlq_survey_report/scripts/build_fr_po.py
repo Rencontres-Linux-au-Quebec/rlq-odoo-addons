@@ -100,6 +100,23 @@ FR = {
     "Group By": "Regrouper par",
     "User guide": "Guide d'utilisation",
     "Help for this page": "Aide de cette page",                      # v1.134.0: button of the desk and the volunteers
+    # v1.138.0: « Topics of interest », « Contact the participants » for the administrators only
+    "Topics of interest": "Sujets d'intérêt",
+    "Topics of interest of the audience": "Sujets d'intérêt de l'audience",
+    "Topics of interest of the visitors": "Sujets d'intérêt des visiteurs",
+    "Only the administrators of the surveys or of the events may contact the participants.":
+        "Seuls les administrateurs des sondages ou des événements peuvent contacter les participants.",
+    "(no ticket)": "(sans billet)",
+    "No question checked « Show in Topics of interest » in the survey « %(survey)s ».":
+        "Aucune question cochée « Afficher dans « Sujets d'intérêt » » dans le sondage « %(survey)s ».",
+    "Show in « Topics of interest »": "Afficher dans « Sujets d'intérêt »",
+    "If checked, the answers to this question are counted in the page « Topics of interest » (Rapports RLQ): each topic chosen or written, with the number of people and the percentage of the respondents, per ticket. Useful for questions such as « Which topics would you like at a next meeting? ». No name or e-mail address is shown.":
+        "Si cochée, les réponses à cette question sont comptées dans la page « Sujets d'intérêt » (Rapports RLQ) : chaque sujet choisi ou écrit, avec le nombre de personnes et le pourcentage des répondants, par billet. Utile pour des questions comme « Quels sujets aimeriez-vous lors d'une prochaine rencontre ? ». Aucun nom ni courriel n'est affiché.",
+    "Tickets": "Billets",
+    "« Visitor tickets »: only the tickets whose name says « visiteur » or « visitor » (case and accents ignored).":
+        "« Billets visiteurs » : seulement les billets dont le nom contient « visiteur » ou « visitor » (sans tenir compte des majuscules ni des accents).",
+    "Every ticket": "Tous les billets",
+    "Visitor tickets": "Billets visiteurs",
     # v1.137.0: « Volunteer expertise », menu « Volunteer management », contact by mailing
     "Volunteer management": "Gestion des bénévoles",
     "Volunteer expertise": "Expertises des bénévoles",
@@ -354,7 +371,7 @@ def add(msgid, ref, python=False):
 
 # 1. views
 VIEW_FILES = ("views/event_registration_desk_views.xml", "views/survey_answer_edit_views.xml", "views/event_survey_followup_views.xml")
-MODEL_FILES = ("event_registration_desk.py", "volunteer_coordinator.py", "survey_answer_edit.py", "volunteer_expertise.py")
+MODEL_FILES = ("event_registration_desk.py", "volunteer_coordinator.py", "survey_answer_edit.py", "volunteer_expertise.py", "audience_topics.py")
 records = [record for view_file in VIEW_FILES for record in ET.parse("%s/%s" % (root_dir, view_file)).getroot()]
 for record in records:
     xmlid = record.get("id")

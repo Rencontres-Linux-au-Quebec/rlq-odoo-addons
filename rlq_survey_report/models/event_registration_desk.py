@@ -44,7 +44,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from odoo import _, api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import AccessError, UserError
 from odoo.tools import SQL
 
 from .. import release
@@ -60,6 +60,7 @@ COMPUTED_SORTS = ("rlq_survey_state", "rlq_desk_progress", "rlq_desk_answers", "
                   "rlq_desk_answers_html")
 MAP_SORTS = ("rlq_survey_state", "rlq_desk_progress", "rlq_desk_answers", "rlq_desk_answers_html")   # sorts that need _rlq_desk_map()
 SURVEY_MANAGER_GROUP = "survey.group_survey_manager"                             # may change the answers (survey_answer_edit.py)
+CONTACT_GROUPS = ("survey.group_survey_manager", "event.group_event_manager")     # v1.138.0: may « Contact the participants »
 TEXT_OPERATORS = ("ilike", "not ilike", "=", "!=")
 CHAT_URL = "/rlq_survey_report/chat/%d"                                          # controllers/chat.py: opens Discuss with the contact
 GUIDE_URL = "/rlq_survey_report/aide#%s"                                         # controllers/aide.py, section of the guide
@@ -110,6 +111,12 @@ def guide_action(env, anchor):
     return {"type": "ir.actions.act_url", "url": GUIDE_URL % anchor, "target": "new", "name": _("User guide")}
 
 
+def can_contact(env):
+    """v1.138.0: « Contact the participants » is for the administrators of the surveys or of the events only (the button has
+    the same groups in the views; this check also covers a call made another way)."""
+    return any(env.user.has_group(group) for group in CONTACT_GROUPS)
+
+
 def contact_action(env, registrations, subject=None):
     """Button « Contact the participants » (v1.135.0, v1.137.0).
 
@@ -118,6 +125,8 @@ def contact_action(env, registrations, subject=None):
     mailing.mailing/new): newsletter templates, design editor, test e-mail, scheduling, statistics. Its recipients are the
     registrations listed (« Recipients » shows the filter « id in [...] »); a person without address is skipped by the mailing.
     Without that application: the e-mail window of Odoo in mass-mail mode (one e-mail per person)."""
+    if not can_contact(env):
+        raise AccessError(_("Only the administrators of the surveys or of the events may contact the participants."))
     with_email = registrations.filtered(lambda r: (r.email or "").strip())
     if not with_email:
         raise UserError(_("No participant of this list has an e-mail address."))
@@ -783,6 +792,8 @@ class RlqRegistrationDesk(models.TransientModel):
     def action_contact(self):
         """v1.135.0: button « Contact the participants »: an e-mail to the registrations LISTED (same filters and search)."""
         self.ensure_one()
+        if not can_contact(self.env):                                    # v1.138.0: before the confirmation window
+            raise AccessError(_("Only the administrators of the surveys or of the events may contact the participants."))
         guard = self._rlq_pi_guard("action_contact")                     # v1.136.0: once per page
         if guard:
             return guard

@@ -6,6 +6,14 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -92. Contacter réservé aux administrateurs, Sujets d'intérêt (v1.138.0)
+
+**À confirmer après `-u rlq_survey_report --i18n-overwrite` :**
+1. Avec un utilisateur qui n'est administrateur ni des sondages ni des événements : le bouton « Contacter les participants » n'apparaît pas (bureau, gestion et expertises des bénévoles). Avec un administrateur : il apparaît et fonctionne.
+2. Cocher « Afficher dans « Sujets d'intérêt » » sur une question de sujets (à choix, avec « Autre ») dans le sondage du billet visiteur.
+3. Rapports RLQ > « Sujets d'intérêt de l'audience » : un tableau par question, sujets du plus demandé au moins demandé, colonnes par billet, total, % des répondants ; aucun nom ni courriel.
+4. Rapports RLQ > « Sujets d'intérêt des visiteurs » : seulement les billets visiteurs ; le champ « Billets » permet de passer à tous les billets.
+
 ## -91. Expertises des bénévoles, Gestion des bénévoles, publipostage, heure de la version (v1.137.0)
 
 **À confirmer après `-u rlq_survey_report --i18n-overwrite` :**

@@ -409,6 +409,32 @@ class TestRegistrationDeskReport(unittest.TestCase):
                       rd.program_footer("p", "v", "2026-11-17 19:30:00 HNE", "America/Toronto", "fr", modified=True))
         self.assertIn("modified on", rd.program_footer("p", "v", "x", "", "en", modified=True))
 
+    def test_topics_of_interest(self):
+        """v1.138.0: topics counted per question, free answers grouped, ranked by count; only numbers in the page."""
+        self.assertTrue(rd.is_visitor_ticket("Visiteurs (gratuit)"))
+        self.assertTrue(rd.is_visitor_ticket("VISITOR"))
+        self.assertFalse(rd.is_visitor_ticket("Bénévole"))
+        questions = [{"title": "Sujets <i>souhaités</i>", "choices": ["Sécurité", "Docker", "Autre"]}, {"title": "Idées", "choices": []}]
+        people = [{"ticket": "Visiteur", "questions": {0, 1}, "answers": {0: ["Docker", "securite", "Docker"], 1: ["Rust"]}},
+                  {"ticket": "Visiteur", "questions": {0, 1}, "answers": {0: ["docker", " Rust  "]}},
+                  {"ticket": "Bénévole", "questions": {0}, "answers": {}},
+                  {"ticket": "Bénévole", "questions": set(), "answers": {}}]
+        first, second = rd.topics_breakdown(people, questions)
+        self.assertEqual((first["concerned"], first["respondents"]), (3, 2))
+        self.assertEqual([(t["topic"], t["count"], t["free"]) for t in first["topics"]],
+                         [("Docker", 2, False), ("Rust", 1, True), ("Sécurité", 1, False)])
+        self.assertEqual(first["topics"][0]["by_ticket"], {"Visiteur": 2})
+        self.assertEqual((second["concerned"], second["respondents"]), (2, 1))
+        html = rd.topics_html([first, second], ["Bénévole", "Visiteur"], "fr", "visitors")
+        for text in ("Sujets d&#x27;intérêt des visiteurs", "Répondants : 2 sur 3", "Rust (texte libre)", ">% des répondants</th>",
+                     ">Visiteur</th>", "100,0\u00a0%"):
+            self.assertIn(text, html)
+        self.assertNotIn("<i>", html)
+        self.assertNotIn("@", html)
+        self.assertIn("Aucune question", rd.topics_html([], [], "fr"))
+        self.assertIn("No registration", rd.topics_html(None, [], "en"))
+        self.assertIn("Topics of interest of the audience", rd.topics_html([first], ["V"], "en"))
+
     def test_expertise_table_and_export(self):
         """v1.137.0: « Expertises des bénévoles »: one column per choice (1), a text column, totals, free text of « Autre »."""
         columns = [{"title": "Expertises", "choices": ["Python", "Réseau", "Autre"]}, {"title": "Commentaire", "choices": []}]

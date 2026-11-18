@@ -100,6 +100,7 @@ msgstr "Inscription"
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__event_id
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_coordinator__event_id
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_expertise__event_id
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_audience_topics__event_id
 msgid "Event"
 msgstr "Événement"
 
@@ -461,6 +462,7 @@ msgstr "Rapport quotidien envoyé à %(dest)s."
 #. odoo-python
 #: code:addons/rlq_survey_report/models/event_survey_followup.py:0
 #, python-format
+#: code:addons/rlq_survey_report/models/audience_topics.py:0
 msgid "(no ticket)"
 msgstr "(sans billet)"
 
@@ -623,6 +625,7 @@ msgstr "Bureau d'inscription RLQ"
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_form
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_expertise_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_audience_topics_form
 msgid "Refresh"
 msgstr "Actualiser"
 
@@ -639,6 +642,7 @@ msgstr "Contacter les participants"
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_form
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_expertise_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_audience_topics_form
 msgid "Help for this page"
 msgstr "Aide de cette page"
 
@@ -687,6 +691,14 @@ msgid "Volunteers"
 msgstr "Bénévoles"
 
 #. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_survey_question_form_rlq_registration_desk
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_audience_topics_form
+#: model:ir.model,name:rlq_survey_report.model_rlq_audience_topics
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_audience_topics__table_html
+msgid "Topics of interest"
+msgstr "Sujets d'intérêt"
+
+#. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_form
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_expertise_form
 msgid "Export to a spreadsheet"
@@ -717,6 +729,24 @@ msgstr "Guide d'utilisation"
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_expertise__table_html
 msgid "Volunteer expertise"
 msgstr "Expertises des bénévoles"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: model:ir.actions.act_window,name:rlq_survey_report.action_rlq_audience_topics
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_audience_topics_events
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_audience_topics_surveys
+#: code:addons/rlq_survey_report/models/audience_topics.py:0
+msgid "Topics of interest of the audience"
+msgstr "Sujets d'intérêt de l'audience"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: model:ir.actions.act_window,name:rlq_survey_report.action_rlq_audience_topics_visitors
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_audience_topics_visitors_events
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_audience_topics_visitors_surveys
+#: code:addons/rlq_survey_report/models/audience_topics.py:0
+msgid "Topics of interest of the visitors"
+msgstr "Sujets d'intérêt des visiteurs"
 
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_edit_line_form
@@ -818,6 +848,14 @@ msgstr "Modifications manuelles"
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_form
 msgid "Event date"
 msgstr "Date de l'événement"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/event_registration_desk.py:0
+#: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
+#: code:addons/rlq_survey_report/models/volunteer_expertise.py:0
+msgid "Only the administrators of the surveys or of the events may contact the participants."
+msgstr "Seuls les administrateurs des sondages ou des événements peuvent contacter les participants."
 
 #. module: rlq_survey_report
 #. odoo-python
@@ -956,6 +994,7 @@ msgstr "Cette page contient des renseignements personnels sur les participants (
 #: model:ir.model.fields,help:rlq_survey_report.field_rlq_registration_desk__event_id
 #: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_coordinator__event_id
 #: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_expertise__event_id
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_audience_topics__event_id
 msgid "By default: the event in progress, otherwise the next one."
 msgstr "Par défaut : l'événement en cours, sinon le prochain."
 
@@ -1453,3 +1492,39 @@ msgstr "Si cochée, la réponse de chaque bénévole à cette question est affic
 #: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_expertise__sort_by
 msgid "Order of the table. Case and accents are ignored; equal values are sorted by name."
 msgstr "Ordre du tableau. Les majuscules et les accents sont ignorés ; à égalité, le tri se fait par nom."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/audience_topics.py:0
+msgid "No question checked « Show in Topics of interest » in the survey « %(survey)s »."
+msgstr "Aucune question cochée « Afficher dans « Sujets d'intérêt » » dans le sondage « %(survey)s »."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_survey_question__rlq_audience_topics
+msgid "Show in « Topics of interest »"
+msgstr "Afficher dans « Sujets d'intérêt »"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_survey_question__rlq_audience_topics
+msgid "If checked, the answers to this question are counted in the page « Topics of interest » (Rapports RLQ): each topic chosen or written, with the number of people and the percentage of the respondents, per ticket. Useful for questions such as « Which topics would you like at a next meeting? ». No name or e-mail address is shown."
+msgstr "Si cochée, les réponses à cette question sont comptées dans la page « Sujets d'intérêt » (Rapports RLQ) : chaque sujet choisi ou écrit, avec le nombre de personnes et le pourcentage des répondants, par billet. Utile pour des questions comme « Quels sujets aimeriez-vous lors d'une prochaine rencontre ? ». Aucun nom ni courriel n'est affiché."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_audience_topics__scope
+msgid "Tickets"
+msgstr "Billets"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_audience_topics__scope
+msgid "« Visitor tickets »: only the tickets whose name says « visiteur » or « visitor » (case and accents ignored)."
+msgstr "« Billets visiteurs » : seulement les billets dont le nom contient « visiteur » ou « visitor » (sans tenir compte des majuscules ni des accents)."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_audience_topics__scope__all
+msgid "Every ticket"
+msgstr "Tous les billets"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_audience_topics__scope__visitors
+msgid "Visitor tickets"
+msgstr "Billets visiteurs"
