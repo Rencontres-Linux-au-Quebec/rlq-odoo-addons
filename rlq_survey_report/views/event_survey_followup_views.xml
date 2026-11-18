@@ -35,6 +35,8 @@
         <field name="model">rlq.survey.pending</field>
         <field name="arch" type="xml">
             <form string="Surveys not completed">
+                <!-- v1.141.0: surveys in « live session » mode block the participants -->
+                <field name="live_session_html" readonly="1" nolabel="1" invisible="not live_session_html"/>
                 <p>Confirmed registrations whose person has not completed the survey of their ticket (otherwise the survey of the event) yet. A survey belongs to a registration when it was answered by the same contact or with the same e-mail address.</p>
                 <group>
                     <field name="event_ids" widget="many2many_tags" context="{'rlq_recent_first': True}"/>
@@ -137,6 +139,29 @@
                     <field name="rlq_browser"/>
                     <field name="rlq_user_agent"/>
                 </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- v1.141.0 - Survey in « live session » mode (survey_live_session.py): warning and safe repair on the survey form.
+         xpath on //sheet, which exists in every version (see rlq_survey_report_views.xml). -->
+    <record id="view_survey_survey_form_rlq_live_session" model="ir.ui.view">
+        <field name="name">survey.survey.form.rlq.live.session</field>
+        <field name="model">survey.survey</field>
+        <field name="inherit_id" ref="survey.survey_survey_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <field name="rlq_live_session_warning" invisible="1"/>
+                <div class="alert alert-danger" role="alert" invisible="not rlq_live_session_warning">
+                    <p class="fw-bold mb-1">Live session mode: the participants wait for a host.</p>
+                    <p class="mb-1">Every person who opens this survey sees « wait for the host to go to the next question » and cannot go further than the first question.</p>
+                    <p class="mb-1">Do not use « End Live Session » of Odoo: it marks EVERY participation as completed, even the unfinished ones.</p>
+                    <span>Participations waiting:</span>
+                    <field name="rlq_stuck_session_count" readonly="1" class="oe_inline ms-1 me-3"/>
+                    <button name="action_rlq_close_live_session" type="object" class="btn btn-danger"
+                            string="Close the live session (keep the answers)"
+                            confirm="Close the live session? The blocked participants will continue after reloading the page; no participation is marked completed."/>
+                </div>
             </xpath>
         </field>
     </record>

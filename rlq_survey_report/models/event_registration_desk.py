@@ -111,6 +111,29 @@ def guide_action(env, anchor):
     return {"type": "ir.actions.act_url", "url": GUIDE_URL % anchor, "target": "new", "name": _("User guide")}
 
 
+def event_surveys(events):
+    """The surveys of the registrations of these events: the surveys of their tickets and of the events themselves."""
+    surveys = events.env["survey.survey"].sudo()
+    for event in events.sudo():
+        if "event_ticket_ids" in event._fields and "rlq_survey_id" in event.event_ticket_ids._fields:
+            surveys |= event.event_ticket_ids.mapped("rlq_survey_id")
+        if "survey_id" in event._fields:
+            surveys |= event.survey_id
+    return surveys
+
+
+def live_session_html(env, surveys):
+    """v1.141.0: a red warning when a survey of the page is in « live session » mode (survey_live_session.py)."""
+    if "rlq_live_session_warning" not in surveys._fields:
+        return ""
+    from .survey_live_session import live_session_warnings                  # imported here: models/__init__.py order
+    warnings = live_session_warnings(env, surveys)
+    if not warnings:
+        return ""
+    return ('<div class="alert alert-danger" role="alert"><strong>%s</strong><ul>%s</ul></div>'
+            % (rd.escape(_("Participants blocked on the first question")), "".join("<li>%s</li>" % rd.escape(w) for w in warnings)))
+
+
 def can_contact(env):
     """v1.138.0: « Contact the participants » is for the administrators of the surveys or of the events only (the button has
     the same groups in the views; this check also covers a call made another way)."""
@@ -813,6 +836,7 @@ class RlqRegistrationDesk(models.TransientModel):
             # v1.126.0: the program name, version, local date and time come FIRST, above the summary.
             lang = self.env.lang or rd.DEFAULT_LANG
             wizard.summary_html = (program_stamp(self.env, wizard.event_id)
+                                   + live_session_html(self.env, event_surveys(wizard.event_id))   # v1.141.0
                                    + rd.desk_summary_html(registrations._rlq_desk_rows(), lang)
                                    + rd.reconciliation_html(wizard._rlq_reconciliation_items(), lang))
             listed = wizard._rlq_listed(registrations)

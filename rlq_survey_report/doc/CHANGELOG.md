@@ -1,5 +1,37 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.141.0
+
+**Short title:** participants blocked on the first question ("wait for the host"): cause found (live session left open), warning, safe repair, prevention.
+
+**Reason for the request:** the same problem as with Firefox mobile happened with Vivaldi on Linux: impossible to go further than the first question "De quelle région ?"; above it, "Nous avons enregistré votre réponse ! Veuillez attendre que l'hôte passe à la question suivante."; the arrows near "Généré par Odoo" do nothing.
+
+**Concurrent changes:** checked before the work and before pushing: PR #23 to #26 merged into `18.0` at 21:20, no open PR, no other branch moved. This branch starts from `18.0`.
+
+**Bugs fixed:**
+
+- Symptom: above. Diagnosis: not a browser problem. The message is the one of the LIVE SESSION mode of Odoo. In Odoo 18 (`addons/survey/models/survey_survey.py`), "Create Live Session" (`action_start_session`) sets `session_state = 'ready'` and forces `questions_layout = 'page_per_question'`; while `session_state` is `ready` or `in_progress`, `_create_answer()` creates every new participation with `is_session_answer = True`, driven by the host question by question. The Odoo button "End Live Session" (`action_end_session`) writes `state = 'done'` on EVERY participation of the survey, also the unfinished ones (they would count as completed everywhere). Fix: new `action_rlq_close_live_session()` (button "Fermer la session en direct (garder les réponses)"): `session_state` and `session_question_id` cleared, the unfinished participations of the session set back to `is_session_answer = False` (the person reloads the page and continues), nothing marked completed.
+
+**Changes:**
+
+- New `models/survey_live_session.py`: `survey.survey.rlq_stuck_session_count`, `rlq_live_session_warning`, `_rlq_used_by_events()`, `action_rlq_close_live_session()`; `action_start_session()` refused (UserError) for a survey used by an event ticket or an event (context `rlq_allow_live_session` to bypass); `live_session_warnings()`.
+- `models/event_registration_desk.py`: `event_surveys()`, `live_session_html()`; red warning at the top of the desk summary. `models/event_survey_followup.py`: field `live_session_html` of "Sondages non complétés".
+- `views/event_survey_followup_views.xml`: red banner with the count and the button on the survey form (xpath `//sheet`, before), warning in "Sondages non complétés".
+- `scripts/build_fr_po.py` (reads `survey_live_session.py` too), `scripts/fr_base.po`, `i18n/fr.po` (rebuilt); `release.py`; guide (news v1.141, v1.140, v1.139; troubleshooting).
+
+**Safeguards and edge cases:**
+
+- The completed participations are not touched; the layout "one page per question" forced by the session is kept (the previous layout is unknown): change it in the Options tab if needed.
+- The repair needs the rights of a survey user, as the sessions of Odoo.
+- A real live session (quiz) stays possible on a survey not used by an event, or on a copy.
+
+**Checks performed:**
+
+- Standalone tests of run-all.sh: all [OK]; ruff: OK; `scripts/build_fr_po.py`: all terms translated; view XML parsed. The cause was checked in the source of Odoo 18 (survey_survey.py).
+- New Odoo test (not run here, no Odoo instance): start refused on an event survey; participation created during a session is a session answer; warning at the desk; safe close releases it without marking it completed.
+
+**Action required from the user:** `-u rlq_survey_report --i18n-overwrite`; open the survey "De quelle région ?" (and the other surveys in red), click "Fermer la session en direct (garder les réponses)"; ask the people who were blocked to reload the page; check the layout in the Options tab. Points "v1.141.0" of `doc/NOTES_VALIDATION.md`.
+
 ## 18.0.1.140.0
 
 **Short title:** operating system and browser of every survey participation (diagnosis of a survey blocking on Firefox mobile), reminders to everybody who has not completed their survey.

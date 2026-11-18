@@ -206,6 +206,29 @@ class TestRlqRegistrationDesk(TransactionCase):
             partners, emails = pending._rlq_invite_recipients(registrations)
             self.assertFalse(set(emails) & set(partners.mapped("email")))
 
+    def test_live_session_blocks_then_safe_close(self):
+        """v1.141.0: a « live session » makes every new participation wait for a host; the safe close releases them without
+        marking anything completed; starting a live session on a survey of an event is refused."""
+        with self.assertRaises(UserError):
+            self.survey.action_start_session()
+        self.survey.sudo().write({"session_state": "ready"})
+        stuck = self.survey._create_answer(email="bloque@example.com")
+        done = self._participation("fini@example.com", "done")
+        self.assertTrue(stuck.is_session_answer)
+        self.survey.invalidate_recordset()
+        self.assertTrue(self.survey.rlq_live_session_warning)
+        self.assertEqual(self.survey.rlq_stuck_session_count, 1)
+        desk = self.env["rlq.registration.desk"].create({"event_id": self.event.id})
+        self.assertIn("alert-danger", desk.summary_html)
+        if self.env.user.has_group("survey.group_survey_user"):
+            self.survey.action_rlq_close_live_session()
+            self.assertFalse(self.survey.session_state)
+            self.assertFalse(stuck.is_session_answer)
+            self.assertNotEqual(stuck.state, "done")                         # not marked completed, unlike Odoo's button
+            self.assertEqual(done.state, "done")
+            self.survey.invalidate_recordset()
+            self.assertFalse(self.survey.rlq_live_session_warning)
+
     def test_survey_columns_in_a_form_not_saved(self):
         """v1.133.0: in a form not saved yet, the registrations of the list are « new » copies (NewId): the survey state and
         the date of submission must be the ones of the real registration, not « No survey »."""

@@ -521,6 +521,11 @@ msgid "The people listed expect %(count)d different surveys: choose one event (o
 msgstr "Les personnes listées attendent %(count)d sondages différents : choisissez un seul événement (ou utilisez « Envoyer un rappel », qui envoie à chaque personne l'invitation de son propre sondage)."
 
 #. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_pending__live_session_html
+msgid "Live sessions"
+msgstr "Sessions en direct"
+
+#. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_event_form_rlq_registration_desk
@@ -912,6 +917,36 @@ msgid "Device"
 msgstr "Appareil"
 
 #. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_survey_survey_form_rlq_live_session
+msgid "Live session mode: the participants wait for a host."
+msgstr "Mode session en direct : les participants attendent un hôte."
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_survey_survey_form_rlq_live_session
+msgid "Every person who opens this survey sees « wait for the host to go to the next question » and cannot go further than the first question."
+msgstr "Toute personne qui ouvre ce sondage voit « Veuillez attendre que l'hôte passe à la question suivante » et ne peut pas aller plus loin que la première question."
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_survey_survey_form_rlq_live_session
+msgid "Do not use « End Live Session » of Odoo: it marks EVERY participation as completed, even the unfinished ones."
+msgstr "N'utilisez pas « Terminer la session en direct » d'Odoo : ce bouton marque TOUTES les participations comme complétées, même celles qui ne sont pas finies."
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_survey_survey_form_rlq_live_session
+msgid "Participations waiting:"
+msgstr "Participations en attente :"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_survey_survey_form_rlq_live_session
+msgid "Close the live session (keep the answers)"
+msgstr "Fermer la session en direct (garder les réponses)"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_survey_survey_form_rlq_live_session
+msgid "Close the live session? The blocked participants will continue after reloading the page; no participation is marked completed."
+msgstr "Fermer la session en direct ? Les participants bloqués pourront continuer en rechargeant la page ; aucune participation n'est marquée complétée."
+
+#. module: rlq_survey_report
 #. odoo-python
 #: code:addons/rlq_survey_report/models/event_registration_desk.py:0
 msgid "(no answer)"
@@ -942,6 +977,12 @@ msgstr "Événement : %(event)s"
 #: code:addons/rlq_survey_report/models/event_registration_desk.py:0
 msgid "Registration desk: %(event)s"
 msgstr "Bureau d'inscription : %(event)s"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/event_registration_desk.py:0
+msgid "Participants blocked on the first question"
+msgstr "Participants bloqués à la première question"
 
 #. module: rlq_survey_report
 #. odoo-python
@@ -1690,3 +1731,48 @@ msgstr "Système d'exploitation de l'appareil qui a répondu en dernier à cette
 #: model:ir.model.fields,help:rlq_survey_report.field_survey_user_input__rlq_browser
 msgid "Browser that last answered this participation, read from its User-Agent."
 msgstr "Navigateur qui a répondu en dernier à cette participation, lu dans son User-Agent."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/survey_live_session.py:0
+msgid "Survey « %(survey)s »: live session mode, %(count)d participations wait for a host. Open the survey and click « Close the live session (keep the answers) »."
+msgstr "Sondage « %(survey)s » : mode session en direct, %(count)d participations attendent un hôte. Ouvrez le sondage et cliquez « Fermer la session en direct (garder les réponses) »."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/survey_live_session.py:0
+msgid "Only survey users can manage sessions."
+msgstr "Seuls les utilisateurs des sondages peuvent gérer les sessions."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/survey_live_session.py:0
+msgid "Live session closed"
+msgstr "Session en direct fermée"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/survey_live_session.py:0
+msgid "%(count)d participations can continue: the people only need to reload the page of the survey. No participation was marked completed."
+msgstr "%(count)d participations peuvent continuer : les personnes n'ont qu'à recharger la page du sondage. Aucune participation n'a été marquée complétée."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/survey_live_session.py:0
+msgid "The survey « %(survey)s » is used by event registrations: a live session would make every person who opens it wait for a host, question by question. Duplicate the survey to run a live session."
+msgstr "Le sondage « %(survey)s » sert aux inscriptions d'un événement : une session en direct ferait attendre un hôte, question par question, à toute personne qui l'ouvre. Dupliquez le sondage pour faire une session en direct."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_survey_survey__rlq_stuck_session_count
+msgid "Participations waiting for the host"
+msgstr "Participations en attente de l'hôte"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_survey_survey__rlq_stuck_session_count
+msgid "Participations not completed that are in « live session » mode: the person sees « wait for the host » and cannot go to the next question."
+msgstr "Participations non complétées en mode « session en direct » : la personne voit « attendez l'hôte » et ne peut pas passer à la question suivante."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_survey_survey__rlq_live_session_warning
+msgid "Live session problem"
+msgstr "Problème de session en direct"

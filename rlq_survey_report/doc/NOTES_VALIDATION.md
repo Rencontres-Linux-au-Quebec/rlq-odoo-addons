@@ -6,6 +6,16 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -95. Participants bloqués par une session en direct (v1.141.0)
+
+**À confirmer après `-u rlq_survey_report --i18n-overwrite` :**
+1. Ouvrir le sondage bloqué : bandeau rouge « Mode session en direct » avec le nombre de participations en attente.
+2. Bureau d'inscription et « Sondages non complétés » de l'événement : avertissement rouge qui nomme le sondage.
+3. Cliquer « Fermer la session en direct (garder les réponses) » : message « N participations peuvent continuer » ; le bandeau disparaît.
+4. Avec Vivaldi (ou Firefox mobile) : recharger la page du sondage ; les flèches fonctionnent, on passe à la 2e question. Les participations non finies restent « Commencé » (pas « Complété »).
+5. Onglet Options du sondage : remettre la mise en page voulue si « Une page par question » ne convient pas.
+6. Sur un sondage de billet, « Créer une session en direct » affiche un message de refus.
+
 ## -94. Appareil des participations, rappels des sondages (v1.140.0)
 
 **À confirmer après `-u rlq_survey_report --i18n-overwrite` :**
