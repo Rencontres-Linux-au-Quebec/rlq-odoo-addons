@@ -47,7 +47,9 @@ class RlqSurveyReportAnswers(http.Controller):
             submitted = rd.local_stamp(moment, "%Y-%m-%d %H:%M", lang)
         html = rd.answers_page_html(name, user_input.survey_id.title or "", user_input.state, submitted,
                                     self._sections(user_input), PRINT_URL % (user_input.survey_id.access_token,
-                                                                             user_input.access_token), lang)
+                                                                             user_input.access_token), lang,
+                                    device=" - ".join(v for v in (getattr(user_input, "rlq_os", ""),
+                                                                  getattr(user_input, "rlq_browser", "")) if v))
         return request.make_response(html, headers=[("Content-Type", "text/html; charset=utf-8"),
                                                     ("Cache-Control", "no-store"), ("X-Robots-Tag", "noindex")])
 

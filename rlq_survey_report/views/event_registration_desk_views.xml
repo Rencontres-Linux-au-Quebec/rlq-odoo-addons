@@ -27,6 +27,8 @@
                 <field name="rlq_departure" string="Left at" optional="hide" width="150px"/>
                 <field name="rlq_survey_state" options="{'allow_order': True}"/>
                 <field name="rlq_survey_done_date" options="{'allow_order': True}" optional="show" width="150px"/>
+                <field name="rlq_survey_os" optional="hide"/>
+                <field name="rlq_survey_browser" optional="hide"/>
                 <field name="rlq_desk_progress" options="{'allow_order': True}" optional="hide"/>
                 <!-- v1.135.0: the answers are a link to every answer of the survey of the person -->
                 <field name="rlq_desk_answers_html" options="{'allow_order': True}"/>
@@ -122,6 +124,8 @@
                             <field name="rlq_departure" string="Left at" optional="hide" width="150px"/>
                             <field name="rlq_survey_state" options="{'allow_order': True}"/>
                             <field name="rlq_survey_done_date" options="{'allow_order': True}" optional="show" width="150px"/>
+                            <field name="rlq_survey_os" optional="hide"/>
+                            <field name="rlq_survey_browser" optional="hide"/>
                             <!-- v1.139.0: hidden in the desk (optional="hide" was not enough: Odoo keeps in the browser the
                                  columns a user showed once); still in « Open as a list » and in « Sort by ». -->
                             <field name="rlq_desk_progress" column_invisible="1"/>

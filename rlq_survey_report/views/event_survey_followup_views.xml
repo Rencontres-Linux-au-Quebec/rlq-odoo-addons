@@ -19,6 +19,8 @@
                 <field name="rlq_expected_survey_id" optional="show"/>
                 <field name="rlq_survey_state"/>
                 <field name="rlq_desk_progress" optional="hide"/>
+                <field name="rlq_survey_os" optional="show"/>
+                <field name="rlq_survey_browser" optional="show"/>
                 <field name="create_date" string="Registered on" optional="show" width="150px"/>
                 <field name="state" optional="hide"/>
                 <field name="date_closed" string="Arrived at" optional="hide" width="150px"/>
@@ -60,12 +62,20 @@
                         <field name="rlq_expected_survey_id" optional="hide"/>
                         <field name="rlq_survey_state"/>
                         <field name="rlq_desk_progress" optional="hide"/>
+                        <field name="rlq_survey_os" optional="show"/>
+                        <field name="rlq_survey_browser" optional="show"/>
                         <field name="create_date" string="Registered on" optional="show" width="150px"/>
                         <field name="state" optional="hide"/>
                     </list>
                 </field>
                 <footer>
                     <button name="action_open_list" type="object" string="Open as a list" class="btn-primary"/>
+                    <!-- v1.140.0: reminders, with the personal link of each person (administrators only) -->
+                    <button name="action_send_reminder" type="object" string="Send a reminder" icon="fa-bell"
+                            groups="survey.group_survey_manager,event.group_event_manager"
+                            confirm="Send the invitation e-mail of their survey again to every person listed (each one receives their own link)?"/>
+                    <button name="action_customize_reminder" type="object" string="Customize the reminder" icon="fa-pencil"
+                            groups="survey.group_survey_manager,event.group_event_manager"/>
                     <button string="Close" special="cancel" class="btn-secondary"/>
                 </footer>
             </form>
@@ -114,5 +124,21 @@
               action="action_rlq_survey_pending"
               sequence="93"
               groups="event.group_event_user"/>
+
+    <!-- v1.140.0 - Device of the participation (survey_device.py), in the form of a participation of the Surveys app. -->
+    <record id="view_survey_user_input_form_rlq_device" model="ir.ui.view">
+        <field name="name">survey.user_input.form.rlq.device</field>
+        <field name="model">survey.user_input</field>
+        <field name="inherit_id" ref="survey.survey_user_input_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Device" name="rlq_device">
+                    <field name="rlq_os"/>
+                    <field name="rlq_browser"/>
+                    <field name="rlq_user_agent"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
 
 </odoo>

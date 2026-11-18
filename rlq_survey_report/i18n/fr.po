@@ -479,6 +479,48 @@ msgid "RLQ reports"
 msgstr "Rapports RLQ"
 
 #. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/event_survey_followup.py:0
+#, python-format
+msgid "Reminder sent to %(count)d people."
+msgstr "Rappel envoyé à %(count)d personnes."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/event_survey_followup.py:0
+#, python-format
+msgid "Survey reminder"
+msgstr "Rappel du sondage"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/event_survey_followup.py:0
+#, python-format
+msgid "Survey reminders"
+msgstr "Rappels des sondages"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/event_survey_followup.py:0
+#, python-format
+msgid "Only the administrators of the surveys or of the events may send reminders."
+msgstr "Seuls les administrateurs des sondages ou des événements peuvent envoyer des rappels."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/event_survey_followup.py:0
+#, python-format
+msgid "Not sent: %(surveys)s"
+msgstr "Non envoyé : %(surveys)s"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/event_survey_followup.py:0
+#, python-format
+msgid "The people listed expect %(count)d different surveys: choose one event (or use « Send a reminder », which sends each person the invitation of their own survey)."
+msgstr "Les personnes listées attendent %(count)d sondages différents : choisissez un seul événement (ou utilisez « Envoyer un rappel », qui envoie à chaque personne l'invitation de son propre sondage)."
+
+#. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_event_form_rlq_registration_desk
@@ -850,6 +892,26 @@ msgid "Event date"
 msgstr "Date de l'événement"
 
 #. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_form
+msgid "Send a reminder"
+msgstr "Envoyer un rappel"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_form
+msgid "Send the invitation e-mail of their survey again to every person listed (each one receives their own link)?"
+msgstr "Renvoyer le courriel d'invitation de leur sondage à toutes les personnes listées (chacune reçoit son propre lien) ?"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_form
+msgid "Customize the reminder"
+msgstr "Personnaliser le rappel"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_survey_user_input_form_rlq_device
+msgid "Device"
+msgstr "Appareil"
+
+#. module: rlq_survey_report
 #. odoo-python
 #: code:addons/rlq_survey_report/models/event_registration_desk.py:0
 msgid "(no answer)"
@@ -970,6 +1032,28 @@ msgstr "La participation de cette personne au sondage attendu (la plus avancée,
 #: model:ir.model.fields,field_description:rlq_survey_report.field_event_registration__rlq_desk_can_edit_answers
 msgid "Can edit the answers"
 msgstr "Peut modifier les réponses"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_event_registration__rlq_survey_os
+#: model:ir.model.fields,field_description:rlq_survey_report.field_survey_user_input__rlq_os
+msgid "Operating system"
+msgstr "Système d'exploitation"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_event_registration__rlq_survey_os
+msgid "Operating system of the device that last answered the survey of this person."
+msgstr "Système d'exploitation de l'appareil qui a répondu en dernier au sondage de cette personne."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_event_registration__rlq_survey_browser
+#: model:ir.model.fields,field_description:rlq_survey_report.field_survey_user_input__rlq_browser
+msgid "Browser"
+msgstr "Navigateur"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_event_registration__rlq_survey_browser
+msgid "Browser that last answered the survey of this person (for example « Firefox 145 »)."
+msgstr "Navigateur qui a répondu en dernier au sondage de cette personne (par exemple « Firefox 145 »)."
 
 #. module: rlq_survey_report
 #: model:ir.model.fields,field_description:rlq_survey_report.field_event_registration__rlq_desk_person
@@ -1586,3 +1670,23 @@ msgstr "Billets choisis"
 #: model:ir.model.fields,help:rlq_survey_report.field_rlq_audience_topics__ticket_ids
 msgid "With « Tickets chosen one by one »: only the registrations to these tickets."
 msgstr "Avec « Billets choisis un par un » : seulement les inscriptions à ces billets."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_survey_user_input__rlq_user_agent
+msgid "User-Agent"
+msgstr "User-Agent"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_survey_user_input__rlq_user_agent
+msgid "User-Agent of the browser that last answered this participation (public survey pages)."
+msgstr "User-Agent du navigateur qui a répondu en dernier à cette participation (pages publiques du sondage)."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_survey_user_input__rlq_os
+msgid "Operating system of the device that last answered this participation, read from its User-Agent."
+msgstr "Système d'exploitation de l'appareil qui a répondu en dernier à cette participation, lu dans son User-Agent."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_survey_user_input__rlq_browser
+msgid "Browser that last answered this participation, read from its User-Agent."
+msgstr "Navigateur qui a répondu en dernier à cette participation, lu dans son User-Agent."

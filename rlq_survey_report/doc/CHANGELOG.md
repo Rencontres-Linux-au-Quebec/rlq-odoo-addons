@@ -1,5 +1,36 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.140.0
+
+**Short title:** operating system and browser of every survey participation (diagnosis of a survey blocking on Firefox mobile), reminders to everybody who has not completed their survey.
+
+**Reason for the request:** [1] with Firefox mobile, a person could not go further than the first question of a survey on Odoo 18 CE; the operating system and the browser must be saved to understand the problem; [2] a way to send a reminder e-mail to everybody who has not completed their survey.
+
+**Concurrent changes:** checked before the work and before pushing: PR #23, #24 and #25 open and not merged, no other branch moved, `18.0` unchanged since PR #22. This branch starts from PR #25: merging it also brings #23, #24 and #25.
+
+**About the bug:** no known and documented bug of Odoo 18 matching "Firefox mobile stops after the first question" was found (only an old forum post about Odoo 14 on Android, without answer). The new fields let us see which device gets stuck before guessing.
+
+**Changes:**
+
+- [1] New `models/survey_device.py`: fields `survey.user_input.rlq_user_agent`, `rlq_os`, `rlq_browser`, filled from the request when it comes from a public page of a survey (`/survey/...`), on create, on write and when answer lines are created (each page answered); the back-office never replaces them. `registration_desk_report.parse_user_agent()` reads the system ("Android 14", "iOS 17.5", "Windows 10/11"...) and the browser ("Firefox 145", "Firefox iOS 133", "Chrome 131", "Samsung Internet 23", "Edge", "Safari"...). Shown: block "Appareil" of the participation form (Surveys), new fields `event.registration.rlq_survey_os` / `rlq_survey_browser` (from the participation used by the desk) in "Sondages non complétés", the desk and "Ouvrir en liste" (hidden by default in the desk), and the line "Appareil" of the page "Voir les réponses".
+- [2] `models/event_survey_followup.py`, `rlq.survey.pending`: `action_send_reminder()` (button "Envoyer un rappel", with confirmation): for each expected survey, a `survey.invite` in "resend" mode with the contacts of the registrations (or their address when there is no contact), sent with the invitation template of Odoo: each person gets their own link and continues where they stopped; a notification gives the count and the surveys not sent. `action_customize_reminder()` (button "Personnaliser le rappel"): the invitation window of Odoo filled with the people listed, when they all expect the same survey. Both for the administrators of the surveys or of the events only (`groups` on the buttons and check on the server).
+- `scripts/build_fr_po.py` (reads `survey_device.py` too), `scripts/fr_base.po`, `i18n/fr.po` (rebuilt); `release.py`; guide (news v1.140, v1.139, v1.138; reminders; troubleshooting line for a survey that blocks on a browser).
+
+**Bugs fixed:** none (diagnosis tool for the Firefox mobile problem).
+
+**Safeguards and edge cases:**
+
+- Only technical data is kept (User-Agent cut at 500 characters, no IP address). The User-Agent is written only when it changes.
+- Reminders: one failing survey (closed, login required...) does not stop the others; the people without address are left out; nobody sees the addresses of the others.
+- Without a request (scheduled action, shell, tests), nothing is captured and nothing breaks.
+
+**Checks performed:**
+
+- Standalone tests of run-all.sh: all [OK] (new: `parse_user_agent()` on Firefox Android/iOS, Chrome, Safari, Edge, Samsung; "Appareil" in the answers page); ruff: OK; `scripts/build_fr_po.py`: all terms translated; view XML parsed.
+- Odoo tests added (not run here, no Odoo instance): device fields read by the desk, reminder groups and recipients.
+
+**Action required from the user:** `-u rlq_survey_report --i18n-overwrite`. Then ask the person who was stuck to try again (the device is recorded from now on, not for the past participations), and look at "Sondages non complétés" (columns "Système d'exploitation" and "Navigateur"). Points "v1.140.0" of `doc/NOTES_VALIDATION.md`.
+
 ## 18.0.1.139.0
 
 **Short title:** "Voir les réponses" shows the name of the person; volunteer, sponsor or chosen tickets in "Sujets d'intérêt"; desk: filter "Réponse", "Questions répondues" hidden, last event displayed kept.

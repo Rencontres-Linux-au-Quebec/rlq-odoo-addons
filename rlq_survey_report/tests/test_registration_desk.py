@@ -191,6 +191,21 @@ class TestRlqRegistrationDesk(TransactionCase):
         self._participation("page@example.com", "done", lunch="Yes")
         self.assertTrue(registration.rlq_desk_user_input_id)
 
+    def test_device_of_the_participation_and_reminder(self):
+        """v1.140.0: the device fields exist and are read by the desk; reminders by survey, recipients without duplicates."""
+        registration = self._registration("Rappel Personne", "rappel@example.com")
+        user_input = self._participation("rappel@example.com", "in_progress", lunch="Yes")
+        if user_input:
+            user_input.sudo().write({"rlq_os": "Android 14", "rlq_browser": "Firefox 145"})
+            registration.invalidate_recordset()
+            self.assertEqual((registration.rlq_survey_os, registration.rlq_survey_browser), ("Android 14", "Firefox 145"))
+        pending = self.env["rlq.survey.pending"].create({"event_ids": [(6, 0, self.event.ids)]})
+        groups = pending._rlq_reminder_groups()
+        self.assertTrue(all(groups.values()))
+        for _survey, registrations in groups.items():
+            partners, emails = pending._rlq_invite_recipients(registrations)
+            self.assertFalse(set(emails) & set(partners.mapped("email")))
+
     def test_survey_columns_in_a_form_not_saved(self):
         """v1.133.0: in a form not saved yet, the registrations of the list are « new » copies (NewId): the survey state and
         the date of submission must be the ones of the real registration, not « No survey »."""

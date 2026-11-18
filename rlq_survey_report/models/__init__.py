@@ -23,4 +23,5 @@ from . import event_registration_desk
 from . import volunteer_coordinator
 from . import volunteer_expertise
 from . import audience_topics
+from . import survey_device
 from . import survey_answer_edit

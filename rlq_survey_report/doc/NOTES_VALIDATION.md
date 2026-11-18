@@ -6,6 +6,15 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -94. Appareil des participations, rappels des sondages (v1.140.0)
+
+**À confirmer après `-u rlq_survey_report --i18n-overwrite` :**
+1. Répondre à un sondage avec un téléphone (Firefox mobile) ; dans Sondages > Participations, la fiche montre le bloc « Appareil » (ex. Android 14, Firefox 145). Les anciennes participations restent vides.
+2. « Sondages non complétés » : colonnes « Système d'exploitation » et « Navigateur » ; la page « Voir les réponses » montre « Appareil ».
+3. « Envoyer un rappel » (administrateur) : confirmation, puis message « Rappel envoyé à N personnes » ; chaque personne reçoit son lien et reprend où elle était.
+4. « Personnaliser le rappel » pour un seul événement : la fenêtre d'invitation d'Odoo s'ouvre avec les personnes ; pour plusieurs sondages, un message explique de choisir un événement.
+5. Avec un utilisateur non administrateur : les deux boutons n'apparaissent pas.
+
 ## -93. Nom dans les réponses, billets des sujets d'intérêt, filtre Réponse, dernier événement (v1.139.0)
 
 **À confirmer après `-u rlq_survey_report --i18n-overwrite` :**

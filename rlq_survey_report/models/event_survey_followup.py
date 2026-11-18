@@ -35,7 +35,7 @@ from collections import defaultdict
 from datetime import timedelta
 
 from odoo import _, api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import AccessError, UserError
 
 from . import followup_report as fr
 from . import registration_desk_report as rd
@@ -341,6 +341,82 @@ class RlqSurveyPending(models.TransientModel):
             wizard.emails = "; ".join(emails)
             wizard.email_count = len(emails)
             wizard.missing_email_count = len(pending.filtered(lambda r: not (r.email or "").strip()))
+
+    # ------------------------------------------------------------------ reminders (v1.140.0)
+
+    def _rlq_reminder_groups(self):
+        """{survey: registrations} of the pending registrations listed, by their EXPECTED survey (ticket, otherwise event)."""
+        self.ensure_one()
+        registrations = self.registration_ids.sudo()
+        status = registrations._rlq_survey_status_map()
+        groups = defaultdict(lambda: self.env["event.registration"].sudo())
+        for registration in registrations:
+            survey = status.get(registration.id, (None,))[0]
+            if survey:
+                groups[survey] |= registration
+        return groups
+
+    @staticmethod
+    def _rlq_invite_recipients(registrations):
+        """(partners, e-mail addresses) to invite: the contact of the registration when it has an address, otherwise the
+        address of the registration (without duplicates)."""
+        partners = registrations.mapped("partner_id").filtered(lambda p: (p.email or "").strip())
+        emails = fr.unique_emails(r.email for r in registrations
+                                  if (r.email or "").strip() and (not r.partner_id or r.partner_id not in partners))
+        return partners, emails
+
+    def _rlq_check_reminder_rights(self):
+        from .event_registration_desk import can_contact                      # imported here: models/__init__.py order
+        if not can_contact(self.env):
+            raise AccessError(_("Only the administrators of the surveys or of the events may send reminders."))
+
+    def action_send_reminder(self):
+        """Button « Send a reminder »: the invitation e-mail of the Surveys application (template « Survey: Invite »), to every
+        person listed, survey by survey, with their PERSONAL link: « resend » mode, so a person who started continues where
+        they stopped, and a person who never opened the survey gets their link again. No address is shown to the others."""
+        self.ensure_one()
+        self._rlq_check_reminder_rights()
+        sent, failed = 0, []
+        for survey, registrations in self._rlq_reminder_groups().items():
+            partners, emails = self._rlq_invite_recipients(registrations)
+            if not partners and not emails:
+                continue
+            try:
+                with self.env.cr.savepoint():
+                    invite = self.env["survey.invite"].sudo().with_context(default_survey_id=survey.id).create({
+                        "survey_id": survey.id, "partner_ids": [(6, 0, partners.ids)], "emails": ", ".join(emails),
+                        "existing_mode": "resend"})
+                    invite.action_invite()
+                sent += len(partners) + len(emails)
+            except (UserError, ValueError) as error:
+                failed.append("%s : %s" % (survey.title, error))
+                _logger.warning("rlq_survey_report: reminder not sent for survey %s", survey.id, exc_info=True)
+        _logger.info("rlq_survey_report: survey reminders sent to %d people by user %s", sent, self.env.uid)
+        message = _("Reminder sent to %(count)d people.", count=sent)
+        if failed:
+            message += " " + _("Not sent: %(surveys)s", surveys="; ".join(failed))
+        return {"type": "ir.actions.client", "tag": "display_notification",
+                "params": {"title": _("Survey reminders"), "message": message, "sticky": bool(failed),
+                           "type": "warning" if failed or not sent else "success",
+                           "next": {"type": "ir.actions.act_window_close"}}}
+
+    def action_customize_reminder(self):
+        """Button « Customize the reminder »: the invitation window of the Surveys application, filled with the people listed
+        (subject, message, deadline can be changed before sending). Only when they all expect the SAME survey."""
+        self.ensure_one()
+        self._rlq_check_reminder_rights()
+        groups = self._rlq_reminder_groups()
+        if len(groups) != 1:
+            raise UserError(_("The people listed expect %(count)d different surveys: choose one event (or use « Send a "
+                              "reminder », which sends each person the invitation of their own survey).", count=len(groups)))
+        survey, registrations = next(iter(groups.items()))
+        partners, emails = self._rlq_invite_recipients(registrations)
+        return {
+            "type": "ir.actions.act_window", "name": _("Survey reminder"), "res_model": "survey.invite", "view_mode": "form",
+            "target": "new",
+            "context": {"default_survey_id": survey.id, "default_partner_ids": partners.ids, "default_emails": ", ".join(emails),
+                        "default_existing_mode": "resend"},
+        }
 
     def action_open_list(self):
         """The same registrations in a list (filters, grouping, export)."""
