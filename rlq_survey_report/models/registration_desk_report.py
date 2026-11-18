@@ -542,6 +542,106 @@ def _has_word(text, words):
     return any(word in key for word in words)
 
 
+VISITOR_WORDS = ("visiteur", "visitor")   # v1.138.0: « Visiteur », « Visiteurs », « Visitor » once accents and case are ignored
+
+TOPICS_TEXTS = {
+    "fr": {"all": "Sujets d'intérêt de l'audience", "visitors": "Sujets d'intérêt des visiteurs", "topic": "Sujet",
+           "total": "Total", "pct": "% des répondants", "free": "texte libre",
+           "respondents": "Répondants : %(respondents)d sur %(concerned)d personnes concernées par la question",
+           "no_question": "Aucune question de sondage n'est cochée « Afficher dans « Sujets d'intérêt » » : ouvrez le sondage "
+                          "du billet (ou de l'événement), puis la question : la case est en bas de sa fiche.",
+           "no_answer": "Personne n'a encore répondu à cette question.",
+           "nobody": "Aucune inscription à afficher pour cet événement et ces billets.",
+           "note": "Seuls des nombres sont affichés : aucun nom ni courriel. Une personne peut choisir plusieurs sujets. Les "
+                   "réponses libres (« Autre », questions texte) sont regroupées quand elles sont identiques, sans tenir "
+                   "compte des majuscules ni des accents."},
+    "en": {"all": "Topics of interest of the audience", "visitors": "Topics of interest of the visitors", "topic": "Topic",
+           "total": "Total", "pct": "% of respondents", "free": "free text",
+           "respondents": "Respondents: %(respondents)d of %(concerned)d people concerned by the question",
+           "no_question": "No survey question is checked « Show in « Topics of interest » »: open the survey of the ticket (or "
+                          "of the event), then the question: the box is at the bottom of its form.",
+           "no_answer": "Nobody has answered this question yet.",
+           "nobody": "No registration to show for this event and these tickets.",
+           "note": "Only numbers are shown: no name, no e-mail. A person can choose several topics. Free answers (« Other », "
+                   "text questions) are grouped when they are identical, case and accents ignored."},
+}
+
+
+def is_visitor_ticket(ticket_name):
+    """v1.138.0: True for a ticket whose name says « visiteur » / « visitor » (any case, with or without accents)."""
+    key = sort_key(ticket_name)
+    return any(word in key for word in VISITOR_WORDS)
+
+
+def topics_breakdown(people, questions):
+    """v1.138.0: for each question checked « Show in Topics of interest », the topics chosen and how many people chose each.
+
+    people: [{"ticket": name, "questions": {question index, ...} (the questions of their survey), "answers": {question
+    index: [texts]}}]; questions: [{"title", "choices"}] (choices empty: a text question).
+    Returns [{"title", "concerned", "respondents", "topics": [{"topic", "free", "count", "by_ticket": {ticket: n}}]}]: the
+    topics sorted by count (descending), then by name; a free answer (not one of the choices) is a topic of its own, the same
+    text written several times (case, accents and spaces ignored) counted together."""
+    result = []
+    for index, question in enumerate(questions or ()):
+        known = {sort_key(choice): choice for choice in question.get("choices") or ()}
+        topics, concerned, respondents = {}, 0, 0
+        for person in people or ():
+            if index not in (person.get("questions") or ()):
+                continue
+            concerned += 1
+            values = [" ".join(str(v).split()) for v in (person.get("answers") or {}).get(index, ()) if str(v or "").strip()]
+            if values:
+                respondents += 1
+            seen = set()
+            for value in values:
+                key = sort_key(value)
+                if key in seen:
+                    continue
+                seen.add(key)
+                topic = topics.setdefault(key, {"topic": known.get(key, value), "free": key not in known, "count": 0,
+                                                "by_ticket": {}})
+                topic["count"] += 1
+                ticket = person.get("ticket") or ""
+                topic["by_ticket"][ticket] = topic["by_ticket"].get(ticket, 0) + 1
+        ranked = sorted(topics.values(), key=lambda t: (-t["count"], sort_key(t["topic"])))
+        result.append({"title": question.get("title") or "", "concerned": concerned, "respondents": respondents,
+                       "topics": ranked})
+    return result
+
+
+def topics_html(breakdown, tickets=(), lang=DEFAULT_LANG, scope="all", notes=()):
+    """v1.138.0: page « Sujets d'intérêt »: one table per question (topic, one column per ticket when there are several,
+    total, % of respondents). Only numbers: no personal information. Everything is escaped."""
+    labels = TOPICS_TEXTS["en"] if texts(lang) is TEXTS["en"] else TOPICS_TEXTS["fr"]
+    tickets = list(tickets or ())
+    per_ticket = len(tickets) > 1
+    html = ["<h4>%s</h4>" % _clean(labels["visitors" if scope == "visitors" else "all"])]
+    html += ['<p class="text-muted small">%s</p>' % _clean(note) for note in notes or ()]
+    if breakdown is None:
+        html.append("<p>%s</p>" % _clean(labels["nobody"]))
+        return "".join(html)
+    if not breakdown:
+        html.append("<p>%s</p>" % _clean(labels["no_question"]))
+        return "".join(html)
+    for question in breakdown:
+        html.append('<h5 style="margin-top:1rem;"><strong>%s</strong></h5>' % _clean(question["title"]))
+        html.append('<p class="text-muted small">%s</p>' % _clean(labels["respondents"] % {
+            "respondents": question["respondents"], "concerned": question["concerned"]}))
+        if not question["topics"]:
+            html.append("<p>%s</p>" % _clean(labels["no_answer"]))
+            continue
+        head = [labels["topic"]] + (tickets if per_ticket else []) + [labels["total"], labels["pct"]]
+        html += [_TABLE, "<thead>%s</thead><tbody>" % _row(head, tag="th")]
+        for number, topic in enumerate(question["topics"]):
+            name = topic["topic"] + (" (%s)" % labels["free"] if topic["free"] else "")
+            cells = [name] + ([topic["by_ticket"].get(ticket, 0) for ticket in tickets] if per_ticket else []) + [
+                topic["count"], percent_text(topic["count"], question["respondents"], lang)]
+            html.append(_row(cells, stripe=number % 2 == 1))
+        html.append("</tbody></table>")
+    html.append('<p class="text-muted small">%s</p>' % _clean(labels["note"]))
+    return "".join(html)
+
+
 def is_volunteer_ticket(ticket_name):
     """True for a ticket whose name says « bénévole » (any case, with or without accents)."""
     return VOLUNTEER_WORD in sort_key(ticket_name)

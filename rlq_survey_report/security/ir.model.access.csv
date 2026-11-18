@@ -16,3 +16,4 @@ access_rlq_survey_answer_change_system,rlq.survey.answer.change.system,model_rlq
 access_rlq_survey_answer_edit_survey_manager,rlq.survey.answer.edit.survey.manager,model_rlq_survey_answer_edit,survey.group_survey_manager,1,1,1,1
 access_rlq_survey_answer_edit_line_survey_manager,rlq.survey.answer.edit.line.survey.manager,model_rlq_survey_answer_edit_line,survey.group_survey_manager,1,1,1,1
 access_rlq_volunteer_expertise_event_user,rlq.volunteer.expertise.event.user,model_rlq_volunteer_expertise,event.group_event_user,1,1,1,1
+access_rlq_audience_topics_event_user,rlq.audience.topics.event.user,model_rlq_audience_topics,event.group_event_user,1,1,1,1

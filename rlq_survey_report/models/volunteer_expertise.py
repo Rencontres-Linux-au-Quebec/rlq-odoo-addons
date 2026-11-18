@@ -18,11 +18,11 @@ choice (1 when chosen: the totals count the volunteers who have this expertise);
 questions of several volunteer surveys with the same title share their columns.
 """
 from odoo import _, api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import AccessError, UserError
 
 from . import registration_desk_report as rd
-from .event_registration_desk import ANSWERS_URL, CHAT_URL, contact_action, guide_action, local_zone, program_stamp
-from .event_registration_desk import registration_list_action
+from .event_registration_desk import (ANSWERS_URL, CHAT_URL, can_contact, contact_action, guide_action, local_zone,
+                                      program_stamp, registration_list_action)
 from .volunteer_coordinator import CHOICE_TYPES, download_xlsx, openpyxl
 
 
@@ -148,6 +148,8 @@ class RlqVolunteerExpertise(models.TransientModel):
 
     def action_contact(self):
         self.ensure_one()
+        if not can_contact(self.env):                                    # v1.138.0: before the confirmation window
+            raise AccessError(_("Only the administrators of the surveys or of the events may contact the participants."))
         guard = self._rlq_pi_guard("action_contact")
         if guard:
             return guard

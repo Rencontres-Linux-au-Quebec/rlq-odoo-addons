@@ -1,5 +1,35 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.138.0
+
+**Short title:** "Contacter les participants" for the administrators of the surveys or the events only; new pages "Sujets d'intérêt de l'audience" and "Sujets d'intérêt des visiteurs".
+
+**Reason for the request:** [1] the button "Contacter les participants" must be available only to the administrators of the surveys or of the events; [2] a menu entry to see the list of the topics that could interest the audience (when the option is chosen on the survey question); [3] the same for the "visiteur" tickets.
+
+**Concurrent changes:** checked before the work and before pushing: PR #23 (18.0.1.137.0) open and not merged, no other branch moved, `18.0` unchanged since PR #22. This branch starts from PR #23: merging it also brings #23.
+
+**Changes:**
+
+- [1] `models/event_registration_desk.py`: `CONTACT_GROUPS` (`survey.group_survey_manager`, `event.group_event_manager`), `can_contact()`; `contact_action()` refuses other users (`AccessError`); the `action_contact()` of the desk, of "Gestion des bénévoles" and of "Expertises des bénévoles" check it BEFORE the confirmation window. `views/event_registration_desk_views.xml`: the three buttons have `groups="survey.group_survey_manager,event.group_event_manager"`.
+- [2] [3] New `models/audience_topics.py`: field `survey.question.rlq_audience_topics` ("Afficher dans « Sujets d'intérêt »", block "Topics of interest" of the question form; `rlq_desk_label` used as title); transient model `rlq.audience.topics` (event, "Billets": every ticket / visitor tickets; buttons Actualiser, Aide de cette page); expected survey of each registration (ticket, otherwise event) and the same participation as the registration desk. `registration_desk_report.py`: `VISITOR_WORDS`, `is_visitor_ticket()`, `TOPICS_TEXTS`, `topics_breakdown()`, `topics_html()`. Two actions (`default_scope` all / visitors) and four menus (Events and Surveys > Rapports RLQ), access rights.
+- `scripts/build_fr_po.py` (reads `audience_topics.py` too), `i18n/fr.po` (rebuilt); `release.py`; guide: new section `#sujets-interet`, "Nouveautés des trois dernières versions" (v1.138, v1.137, v1.136), contact for administrators, menus.
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:**
+
+- The topics pages show only numbers (no name, no e-mail): no export, no contact, no confirmation window.
+- Topics: an answer counted once per person even if written twice; free answers grouped when identical (case, accents, spaces ignored); percentages out of the people who answered the question; "concerned" = the people whose survey contains the question.
+- No registration, no checked question, no answer: a clear message instead of an empty table.
+- Contact: the rights are checked on the server too, not only by the visibility of the button.
+
+**Checks performed:**
+
+- Standalone tests of run-all.sh: all [OK] (new: topics breakdown and page, visitor tickets); ruff: OK; `scripts/build_fr_po.py`: all terms translated; view XML parsed.
+- Odoo tests added/updated (not run here, no Odoo instance): topics page for both scopes, contact refused without the rights.
+
+**Action required from the user:** `-u rlq_survey_report --i18n-overwrite`; in the surveys, check "Afficher dans « Sujets d'intérêt »" on the questions about the wanted topics; then the points "v1.138.0" of `doc/NOTES_VALIDATION.md`.
+
 ## 18.0.1.137.0
 
 **Short title:** new page "Expertises des bénévoles", menu "Gestion des bénévoles", "Contacter les participants" opens an Email Marketing mailing, header shows the time of the last change of the module, guide "Nouveautés" lists the last three versions.

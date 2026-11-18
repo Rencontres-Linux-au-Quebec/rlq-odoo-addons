@@ -86,7 +86,8 @@
                 <header>
                     <button name="action_refresh" type="object" string="Refresh" icon="fa-refresh" class="btn-primary"/>
                     <button name="action_open_list" type="object" string="Open as a list" icon="fa-list"/>
-                    <button name="action_contact" type="object" string="Contact the participants" icon="fa-envelope"/>
+                    <button name="action_contact" type="object" string="Contact the participants" icon="fa-envelope"
+                            groups="survey.group_survey_manager,event.group_event_manager"/>
                     <!-- v1.134.0: the guide, opened at the section of this page -->
                     <button name="action_open_guide" type="object" string="Help for this page" icon="fa-question-circle"/>
                 </header>
@@ -220,11 +221,15 @@
             <xpath expr="//sheet" position="inside">
                 <group string="Registration desk" name="rlq_registration_desk">
                     <field name="rlq_registration_desk"/>
-                    <field name="rlq_desk_label" invisible="not rlq_registration_desk and not rlq_volunteer_expertise"/>
+                    <field name="rlq_desk_label" invisible="not rlq_registration_desk and not rlq_volunteer_expertise and not rlq_audience_topics"/>
                 </group>
                 <!-- v1.137.0: the questions shown in « Volunteer expertise » -->
                 <group string="Volunteers" name="rlq_volunteer_expertise">
                     <field name="rlq_volunteer_expertise"/>
+                </group>
+                <!-- v1.138.0: the questions counted in « Topics of interest » -->
+                <group string="Topics of interest" name="rlq_audience_topics">
+                    <field name="rlq_audience_topics"/>
                 </group>
             </xpath>
         </field>
@@ -248,7 +253,8 @@
                     <button name="action_export_excel" type="object" string="Export to a spreadsheet" icon="fa-file-excel-o"/>
                     <!-- v1.135.0: as at the registration desk -->
                     <button name="action_open_list" type="object" string="Open as a list" icon="fa-list"/>
-                    <button name="action_contact" type="object" string="Contact the participants" icon="fa-envelope"/>
+                    <button name="action_contact" type="object" string="Contact the participants" icon="fa-envelope"
+                            groups="survey.group_survey_manager,event.group_event_manager"/>
                     <!-- v1.134.0: the guide, opened at the section of this page -->
                     <button name="action_open_guide" type="object" string="Help for this page" icon="fa-question-circle"/>
                 </header>
@@ -345,7 +351,8 @@
                     <button name="action_refresh" type="object" string="Refresh" icon="fa-refresh" class="btn-primary"/>
                     <button name="action_export_excel" type="object" string="Export to a spreadsheet" icon="fa-file-excel-o"/>
                     <button name="action_open_list" type="object" string="Open as a list" icon="fa-list"/>
-                    <button name="action_contact" type="object" string="Contact the participants" icon="fa-envelope"/>
+                    <button name="action_contact" type="object" string="Contact the participants" icon="fa-envelope"
+                            groups="survey.group_survey_manager,event.group_event_manager"/>
                     <button name="action_open_guide" type="object" string="Help for this page" icon="fa-question-circle"/>
                 </header>
                 <sheet>
@@ -385,6 +392,78 @@
               parent="menu_rlq_survey_report_in_survey_app"
               action="action_rlq_volunteer_expertise"
               sequence="78"
+              groups="event.group_event_user"/>
+
+    <!-- v1.138.0 - « Sujets d'intérêt » (audience_topics.py): the topics that could interest the audience, counted from the
+         questions checked « Show in Topics of interest ». Two menus: every ticket, and the visitor tickets only. -->
+    <record id="view_rlq_audience_topics_form" model="ir.ui.view">
+        <field name="name">rlq.audience.topics.form</field>
+        <field name="model">rlq.audience.topics</field>
+        <field name="arch" type="xml">
+            <form string="Topics of interest">
+                <header>
+                    <button name="action_refresh" type="object" string="Refresh" icon="fa-refresh" class="btn-primary"/>
+                    <button name="action_open_guide" type="object" string="Help for this page" icon="fa-question-circle"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="event_id" options="{'no_create': True}" context="{'rlq_recent_first': True}"/>
+                        </group>
+                        <group>
+                            <field name="scope"/>
+                        </group>
+                    </group>
+                    <field name="table_html" readonly="1" nolabel="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rlq_audience_topics" model="ir.actions.act_window">
+        <field name="name">Topics of interest of the audience</field>
+        <field name="res_model">rlq.audience.topics</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_rlq_audience_topics_form"/>
+        <field name="target">current</field>
+        <field name="context">{'default_scope': 'all'}</field>
+    </record>
+
+    <record id="action_rlq_audience_topics_visitors" model="ir.actions.act_window">
+        <field name="name">Topics of interest of the visitors</field>
+        <field name="res_model">rlq.audience.topics</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_rlq_audience_topics_form"/>
+        <field name="target">current</field>
+        <field name="context">{'default_scope': 'visitors'}</field>
+    </record>
+
+    <menuitem id="menu_rlq_audience_topics_events"
+              name="Topics of interest of the audience"
+              parent="menu_rlq_reports_events"
+              action="action_rlq_audience_topics"
+              sequence="36"
+              groups="event.group_event_user"/>
+
+    <menuitem id="menu_rlq_audience_topics_visitors_events"
+              name="Topics of interest of the visitors"
+              parent="menu_rlq_reports_events"
+              action="action_rlq_audience_topics_visitors"
+              sequence="37"
+              groups="event.group_event_user"/>
+
+    <menuitem id="menu_rlq_audience_topics_surveys"
+              name="Topics of interest of the audience"
+              parent="menu_rlq_survey_report_in_survey_app"
+              action="action_rlq_audience_topics"
+              sequence="79"
+              groups="event.group_event_user"/>
+
+    <menuitem id="menu_rlq_audience_topics_visitors_surveys"
+              name="Topics of interest of the visitors"
+              parent="menu_rlq_survey_report_in_survey_app"
+              action="action_rlq_audience_topics_visitors"
+              sequence="79"
               groups="event.group_event_user"/>
 
 </odoo>
