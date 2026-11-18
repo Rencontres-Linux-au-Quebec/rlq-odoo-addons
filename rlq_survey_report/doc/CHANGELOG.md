@@ -1,5 +1,33 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.144.0
+
+**Short title:** "Non" no longer counted in the totals of "Gestion des bénévoles"; every "§ N" of the guide is a link to its section.
+
+**Reason for the request:** [1] in a "Gestion des bénévoles" report, an answer "non" must not increment the total; [2] in the documentation, a reference such as "(voir § 2)" must be a hyperlink to section 2.
+
+**Concurrent changes:** checked before the work and before pushing: PR #27, #28 and #29 merged into `18.0` this morning, no open PR, no other branch moved. This branch starts from `18.0`.
+
+**Bugs fixed:**
+
+- [1] Symptom: an extra column such as "Dîner ?" counted "Non" as one more volunteer. Diagnosis: `volunteer_column_totals()` counted every non-empty cell. Fix: new `is_negative_answer()` ("Non", "non merci", "Non, je ne pourrai pas", "Aucun(e)", "No", "Jamais", "0", "-", "N/A"..., accents and case ignored, decided by the first word, the hyphen kept: "Non-binaire" is not a "no"); `_counts()` is used for the extra columns, languages, arrival and departure hours, role cells (free text of "Autre") and the totals of "Expertises des bénévoles". The cell is still shown.
+- Guide: "(voir section 15)" pointed to the wrong section since the sections were renumbered (the system parameter is in § 17); fixed.
+
+**Changes:**
+
+- `models/registration_desk_report.py`: `NEGATIVE_WORDS`, `NEGATIVE_VALUES`, `is_negative_answer()`, `_counts()`; `volunteer_column_totals()` and `expertise_totals()` use them.
+- `doc/Guide-utilisateur-rlq_survey_report.html`: the 32 "§ N" and the 2 "section N" are links `<a href="#<section id>">`; news v1.144, v1.143, v1.142; note on the totals in "Gestion des bénévoles".
+- `tests/test_release.py`: new test, every "§ N" / "section N" of the guide is a link to the right section, and every internal link leads to an existing anchor. `tests/test_registration_desk_report.py`: negative answers. `release.py`.
+
+**Safeguards and edge cases:**
+
+- Only the totals change; the spreadsheet keeps the text of the answers ("Non" stays readable); the column "Présentiel" and the roles with 1 are unchanged.
+- A new "§ N" written later without a link makes `tests/test_release.py` fail.
+
+**Checks performed:** standalone tests of run-all.sh: all [OK]; ruff: OK; `scripts/build_fr_po.py`: all terms translated.
+
+**Action required from the user:** `-u rlq_survey_report`; check the totals of "Gestion des bénévoles" and a few links "§" of the guide ("Aide de cette page"). Points "v1.144.0" of `doc/NOTES_VALIDATION.md`.
+
 ## 18.0.1.143.0
 
 **Short title:** "Vos réponses" e-mail not received: the survey link of the registrations carries the address, the result of every sending attempt is kept and logged, manual resend button.

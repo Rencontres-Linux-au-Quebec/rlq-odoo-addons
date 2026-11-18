@@ -6,6 +6,12 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -98. « Non » hors des totaux des bénévoles, liens « § » du guide (v1.144.0)
+
+**À confirmer après `-u rlq_survey_report` :**
+1. Gestion des bénévoles : dans une colonne où certains ont répondu « Non », le total du haut et du bas ne compte que les autres réponses.
+2. Guide (bouton « Aide de cette page ») : cliquer un « § 15 » mène à la section 15 ; « voir § 17 » (paramètre courriel_inscriptions) mène aux administrateurs.
+
 ## -97. Courriel « Vos réponses » non reçu (v1.143.0)
 
 **À confirmer après `-u rlq_survey_report` :**

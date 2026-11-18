@@ -904,9 +904,33 @@ def reconciliation_html(items, lang=DEFAULT_LANG):
     return "".join(html)
 
 
+NEGATIVE_WORDS = ("non", "no", "aucun", "aucune", "none", "jamais", "never", "nope", "faux", "false")
+NEGATIVE_VALUES = ("0", "-", "n/a", "na", "s.o.", "so", "sans objet", "pas du tout", "not at all")
+
+
+def is_negative_answer(value):
+    """v1.144.0: True for an answer that means « no » (« Non », « non merci », « Aucune », « No », « 0 », « - », « N/A »...),
+    accents and case ignored: such a cell is shown but NOT counted in the totals. The first word decides (« Non, je ne
+    pourrai pas »), split on spaces and punctuation but not on the hyphen (« Non-binaire » is not a « no »)."""
+    text = " ".join(str(value or "").split())
+    if not text:
+        return False
+    key = sort_key(text)
+    if key in NEGATIVE_VALUES:
+        return True
+    first = re.split(r"[\s,;.:!?()]+", key, maxsplit=1)[0]
+    return first in NEGATIVE_WORDS
+
+
+def _counts(value):
+    """A cell counts in a total when it is not empty and does not mean « no »."""
+    return bool(str(value or "").strip()) and not is_negative_answer(value)
+
+
 def volunteer_column_totals(rows, role_groups=(), extra_count=0):
     """v1.131.0: one total per column of the volunteers' table: the number of volunteers in the name column, the number of
-    completed surveys in the survey column, and the number of non-empty cells (a role chosen, an hour given...) elsewhere."""
+    completed surveys in the survey column, and the number of non-empty cells (a role chosen, an hour given...) elsewhere.
+    v1.144.0: a cell that means « no » (« Non », « Aucun »..., is_negative_answer()) is not counted."""
     rows = list(rows or ())
     totals = [len(rows)]
     for key in ("registered", "survey", "type", "on_site", "languages", "arrived", "departed"):
@@ -914,10 +938,12 @@ def volunteer_column_totals(rows, role_groups=(), extra_count=0):
             totals.append(sum(1 for row in rows if row.get("survey") == "done"))
         elif key == "on_site":                                    # v1.136.0: the volunteers who will be there in person
             totals.append(sum(1 for row in rows if is_on_site(row.get("type"))))
-        else:
+        elif key in ("registered", "type"):
             totals.append(sum(1 for row in rows if str(row.get(key) or "").strip()))
+        else:
+            totals.append(sum(1 for row in rows if _counts(row.get(key))))
     for index in range(extra_count):
-        totals.append(sum(1 for row in rows if index < len(row.get("extra") or ()) and str(row["extra"][index] or "").strip()))
+        totals.append(sum(1 for row in rows if index < len(row.get("extra") or ()) and _counts(row["extra"][index])))
     for group_index, group in enumerate(role_groups or ()):
         if not group.get("choices"):
             continue
@@ -926,7 +952,7 @@ def volunteer_column_totals(rows, role_groups=(), extra_count=0):
             values = list(row.get("roles") or ())
             cells = role_cells(group["choices"], values[group_index] if group_index < len(values) else ())
             for index, cell in enumerate(cells):
-                if cell:
+                if _counts(cell):
                     counts[index] += 1
         totals += counts
     return totals
@@ -953,7 +979,7 @@ def expertise_totals(rows, columns):
             cells = expertise_cells(column, answers[index] if index < len(answers) else ())
             counts = counts or [0] * len(cells)
             for position, cell in enumerate(cells):
-                counts[position] += 1 if str(cell or "").strip() else 0
+                counts[position] += 1 if _counts(cell) else 0                       # v1.144.0: « Non » not counted
         totals += counts or [0] * max(len(column.get("choices") or ()), 1)
     return totals
 
