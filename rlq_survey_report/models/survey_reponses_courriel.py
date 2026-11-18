@@ -68,6 +68,12 @@ class SurveyUserInputReponses(models.Model):
         help="Date de mise en file du courriel qui rappelle ses réponses au participant "
              "(vide : jamais envoyé).",
     )
+    rlq_courriel_reponses_statut = fields.Char(
+        string="Courriel de réponses : résultat", copy=False, readonly=True,
+        help="Résultat de la dernière tentative d'envoi du courriel « Vos réponses » (v1.143.0) : mis en file pour une adresse, "
+             "ou la raison du non-envoi (aucune adresse connue, entrée de test, aucun modèle...). Le courriel envoyé est "
+             "ensuite supprimé des courriels sortants (Loi 25) : il n'y apparaît donc plus.",
+    )
     rlq_reponses_html = fields.Html(
         string="Réponses (courriel)", compute="_compute_rlq_reponses_html", sanitize=False,
         help="Questions et réponses de cette participation, en HTML - insérées dans le "
@@ -242,26 +248,59 @@ class SurveyUserInputReponses(models.Model):
         envoyes = 0
         for participation in self:
             try:
-                if participation.test_entry or participation.state != "done":
-                    continue
-                if participation.rlq_courriel_reponses_envoye and not force:
-                    continue
+                raison = None
+                if participation.test_entry:
+                    raison = "Non envoyé : entrée de test (bouton « Tester » du sondage)."
+                elif participation.state != "done":
+                    raison = "Non envoyé : le sondage n'est pas terminé."
+                elif participation.rlq_courriel_reponses_envoye and not force:
+                    continue                                                    # déjà envoyé : rien à changer
                 destinataire = participation._rlq_destinataire()
                 modele = participation._rlq_modele_reponses()
-                if not destinataire or not modele or not participation.rlq_reponses_html:
+                if not raison and not destinataire:
+                    raison = ("Non envoyé : aucune adresse courriel connue pour cette participation (personne non "
+                              "connectée, sans question de courriel, et lien du sondage sans « email= »).")
+                elif not raison and not modele:
+                    raison = "Non envoyé : aucun modèle de courriel (« Vos réponses au sondage » supprimé ?)."
+                elif not raison and not participation.rlq_reponses_html:
+                    raison = "Non envoyé : aucune réponse à mettre dans le courriel."
+                if raison:
+                    # v1.143.0 : la raison est gardée et journalisée ; avant, ces cas étaient sautés sans aucune trace.
+                    participation.sudo().rlq_courriel_reponses_statut = raison
+                    _logger.info("rlq_survey_report : survey.user_input %s - %s", participation.id, raison)
                     continue
                 with self.env.cr.savepoint():
                     modele.sudo().send_mail(
                         participation.id, force_send=False,
                         email_values={"email_to": destinataire, "recipient_ids": [(5,)], "auto_delete": True},
                     )
-                    participation.sudo().rlq_courriel_reponses_envoye = fields.Datetime.now()
+                    maintenant = fields.Datetime.now()
+                    participation.sudo().write({
+                        "rlq_courriel_reponses_envoye": maintenant,
+                        "rlq_courriel_reponses_statut": "Mis en file pour %s le %s (UTC) ; supprimé des courriels sortants "
+                                                        "après l'envoi." % (destinataire, fields.Datetime.to_string(maintenant)),
+                    })
+                _logger.info("rlq_survey_report : courriel de réponses mis en file pour survey.user_input %s", participation.id)
                 envoyes += 1
-            except Exception:  # noqa: BLE001 - ne JAMAIS bloquer la soumission du sondage
+            except Exception as erreur:  # noqa: BLE001 - ne JAMAIS bloquer la soumission du sondage
                 _logger.exception(
                     "rlq_survey_report : courriel de réponses non envoyé pour survey.user_input %s", participation.id
                 )
+                try:
+                    participation.sudo().rlq_courriel_reponses_statut = ("Échec : %s" % erreur)[:250]
+                except Exception:  # noqa: BLE001
+                    pass
         return envoyes
+
+    def action_rlq_renvoyer_reponses(self):
+        """Bouton « Envoyer ses réponses par courriel » de la fiche d'une participation (v1.143.0) : renvoie le courriel
+        même s'il a déjà été envoyé, et affiche le résultat."""
+        nombre = self.rlq_envoyer_reponses_courriel(force=True)
+        resultats = "; ".join(p.rlq_courriel_reponses_statut or "" for p in self)
+        return {"type": "ir.actions.client", "tag": "display_notification",
+                "params": {"title": "Courriel de réponses", "message": resultats, "sticky": not nombre,
+                           "type": "success" if nombre else "warning",
+                           "next": {"type": "ir.actions.client", "tag": "soft_reload"}}}
 
     def _mark_done(self):
         """Après le traitement natif, envoie au participant ses réponses (sondages cochés)."""

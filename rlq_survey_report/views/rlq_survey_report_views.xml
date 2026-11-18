@@ -71,6 +71,14 @@
         <field name="inherit_id" ref="survey.survey_user_input_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="inside">
+                <!-- v1.143.0 : résultat du courriel « Vos réponses » et renvoi manuel -->
+                <group string="Courriel de réponses au participant" name="rlq_courriel_reponses">
+                    <field name="rlq_courriel_reponses_envoye"/>
+                    <field name="rlq_courriel_reponses_statut"/>
+                    <button name="action_rlq_renvoyer_reponses" type="object" string="Envoyer ses réponses par courriel"
+                            class="btn-secondary" icon="fa-envelope" groups="survey.group_survey_user"
+                            confirm="Envoyer au participant le courriel de ses réponses (même s'il a déjà été envoyé) ?"/>
+                </group>
                 <group string="Commentaire (interne)">
                     <field name="rlq_commentaire_staff" nolabel="1" placeholder="Note libre sur cette réponse précise, visible dans le rapport une fois généré..."/>
                 </group>

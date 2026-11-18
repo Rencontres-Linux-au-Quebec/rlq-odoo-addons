@@ -1,5 +1,38 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.143.0
+
+**Short title:** "Vos réponses" e-mail not received: the survey link of the registrations carries the address, the result of every sending attempt is kept and logged, manual resend button.
+
+**Reason for the request:** after registering to an event and answering the survey, no e-mail with the answers was received, although "Envoyer ses réponses au participant ?" is checked on the survey; no error in the logs nor in the sent e-mails.
+
+**Concurrent changes:** checked before the work and before pushing: PR #27 and #28 open and not merged, no other branch moved, `18.0` unchanged since PR #26. This branch starts from PR #28: merging it also brings #27 and #28.
+
+**Bugs fixed:**
+
+- Symptom: no e-mail, nothing in the logs nor in the outgoing e-mails. Diagnosis: `rlq_envoyer_reponses_courriel()` skipped, WITHOUT ANY TRACE, a participation without address (no `email`, no `partner_id`), a test entry, a missing template or empty answers. A person who is not logged in and opens the link of the registration ("Lien du sondage (type de billet)", `survey.get_start_url()`, the same for everybody) creates an ANONYMOUS participation, unless the survey has an e-mail question: no recipient. And when the e-mail is sent, it is deleted from the outgoing e-mails after sending (`auto_delete`, Loi 25), so it is not seen there either. Fix: (1) the link of the registration now ends with `?email=<address of the registration>`: the route `/survey/start/<token>` of Odoo 18 passes it to `_create_answer(email=...)`, so the participation knows the address (also used by the registration desk to link the survey to the registration); (2) every attempt writes its result in the new field `survey.user_input.rlq_courriel_reponses_statut` and in the log (info): "Mis en file pour <address> le ...", or the reason of the non-sending; (3) a failure writes "Échec : ...".
+
+**Changes:**
+
+- `models/event_ticket_survey.py`: `avec_courriel()`; `_compute_rlq_lien_sondage_billet()` depends on `email` too.
+- New `migrations/18.0.1.143.0/post-migrate.py`: recomputes the stored link of the existing registrations (Odoo does not recompute a stored field when only its dependencies change).
+- `models/survey_reponses_courriel.py`: field `rlq_courriel_reponses_statut`; `rlq_envoyer_reponses_courriel()` keeps and logs the reason of every non-sending; `action_rlq_renvoyer_reponses()`.
+- `views/rlq_survey_report_views.xml`: block "Courriel de réponses au participant" on the form of a participation (date, result, button "Envoyer ses réponses par courriel", survey users).
+- `release.py`; guide (news v1.143, v1.142, v1.141; troubleshooting).
+
+**Safeguards and edge cases:**
+
+- The submission of a survey is never blocked: every error is caught, logged and kept as the result.
+- A participation that is already anonymous cannot get its address back: the person has to answer again with the new link, or the e-mail is sent by hand.
+- The address in the link is the one of the registration; it appears in the link received by the person only (and in the access log of the web server).
+
+**Checks performed:**
+
+- Standalone tests of run-all.sh: all [OK]; ruff: OK; `scripts/build_fr_po.py`: all terms translated; view XML parsed. The parameter `email` of `/survey/start` was checked in the source of Odoo 18 (`addons/survey/controllers/main.py`).
+- New Odoo test (not run here, no Odoo instance): link with the address, reason "aucune adresse" kept, sending queued for a known address.
+
+**Action required from the user:** `-u rlq_survey_report` (the migration recomputes the links). Open your participation in Surveys > Participations: the block "Courriel de réponses au participant" will say why the e-mail was not sent once you click "Envoyer ses réponses par courriel". Check that the confirmation e-mail of the registrations uses the field "Lien du sondage (type de billet)". Points "v1.143.0" of `doc/NOTES_VALIDATION.md`.
+
 ## 18.0.1.142.0
 
 **Short title:** "End Live Session" of Odoo made safe for event surveys, "Sondage" column in colour, duplicate "Nom du participant" column removed.

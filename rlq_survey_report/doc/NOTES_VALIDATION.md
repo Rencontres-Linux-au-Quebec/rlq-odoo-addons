@@ -6,6 +6,14 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -97. Courriel « Vos réponses » non reçu (v1.143.0)
+
+**À confirmer après `-u rlq_survey_report` :**
+1. Fiche d'une inscription : « Lien du sondage (type de billet) » se termine par « ?email=<adresse> ».
+2. S'inscrire sans être connecté, ouvrir le lien reçu, terminer le sondage : le courriel « Vos réponses » arrive ; la participation montre « Mis en file pour ... ».
+3. Sur votre participation de ce soir : cliquer « Envoyer ses réponses par courriel » ; le message indique le résultat (ex. « aucune adresse courriel connue »).
+4. Une participation faite avec « Tester » indique « entrée de test ».
+
 ## -96. Fin de session sans danger, couleurs de la colonne Sondage, colonne en double (v1.142.0)
 
 **À confirmer après `-u rlq_survey_report` :**

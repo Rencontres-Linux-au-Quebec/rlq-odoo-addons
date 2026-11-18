@@ -236,6 +236,19 @@ class TestRlqRegistrationDesk(TransactionCase):
             self.assertFalse(again.is_session_answer)
             self.assertNotEqual(again.state, "done")
 
+    def test_answers_email_link_and_reason(self):
+        """v1.143.0: the survey link of a registration carries its address (the participation then knows it); a participation
+        without any address keeps the reason why the « Vos réponses » e-mail was not sent."""
+        registration = self._registration("Lien Courriel", "lien.courriel+rlq@example.com")
+        self.assertIn("email=lien.courriel%2Brlq@example.com", registration.rlq_lien_sondage_billet or "")
+        self.survey.sudo().rlq_envoyer_reponses = True
+        anonymous = self.env["survey.user_input"].create({"survey_id": self.survey.id, "state": "done"})
+        self.assertEqual(anonymous.rlq_envoyer_reponses_courriel(force=True), 0)
+        self.assertIn("aucune adresse", anonymous.rlq_courriel_reponses_statut or "")
+        known = self._participation("connu@example.com", "done", lunch="Yes")
+        self.assertEqual(known.rlq_envoyer_reponses_courriel(force=True), 1)
+        self.assertIn("connu@example.com", known.rlq_courriel_reponses_statut or "")
+
     def test_survey_columns_in_a_form_not_saved(self):
         """v1.133.0: in a form not saved yet, the registrations of the list are « new » copies (NewId): the survey state and
         the date of submission must be the ones of the real registration, not « No survey »."""
