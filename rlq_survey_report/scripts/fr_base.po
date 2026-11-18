@@ -465,3 +465,8 @@ msgstr "Non envoyé : %(surveys)s"
 #, python-format
 msgid "The people listed expect %(count)d different surveys: choose one event (or use « Send a reminder », which sends each person the invitation of their own survey)."
 msgstr "Les personnes listées attendent %(count)d sondages différents : choisissez un seul événement (ou utilisez « Envoyer un rappel », qui envoie à chaque personne l'invitation de son propre sondage)."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_pending__live_session_html
+msgid "Live sessions"
+msgstr "Sessions en direct"

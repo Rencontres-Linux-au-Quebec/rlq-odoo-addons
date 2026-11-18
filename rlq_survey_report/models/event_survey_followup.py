@@ -327,6 +327,14 @@ class RlqSurveyPending(models.TransientModel):
                               "« Bcc » field of an e-mail).")
     email_count = fields.Integer(string="Addresses", compute="_compute_pending")
     missing_email_count = fields.Integer(string="Without e-mail address", compute="_compute_pending")
+    live_session_html = fields.Html(string="Live sessions", compute="_compute_live_session_html", sanitize=False)
+
+    @api.depends("event_ids")
+    def _compute_live_session_html(self):
+        """v1.141.0: warning when a survey of these events is in « live session » mode (participants blocked)."""
+        from .event_registration_desk import event_surveys, live_session_html     # imported here: models/__init__.py order
+        for wizard in self:
+            wizard.live_session_html = live_session_html(self.env, event_surveys(wizard.event_ids)) or False
 
     @api.depends("event_ids", "include_started")
     def _compute_pending(self):

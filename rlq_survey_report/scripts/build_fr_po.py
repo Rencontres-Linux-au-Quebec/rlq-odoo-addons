@@ -100,6 +100,29 @@ FR = {
     "Group By": "Regrouper par",
     "User guide": "Guide d'utilisation",
     "Help for this page": "Aide de cette page",                      # v1.134.0: button of the desk and the volunteers
+    # v1.141.0: participants blocked by a « live session »
+    "Live session mode: the participants wait for a host.": "Mode session en direct : les participants attendent un hôte.",
+    "Every person who opens this survey sees « wait for the host to go to the next question » and cannot go further than the first question.":
+        "Toute personne qui ouvre ce sondage voit « Veuillez attendre que l'hôte passe à la question suivante » et ne peut pas aller plus loin que la première question.",
+    "Do not use « End Live Session » of Odoo: it marks EVERY participation as completed, even the unfinished ones.":
+        "N'utilisez pas « Terminer la session en direct » d'Odoo : ce bouton marque TOUTES les participations comme complétées, même celles qui ne sont pas finies.",
+    "Participations waiting:": "Participations en attente :",
+    "Close the live session (keep the answers)": "Fermer la session en direct (garder les réponses)",
+    "Close the live session? The blocked participants will continue after reloading the page; no participation is marked completed.":
+        "Fermer la session en direct ? Les participants bloqués pourront continuer en rechargeant la page ; aucune participation n'est marquée complétée.",
+    "Participants blocked on the first question": "Participants bloqués à la première question",
+    "Survey « %(survey)s »: live session mode, %(count)d participations wait for a host. Open the survey and click « Close the live session (keep the answers) ».":
+        "Sondage « %(survey)s » : mode session en direct, %(count)d participations attendent un hôte. Ouvrez le sondage et cliquez « Fermer la session en direct (garder les réponses) ».",
+    "Only survey users can manage sessions.": "Seuls les utilisateurs des sondages peuvent gérer les sessions.",
+    "Live session closed": "Session en direct fermée",
+    "%(count)d participations can continue: the people only need to reload the page of the survey. No participation was marked completed.":
+        "%(count)d participations peuvent continuer : les personnes n'ont qu'à recharger la page du sondage. Aucune participation n'a été marquée complétée.",
+    "The survey « %(survey)s » is used by event registrations: a live session would make every person who opens it wait for a host, question by question. Duplicate the survey to run a live session.":
+        "Le sondage « %(survey)s » sert aux inscriptions d'un événement : une session en direct ferait attendre un hôte, question par question, à toute personne qui l'ouvre. Dupliquez le sondage pour faire une session en direct.",
+    "Participations waiting for the host": "Participations en attente de l'hôte",
+    "Participations not completed that are in « live session » mode: the person sees « wait for the host » and cannot go to the next question.":
+        "Participations non complétées en mode « session en direct » : la personne voit « attendez l'hôte » et ne peut pas passer à la question suivante.",
+    "Live session problem": "Problème de session en direct",
     # v1.140.0: device of the participations, survey reminders
     "Send a reminder": "Envoyer un rappel",
     "Send the invitation e-mail of their survey again to every person listed (each one receives their own link)?":
@@ -404,7 +427,7 @@ def add(msgid, ref, python=False):
 
 # 1. views
 VIEW_FILES = ("views/event_registration_desk_views.xml", "views/survey_answer_edit_views.xml", "views/event_survey_followup_views.xml")
-MODEL_FILES = ("event_registration_desk.py", "volunteer_coordinator.py", "survey_answer_edit.py", "volunteer_expertise.py", "audience_topics.py", "survey_device.py")
+MODEL_FILES = ("event_registration_desk.py", "volunteer_coordinator.py", "survey_answer_edit.py", "volunteer_expertise.py", "audience_topics.py", "survey_device.py", "survey_live_session.py")
 records = [record for view_file in VIEW_FILES for record in ET.parse("%s/%s" % (root_dir, view_file)).getroot()]
 for record in records:
     xmlid = record.get("id")
