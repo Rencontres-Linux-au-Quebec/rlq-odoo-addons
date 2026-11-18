@@ -100,6 +100,18 @@ FR = {
     "Group By": "Regrouper par",
     "User guide": "Guide d'utilisation",
     "Help for this page": "Aide de cette page",                      # v1.134.0: button of the desk and the volunteers
+    # v1.137.0: « Volunteer expertise », menu « Volunteer management », contact by mailing
+    "Volunteer management": "Gestion des bénévoles",
+    "Volunteer expertise": "Expertises des bénévoles",
+    "Volunteer expertise: %(event)s": "Expertises des bénévoles : %(event)s",
+    "Event: %(event)s": "Événement : %(event)s",
+    "No question checked « Show in Volunteer expertise » in the survey « %(survey)s ».":
+        "Aucune question cochée « Afficher dans Expertises des bénévoles » dans le sondage « %(survey)s ».",
+    "Show in « Volunteer expertise »": "Afficher dans « Expertises des bénévoles »",
+    "If checked, the answer of each volunteer to this question is shown in the page « Volunteer expertise » (Rapports RLQ): one column per choice, with the number of volunteers who chose it. Useful for questions such as « What are your areas of expertise? ». Only the survey of the volunteer ticket is read.":
+        "Si cochée, la réponse de chaque bénévole à cette question est affichée dans la page « Expertises des bénévoles » (Rapports RLQ) : une colonne par choix, avec le nombre de bénévoles qui l'ont choisi. Utile pour des questions comme « Quelles sont vos expertises ? ». Seul le sondage du billet bénévole est lu.",
+    "Order of the table. Case and accents are ignored; equal values are sorted by name.":
+        "Ordre du tableau. Les majuscules et les accents sont ignorés ; à égalité, le tri se fait par nom.",
     # v1.136.0: confirmation about personal information, once per page
     "Confirmation": "Confirmation",
     "This page shows personal information about the participants (names, e-mail addresses, phone numbers). I confirm that I am responsible for its confidentiality and will share it only with authorized people.":
@@ -342,7 +354,7 @@ def add(msgid, ref, python=False):
 
 # 1. views
 VIEW_FILES = ("views/event_registration_desk_views.xml", "views/survey_answer_edit_views.xml", "views/event_survey_followup_views.xml")
-MODEL_FILES = ("event_registration_desk.py", "volunteer_coordinator.py", "survey_answer_edit.py")
+MODEL_FILES = ("event_registration_desk.py", "volunteer_coordinator.py", "survey_answer_edit.py", "volunteer_expertise.py")
 records = [record for view_file in VIEW_FILES for record in ET.parse("%s/%s" % (root_dir, view_file)).getroot()]
 for record in records:
     xmlid = record.get("id")

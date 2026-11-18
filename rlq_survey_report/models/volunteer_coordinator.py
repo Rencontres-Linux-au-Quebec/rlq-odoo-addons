@@ -49,6 +49,29 @@ CHAT_URL = "/rlq_survey_report/chat/%d"
 CHOICE_TYPES = ("simple_choice", "multiple_choice")
 
 
+def download_xlsx(page, content, prefix, summary, count):
+    """Attachment + access history + download action of an .xlsx export (shared with « Volunteer expertise », v1.137.0).
+    The file contains names and e-mail addresses: every export is written in the access history of the reports."""
+    zone = local_zone(page.env, page.event_id)
+    stamp = fields.Datetime.context_timestamp(page.with_context(tz=zone), fields.Datetime.now()).strftime("%Y%m%d.%H%M%S")
+    name = "%s-%s-%s.xlsx" % (prefix, rb.slug(page.event_id.name)[:60], stamp)
+    attachment = page.env["ir.attachment"].create({
+        "name": name, "type": "binary", "datas": base64.b64encode(content), "res_model": page._name, "res_id": page.id,
+        "mimetype": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    })
+    try:                                                    # traceability, like the survey reports; never blocks the export
+        page.env["rlq.survey.report.acces"].sudo().create({
+            "user_id": page.env.user.id, "action": "excel", "nom_fichier": name, "attachment_id": attachment.id,
+            "fichier_telecharger": attachment.sudo().datas, "anonymise": False, "nb_sondages": 0,
+            "resume_sondages": (summary or "")[:250],
+        })
+    except Exception:  # noqa: BLE001
+        _logger.warning("rlq_survey_report: access log entry not written for %s", name, exc_info=True)
+    _logger.info("rlq_survey_report: spreadsheet %s exported by user %s (%d volunteers)", name, page.env.uid, count)
+    return {"type": "ir.actions.act_url", "url": "/web/content/%d?download=true&filename=%s" % (attachment.id, name),
+            "target": "page"}
+
+
 class RlqVolunteerCoordinator(models.TransientModel):
     _name = "rlq.volunteer.coordinator"
     _inherit = ["rlq.pi.confirmation.mixin"]                              # v1.136.0: confirmation once per page
@@ -123,6 +146,26 @@ class RlqVolunteerCoordinator(models.TransientModel):
         registrations = registrations.search([("event_id", "=", self.event_id.id), ("state", "in", list(LIST_STATES))])
         return registrations.filtered(lambda r: r.event_ticket_id and rd.is_volunteer_ticket(r.event_ticket_id.name))
 
+    def _rlq_volunteer_base(self):
+        """(registrations, status, values, chosen) of the volunteers, shared by this page and « Volunteer expertise »
+        (v1.137.0): the volunteer registrations, {registration id: (survey, state, done at)} with the survey of the volunteer
+        TICKET only (never the survey of the event), {(participation id, question id): [answers]} and {registration id:
+        participation id}."""
+        self.ensure_one()
+        registrations = self._rlq_volunteer_registrations()
+        if not registrations:
+            return registrations, {}, {}, {}
+        empty = self.env["survey.survey"].sudo().browse()
+        status = registrations._rlq_survey_status_map()
+        for registration in registrations:
+            survey = registration.event_ticket_id.rlq_survey_id
+            if not survey:
+                status[registration.id] = (empty, "none", None)
+            elif status[registration.id][0] != survey:                      # defensive: the map already prefers the ticket
+                status[registration.id] = (survey, status[registration.id][1], None)
+        _inputs, _answered, values, chosen = registrations._rlq_desk_participations(status)
+        return registrations, status, values, chosen
+
     def _rlq_survey_layout(self, survey):
         """The questions of one volunteer survey used by the table.
 
@@ -156,19 +199,9 @@ class RlqVolunteerCoordinator(models.TransientModel):
         """(rows, role groups, labels of the extra columns, notes) of the table: shared by the screen and the spreadsheet."""
         self.ensure_one()
         lang = self.env.lang or rd.DEFAULT_LANG
-        registrations = self._rlq_volunteer_registrations()
+        registrations, status, values, chosen = self._rlq_volunteer_base()
         if not registrations:
             return [], [], [], []
-        # The survey of the volunteer TICKET only (never the survey of the event).
-        empty = self.env["survey.survey"].sudo().browse()
-        status = registrations._rlq_survey_status_map()
-        for registration in registrations:
-            survey = registration.event_ticket_id.rlq_survey_id
-            if not survey:
-                status[registration.id] = (empty, "none", None)
-            elif status[registration.id][0] != survey:                      # defensive: the map already prefers the ticket
-                status[registration.id] = (survey, status[registration.id][1], None)
-        _inputs, _answered, values, chosen = registrations._rlq_desk_participations(status)
 
         layouts, notes = {}, []
         groups, group_index = [], {}                                         # role columns, shared by every volunteer survey
@@ -288,21 +321,4 @@ class RlqVolunteerCoordinator(models.TransientModel):
             raise UserError(_("No volunteer to export for this event."))
         lang = self.env.lang or rd.DEFAULT_LANG
         content = self._rlq_workbook(rd.volunteer_export_sheets(rows, groups, lang, extra_columns=extra_labels))
-        zone = local_zone(self.env, self.event_id)
-        stamp = fields.Datetime.context_timestamp(self.with_context(tz=zone), fields.Datetime.now()).strftime("%Y%m%d.%H%M%S")
-        name = "Benevoles-%s-%s.xlsx" % (rb.slug(self.event_id.name)[:60], stamp)
-        attachment = self.env["ir.attachment"].create({
-            "name": name, "type": "binary", "datas": base64.b64encode(content), "res_model": self._name, "res_id": self.id,
-            "mimetype": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        })
-        try:                                                    # traceability, like the survey reports; never blocks the export
-            self.env["rlq.survey.report.acces"].sudo().create({
-                "user_id": self.env.user.id, "action": "excel", "nom_fichier": name, "attachment_id": attachment.id,
-                "fichier_telecharger": attachment.sudo().datas, "anonymise": False, "nb_sondages": 0,
-                "resume_sondages": (_("Volunteers: %(event)s", event=self.event_id.name) or "")[:250],
-            })
-        except Exception:  # noqa: BLE001
-            _logger.warning("rlq_survey_report: access log entry not written for %s", name, exc_info=True)
-        _logger.info("rlq_survey_report: volunteers spreadsheet %s exported by user %s (%d volunteers)", name, self.env.uid, len(rows))
-        return {"type": "ir.actions.act_url", "url": "/web/content/%d?download=true&filename=%s" % (attachment.id, name),
-                "target": "self"}
+        return download_xlsx(self, content, "Benevoles", _("Volunteers: %(event)s", event=self.event_id.name), len(rows))

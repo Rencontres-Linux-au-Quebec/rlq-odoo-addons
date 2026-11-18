@@ -40,11 +40,14 @@ Sorting (v1.123.0):
 """
 import logging
 from collections import defaultdict
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 from odoo.tools import SQL
 
+from .. import release
 from . import registration_desk_report as rd
 from .registration_desk_report import sort_key
 
@@ -58,9 +61,9 @@ COMPUTED_SORTS = ("rlq_survey_state", "rlq_desk_progress", "rlq_desk_answers", "
 MAP_SORTS = ("rlq_survey_state", "rlq_desk_progress", "rlq_desk_answers", "rlq_desk_answers_html")   # sorts that need _rlq_desk_map()
 SURVEY_MANAGER_GROUP = "survey.group_survey_manager"                             # may change the answers (survey_answer_edit.py)
 TEXT_OPERATORS = ("ilike", "not ilike", "=", "!=")
-CHAT_URL = "/rlq_survey_report/chat/%d"
-GUIDE_URL = "/rlq_survey_report/aide#%s"
-ANSWERS_URL = "/rlq_survey_report/answers/%d"                                    # controllers/reponses.py: the answers of a person                                         # controllers/aide.py, section of the guide                                          # controllers/: opens Discuss with the contact
+CHAT_URL = "/rlq_survey_report/chat/%d"                                          # controllers/chat.py: opens Discuss with the contact
+GUIDE_URL = "/rlq_survey_report/aide#%s"                                         # controllers/aide.py, section of the guide
+ANSWERS_URL = "/rlq_survey_report/answers/%d"                                    # controllers/answers.py: the answers of a person
 STATE_ORDER = {"draft": 0, "open": 1, "done": 2, "cancel": 3}
 RECENT_EVENTS_FIRST = "date_begin desc, id desc"
 DEFAULT_ZONE = "America/Toronto"
@@ -107,17 +110,33 @@ def guide_action(env, anchor):
     return {"type": "ir.actions.act_url", "url": GUIDE_URL % anchor, "target": "new", "name": _("User guide")}
 
 
-def contact_action(env, registrations):
-    """v1.135.0: the e-mail window of Odoo, one e-mail per registration that has an address (mass mailing on
-    event.registration: each person receives their own e-mail, the addresses are never shown to the others)."""
+def contact_action(env, registrations, subject=None):
+    """Button « Contact the participants » (v1.135.0, v1.137.0).
+
+    With the application Email Marketing and its link to Events (mass_mailing_event, which makes event.registration a mailing
+    model): a NEW mailing, the same form as the button « Contact the attendees » of the event (/odoo/events/<id>/
+    mailing.mailing/new): newsletter templates, design editor, test e-mail, scheduling, statistics. Its recipients are the
+    registrations listed (« Recipients » shows the filter « id in [...] »); a person without address is skipped by the mailing.
+    Without that application: the e-mail window of Odoo in mass-mail mode (one e-mail per person)."""
     with_email = registrations.filtered(lambda r: (r.email or "").strip())
     if not with_email:
         raise UserError(_("No participant of this list has an e-mail address."))
+    events = with_email.mapped("event_id")
+    subject = subject or (_("Event: %(event)s", event=events[0].name) if len(events) == 1 else "")
+    if "mailing.mailing" in env and getattr(env["event.registration"], "_mailing_enabled", False):
+        return {
+            "type": "ir.actions.act_window", "name": _("Contact the participants"), "res_model": "mailing.mailing",
+            "view_mode": "form", "target": "current",
+            "context": {"default_mailing_model_id": env["ir.model"]._get_id("event.registration"),
+                        "default_mailing_domain": repr([("id", "in", with_email.ids)]),
+                        "default_subject": subject},
+        }
     return {
         "type": "ir.actions.act_window", "name": _("Contact the participants"), "res_model": "mail.compose.message",
         "view_mode": "form", "target": "new",
         "context": {"default_model": "event.registration", "default_res_ids": with_email.ids,
-                    "default_composition_mode": "mass_mail", "active_model": "event.registration", "active_ids": with_email.ids},
+                    "default_composition_mode": "mass_mail", "active_model": "event.registration", "active_ids": with_email.ids,
+                    "default_subject": subject},
     }
 
 
@@ -132,11 +151,19 @@ def registration_list_action(env, name, domain, event_id):
 
 
 def program_stamp(env, event=None):
-    """Footer of the screens: program name, installed version, local date and time of the display, with the time zone."""
-    zone = local_zone(env, event)
-    now = fields.Datetime.context_timestamp(env["res.users"].with_context(tz=zone), fields.Datetime.now())
+    """Header of the pages of the events: program name, installed version and, v1.137.0, the LOCAL date and time of the last
+    change of the module (release.py), with its time zone; before: the time of the display, which said nothing about the
+    version. When the files on the server are newer than the installed module, both versions are shown."""
     lang = env.lang or rd.DEFAULT_LANG
-    return rd.program_footer(PROGRAM, program_version(env), rd.local_stamp(now, "%Y-%m-%d %H:%M:%S", lang), zone, lang)
+    installed = program_version(env)
+    version = installed if installed == release.__version__ else "%s (%s %s)" % (
+        installed, "files" if rd.texts(lang) is rd.TEXTS["en"] else "fichiers", release.__version__)
+    try:
+        moment = datetime.strptime(release.VERSION_DATETIME, "%Y-%m-%d %H:%M:%S").replace(tzinfo=ZoneInfo(release.VERSION_ZONE))
+        changed = rd.local_stamp(moment, "%Y-%m-%d %H:%M:%S", lang)
+    except (ValueError, KeyError):                                       # a bad value never breaks the page
+        changed = release.VERSION_DATETIME
+    return rd.program_footer(PROGRAM, version, changed, release.VERSION_ZONE, lang, modified=True)
 
 
 class EventRegistrationDesk(models.Model):

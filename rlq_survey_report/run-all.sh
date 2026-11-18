@@ -8,6 +8,7 @@
 # run-all.sh - Lance TOUTES les vérifications du module rlq_survey_report
 # =============================================================================
 # Résumé des versions (détail complet : doc/run-all.changelog.txt) :
+#   1.6.20261117.192734 - standalone tests: tests.test_release added (release.py, manifest, CHANGELOG and guide agree, module 1.137.0)
 #   1.5.20261117.094611 - standalone tests: tests.test_related_fields added (type of the related fields, module 1.130.0)
 #   1.4.20261117.091527 - standalone tests: tests.test_translations added (escaped view texts in i18n/fr.po, module 1.129.0)
 #   1.3.20261116.145015 - standalone tests: tests.test_registration_desk_report added (registration desk, module 1.121.0)
@@ -22,7 +23,7 @@
 # la ligne de commande ont priorité. Voir scripts/LISEZMOI.md.
 # =============================================================================
 
-VERSION="1.5.20261117.094611"
+VERSION="1.6.20261117.192734"
 PROGRAMME="run-all"
 
 set -u
@@ -293,7 +294,7 @@ PYEOF
 
 etape_tests_autonomes() {
     etape "Tests autonomes"
-    if (cd "$RACINE" && "$PYTHON" -m unittest tests.test_report_builder tests.test_email_check tests.test_followup_report tests.test_registration_desk_report tests.test_translations tests.test_related_fields) >> "$ETAPE_LOG" 2>&1; then
+    if (cd "$RACINE" && "$PYTHON" -m unittest tests.test_report_builder tests.test_email_check tests.test_followup_report tests.test_registration_desk_report tests.test_translations tests.test_related_fields tests.test_release) >> "$ETAPE_LOG" 2>&1; then
         fin_etape OK "$(grep -E '^Ran [0-9]+ tests?' "$ETAPE_LOG" | tail -n 1) - OK"
     else
         fin_etape ECHEC "des tests autonomes échouent"; return 1

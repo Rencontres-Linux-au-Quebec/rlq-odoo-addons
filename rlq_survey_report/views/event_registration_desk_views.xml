@@ -220,7 +220,11 @@
             <xpath expr="//sheet" position="inside">
                 <group string="Registration desk" name="rlq_registration_desk">
                     <field name="rlq_registration_desk"/>
-                    <field name="rlq_desk_label" invisible="not rlq_registration_desk"/>
+                    <field name="rlq_desk_label" invisible="not rlq_registration_desk and not rlq_volunteer_expertise"/>
+                </group>
+                <!-- v1.137.0: the questions shown in « Volunteer expertise » -->
+                <group string="Volunteers" name="rlq_volunteer_expertise">
+                    <field name="rlq_volunteer_expertise"/>
                 </group>
             </xpath>
         </field>
@@ -273,7 +277,7 @@
     </record>
 
     <menuitem id="menu_rlq_volunteer_coordinator_events"
-              name="Volunteers"
+              name="Volunteer management"
               parent="menu_rlq_reports_events"
               action="action_rlq_volunteer_coordinator"
               sequence="30"
@@ -302,10 +306,85 @@
               groups="event.group_event_user"/>
 
     <menuitem id="menu_rlq_volunteer_coordinator_surveys"
-              name="Volunteers"
+              name="Volunteer management"
               parent="menu_rlq_survey_report_in_survey_app"
               action="action_rlq_volunteer_coordinator"
               sequence="77"
+              groups="event.group_event_user"/>
+
+    <!-- v1.137.0 - « Expertises des bénévoles » (volunteer_expertise.py): the answers of the volunteers to the questions
+         checked « Show in Volunteer expertise ». Same buttons and confirmation as « Gestion des bénévoles ». -->
+    <record id="view_rlq_volunteer_expertise_pi_confirmation" model="ir.ui.view">
+        <field name="name">rlq.volunteer.expertise.form.pi.confirmation</field>
+        <field name="model">rlq.volunteer.expertise</field>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <form string="Confirmation">
+                <sheet>
+                    <div class="alert alert-info" role="alert" style="display:flex;align-items:flex-start;gap:.6rem;">
+                        <span style="background:#fff;border:2px solid #000;border-radius:4px;padding:1px 3px;display:inline-flex;flex-shrink:0;margin-top:2px;">
+                            <field name="rlq_pi_confirmed" nolabel="1"/>
+                        </span>
+                        <label for="rlq_pi_confirmed" style="margin:0;" string="This page shows personal information about the participants (names, e-mail addresses, phone numbers). I confirm that I am responsible for its confidentiality and will share it only with authorized people."/>
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_rlq_pi_continue" type="object" string="Continue" class="btn-primary"/>
+                    <button special="cancel" string="Cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_rlq_volunteer_expertise_form" model="ir.ui.view">
+        <field name="name">rlq.volunteer.expertise.form</field>
+        <field name="model">rlq.volunteer.expertise</field>
+        <field name="arch" type="xml">
+            <form string="Volunteer expertise">
+                <header>
+                    <button name="action_refresh" type="object" string="Refresh" icon="fa-refresh" class="btn-primary"/>
+                    <button name="action_export_excel" type="object" string="Export to a spreadsheet" icon="fa-file-excel-o"/>
+                    <button name="action_open_list" type="object" string="Open as a list" icon="fa-list"/>
+                    <button name="action_contact" type="object" string="Contact the participants" icon="fa-envelope"/>
+                    <button name="action_open_guide" type="object" string="Help for this page" icon="fa-question-circle"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="event_id" options="{'no_create': True}" context="{'rlq_recent_first': True}"/>
+                            <field name="survey_filter"/>
+                        </group>
+                        <group>
+                            <field name="sort_by"/>
+                            <field name="sort_desc"/>
+                        </group>
+                    </group>
+                    <field name="table_html" readonly="1" nolabel="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rlq_volunteer_expertise" model="ir.actions.act_window">
+        <field name="name">Volunteer expertise</field>
+        <field name="res_model">rlq.volunteer.expertise</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_rlq_volunteer_expertise_form"/>
+        <field name="target">current</field>
+    </record>
+
+    <menuitem id="menu_rlq_volunteer_expertise_events"
+              name="Volunteer expertise"
+              parent="menu_rlq_reports_events"
+              action="action_rlq_volunteer_expertise"
+              sequence="35"
+              groups="event.group_event_user"/>
+
+    <menuitem id="menu_rlq_volunteer_expertise_surveys"
+              name="Volunteer expertise"
+              parent="menu_rlq_survey_report_in_survey_app"
+              action="action_rlq_volunteer_expertise"
+              sequence="78"
               groups="event.group_event_user"/>
 
 </odoo>
