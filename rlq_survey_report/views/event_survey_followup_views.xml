@@ -17,7 +17,7 @@
                 <field name="company_name" optional="hide"/>
                 <field name="event_ticket_id" optional="show"/>
                 <field name="rlq_expected_survey_id" optional="show"/>
-                <field name="rlq_survey_state"/>
+                <field name="rlq_survey_state" widget="badge" decoration-danger="rlq_survey_state == 'not_started'" decoration-warning="rlq_survey_state == 'in_progress'" decoration-success="rlq_survey_state == 'done'"/>
                 <field name="rlq_desk_progress" optional="hide"/>
                 <field name="rlq_survey_os" optional="show"/>
                 <field name="rlq_survey_browser" optional="show"/>
@@ -62,7 +62,7 @@
                         <field name="company_name" optional="hide"/>
                         <field name="event_ticket_id"/>
                         <field name="rlq_expected_survey_id" optional="hide"/>
-                        <field name="rlq_survey_state"/>
+                        <field name="rlq_survey_state" widget="badge" decoration-danger="rlq_survey_state == 'not_started'" decoration-warning="rlq_survey_state == 'in_progress'" decoration-success="rlq_survey_state == 'done'"/>
                         <field name="rlq_desk_progress" optional="hide"/>
                         <field name="rlq_survey_os" optional="show"/>
                         <field name="rlq_survey_browser" optional="show"/>

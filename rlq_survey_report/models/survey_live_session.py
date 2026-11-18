@@ -23,7 +23,8 @@ Diagnosis (Odoo 18, addons/survey/models/survey_survey.py):
 Repair, without that side effect: action_rlq_close_live_session() closes the session and makes the stuck participations
 normal again (is_session_answer = False): the participant reloads the page and continues; nothing is marked completed.
 Prevention: action_start_session() is refused for a survey used by an event (ticket or event), where a live session makes
-no sense. A warning is shown on the survey, at the registration desk and in « Sondages non complétés ».
+no sense; and (v1.142.0) the button « End Live Session » of Odoo, shown on the cards of Surveys > Surveys, does the safe close
+for such a survey. A warning is shown on the survey, at the registration desk and in « Sondages non complétés ».
 """
 import logging
 
@@ -74,6 +75,19 @@ class SurveySurveyLiveSession(models.Model):
                                   "person who opens it wait for a host, question by question. Duplicate the survey to run a live "
                                   "session.", survey=survey.title))
         return super().action_start_session()
+
+    def action_end_session(self):
+        """v1.141.0+: the button « End Live Session » of Odoo (also on the cards of Surveys > Surveys) marks EVERY participation
+        of the survey completed. For a survey used by an event, it now does the safe close instead (the people continue,
+        nothing is marked completed); a survey not used by an event (a real quiz) keeps the behaviour of Odoo."""
+        events_surveys = self.filtered(lambda s: s._rlq_used_by_events())
+        result = None
+        if events_surveys:
+            result = events_surveys.action_rlq_close_live_session()
+        others = self - events_surveys
+        if others:
+            result = super(SurveySurveyLiveSession, others).action_end_session()
+        return result
 
     def action_rlq_close_live_session(self):
         """Button « Close the live session (keep the answers) »: session closed, stuck participations made normal again.

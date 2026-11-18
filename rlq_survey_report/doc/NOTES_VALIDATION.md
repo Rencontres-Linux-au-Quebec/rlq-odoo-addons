@@ -6,6 +6,13 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -96. Fin de session sans danger, couleurs de la colonne Sondage, colonne en double (v1.142.0)
+
+**À confirmer après `-u rlq_survey_report` :**
+1. Sondages > Sondages : sur la carte d'un sondage d'événement en session, « Terminer la session en direct » affiche « Session en direct fermée » et les participations non finies restent « Commencé ».
+2. Bureau d'inscription : colonne « Sondage » en rouge (Non commencé), orange (Commencé), vert (Complété) ; pareil dans « Ouvrir en liste » et « Sondages non complétés ».
+3. Gestion des bénévoles > Ouvrir en liste : un seul « Nom du participant » dans le menu des colonnes.
+
 ## -95. Participants bloqués par une session en direct (v1.141.0)
 
 **À confirmer après `-u rlq_survey_report --i18n-overwrite` :**

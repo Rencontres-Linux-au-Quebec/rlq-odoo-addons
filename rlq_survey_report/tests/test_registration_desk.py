@@ -228,6 +228,13 @@ class TestRlqRegistrationDesk(TransactionCase):
             self.assertEqual(done.state, "done")
             self.survey.invalidate_recordset()
             self.assertFalse(self.survey.rlq_live_session_warning)
+            # v1.142.0: Odoo's « End Live Session » (cards of Surveys > Surveys) does the same safe close on an event survey.
+            self.survey.sudo().write({"session_state": "ready"})
+            again = self.survey._create_answer(email="encore@example.com")
+            self.survey.action_end_session()
+            self.assertFalse(self.survey.session_state)
+            self.assertFalse(again.is_session_answer)
+            self.assertNotEqual(again.state, "done")
 
     def test_survey_columns_in_a_form_not_saved(self):
         """v1.133.0: in a form not saved yet, the registrations of the list are « new » copies (NewId): the survey state and
