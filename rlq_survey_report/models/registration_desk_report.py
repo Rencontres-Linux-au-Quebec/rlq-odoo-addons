@@ -507,6 +507,10 @@ VOLUNTEER_TEXTS = {
         "done": "Complété", "in_progress": "Commencé", "not_started": "Non commencé", "none": "Aucun sondage",
         "on_site": "Présentiel", "online": "Virtuel", "yes": "1", "column_total": "Total",
         "unique": "Participants uniques (courriel)",
+        "expertise_title": "Expertises des bénévoles",
+        "no_expertise_question": "Aucune question de sondage n'est cochée « Afficher dans Expertises des bénévoles » : ouvrez "
+                                 "le sondage du billet bénévole, puis la question : la case est en bas de sa fiche.",
+        "other_text": "texte libre",
     },
     "en": {
         "name": "Volunteer", "registered": "Registered on", "survey": "Survey", "type": "Type", "languages": "Languages spoken",
@@ -515,6 +519,10 @@ VOLUNTEER_TEXTS = {
         "done": "Completed", "in_progress": "Started", "not_started": "Not started", "none": "No survey",
         "on_site": "On site", "online": "Online", "yes": "1", "column_total": "Total",
         "unique": "Unique participants (e-mail)",
+        "expertise_title": "Volunteer expertise",
+        "no_expertise_question": "No survey question is checked « Show in Volunteer expertise »: open the survey of the "
+                                 "volunteer ticket, then the question: the box is at the bottom of its form.",
+        "other_text": "free text",
     },
 }
 
@@ -703,6 +711,119 @@ def volunteer_column_totals(rows, role_groups=(), extra_count=0):
     return totals
 
 
+def expertise_cells(column, values, yes="1"):
+    """v1.137.0: the cells of one question of « Volunteer expertise » for one volunteer. A choice question (column["choices"]
+    not empty): one cell per choice, `yes` when chosen, the free text of « Autre » in the « Autre » (or last) cell, like the
+    roles. A text question: one cell, the answers joined."""
+    values = [v for v in (values or ()) if str(v or "").strip()]
+    if column.get("choices"):
+        return role_cells(column["choices"], values, yes)
+    return [", ".join(str(v) for v in values)]
+
+
+def expertise_totals(rows, columns):
+    """Number of volunteers per cell column (a choice chosen, a text answered), and the number of volunteers first."""
+    rows = list(rows or ())
+    totals = [len(rows)]
+    for index, column in enumerate(columns or ()):
+        counts = None
+        for row in rows:
+            answers = list(row.get("answers") or ())
+            cells = expertise_cells(column, answers[index] if index < len(answers) else ())
+            counts = counts or [0] * len(cells)
+            for position, cell in enumerate(cells):
+                counts[position] += 1 if str(cell or "").strip() else 0
+        totals += counts or [0] * max(len(column.get("choices") or ()), 1)
+    return totals
+
+
+def expertise_table_html(rows, columns=(), lang=DEFAULT_LANG, notes=()):
+    """v1.137.0: table « Volunteer expertise »: one line per volunteer (name: link to Discuss; survey state: link to every
+    answer), then, for each question checked « Show in Volunteer expertise », one column per choice (1 when chosen) or one
+    text column. Totals at the top and the bottom. Everything is escaped."""
+    labels = volunteer_texts(lang)
+    rows, columns = list(rows or ()), list(columns or ())
+    html = ['<h4>%s</h4>' % _clean(labels["expertise_title"])]
+    html += ['<p class="text-muted small">%s</p>' % _clean(note) for note in notes or ()]
+    if not columns:
+        html.append("<p>%s</p>" % _clean(labels["no_expertise_question"]))
+    if not rows:
+        html.append("<p>%s</p>" % _clean(labels["no_volunteer"]))
+        return "".join(html)
+    has_choices = any(column.get("choices") for column in columns)
+    span = ' rowspan="2"' if has_choices else ""
+    th, th_center = cell_style("th"), cell_style("th", extra="text-align:center")
+    head = "".join("<th%s%s>%s</th>" % (span, th, _clean(labels[k])) for k in ("name", "survey"))
+    for column in columns:
+        if column.get("choices"):
+            head += '<th colspan="%d"%s>%s</th>' % (len(column["choices"]), th_center, _clean(column["title"]))
+        else:
+            head += "<th%s%s>%s</th>" % (span, th, _clean(column["title"]))
+    head_lines = ["<tr>%s</tr>" % head]
+    if has_choices:
+        head_lines.append("<tr>%s</tr>" % "".join("<th%s>%s</th>" % (th_center, _clean(choice))
+                                                  for column in columns for choice in column.get("choices") or ()))
+    totals = expertise_totals(rows, columns)
+    total_cells = ["%s : %d" % (_clean(labels["column_total"]), totals[0]), ""] + [str(n) for n in totals[1:]]
+    total_line = "<tr>%s</tr>" % "".join("<th%s>%s</th>" % (cell_style(total=True, extra="text-align:center" if i else ""), c)
+                                         for i, c in enumerate(total_cells))
+    html += [_TABLE, "<thead>%s%s</thead><tbody>" % ("".join(head_lines), total_line)]
+    for number, row in enumerate(rows):
+        name = _clean(row.get("name"))
+        if row.get("chat_url"):
+            name = '<a href="%s" target="_blank">%s</a>' % (escape(str(row["chat_url"]), quote=True), name)
+        survey = _clean(labels.get(row.get("survey"), ""))
+        if row.get("answers_url") and survey:
+            survey = '<a href="%s" target="_blank">%s</a>' % (escape(str(row["answers_url"]), quote=True), survey)
+        cells = [name, survey]
+        answers = list(row.get("answers") or ())
+        for index, column in enumerate(columns):
+            for cell in expertise_cells(column, answers[index] if index < len(answers) else (), labels["yes"]):
+                text = _clean(cell)
+                cells.append('<span style="display:block;text-align:center;">%s</span>' % text
+                             if column.get("choices") and text == labels["yes"] else text)
+        td = cell_style(stripe=number % 2 == 1)
+        html.append("<tr>%s</tr>" % "".join("<td%s>%s</td>" % (td, cell) for cell in cells))
+    html.append("</tbody><tfoot>%s</tfoot></table><p>%s: %d - %s: %d</p>" % (
+        total_line, _clean(labels["total"]), len(rows), _clean(labels["unique"]), unique_people(rows)))
+    return "".join(html)
+
+
+def expertise_export_sheet(rows, columns=(), lang=DEFAULT_LANG):
+    """v1.137.0: (title, header, lines) of « Volunteer expertise » for the spreadsheet: name, e-mail, ticket, survey, then one
+    column per choice with the NUMBER 1 (empty otherwise, so that it can be summed) and one « (free text) » column per choice
+    question when somebody wrote one, or one text column per text question."""
+    labels = volunteer_texts(lang)
+    english = texts(lang) is TEXTS["en"]
+    words = {"email": "E-mail" if english else "Courriel", "ticket": "Ticket" if english else "Billet"}
+    columns = list(columns or ())
+    with_free = []
+    for index, column in enumerate(columns):
+        with_free.append(bool(column.get("choices")) and any(
+            role_numbers(column["choices"], (list(row.get("answers") or ())[index:index + 1] or [()])[0])[1] for row in rows or ()))
+    header = [labels["name"], words["email"], words["ticket"], labels["survey"]]
+    for column, free in zip(columns, with_free):
+        if column.get("choices"):
+            header += ["%s - %s" % (column["title"], choice) for choice in column["choices"]]
+            if free:
+                header.append("%s (%s)" % (column["title"], labels["other_text"]))
+        else:
+            header.append(column["title"])
+    lines = []
+    for row in rows or ():
+        answers = list(row.get("answers") or ())
+        line = [row.get("name") or "", row.get("email") or "", row.get("ticket") or "", labels.get(row.get("survey"), "")]
+        for index, (column, free) in enumerate(zip(columns, with_free)):
+            values = [v for v in (answers[index] if index < len(answers) else ()) if str(v or "").strip()]
+            if column.get("choices"):
+                numbers, texts_free = role_numbers(column["choices"], values)
+                line += numbers + ([", ".join(texts_free)] if free else [])
+            else:
+                line.append(", ".join(str(v) for v in values))
+        lines.append(line)
+    return labels["expertise_title"], _unique_labels(header), lines
+
+
 def volunteer_sort_value(row, sort_by):
     """Sort value of one row of the volunteers' table (case and accents ignored for the texts)."""
     if sort_by == "survey":
@@ -830,14 +951,17 @@ def local_stamp(moment, pattern="%Y-%m-%d %H:%M", lang=DEFAULT_LANG):
     return "%s %s" % (text, label) if label else text
 
 
-def program_footer(program, version, shown_at="", zone="", lang=DEFAULT_LANG):
+def program_footer(program, version, shown_at="", zone="", lang=DEFAULT_LANG, modified=False):
     """« rlq_survey_report 18.0.1.124.0 - affiché le 2026-11-16 21:15:02 HNE (heure locale, America/Toronto) » under a screen,
-    so that a screenshot says which version produced it and when. shown_at is already formatted in LOCAL time, never UTC."""
+    so that a screenshot says which version produced it and when. shown_at is already formatted in LOCAL time, never UTC.
+    v1.137.0: modified=True says « modifié le » / « modified on »: shown_at is then the time of the last change of the module
+    (release.VERSION_DATETIME), not the time of the display."""
     text = "%s %s" % (_clean(program), _clean(version or "?"))
     if shown_at:
         english = texts(lang) is TEXTS["en"]
         local = ("local time, %s" if english else "heure locale, %s") % _clean(zone) if zone else ("local time" if english else "heure locale")
-        text += " - %s %s (%s)" % ("shown on" if english else "affiché le", _clean(shown_at), local)
+        verb = ("modified on" if english else "modifié le") if modified else ("shown on" if english else "affiché le")
+        text += " - %s %s (%s)" % (verb, _clean(shown_at), local)
     return '<p class="text-muted small">%s</p>' % text
 
 

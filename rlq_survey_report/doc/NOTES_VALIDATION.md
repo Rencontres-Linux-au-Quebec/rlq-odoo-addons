@@ -6,6 +6,15 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -91. Expertises des bénévoles, Gestion des bénévoles, publipostage, heure de la version (v1.137.0)
+
+**À confirmer après `-u rlq_survey_report --i18n-overwrite` :**
+1. En haut des pages du bureau, de la gestion et des expertises des bénévoles : « rlq_survey_report 18.0.1.137.0 - modifié le 2026-11-17 ... HNE ». L'heure ne change plus à chaque affichage.
+2. Menu Rapports RLQ (Événements et Sondages) : « Gestion des bénévoles » et « Expertises des bénévoles ».
+3. Dans le sondage du billet bénévole, cocher « Afficher dans « Expertises des bénévoles » » sur une question à choix (ex. expertises) et sur une question texte ; la page montre une colonne par choix avec des 1 et les totaux ; l'export a des 1 qui s'additionnent.
+4. « Contacter les participants » (bureau, gestion, expertises) : après la confirmation, le formulaire de publipostage du Marketing par courriel s'ouvre, avec le choix du modèle ; onglet Destinataires : « ID est dans ... » ; envoyer un courriel d'essai.
+5. Guide : « Nouveautés des trois dernières versions » (v1.137, v1.136, v1.135) ; le bouton « Aide de cette page » des expertises ouvre la bonne section.
+
 ## -90. Participants uniques, Présentiel, 1 à l'écran, confirmation une fois par page, menus « Rapports RLQ » (v1.136.0)
 
 **À confirmer après `-u rlq_survey_report --i18n-overwrite` :**

@@ -99,6 +99,7 @@ msgstr "Inscription"
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_search
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__event_id
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_coordinator__event_id
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_expertise__event_id
 msgid "Event"
 msgstr "Événement"
 
@@ -106,6 +107,7 @@ msgstr "Événement"
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_email_fix_line__name
 #: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__sort_by__name
 #: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__sort_by__name
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_expertise__sort_by__name
 msgid "Name"
 msgstr "Nom"
 
@@ -220,6 +222,7 @@ msgstr "Corriger"
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_email_fix_form
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_pi_confirmation
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_pi_confirmation
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_expertise_pi_confirmation
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_edit_form
 msgid "Cancel"
 msgstr "Annuler"
@@ -268,6 +271,8 @@ msgstr "%(n)d inscription(s) corrigée(s)."
 #: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__sort_by__survey
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_change__survey_id
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit__survey_id
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_expertise__survey_filter
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_expertise__sort_by__survey
 msgid "Survey"
 msgstr "Sondage"
 
@@ -407,6 +412,7 @@ msgstr "Inscriptions confirmées dont la personne n'a pas encore complété le s
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_pending_form
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_expertise_form
 msgid "Open as a list"
 msgstr "Ouvrir en liste"
 
@@ -569,6 +575,7 @@ msgstr "Pas encore présent"
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
 #: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__survey_filter__done
 #: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__survey_filter__done
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_expertise__survey_filter__done
 msgid "Survey completed"
 msgstr "Sondage complété"
 
@@ -576,6 +583,7 @@ msgstr "Sondage complété"
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
 #: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__survey_filter__in_progress
 #: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__survey_filter__in_progress
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_expertise__survey_filter__in_progress
 msgid "Survey started"
 msgstr "Sondage commencé"
 
@@ -583,6 +591,7 @@ msgstr "Sondage commencé"
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
 #: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__survey_filter__not_started
 #: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__survey_filter__not_started
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_expertise__survey_filter__not_started
 msgid "Survey not started"
 msgstr "Sondage non commencé"
 
@@ -613,6 +622,7 @@ msgstr "Bureau d'inscription RLQ"
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_expertise_form
 msgid "Refresh"
 msgstr "Actualiser"
 
@@ -620,6 +630,7 @@ msgstr "Actualiser"
 #. odoo-python
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_expertise_form
 #: code:addons/rlq_survey_report/models/event_registration_desk.py:0
 msgid "Contact the participants"
 msgstr "Contacter les participants"
@@ -627,6 +638,7 @@ msgstr "Contacter les participants"
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_form
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_expertise_form
 msgid "Help for this page"
 msgstr "Aide de cette page"
 
@@ -644,6 +656,7 @@ msgstr "« Présent » enregistre l'heure d'arrivée. Les questions listées sou
 #. odoo-python
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_pi_confirmation
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_pi_confirmation
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_expertise_pi_confirmation
 #: code:addons/rlq_survey_report/models/event_registration_desk.py:0
 msgid "Confirmation"
 msgstr "Confirmation"
@@ -651,21 +664,22 @@ msgstr "Confirmation"
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_pi_confirmation
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_pi_confirmation
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_expertise_pi_confirmation
 msgid "This page shows personal information about the participants (names, e-mail addresses, phone numbers). I confirm that I am responsible for its confidentiality and will share it only with authorized people."
 msgstr "Cette page contient des renseignements personnels sur les participants (noms, courriels, téléphones). Je confirme être responsable de leur confidentialité et m'engage à ne les partager qu'avec les personnes autorisées."
 
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_pi_confirmation
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_pi_confirmation
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_expertise_pi_confirmation
 msgid "Continue"
 msgstr "Continuer"
 
 #. module: rlq_survey_report
 #. odoo-python
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_survey_question_form_rlq_registration_desk
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_form
 #: model:ir.actions.act_window,name:rlq_survey_report.action_rlq_volunteer_coordinator
-#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_volunteer_coordinator_events
-#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_volunteer_coordinator_surveys
 #: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
 #: model:ir.model,name:rlq_survey_report.model_rlq_volunteer_coordinator
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_coordinator__table_html
@@ -674,8 +688,15 @@ msgstr "Bénévoles"
 
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_coordinator_form
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_expertise_form
 msgid "Export to a spreadsheet"
 msgstr "Exporter dans un chiffrier"
+
+#. module: rlq_survey_report
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_volunteer_coordinator_events
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_volunteer_coordinator_surveys
+msgid "Volunteer management"
+msgstr "Gestion des bénévoles"
 
 #. module: rlq_survey_report
 #. odoo-python
@@ -684,6 +705,18 @@ msgstr "Exporter dans un chiffrier"
 #: code:addons/rlq_survey_report/models/event_registration_desk.py:0
 msgid "User guide"
 msgstr "Guide d'utilisation"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_volunteer_expertise_form
+#: model:ir.actions.act_window,name:rlq_survey_report.action_rlq_volunteer_expertise
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_volunteer_expertise_events
+#: model:ir.ui.menu,name:rlq_survey_report.menu_rlq_volunteer_expertise_surveys
+#: code:addons/rlq_survey_report/models/volunteer_expertise.py:0
+#: model:ir.model,name:rlq_survey_report.model_rlq_volunteer_expertise
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_expertise__table_html
+msgid "Volunteer expertise"
+msgstr "Expertises des bénévoles"
 
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_survey_answer_edit_line_form
@@ -791,6 +824,12 @@ msgstr "Date de l'événement"
 #: code:addons/rlq_survey_report/models/event_registration_desk.py:0
 msgid "No participant of this list has an e-mail address."
 msgstr "Aucun participant de cette liste n'a d'adresse courriel."
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/event_registration_desk.py:0
+msgid "Event: %(event)s"
+msgstr "Événement : %(event)s"
 
 #. module: rlq_survey_report
 #. odoo-python
@@ -916,6 +955,7 @@ msgstr "Cette page contient des renseignements personnels sur les participants (
 #. module: rlq_survey_report
 #: model:ir.model.fields,help:rlq_survey_report.field_rlq_registration_desk__event_id
 #: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_coordinator__event_id
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_expertise__event_id
 msgid "By default: the event in progress, otherwise the next one."
 msgstr "Par défaut : l'événement en cours, sinon le prochain."
 
@@ -942,12 +982,14 @@ msgstr "Liste seulement les inscriptions dont le sondage est dans cet état."
 #. module: rlq_survey_report
 #: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__survey_filter__all
 #: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__survey_filter__all
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_expertise__survey_filter__all
 msgid "All"
 msgstr "Tous"
 
 #. module: rlq_survey_report
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__sort_by
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_coordinator__sort_by
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_expertise__sort_by
 msgid "Sort by"
 msgstr "Trier par"
 
@@ -959,6 +1001,7 @@ msgstr "Ordre de la liste ci-dessous. Les majuscules et les accents sont ignoré
 #. module: rlq_survey_report
 #: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__sort_by__create_date
 #: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__sort_by__registered
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_expertise__sort_by__registered
 msgid "Registration date"
 msgstr "Date d'inscription"
 
@@ -977,6 +1020,7 @@ msgstr "Départ"
 #. module: rlq_survey_report
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__sort_desc
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_coordinator__sort_desc
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_expertise__sort_desc
 msgid "Descending"
 msgstr "Ordre décroissant"
 
@@ -1020,12 +1064,14 @@ msgstr "Certains billets bénévoles n'ont pas de sondage : leurs bénévoles so
 #. module: rlq_survey_report
 #. odoo-python
 #: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
+#: code:addons/rlq_survey_report/models/volunteer_expertise.py:0
 msgid "The spreadsheet export needs the Python library « openpyxl », which is not installed on this server (pip install openpyxl)."
 msgstr "L'export dans un chiffrier nécessite la bibliothèque Python « openpyxl », qui n'est pas installée sur ce serveur (pip install openpyxl)."
 
 #. module: rlq_survey_report
 #. odoo-python
 #: code:addons/rlq_survey_report/models/volunteer_coordinator.py:0
+#: code:addons/rlq_survey_report/models/volunteer_expertise.py:0
 msgid "No volunteer to export for this event."
 msgstr "Aucun bénévole à exporter pour cet événement."
 
@@ -1061,6 +1107,7 @@ msgstr "Aucune question sur le type (présentiel ou virtuel) dans le sondage « 
 
 #. module: rlq_survey_report
 #: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_coordinator__survey_filter
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_expertise__survey_filter
 msgid "Lists only the volunteers whose survey is in this state."
 msgstr "Liste seulement les bénévoles dont le sondage est dans cet état."
 
@@ -1086,6 +1133,7 @@ msgstr "Nombre de rôles"
 
 #. module: rlq_survey_report
 #: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_coordinator__sort_desc
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_expertise__sort_desc
 msgid "Reverses the order of the table."
 msgstr "Inverse l'ordre du tableau."
 
@@ -1378,3 +1426,30 @@ msgstr "La nouvelle réponse, seulement pour les questions modifiées ; vide qua
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_answer_edit_line__changed
 msgid "Changed"
 msgstr "Modifiée"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/volunteer_expertise.py:0
+msgid "Volunteer expertise: %(event)s"
+msgstr "Expertises des bénévoles : %(event)s"
+
+#. module: rlq_survey_report
+#. odoo-python
+#: code:addons/rlq_survey_report/models/volunteer_expertise.py:0
+msgid "No question checked « Show in Volunteer expertise » in the survey « %(survey)s »."
+msgstr "Aucune question cochée « Afficher dans Expertises des bénévoles » dans le sondage « %(survey)s »."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_survey_question__rlq_volunteer_expertise
+msgid "Show in « Volunteer expertise »"
+msgstr "Afficher dans « Expertises des bénévoles »"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_survey_question__rlq_volunteer_expertise
+msgid "If checked, the answer of each volunteer to this question is shown in the page « Volunteer expertise » (Rapports RLQ): one column per choice, with the number of volunteers who chose it. Useful for questions such as « What are your areas of expertise? ». Only the survey of the volunteer ticket is read."
+msgstr "Si cochée, la réponse de chaque bénévole à cette question est affichée dans la page « Expertises des bénévoles » (Rapports RLQ) : une colonne par choix, avec le nombre de bénévoles qui l'ont choisi. Utile pour des questions comme « Quelles sont vos expertises ? ». Seul le sondage du billet bénévole est lu."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_expertise__sort_by
+msgid "Order of the table. Case and accents are ignored; equal values are sorted by name."
+msgstr "Ordre du tableau. Les majuscules et les accents sont ignorés ; à égalité, le tri se fait par nom."

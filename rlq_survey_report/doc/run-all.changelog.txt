@@ -1,6 +1,16 @@
 Journal des changements de run-all.sh (version la plus récente en premier)
 ==========================================================================
 
+Version 1.6.20261117.192734 - 2026-11-17
+  Short title: standalone tests also run tests/test_release.py.
+  Reason: module 1.137.0 adds release.py (version and local time of the last change, shown in the header of the pages); the new
+    test checks that release.py, __manifest__.py, the first entry of doc/CHANGELOG.md and the « Nouveautés » of the guide agree.
+  Changes: etape_tests_autonomes() adds « tests.test_release ». No option changed.
+  Bugs fixed: none.
+  Safeguards and edge cases: none new.
+  Checks: the standalone tests run with python3 -m unittest.
+  Action required: none.
+
 Version 1.5.20261117.094611 - 2026-11-17
   Short title: standalone tests also run tests/test_related_fields.py.
   Reason: module 1.129.0 could not be loaded by Odoo (related field of the wrong type, site down); the new test checks the type of

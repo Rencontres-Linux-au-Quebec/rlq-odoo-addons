@@ -134,12 +134,26 @@ class TestRlqRegistrationDesk(TransactionCase):
             desk.with_context(rlq_pi_next="action_contact").action_rlq_pi_continue()     # box not checked
         desk.rlq_pi_confirmed = True
         action = desk.with_context(rlq_pi_next="action_contact").action_rlq_pi_continue()
-        self.assertEqual(action["res_model"], "mail.compose.message")
+        self.assertIn(action["res_model"], ("mailing.mailing", "mail.compose.message"))
         self.assertEqual(desk.action_open_list()["res_model"], "event.registration")     # not asked again on this page
         action = desk.action_contact()
-        self.assertEqual(action["res_model"], "mail.compose.message")
-        self.assertEqual(action["context"]["default_res_ids"], registration.ids)
-        self.assertEqual(action["context"]["default_composition_mode"], "mass_mail")
+        # v1.137.0: a mailing of Email Marketing when mass_mailing_event is installed, otherwise the e-mail window.
+        if action["res_model"] == "mailing.mailing":
+            self.assertEqual(action["context"]["default_mailing_domain"], repr([("id", "in", registration.ids)]))
+            self.assertEqual(action["context"]["default_mailing_model_id"], self.env["ir.model"]._get_id("event.registration"))
+        else:
+            self.assertEqual(action["context"]["default_res_ids"], registration.ids)
+            self.assertEqual(action["context"]["default_composition_mode"], "mass_mail")
+
+    def test_volunteer_expertise_page(self):
+        """v1.137.0: the questions checked « Show in Volunteer expertise » of the volunteer ticket survey, one column per choice."""
+        page = self.env["rlq.volunteer.expertise"].create({"event_id": self.event.id})
+        rows, columns, _notes = page._rlq_table_data()
+        self.assertIsInstance(rows, list)
+        self.assertIn("Expertises des bénévoles" if (self.env.lang or "fr").startswith("fr") else "Volunteer expertise",
+                      page.table_html)
+        self.assertEqual(page.action_open_guide()["url"], "/rlq_survey_report/aide#expertises-benevoles")
+        self.assertEqual(page.action_export_excel()["context"]["rlq_pi_next"], "action_export_excel")
 
     def test_survey_columns_in_a_form_not_saved(self):
         """v1.133.0: in a form not saved yet, the registrations of the list are « new » copies (NewId): the survey state and

@@ -404,6 +404,31 @@ class TestRegistrationDeskReport(unittest.TestCase):
         english = rd.program_footer("rlq_survey_report", "18.0.1.124.0", "2026-11-16 21:15:02 EST", "", "en_US")
         self.assertIn("shown on 2026-11-16 21:15:02 EST (local time)", english)
         self.assertNotIn("<b>", rd.program_footer("p", "v", "<b>x</b>", "<b>z</b>"))
+        # v1.137.0: the time of the last change of the module, not the time of the display.
+        self.assertIn("modifié le 2026-11-17 19:30:00 HNE (heure locale, America/Toronto)",
+                      rd.program_footer("p", "v", "2026-11-17 19:30:00 HNE", "America/Toronto", "fr", modified=True))
+        self.assertIn("modified on", rd.program_footer("p", "v", "x", "", "en", modified=True))
+
+    def test_expertise_table_and_export(self):
+        """v1.137.0: « Expertises des bénévoles »: one column per choice (1), a text column, totals, free text of « Autre »."""
+        columns = [{"title": "Expertises", "choices": ["Python", "Réseau", "Autre"]}, {"title": "Commentaire", "choices": []}]
+        rows = [{"name": "Zoé", "survey": "done", "email": "z@x.org", "answers_url": "/rlq_survey_report/answers/4",
+                 "answers": [["python", "Kubernetes"], ["J'aime <b>Linux</b>"]]},
+                {"name": "Éric", "survey": "not_started", "email": "Z@x.org", "answers": [[], []]}]
+        self.assertEqual(rd.expertise_totals(rows, columns), [2, 1, 0, 1, 1])
+        html = rd.expertise_table_html(rows, columns, "fr")
+        for text in ("Expertises des bénévoles", 'colspan="3"', ">Python</th>", ">Commentaire</th>", "Kubernetes",
+                     '<a href="/rlq_survey_report/answers/4" target="_blank">Complété</a>', "Participants uniques (courriel): 1"):
+            self.assertIn(text, html)
+        self.assertNotIn("<b>Linux</b>", html)
+        self.assertIn("Aucune question de sondage", rd.expertise_table_html(rows, [], "fr"))
+        self.assertIn("No volunteer", rd.expertise_table_html([], columns, "en"))
+        title, header, lines = rd.expertise_export_sheet(rows, columns, "fr")
+        self.assertEqual(title, "Expertises des bénévoles")
+        self.assertEqual(header, ["Bénévole", "Courriel", "Billet", "Sondage", "Expertises - Python", "Expertises - Réseau",
+                                  "Expertises - Autre", "Expertises (texte libre)", "Commentaire"])
+        self.assertEqual(lines[0][4:], [1, None, 1, "Kubernetes", "J'aime <b>Linux</b>"])
+        self.assertEqual(lines[1][4:], [None, None, None, "", ""])
 
     # ------------------------------------------------------------------ v1.131.0
 

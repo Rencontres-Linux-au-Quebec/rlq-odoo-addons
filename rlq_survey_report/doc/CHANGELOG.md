@@ -1,5 +1,42 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.137.0
+
+**Short title:** new page "Expertises des bénévoles", menu "Gestion des bénévoles", "Contacter les participants" opens an Email Marketing mailing, header shows the time of the last change of the module, guide "Nouveautés" lists the last three versions.
+
+**Reason for the request:** [1] the time in "rlq_survey_report 18.0.1.136.0 - affiché le 2026-11-17 19:04:21 HNE (heure locale, America/Toronto)" must be the time of the last change of the module; [2] in the menu "Rapports RLQ", "Bénévoles" becomes "Gestion des bénévoles"; [3] a new page "Expertises des bénévoles" showing selected survey questions; [4] "Contacter les participants" must be the same as /odoo/events/125/mailing.mailing/new, with more choice for the kind of e-mail (newsletter style...); [5] the section "Nouveautés depuis la version précédente de ce guide" was not up to date: the guide must show the last three changes.
+
+**Concurrent changes:** checked before the work and before pushing: PR #20, #21 and #22 merged into `18.0` at 17:50; no open PR, no other branch moved. This branch starts from `18.0`.
+
+**Changes:**
+
+- New `release.py`: `__version__`, `VERSION_DATETIME` (local time of the last change), `VERSION_ZONE`. `models/event_registration_desk.py` `program_stamp()` shows "modifié le <VERSION_DATETIME> HNE/HAE (heure locale, America/Toronto)" instead of the time of the display; when the files are newer than the installed module, both versions are shown ("18.0.1.136.0 (fichiers 18.0.1.137.0)"). `registration_desk_report.program_footer()`: new argument `modified`.
+- New `tests/test_release.py` (in run-all.sh, version 1.6): `release.__version__` = manifest version = first entry of CHANGELOG.md; `VERSION_DATETIME` valid; the "Nouveautés" of the guide name the current version and the two before, and its header the current version.
+- [2] Menus `menu_rlq_volunteer_coordinator_events` / `_surveys`: "Volunteer management" / "Gestion des bénévoles" (the page keeps its title).
+- [3] New `models/volunteer_expertise.py`: field `survey.question.rlq_volunteer_expertise` ("Afficher dans « Expertises des bénévoles »", in the question form under the registration-desk block; the short label `rlq_desk_label` is used as column title); transient model `rlq.volunteer.expertise` (event, "Sondage" filter, "Trier par", "Ordre décroissant"; buttons Actualiser, Exporter dans un chiffrier, Ouvrir en liste, Contacter les participants, Aide de cette page; confirmation about personal information once per page). Same volunteers as "Gestion des bénévoles" (new shared `rlq.volunteer.coordinator._rlq_volunteer_base()`). `registration_desk_report.py`: `expertise_cells()`, `expertise_totals()`, `expertise_table_html()`, `expertise_export_sheet()`. Views, action, menus in Events and Surveys > Rapports RLQ, access rights (`security/ir.model.access.csv`).
+- `models/volunteer_coordinator.py`: new module function `download_xlsx()` (attachment, access history, download), shared by both pages; `action_export_excel()` uses it.
+- [4] `contact_action()`: with Email Marketing linked to Events (`mass_mailing_event`, `event.registration._mailing_enabled`), a NEW `mailing.mailing` (same form as the button of the event: templates, editor, test, scheduling, statistics), recipients `[("id", "in", [...])]` on `event.registration`, subject "Événement : <name>"; otherwise the e-mail window as before.
+- [5] `doc/Guide-utilisateur-rlq_survey_report.html`: "Nouveautés des trois dernières versions" (v1.137, v1.136, v1.135); header version with date and time; new section `#expertises-benevoles`; "Gestion des bénévoles"; contact by mailing.
+- `scripts/build_fr_po.py` (reads `volunteer_expertise.py` too), `i18n/fr.po` (rebuilt). Comments of `CHAT_URL`, `GUIDE_URL`, `ANSWERS_URL` put back in order (they had been shifted by an earlier edit).
+
+**Bugs fixed:**
+
+- [1] Symptom: the header showed the time of the display, which does not say which change is installed. Diagnosis: `program_stamp()` used `now()`. Fix: the time of the last change, from `release.py`.
+- [5] Symptom: "Nouveautés" listed old features. Diagnosis: the paragraph was never updated after v1.32. Fix: rewritten, and `tests/test_release.py` now fails when it does not name the current version.
+
+**Safeguards and edge cases:**
+
+- A wrong `VERSION_DATETIME` never breaks a page: the text is shown as is.
+- "Expertises des bénévoles" without any checked question: the page says so and where to check. The free text of an "Autre" choice is shown in that column and exported in its own "(texte libre)" column, so the 1 columns stay summable.
+- The mailing is used only when `event.registration` is a mailing model; its recipients are the registrations listed (the domain is shown in "Destinataires"); people without address are skipped by the mailing itself.
+
+**Checks performed:**
+
+- Standalone tests of run-all.sh: all [OK] (new: test_release, expertise table and export, footer "modifié le"); ruff: OK; `scripts/build_fr_po.py`: all terms translated; every view XML parsed.
+- Odoo tests added/updated (not run here, no Odoo instance): expertise page, contact by mailing or e-mail window.
+
+**Action required from the user:** `-u rlq_survey_report --i18n-overwrite` (new model, field, views, menus, access rights, translations). Then, in the survey of the volunteer ticket, check "Afficher dans « Expertises des bénévoles »" on the wanted questions, and the points "v1.137.0" of `doc/NOTES_VALIDATION.md`. For every future change, `release.py` is updated with the manifest.
+
 ## 18.0.1.136.0
 
 **Short title:** unique participants by e-mail, "Présentiel" column for the volunteers, 1 instead of "X" on screen, confirmation about personal information once per page, every menu of the module in a sub-menu "Rapports RLQ".
