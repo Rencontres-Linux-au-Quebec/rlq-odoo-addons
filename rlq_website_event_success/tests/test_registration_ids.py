@@ -44,6 +44,11 @@ class TestParseRegistrationIds(_Base):
     def test_too_large_for_postgresql(self):
         self.assertEqual(parse("99999999999,7"), [7])
 
+    def test_json_list_of_ticket_link(self):
+        # Format of /event/<id>/my_tickets?registration_ids=[2094]
+        self.assertEqual(parse("[2094]"), [2094])
+        self.assertEqual(parse("[2094, 2095]"), [2094, 2095])
+
     def test_list(self):
         self.assertEqual(parse(["1", "2"]), [1, 2])
 
