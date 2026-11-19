@@ -5,10 +5,11 @@
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or (at your option) any later version. (http://www.gnu.org/licenses/agpl)
 # test_registration_ids: pure function, also runs alone without Odoo.
-# test_registration_success: needs an Odoo instance (HttpCase); its import fails cleanly without Odoo.
+# test_registration_success, test_my_tickets: need an Odoo instance (HttpCase); its import fails cleanly without Odoo.
 from . import test_registration_ids
 
 try:
+    from . import test_my_tickets
     from . import test_registration_success
 except ImportError:
     pass

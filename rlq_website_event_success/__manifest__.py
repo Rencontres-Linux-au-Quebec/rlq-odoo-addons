@@ -24,17 +24,23 @@ Ce module garde la page d'Odoo quand le visiteur est reconnu. Sinon, il affiche 
 les billets sont dans le courriel, sans aucune donnée personnelle de l'inscription, ou explique comment vérifier son
 inscription si aucune n'est trouvée.
 
+La page des billets /event/<id>/my_tickets répond 404 au lieu d'une erreur 500 quand ses paramètres manquent ou sont
+illisibles (par exemple quand le scanneur de liens d'un fournisseur de courriel rejoue le lien du rappel en le modifiant).
+
 Registration confirmation page without errors
 =============================================
 
 Replaces the error 500 (missing registration_ids) and the error 404 (visitor not recognised) of the registration
 confirmation page by a page saying that the registration is recorded and the tickets are in the e-mail.
 
+The ticket page /event/<id>/my_tickets answers 404 instead of an error 500 when its parameters are missing or unreadable
+(for example when the link scanner of an e-mail provider replays the link of the reminder e-mail with changes).
+
 Copyright (C) 2026 Services-Conseils Linux Inc. (info@rencontres-linux.quebec)
 Copyright (C) 2026 Rencontres Linux au Québec contributors
 GNU Affero General Public License v3 or later (http://www.gnu.org/licenses/agpl)
 """,
-    "version": "18.0.1.0.0",
+    "version": "18.0.1.1.0",
     "category": "Marketing/Events",
     "author": "Services-Conseils Linux Inc. (info@rencontres-linux.quebec), Rencontres Linux au Québec contributors",
     "maintainer": "Rencontres Linux au Québec <info@rencontres-linux.quebec>",
