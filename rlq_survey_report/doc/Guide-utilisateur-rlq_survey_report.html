@@ -42,16 +42,16 @@
 <div class="page">
 
 <h1>Guide utilisateur — Rapport de sondage</h1>
-<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.143.0</strong> du 2026-11-17 à 23 h 12 (heure locale, HNE).</p>
+<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.144.0</strong> du 2026-11-18 à 16 h 28 (heure locale, HNE).</p>
 
 <p>Ce module produit un compte-rendu détaillé — à l'écran, en fichier HTML, en PDF ou en Excel — des réponses à un ou plusieurs sondages Odoo, notamment les sondages de satisfaction envoyés après chaque rencontre. Il aide à repérer ce qui va bien, ce qui se dégrade, et à suivre les actions entreprises d'une rencontre à l'autre.</p>
 
 <div class="encadre">
   <p><strong>Nouveautés des trois dernières versions :</strong></p>
   <ul>
-    <li><strong>v1.143</strong> : courriel « Vos réponses » non reçu : le lien du sondage envoyé à l'inscription porte maintenant l'adresse de la personne ; chaque participation garde le <em>résultat de l'envoi</em> (ou la raison du non-envoi) et un bouton <em>Envoyer ses réponses par courriel</em> (§&nbsp;18).</li>
+    <li><strong>v1.144</strong> : dans la gestion des bénévoles, une réponse « Non » (ou « Aucun », « No », « 0 »…) n'est plus comptée dans les totaux ; dans ce guide, chaque renvoi « §&nbsp;N » est un lien vers la section.</li>
+    <li><strong>v1.143</strong> : courriel « Vos réponses » non reçu : le lien du sondage envoyé à l'inscription porte maintenant l'adresse de la personne ; chaque participation garde le <em>résultat de l'envoi</em> (ou la raison du non-envoi) et un bouton <em>Envoyer ses réponses par courriel</em> (<a href="#depannage">§&nbsp;18</a>).</li>
     <li><strong>v1.142</strong> : le bouton « Terminer la session en direct » d'Odoo (cartes de Sondages &rarr; Sondages) ferme sans danger la session d'un sondage d'événement ; colonne <em>Sondage</em> en couleur (rouge : non commencé, orange : commencé, vert : complété) ; colonne « Nom du participant » en double retirée de « Ouvrir en liste ».</li>
-    <li><strong>v1.141</strong> : cause trouvée des participants bloqués à la première question (« Veuillez attendre que l'hôte passe à la question suivante ») : une <em>session en direct</em> laissée ouverte sur le sondage ; avertissement en rouge et bouton <em>Fermer la session en direct (garder les réponses)</em> (§&nbsp;18).</li>
   </ul>
   <p>Le détail de chaque version est dans <code>doc/CHANGELOG.md</code>.</p>
 </div>
@@ -86,12 +86,12 @@
 <p>Dans le menu <strong>Sondage</strong>, ouvrez <strong>Rapports RLQ</strong>. Seules les personnes ayant au moins le rôle « Utilisateur » du module Sondage voient ce menu. Il contient trois entrées :</p>
 <table>
   <tr><th>Entrée</th><th>À quoi elle sert</th></tr>
-  <tr><td><strong>Sélection manuelle des sondages</strong></td><td>Ouvre le formulaire de génération, à blanc. C'est le point de départ habituel (voir §&nbsp;2).</td></tr>
-  <tr><td><strong>Actions de suivi (amélioration continue)</strong></td><td>Liste de tous les sondages, avec une colonne modifiable pour noter ce qui a été fait suite à chaque rencontre (voir §&nbsp;8).</td></tr>
-  <tr><td><strong>Historique et fichiers déjà générés</strong></td><td>Qui a généré quoi, quand — et téléchargement des fichiers déjà produits, sans les régénérer (voir §&nbsp;9).</td></tr>
+  <tr><td><strong>Sélection manuelle des sondages</strong></td><td>Ouvre le formulaire de génération, à blanc. C'est le point de départ habituel (voir <a href="#generer">§&nbsp;2</a>).</td></tr>
+  <tr><td><strong>Actions de suivi (amélioration continue)</strong></td><td>Liste de tous les sondages, avec une colonne modifiable pour noter ce qui a été fait suite à chaque rencontre (voir <a href="#suivi">§&nbsp;8</a>).</td></tr>
+  <tr><td><strong>Historique et fichiers déjà générés</strong></td><td>Qui a généré quoi, quand — et téléchargement des fichiers déjà produits, sans les régénérer (voir <a href="#historique">§&nbsp;9</a>).</td></tr>
 </table>
 <figure class="capture"><b>Capture à ajouter — <code>01-menu-sondage.png</code></b><br>Le menu Sondage déroulé, avec « Rapports RLQ » et ses trois entrées.</figure>
-<div class="encadre"><p>Les anciens sous-menus « Premier mardi du mois », « Pause café », « Portes ouvertes »… n'existent plus : ils sont remplacés par la liste <strong>Filtrer par titre</strong> du formulaire (§&nbsp;3), qui fait la même chose sans quitter l'écran.</p></div>
+<div class="encadre"><p>Les anciens sous-menus « Premier mardi du mois », « Pause café », « Portes ouvertes »… n'existent plus : ils sont remplacés par la liste <strong>Filtrer par titre</strong> du formulaire (<a href="#formulaire">§&nbsp;3</a>), qui fait la même chose sans quitter l'écran.</p></div>
 
 <!-- ============================================================ 2 -->
 <h2 id="generer">2. Générer un rapport, pas à pas</h2>
@@ -103,9 +103,9 @@
       <li>par personne : la liste <em>Filtrer par présentateur</em>, pour ne garder que les rencontres où cette personne a présenté — pratique pour lui envoyer un rapport ciblé.</li>
     </ul>
     Une ligne « Ampleur de la génération » indique combien de sondages et de réponses seront traités.</li>
-  <li><strong>Ajustez les filtres</strong> à gauche (exclusions, plage de dates…) et les <strong>options</strong> à droite (§&nbsp;3).</li>
-  <li><strong>Décidez de l'anonymisation</strong> : la case « Anonymiser les participants » est cochée par défaut (§&nbsp;4). Elle détermine aussi si un mot de passe sera demandé (§&nbsp;5).</li>
-  <li><strong>Choisissez le format de sortie</strong> — à l'écran, fichier HTML ou fichier PDF — puis cliquez sur <strong>Générer</strong>. Une fenêtre <strong>Confirmation</strong> s'ouvre : cochez « Ce rapport contient des renseignements personnels… Je confirme être responsable de leur confidentialité… », puis <strong>Continuer</strong>. Si un mot de passe est requis (§&nbsp;5), il est dans la même fenêtre, pré-rempli. La confirmation est demandée une fois par fenêtre de rapport : les téléchargements et l'export Excel qui suivent ne la redemandent pas.</li>
+  <li><strong>Ajustez les filtres</strong> à gauche (exclusions, plage de dates…) et les <strong>options</strong> à droite (<a href="#formulaire">§&nbsp;3</a>).</li>
+  <li><strong>Décidez de l'anonymisation</strong> : la case « Anonymiser les participants » est cochée par défaut (<a href="#anonymisation">§&nbsp;4</a>). Elle détermine aussi si un mot de passe sera demandé (<a href="#mdp">§&nbsp;5</a>).</li>
+  <li><strong>Choisissez le format de sortie</strong> — à l'écran, fichier HTML ou fichier PDF — puis cliquez sur <strong>Générer</strong>. Une fenêtre <strong>Confirmation</strong> s'ouvre : cochez « Ce rapport contient des renseignements personnels… Je confirme être responsable de leur confidentialité… », puis <strong>Continuer</strong>. Si un mot de passe est requis (<a href="#mdp">§&nbsp;5</a>), il est dans la même fenêtre, pré-rempli. La confirmation est demandée une fois par fenêtre de rapport : les téléchargements et l'export Excel qui suivent ne la redemandent pas.</li>
   <li>Une fois le rapport affiché, vous pouvez le <strong>télécharger</strong> (HTML, PDF), l'<strong>exporter en Excel</strong>, ou <strong>Modifier les paramètres</strong> pour recommencer sans tout ressaisir.</li>
 </ol>
 <figure class="capture"><b>Capture à ajouter — <code>03-formulaire-complet.png</code></b><br>Le formulaire en entier, des sondages jusqu'aux boutons, puis la fenêtre « Confirmation ».</figure>
@@ -136,11 +136,11 @@
   <tr><td><strong>Inclure les réponses partielles (non terminées)</strong></td><td>coché</td><td>Compte aussi les réponses commencées mais non terminées.</td></tr>
   <tr><td><strong>Voir les personnes n'ayant pas répondu</strong></td><td>coché (depuis la v1.127)</td><td>Ajoute, par rencontre, les invités qui n'ont jamais commencé. Suppose que ces invitations existent dans Odoo, ce qui dépend de la façon dont vos sondages sont envoyés.</td></tr>
   <tr><td><strong>Ventiler les notes (liste dépliable détaillée)</strong></td><td>coché</td><td>Sous chaque note moyenne, une liste dépliable indique qui a donné quelle note.</td></tr>
-  <tr><td><strong>Combiner les réponses d'un utilisateur à un même sondage</strong></td><td>décoché</td><td>Voir §&nbsp;7.</td></tr>
+  <tr><td><strong>Combiner les réponses d'un utilisateur à un même sondage</strong></td><td>décoché</td><td>Voir <a href="#participant">§&nbsp;7</a>.</td></tr>
   <tr><td><strong>Dédoublonner les réponses libres avec compteur</strong></td><td>coché</td><td>Regroupe les réponses libres identiques avec un compteur (×2, ×3…).</td></tr>
-  <tr><td><strong>Anonymiser les participants</strong></td><td>coché</td><td>Voir §&nbsp;4.</td></tr>
+  <tr><td><strong>Anonymiser les participants</strong></td><td>coché</td><td>Voir <a href="#anonymisation">§&nbsp;4</a>.</td></tr>
   <tr><td><strong>Ajouter une section « À surveiller » (notes ≤ 2)</strong></td><td>coché</td><td>Liste, à la fin du rapport, toutes les notes de 2 ou moins.</td></tr>
-  <tr><td><strong>Mot de passe du fichier</strong> / <strong>Confirmer</strong></td><td>pré-rempli, masqué</td><td>Voir §&nbsp;5.</td></tr>
+  <tr><td><strong>Mot de passe du fichier</strong> / <strong>Confirmer</strong></td><td>pré-rempli, masqué</td><td>Voir <a href="#mdp">§&nbsp;5</a>.</td></tr>
 </table>
 <figure class="capture"><b>Capture à ajouter — <code>05-colonne-gauche.png</code> et <code>06-colonne-droite.png</code></b><br>Gros plan sur chacune des deux colonnes.</figure>
 
@@ -150,9 +150,9 @@
   <tr><td><strong>Générer</strong></td><td>Lance la génération selon le format choisi.</td></tr>
   <tr><td><strong>Télécharger en HTML</strong> / <strong>Télécharger en PDF</strong></td><td>Après une génération à l'écran : télécharge le rapport affiché, sans tout régénérer.</td></tr>
   <tr><td><strong>Options PDF</strong></td><td>Ouvre une petite fenêtre : « Tableaux de réponses par participant dans le PDF » (à décocher si un très gros PDF échoue), « Saut de page forcé par rencontre », « Saut de page forcé par participant » (à décocher s'il y a un très grand nombre de participants : le PDF peut devenir trop volumineux).</td></tr>
-  <tr><td><strong>Exporter en Excel</strong></td><td>Voir §&nbsp;10. Toujours protégé par mot de passe.</td></tr>
+  <tr><td><strong>Exporter en Excel</strong></td><td>Voir <a href="#excel">§&nbsp;10</a>. Toujours protégé par mot de passe.</td></tr>
   <tr><td><strong>Modifier les paramètres</strong></td><td>Revient au formulaire sans perdre vos choix.</td></tr>
-  <tr><td><strong>Aide</strong></td><td>Ouvre la page d'aide du module dans un nouvel onglet (son adresse est un réglage d'administrateur, §&nbsp;15).</td></tr>
+  <tr><td><strong>Aide</strong></td><td>Ouvre la page d'aide du module dans un nouvel onglet (son adresse est un réglage d'administrateur, <a href="#bureau-inscription">§&nbsp;15</a>).</td></tr>
   <tr><td><strong>Fermer</strong></td><td>Ferme la fenêtre sans rien enregistrer.</td></tr>
 </table>
 
@@ -190,7 +190,7 @@
 <h3>Le mot de passe par défaut</h3>
 <p>Les deux champs sont <strong>pré-remplis et masqués</strong> avec le mot de passe par défaut de votre organisation. Le bouton <strong>Afficher le mot de passe</strong> le montre dans un message à l'écran. Vous pouvez le remplacer pour un rapport précis : tapez-en un autre dans les deux champs.</p>
 <div class="encadre attention">
-  <p><strong>Un encadré jaune « Le mot de passe par défaut n'a pas été changé »</strong> apparaît tant que la valeur est encore <code>!CHANGE-MOI@</code>, le marqueur livré avec le module : il est <em>refusé</em>. Un administrateur doit définir le vrai mot de passe par défaut (§&nbsp;15) ; le bouton <strong>Ouvrir le paramètre</strong>, réservé aux administrateurs, y mène directement. En attendant, saisissez votre propre mot de passe dans les deux champs.</p>
+  <p><strong>Un encadré jaune « Le mot de passe par défaut n'a pas été changé »</strong> apparaît tant que la valeur est encore <code>!CHANGE-MOI@</code>, le marqueur livré avec le module : il est <em>refusé</em>. Un administrateur doit définir le vrai mot de passe par défaut (<a href="#bureau-inscription">§&nbsp;15</a>) ; le bouton <strong>Ouvrir le paramètre</strong>, réservé aux administrateurs, y mène directement. En attendant, saisissez votre propre mot de passe dans les deux champs.</p>
 </div>
 <figure class="capture"><b>Capture à ajouter — <code>15-avertissement-mot-de-passe.png</code></b><br>L'encadré jaune au-dessus des champs du mot de passe.</figure>
 
@@ -222,7 +222,7 @@
   <li><strong>Tendance de la Note globale</strong> (voir plus bas).</li>
   <li><strong>Synthèse</strong> (si plusieurs rencontres) : « Ce qui a le plus bougé depuis la dernière rencontre », tendance de chaque question, et la liste consolidée des actions de suivi.</li>
   <li><strong>Une section par rencontre</strong>, la plus récente en premier : sa Note globale, ses actions de suivi, les présentateurs, les participants, la répartition présents / inscrits / non-inscrits à l'événement, puis le détail question par question.</li>
-  <li><strong>Une fiche par participant</strong> (§&nbsp;7).</li>
+  <li><strong>Une fiche par participant</strong> (<a href="#participant">§&nbsp;7</a>).</li>
   <li><strong>À surveiller</strong> : toutes les notes de 2 ou moins, avec leur date, la question et — si la même personne en a écrit un — son commentaire libre.</li>
   <li><strong>Appréciation des présentateurs</strong> : note moyenne par présentateur, détail des votants, et une flèche de tendance quand il a présenté plusieurs fois.</li>
 </ol>
@@ -253,8 +253,8 @@
   <li><strong>En-tête</strong> : le nom (ou « Participant N ») et le nombre de participations. Si le rapport n'est <em>pas</em> anonymisé : courriel, téléphone / mobile / ville / pays sur une seule ligne, étiquettes, nombre de sondages remplis et d'événements inscrits avec leurs dates cliquables.</li>
   <li><strong>Tableau des réponses</strong> : une ligne par question. Par défaut, <strong>chaque soumission a sa propre colonne</strong>, avec sur trois lignes : la date du sondage, la date et l'heure réelles de la réponse, et le temps mis à répondre. Si une personne a répondu plusieurs fois au même sondage, vous voyez chaque tentative. Un badge « Entrée test » signale une réponse d'essai.</li>
   <li><strong>Choix multiples</strong> : chaque réponse cochée est sur sa propre ligne.</li>
-  <li><strong>Combiner les réponses d'un utilisateur à un même sondage</strong> (option, §&nbsp;3) : revient à une seule colonne par rencontre. Une section « Détail des soumissions » réapparaît alors, pour ne pas perdre les tentatives multiples.</li>
-  <li>Un <strong>commentaire interne</strong> noté sur une réponse (§&nbsp;8) est rappelé ici.</li>
+  <li><strong>Combiner les réponses d'un utilisateur à un même sondage</strong> (option, <a href="#formulaire">§&nbsp;3</a>) : revient à une seule colonne par rencontre. Une section « Détail des soumissions » réapparaît alors, pour ne pas perdre les tentatives multiples.</li>
+  <li>Un <strong>commentaire interne</strong> noté sur une réponse (<a href="#suivi">§&nbsp;8</a>) est rappelé ici.</li>
 </ul>
 <figure class="capture"><b>Capture à ajouter — <code>11-rapport-participant.png</code></b><br>Une fiche de participant avec son tableau de réponses.</figure>
 
@@ -293,7 +293,7 @@
   <tr><td>Réponses libres</td><td>Seulement les questions à texte libre.</td></tr>
   <tr><td>Note globale</td><td>La note composite de chaque rencontre, pour vos propres graphiques.</td></tr>
 </table>
-<p>Rappel : cet export contient les <strong>vrais noms</strong> (§&nbsp;4).</p>
+<p>Rappel : cet export contient les <strong>vrais noms</strong> (<a href="#anonymisation">§&nbsp;4</a>).</p>
 
 <!-- ============================================================ 11 -->
 <h2 id="billets">11. Un sondage par type de billet</h2>
@@ -326,7 +326,7 @@
   <li>Indiquez <strong>Nombre d'inscriptions (N)</strong>. Facultatif : <strong>Courriel à avertir</strong> pour cet événement (plusieurs adresses séparées par des virgules).</li>
 </ol>
 <p>Pour être aussi averti à chaque sondage complété, cochez <strong>Avertir aussi à chaque sondage complété</strong> (case indépendante de la précédente). Le courriel est envoyé quand une personne termine le sondage d'un type de billet de l'événement (ou le sondage de l'événement) ; il donne son nom, son billet et le nombre de sondages complétés sur les inscriptions confirmées, jamais ses réponses ni son courriel. Un seul courriel par participation ; rien pour un essai.</p>
-<p>Sans courriel propre à l'événement, le courriel part vers l'adresse du paramètre système <code>rlq_survey_report.courriel_inscriptions</code> (voir section 15) et, si ce paramètre est vide, vers le courriel par défaut d'Odoo (celui de la société). Seules les inscriptions confirmées ou présentes comptent. Le courriel part <strong>une seule fois</strong> ; changer N ou recocher la case réarme l'avertissement (si le seuil est déjà atteint, il part tout de suite). Il ne contient aucune donnée personnelle des inscrits ; une note « Avertissement envoyé à … » s'ajoute au fil de l'événement.</p>
+<p>Sans courriel propre à l'événement, le courriel part vers l'adresse du paramètre système <code>rlq_survey_report.courriel_inscriptions</code> (voir <a href="#admin">§&nbsp;17</a>) et, si ce paramètre est vide, vers le courriel par défaut d'Odoo (celui de la société). Seules les inscriptions confirmées ou présentes comptent. Le courriel part <strong>une seule fois</strong> ; changer N ou recocher la case réarme l'avertissement (si le seuil est déjà atteint, il part tout de suite). Il ne contient aucune donnée personnelle des inscrits ; une note « Avertissement envoyé à … » s'ajoute au fil de l'événement.</p>
 
 <!-- ============================================================ 12 -->
 <h2 id="groupes">12. Groupes et étiquettes des inscrits et des sondages</h2>
@@ -394,7 +394,7 @@
 
 <!-- ============================================================ 14 -->
 <h2 id="suivi-sondages">14. Sondages non complétés et rapport quotidien <span class="pastille">nouveau, v1.114</span></h2>
-<p>Quand un sondage est assigné à un type de billet (§&nbsp;11), remplir ce sondage confirme l'inscription. Le module montre maintenant qui ne l'a pas encore fait, et peut vous envoyer chaque matin un résumé des inscriptions et des sondages.</p>
+<p>Quand un sondage est assigné à un type de billet (<a href="#billets">§&nbsp;11</a>), remplir ce sondage confirme l'inscription. Le module montre maintenant qui ne l'a pas encore fait, et peut vous envoyer chaque matin un résumé des inscriptions et des sondages.</p>
 <h3>Liste des courriels à relancer</h3>
 <ol>
   <li>Ouvrez <strong>Événements → Sondages non complétés</strong> (aussi dans Sondages → Rapports RLQ, ou le bouton <strong>Sondages non complétés</strong> du bloc « Suivi des sondages et rapport quotidien » du formulaire de l'événement).</li>
@@ -426,7 +426,7 @@
 <p>Un seul écran pour les bénévoles qui accueillent les gens le jour de l'événement : qui est inscrit, qui est arrivé, qui a rempli son sondage, et ce que chacun a répondu aux questions utiles sur place (en ligne ou sur place, présent pour le dîner, etc.).</p>
 <h3>Préparer : choisir les questions à afficher</h3>
 <ol>
-  <li>Ouvrez le sondage du billet (§&nbsp;11), puis la question voulue (par exemple « Serez-vous présent pour le dîner ? »).</li>
+  <li>Ouvrez le sondage du billet (<a href="#billets">§&nbsp;11</a>), puis la question voulue (par exemple « Serez-vous présent pour le dîner ? »).</li>
   <li>Dans le bloc <strong>Bureau d'inscription</strong>, cochez <strong>Afficher au bureau d'inscription</strong>. Le <strong>libellé court</strong> (par exemple « Dîner ») remplace le titre de la question à l'écran ; laissez-le vide pour garder le titre.</li>
 </ol>
 <h3>Le jour de l'événement</h3>
@@ -441,7 +441,7 @@
 <h3>Réponses d'un participant, contact, recherche <span class="pastille">nouveau, v1.135</span></h3>
 <ul>
   <li>Un clic sur les <strong>réponses</strong> d'un participant, ou le bouton <strong>Voir les réponses</strong> de sa ligne, ouvre dans un nouvel onglet toutes les réponses du sondage qu'il a rempli, sans passer par l'application Sondages. Depuis la v1.139, cette page est celle du module : le <strong>nom de la personne</strong> est dans le titre de l'onglet et en haut, avec le sondage, son état, la date de soumission et chaque question avec ses réponses, page par page ; un lien ouvre aussi la version imprimable d'Odoo.</li>
-  <li><strong>Modifier les réponses</strong> : bouton visible seulement pour les administrateurs des sondages ; il ouvre la fenêtre de modification des réponses (§&nbsp;16).</li>
+  <li><strong>Modifier les réponses</strong> : bouton visible seulement pour les administrateurs des sondages ; il ouvre la fenêtre de modification des réponses (<a href="#modifier-reponses">§&nbsp;16</a>).</li>
   <li><strong>Contacter les participants</strong> (en haut ; depuis la v1.138, visible seulement pour les <strong>administrateurs des sondages ou des événements</strong>) : pour écrire aux inscriptions <strong>listées</strong> (mêmes filtres et même recherche). Depuis la v1.137, quand l'application <strong>Marketing par courriel</strong> est installée, le bouton ouvre un <strong>nouveau publipostage</strong>, le même écran que le bouton « Contacter les participants » de l'événement : choix d'un modèle (infolettre, annonce, texte simple…), éditeur visuel, courriel d'essai, envoi planifié et statistiques. Les destinataires sont déjà choisis (onglet <em>Destinataires</em> : « ID est dans… ») ; ne les modifiez pas. Sans cette application, c'est la fenêtre de courriel d'Odoo. Chaque personne reçoit son propre courriel ; les inscriptions sans adresse sont laissées de côté.</li>
   <li><strong>Téléphone</strong> : colonne cachée par défaut, à afficher avec le menu des colonnes.</li>
   <li><strong>Filtrer sur un texte</strong> : dans le bureau, <strong>Recherche</strong> cherche dans le nom, le courriel, l'entreprise, le téléphone, le billet et les réponses, sans tenir compte des majuscules ni des accents (« vege » trouve « Végétarien »). Dans <strong>Ouvrir en liste</strong>, tapez le texte dans la barre de recherche et choisissez la colonne dans la liste qui apparaît : Personne, Billet, Réponses, Téléphone, Courriel, Entreprise. Plusieurs critères se combinent.</li>
@@ -489,6 +489,7 @@
   <li><strong>Heure d'arrivée et heure de départ</strong> (v1.126) : ce sont les heures <strong>prévues</strong> par le bénévole, lues dans le sondage (question dont le titre parle d'« arrivée » et de « départ »). Si le sondage n'a pas ces questions, ce sont les heures enregistrées au bureau d'inscription (boutons <strong>Présent</strong> et <strong>Départ</strong>), et une note le dit au-dessus du tableau.</li>
 </ul>
 
+<p><strong>Totaux</strong> (v1.144) : une case qui veut dire « non » (« Non », « Non merci », « Aucun », « Aucune », « No », « Jamais », « 0 », « - », « N/A »…) reste affichée mais n'est <strong>pas comptée</strong> dans les totaux du haut et du bas ; seul le premier mot compte (« Non, je ne pourrai pas » est un non, « Non-binaire » ne l'est pas).</p>
 <h3 id="expertises-benevoles">Expertises des bénévoles <span class="pastille">nouveau, v1.137</span></h3>
 <p>Événements (ou Sondages) &rarr; Rapports RLQ &rarr; <strong>Expertises des bénévoles</strong> : les réponses des bénévoles aux questions de sondage que <strong>vous choisissez</strong>, par exemple « Quelles sont vos expertises ? » ou « Quelles distributions Linux connaissez-vous ? ».</p>
 <ol>
@@ -542,11 +543,11 @@
   <tr><td><code>rlq_survey_report.mot_de_passe_defaut</code></td><td>Le mot de passe pré-rempli dans le formulaire. <strong>À définir après l'installation</strong> : la valeur livrée (<code>!CHANGE-MOI@</code>) est refusée. Le module ne crée ce paramètre que s'il n'existe pas : ni une mise à jour, ni une réinstallation ne remplacent une valeur déjà définie. Pour désactiver le pré-remplissage, <em>videz la valeur</em> plutôt que de supprimer le paramètre (une mise à jour le recréerait avec le marqueur).</td></tr>
   <tr><td><code>rlq_survey_report.courriel_inscriptions</code></td><td>Adresse(s) à avertir (séparées par des virgules) quand un événement atteint son nombre d'inscriptions et n'a pas de courriel propre. Créé vide par le module. Vide : le courriel de la société est utilisé.</td></tr>
   <tr><td><code>rlq_survey_report.url_aide</code></td><td>L'adresse ouverte par le bouton « Aide ».</td></tr>
-  <tr><td><code>rlq_survey_report.etiquettes_groupes</code></td><td>1 (défaut) : étiquettes de contact pour les groupes des inscrits ; 0 : aucune étiquette (§&nbsp;12).</td></tr>
-  <tr><td><code>rlq_survey_report.registration_email_autofix</code></td><td>Correction automatique des adresses courriel à l'inscription : <code>syntax</code> (défaut : ponctuation et espaces seulement), <code>off</code>, <code>typos</code> (aussi un domaine courant mal écrit). Voir la section 13.</td></tr>
+  <tr><td><code>rlq_survey_report.etiquettes_groupes</code></td><td>1 (défaut) : étiquettes de contact pour les groupes des inscrits ; 0 : aucune étiquette (<a href="#groupes">§&nbsp;12</a>).</td></tr>
+  <tr><td><code>rlq_survey_report.registration_email_autofix</code></td><td>Correction automatique des adresses courriel à l'inscription : <code>syntax</code> (défaut : ponctuation et espaces seulement), <code>off</code>, <code>typos</code> (aussi un domaine courant mal écrit). Voir la <a href="#courriels-invalides">§&nbsp;13</a>.</td></tr>
 </table>
 <h3>Entretien automatique</h3>
-<p>Deux autres tâches planifiées concernent les groupes (§&nbsp;12) : une quotidienne pour les étiquettes et une toutes les 5 minutes pour la synchronisation périodique des sondages et événements cochés (désactivée tant que rien n'est coché). Une tâche planifiée quotidienne supprime les copies <em>non anonymisées</em> de plus de 3 jours (<em>Paramètres → Technique → Tâches planifiées</em>).</p>
+<p>Deux autres tâches planifiées concernent les groupes (<a href="#groupes">§&nbsp;12</a>) : une quotidienne pour les étiquettes et une toutes les 5 minutes pour la synchronisation périodique des sondages et événements cochés (désactivée tant que rien n'est coché). Une tâche planifiée quotidienne supprime les copies <em>non anonymisées</em> de plus de 3 jours (<em>Paramètres → Technique → Tâches planifiées</em>).</p>
 <h3>Droits d'accès</h3>
 <p>Le groupe « Sondage : Utilisateur » (et plus) accède au rapport et à l'historique. Seul le groupe Administrateur gère l'historique en entier, voit le bouton « Ouvrir le paramètre » et peut modifier le mot de passe par défaut.</p>
 <h3>Bibliothèques Python</h3>
@@ -562,28 +563,28 @@
   <tr><td>Un participant ne va pas plus loin que la première question ; au-dessus : « Nous avons enregistré votre réponse ! Veuillez attendre que l'hôte passe à la question suivante » ; les flèches près de « Généré par Odoo » ne font rien</td><td><strong>Ce n'est pas le navigateur</strong> (vu avec Firefox mobile et Vivaldi sous Linux). Quelqu'un a cliqué <strong>Créer une session en direct</strong> sur le sondage : tant que cette session est ouverte, Odoo crée chaque nouvelle participation en mode « session », où la personne attend qu'un hôte fasse défiler les questions. Le module l'indique en rouge sur le sondage, au bureau d'inscription et dans « Sondages non complétés » (v1.141). <strong>Réparation</strong> : ouvrez le sondage et cliquez <strong>Fermer la session en direct (garder les réponses)</strong>, puis demandez aux personnes de recharger la page : elles continuent là où elles étaient. Depuis la v1.142, le bouton « Terminer la session en direct » d'Odoo, visible sur les cartes de <strong>Sondages &rarr; Sondages</strong>, fait la même fermeture sans danger pour un sondage utilisé par un billet ou un événement ; pour un autre sondage (un vrai quiz), il garde le comportement d'Odoo, qui marque toutes les participations comme complétées. La session avait aussi mis le sondage en « une page par question » : remettez la mise en page voulue dans l'onglet Options au besoin. Depuis la v1.141, une session en direct est refusée sur un sondage utilisé par un billet ou un événement (dupliquez le sondage pour en faire une).</td></tr>
   <tr><td>Un sondage bloque sur un navigateur précis, sans ce message</td><td>Chaque participation garde le <strong>système d'exploitation</strong> et le <strong>navigateur</strong> qui y ont répondu en dernier (v1.140 ; Sondages &rarr; Participations, bloc « Appareil » ; colonnes de « Sondages non complétés » et du bureau ; page « Voir les réponses »). Comparez les sondages restés « Commencé ». Pistes : une question obligatoire ou une validation dont le message s'affiche hors de l'écran ; une question conditionnelle ; la protection contre le pistage ou un bloqueur de publicité ; une vieille version du navigateur.</td></tr>
   <tr><td>Le bouton Générer ne fait rien</td><td>Vérifiez qu'au moins un sondage est sélectionné. La case de confirmation est dans la fenêtre « Confirmation » qui s'ouvre après le clic : sans elle, « Continuer » affiche un message et rien n'est généré.</td></tr>
-  <tr><td>Le mot de passe par défaut est redevenu « !CHANGE-MOI@ »</td><td>Avec une version antérieure à la 1.93, une réinstallation du module pouvait remplacer la valeur définie. Redéfinissez-la une fois (§&nbsp;15) : elle n'est plus jamais écrasée ensuite.</td></tr>
-  <tr><td>« Le mot de passe par défaut n'a pas encore été personnalisé »</td><td>Le mot de passe pré-rempli est encore le marqueur livré. Saisissez le vôtre dans les deux champs, ou demandez à un administrateur de définir le mot de passe par défaut (§&nbsp;15).</td></tr>
+  <tr><td>Le mot de passe par défaut est redevenu « !CHANGE-MOI@ »</td><td>Avec une version antérieure à la 1.93, une réinstallation du module pouvait remplacer la valeur définie. Redéfinissez-la une fois (<a href="#bureau-inscription">§&nbsp;15</a>) : elle n'est plus jamais écrasée ensuite.</td></tr>
+  <tr><td>« Le mot de passe par défaut n'a pas encore été personnalisé »</td><td>Le mot de passe pré-rempli est encore le marqueur livré. Saisissez le vôtre dans les deux champs, ou demandez à un administrateur de définir le mot de passe par défaut (<a href="#bureau-inscription">§&nbsp;15</a>).</td></tr>
   <tr><td>On me demande un mot de passe pour un rapport anonymisé</td><td>Vérifiez que « Anonymiser les participants » est bien coché : sans anonymisation, un mot de passe est requis, même à l'écran. L'export Excel en exige toujours un.</td></tr>
   <tr><td>Un sondage attendu manque dans une catégorie</td><td>Le critère de la catégorie (mot du titre, date) ne correspond peut-être pas à son titre exact : ajoutez-le à la main, ou vérifiez « Exclure les sondages dont le titre contient » et « Minimum ayant débuté ou terminé? ».</td></tr>
   <tr><td>La liste « Filtrer par présentateur » est vide ou incomplète</td><td>Un présentateur est reconnu seulement si le titre de sa présentation se termine par son nom entre crochets ou parenthèses : « Titre [Nom Prénom] ».</td></tr>
   <tr><td>Pas de Note globale pour une rencontre</td><td>Aucune des trois questions qui la composent n'a de réponse numérique pour cette rencontre.</td></tr>
-  <tr><td>Un contour marqué ou un message de dérive</td><td>Ce sont des signaux à examiner (§&nbsp;6), pas forcément un problème confirmé.</td></tr>
+  <tr><td>Un contour marqué ou un message de dérive</td><td>Ce sont des signaux à examiner (<a href="#lire">§&nbsp;6</a>), pas forcément un problème confirmé.</td></tr>
   <tr><td>Un lien de date ouvre l'administration d'Odoo au lieu de défiler dans le rapport</td><td>Ce sondage ou événement n'est pas inclus dans ce rapport.</td></tr>
   <tr><td>La génération du rapport ou du fichier HTML/PDF est longue</td><td>Regardez la ligne <strong>Durée de génération</strong> sous le titre du formulaire (aussi au bas du rapport et dans le journal du serveur) : elle donne la durée de chaque étape du rapport (sondages, synthèse et participants, anonymisation, enregistrement) puis, depuis la version 1.131, celle du fichier (« Fichier HTML » : chiffrement, enregistrement ; « Fichier PDF » : moteur PDF, chiffrement, enregistrement). Envoyez cette ligne au responsable du module : elle dit où va le temps. Si « moteur PDF » domine, un administrateur peut définir le paramètre système <code>report.url</code> à l'adresse locale d'Odoo (ex. <code>http://127.0.0.1:8069</code>) : wkhtmltopdf lit alors les styles du rapport sans passer par l'adresse publique du site. Sinon, réduisez le nombre de sondages ou la période, et pour un PDF, décochez dans « Options PDF » les tableaux de réponses par participant.</td></tr>
   <tr><td>La génération d'un PDF échoue ou reste incomplète</td><td>Dans « Options PDF », décochez « Tableaux de réponses par participant » et/ou « Saut de page forcé par participant ».</td></tr>
   <tr><td>Un avertissement dit qu'une date n'a pas été reconnue</td><td>Le titre du sondage ne suit pas le format attendu (ex. « 4 août 2026 ») : le message cite le titre en cause.</td></tr>
   <tr><td>Le nom d'un fichier est coupé dans l'historique</td><td>Le nom complet passe à la ligne dans la colonne « Télécharger » ; si ce n'était pas le cas, faites actualiser la page (Ctrl+F5) après la mise à jour du module.</td></tr>
-  <tr><td>Une personne inscrite n'a jamais reçu sa confirmation</td><td>Regardez <strong>Événements → Courriels invalides</strong> : si son adresse y figure, « Corriger et renvoyer » (§&nbsp;13). Sinon, un administrateur vérifie <strong>Courriels en échec</strong> (cause de l'échec) ; sur le serveur, <code>odoo-mail-retry.py</code> liste et renvoie les courriels en échec.</td></tr>
-  <tr><td>Une adresse a été corrigée toute seule à l'inscription</td><td>Normal : seule la ponctuation ou les espaces étaient en cause (<code>gmail'com</code> → <code>gmail.com</code>) ; une note dans le fil de l'inscription montre l'adresse d'origine. Pour désactiver : paramètre <code>rlq_survey_report.registration_email_autofix</code> = <code>off</code> (§&nbsp;15).</td></tr>
+  <tr><td>Une personne inscrite n'a jamais reçu sa confirmation</td><td>Regardez <strong>Événements → Courriels invalides</strong> : si son adresse y figure, « Corriger et renvoyer » (<a href="#courriels-invalides">§&nbsp;13</a>). Sinon, un administrateur vérifie <strong>Courriels en échec</strong> (cause de l'échec) ; sur le serveur, <code>odoo-mail-retry.py</code> liste et renvoie les courriels en échec.</td></tr>
+  <tr><td>Une adresse a été corrigée toute seule à l'inscription</td><td>Normal : seule la ponctuation ou les espaces étaient en cause (<code>gmail'com</code> → <code>gmail.com</code>) ; une note dans le fil de l'inscription montre l'adresse d'origine. Pour désactiver : paramètre <code>rlq_survey_report.registration_email_autofix</code> = <code>off</code> (<a href="#bureau-inscription">§&nbsp;15</a>).</td></tr>
 </table>
 
 <!-- ============================================================ 17 -->
 <h2 id="limites">19. Limites et prudence</h2>
 <ul>
-  <li><strong>L'anonymisation réduit le risque, elle ne l'élimine pas</strong> : le contenu des réponses libres et un petit nombre de répondants peuvent permettre de reconnaître quelqu'un (§&nbsp;4).</li>
+  <li><strong>L'anonymisation réduit le risque, elle ne l'élimine pas</strong> : le contenu des réponses libres et un petit nombre de répondants peuvent permettre de reconnaître quelqu'un (<a href="#anonymisation">§&nbsp;4</a>).</li>
   <li><strong>Ni ce module ni ce guide ne donnent d'avis juridique.</strong> La conformité à la Loi 25 ou au RGPD, surtout pour une diffusion publique, relève d'une personne qualifiée.</li>
-  <li>L'historique des accès n'est pas le registre des incidents de confidentialité (§&nbsp;9).</li>
+  <li>L'historique des accès n'est pas le registre des incidents de confidentialité (<a href="#historique">§&nbsp;9</a>).</li>
   <li>Le module a été développé sans accès direct à une instance Odoo : après une mise à jour, vérifiez les écrans décrits ici et signalez tout écart.</li>
 </ul>
 

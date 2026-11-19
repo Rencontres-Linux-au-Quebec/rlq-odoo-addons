@@ -569,6 +569,20 @@ class TestRegistrationDeskReport(unittest.TestCase):
         self.assertIn("<tfoot>", html)
         self.assertEqual(html.count("Total : %d" % len(rows)), 2)        # top (header) and bottom (footer)
 
+    def test_negative_answers_not_counted(self):
+        """v1.144.0: « Non », « Aucune », « No », « 0 »... are shown but not counted in the totals of the volunteers."""
+        for value in ("Non", "non merci", "Non, je ne pourrai pas", "Aucune", "No", "0", "-", "N/A", "Jamais"):
+            self.assertTrue(rd.is_negative_answer(value), value)
+        for value in ("Oui", "Non-binaire", "Nonante", "", None, "Noël", "12 h"):
+            self.assertFalse(rd.is_negative_answer(value), value)
+        rows = [{"name": "A", "extra": ["Oui"], "languages": "Français"}, {"name": "B", "extra": ["Non"], "languages": "Aucune"},
+                {"name": "C", "extra": [""]}]
+        totals = rd.volunteer_column_totals(rows, [], extra_count=1)
+        self.assertEqual(totals[-1], 1)                                     # « Dîner ? »: Oui counted, Non not counted
+        self.assertEqual(totals[5], 1)                                      # languages: « Aucune » not counted
+        self.assertEqual(rd.expertise_totals([{"answers": [["Non"]]}, {"answers": [["Linux"]]}],
+                                             [{"title": "Commentaire", "choices": []}]), [2, 1])
+
     def test_on_site_and_unique_people(self):
         """v1.136.0: who will be there in person, and the number of different people by e-mail address."""
         self.assertTrue(rd.is_on_site("Présentiel"))

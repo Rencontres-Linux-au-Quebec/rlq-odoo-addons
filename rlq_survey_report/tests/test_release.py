@@ -53,5 +53,21 @@ class TestRelease(unittest.TestCase):
         self.assertIn(release.__version__, guide[:guide.index("Nouveautés")])          # the header of the guide
 
 
+    def test_guide_section_references_are_links(self):
+        """v1.144.0: every « § N » of the guide is a link to the section N, and every link « #... » leads somewhere."""
+        with open(os.path.join(HERE, "doc", "Guide-utilisateur-rlq_survey_report.html"), encoding="utf-8") as handle:
+            guide = handle.read()
+        sections = {int(number): anchor for anchor, number in re.findall(r'<h2 id="([^"]+)">(\d+)\.', guide)}
+        self.assertGreaterEqual(len(sections), 15)
+        outside_links = re.sub(r"<a\b[^>]*>.*?</a>", "", guide, flags=re.S)
+        self.assertNotRegex(outside_links, r"§(&nbsp;|\s)\d", "a « § N » of the guide is not a link")
+        self.assertNotRegex(outside_links, r"(?i)\bsection\s+\d", "a « section N » of the guide is not a link")
+        for anchor, number in re.findall(r'<a href="#([^"]+)">§&nbsp;(\d+)</a>', guide):
+            self.assertEqual(sections.get(int(number)), anchor, "§ %s points to #%s" % (number, anchor))
+        ids = set(re.findall(r'id="([^"]+)"', guide))
+        for anchor in re.findall(r'href="#([^"]+)"', guide):
+            self.assertIn(anchor, ids, "link to a missing anchor #%s" % anchor)
+
+
 if __name__ == "__main__":
     unittest.main()
