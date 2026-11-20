@@ -470,3 +470,33 @@ msgstr "Les personnes listées attendent %(count)d sondages différents : choisi
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_pending__live_session_html
 msgid "Live sessions"
 msgstr "Sessions en direct"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_pending__attendance_filter
+msgid "On site or online"
+msgstr "Présentiel ou virtuel"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_survey_pending__attendance_filter
+msgid "Lists only the people who will be on site (« Présentiel », « Sur place », « Hybride », or « Oui » to « Serez-vous présent à l'ÉTS ? »), only the people online, or only the people whose answers say neither. Read in this order: the answer to the on site or online question of their survey, the roles questions « (en présentiel) » / « (en virtuel) » they answered, then the name of their ticket."
+msgstr "Liste seulement les personnes qui seront en présentiel (« Présentiel », « Sur place », « Hybride », ou « Oui » à « Serez-vous présent à l'ÉTS ? »), seulement les personnes en virtuel, ou seulement celles dont les réponses ne disent ni l'un ni l'autre. Lu dans cet ordre : la réponse à la question présentiel ou virtuel de leur sondage, les questions de rôles « (en présentiel) » / « (en virtuel) » auxquelles elles ont répondu, puis le nom de leur billet."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_survey_pending__attendance_filter__all
+msgid "All"
+msgstr "Tous"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_survey_pending__attendance_filter__on_site
+msgid "On site"
+msgstr "Présentiel"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_survey_pending__attendance_filter__online
+msgid "Online"
+msgstr "Virtuel"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_survey_pending__attendance_filter__unknown
+msgid "Not specified"
+msgstr "Non précisé"

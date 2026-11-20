@@ -922,6 +922,127 @@ def is_negative_answer(value):
     return first in NEGATIVE_WORDS
 
 
+# ------------------------------------------------------------------ on site or online (v1.145.0)
+
+ATTENDANCE_FILTERS = ("all", "on_site", "online", "unknown")
+HYBRID_WORDS = ("hybride", "hybrid")
+AFFIRMATIVE_WORDS = ("oui", "yes", "o", "y", "certainement", "absolument", "bien sur", "of course", "sure")
+# « Serez-vous présent à l'ÉTS ? », « Présence à l'événement ? »: never « présentation », never « présentiel » (ON_SITE_WORDS).
+PRESENCE_PATTERN = re.compile(r"\b(present|presente|presents|presentes|presence)\b")
+# « Serez-vous présent pour le dîner ? » speaks of a meal, not of on site or online.
+MEAL_WORDS = ("diner", "dejeuner", "souper", "repas", "lunch", "dinner", "breakfast", "meal", "pizza", "cocktail", "collation",
+              "5 a 7")
+
+
+def _first_word(text):
+    return re.split(r"[\s,;.:!?()]+", sort_key(text), maxsplit=1)[0]
+
+
+def is_affirmative_answer(value):
+    """v1.145.0: True for an answer that means « yes » (« Oui », « Oui, toute la journée », « Yes »...)."""
+    key = sort_key(" ".join(str(value or "").split()))
+    return bool(key) and (key in AFFIRMATIVE_WORDS or _first_word(key) in AFFIRMATIVE_WORDS)
+
+
+def _title_kind(title):
+    """« on_site » / « online » when the title of a question asks about one of them, otherwise None."""
+    key = sort_key(title)
+    if any(word in key for word in MEAL_WORDS):
+        return None
+    on_site = _has_word(title, ON_SITE_WORDS) or bool(PRESENCE_PATTERN.search(key))
+    online = _has_word(title, ONLINE_WORDS)
+    if on_site == online:
+        return None
+    return "on_site" if on_site else "online"
+
+
+def find_attendance_question(questions):
+    """v1.145.0: the question of a survey that says whether the person will be on site or online, or None.
+
+    questions: [{"id", "title", "choices": [labels], "is_choice": bool}] in the order of the survey. Only choice questions;
+    the roles questions (« Rôles pendant l'événement (en présentiel) ? ») and the hours of arrival or departure (« Heure
+    d'arrivée sur place ») are never taken. In this order:
+      1. a title that speaks of on site / online / hybrid (« Présentiel ou virtuel ? », « Participerez-vous en ligne ? »);
+      2. choices that offer both (« Sur place » and « En ligne »);
+      3. a yes / no question about the presence (« Serez-vous présent à l'ÉTS ? »), never about a meal.
+    """
+    candidates = []
+    for question in questions or ():
+        title = question.get("title") or ""
+        key = sort_key(title)
+        if not question.get("is_choice") or is_roles_title(title) \
+                or ARRIVAL_PATTERN.search(key) or DEPARTURE_PATTERN.search(key):
+            continue
+        candidates.append(question)
+    for question in candidates:
+        if _has_word(question.get("title"), TYPE_WORDS):
+            return question["id"]
+    for question in candidates:
+        choices = question.get("choices") or ()
+        if any(_has_word(c, ON_SITE_WORDS + HYBRID_WORDS) for c in choices) and any(_has_word(c, ONLINE_WORDS) for c in choices):
+            return question["id"]
+    for question in candidates:
+        if _title_kind(question.get("title")):
+            return question["id"]
+    return None
+
+
+def attendance_from_answers(title, values):
+    """v1.145.0: « on_site », « online » or None from the answers of the attendance question.
+
+    The answer decides first: « Présentiel », « Sur place », « Hybride », « Présentiel, Virtuel » -> on site (as is_on_site());
+    « Virtuel », « En ligne », « À distance » -> online; « Présent » -> on site. Otherwise a yes / no answer to a title that
+    asks about one of them: « Serez-vous présent à l'ÉTS ? » « Oui » -> on site, « Non » -> online.
+    """
+    values = [" ".join(str(v or "").split()) for v in values or () if str(v or "").strip()]
+    text = ", ".join(values)
+    if not text:
+        return None
+    if _has_word(text, ON_SITE_WORDS + HYBRID_WORDS):
+        return "on_site"
+    if _has_word(text, ONLINE_WORDS):
+        return "online"
+    if PRESENCE_PATTERN.search(sort_key(text)) and not is_negative_answer(text):
+        return "on_site"
+    kind = _title_kind(title)
+    if kind and is_affirmative_answer(values[0]):
+        return kind
+    if kind and is_negative_answer(values[0]):
+        return "online" if kind == "on_site" else "on_site"
+    return None
+
+
+def is_roles_title(title):
+    """v1.145.0: True for the title of a roles question (« Rôles pendant l'événement (en présentiel) ? »)."""
+    return _has_word(title, ROLE_WORDS)
+
+
+def ticket_attendance(ticket_name):
+    """v1.145.0: « on_site » / « online » when the name of the ticket says so (« Visiteur - virtuel »), otherwise None."""
+    on_site = _has_word(ticket_name, ON_SITE_WORDS)
+    online = _has_word(ticket_name, ONLINE_WORDS)
+    if on_site == online:
+        return None
+    return "on_site" if on_site else "online"
+
+
+def roles_attendance(kinds):
+    """v1.145.0: from the role_kind() of the roles questions answered: on site wins (a volunteer on site and online comes)."""
+    kinds = set(kinds or ())
+    if "on_site" in kinds:
+        return "on_site"
+    return "online" if "online" in kinds else None
+
+
+def attendance_matches(kind, wanted):
+    """v1.145.0: filter « On site or online » of the RLQ pages. wanted: « all », « on_site », « online » or « unknown »."""
+    if not wanted or wanted == "all":
+        return True
+    if wanted == "unknown":
+        return kind not in ("on_site", "online")
+    return kind == wanted
+
+
 def _counts(value):
     """A cell counts in a total when it is not empty and does not mean « no »."""
     return bool(str(value or "").strip()) and not is_negative_answer(value)

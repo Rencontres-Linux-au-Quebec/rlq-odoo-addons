@@ -38,6 +38,7 @@ from odoo import _, api, fields, models
 from odoo.exceptions import AccessError, UserError
 
 from . import followup_report as fr
+from .registration_desk_report import attendance_matches
 from . import registration_desk_report as rd
 from .event_inscriptions_alerte import CLE_PARAMETRE_COURRIEL_INSCRIPTIONS, ETATS_COMPTES
 
@@ -321,6 +322,14 @@ class RlqSurveyPending(models.TransientModel):
         string="Include started surveys", default=True,
         help="Also list the people who started the survey without finishing it (their registration is not confirmed either).",
     )
+    # v1.145.0: on site or online (event.registration._rlq_attendance_map()); literal here, for scripts/build_fr_po.py.
+    attendance_filter = fields.Selection(
+        [("all", "All"), ("on_site", "On site"), ("online", "Online"), ("unknown", "Not specified")],
+        string="On site or online", default="all", required=True,
+        help="Lists only the people who will be on site (« Présentiel », « Sur place », « Hybride », or « Oui » to « Serez-vous "
+             "présent à l'ÉTS ? »), only the people online, or only the people whose answers say neither. Read in this order: "
+             "the answer to the on site or online question of their survey, the roles questions « (en présentiel) » / « (en "
+             "virtuel) » they answered, then the name of their ticket.")
     registration_ids = fields.Many2many("event.registration", string="Registrations", compute="_compute_pending")
     emails = fields.Char(string="E-mail addresses", compute="_compute_pending",
                          help="Addresses of the people to remind, without duplicates, separated by « ; » (to copy into the « To » or "
@@ -336,7 +345,7 @@ class RlqSurveyPending(models.TransientModel):
         for wizard in self:
             wizard.live_session_html = live_session_html(self.env, event_surveys(wizard.event_ids)) or False
 
-    @api.depends("event_ids", "include_started")
+    @api.depends("event_ids", "include_started", "attendance_filter")
     def _compute_pending(self):
         for wizard in self:
             states = ("not_started", "in_progress") if wizard.include_started else ("not_started",)
@@ -344,6 +353,10 @@ class RlqSurveyPending(models.TransientModel):
                 ("event_id", "in", wizard.event_ids.ids), ("state", "in", list(ETATS_COMPTES))])
             status = registrations._rlq_survey_status_map()
             pending = registrations.browse([rid for rid, (_s, state, _d) in status.items() if state in states])
+            if wizard.attendance_filter and wizard.attendance_filter != "all":         # v1.145.0: also limits the reminders
+                attendance = pending._rlq_attendance_map()
+                wanted = wizard.attendance_filter
+                pending = pending.filtered(lambda r, attendance=attendance, wanted=wanted: attendance_matches(attendance.get(r.id), wanted))
             emails = fr.unique_emails(pending.mapped("email"))
             wizard.registration_ids = pending.sorted(lambda r: (r.event_id.name or "", (r.name or "").lower()))
             wizard.emails = "; ".join(emails)

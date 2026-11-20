@@ -526,6 +526,69 @@ msgid "Live sessions"
 msgstr "Sessions en direct"
 
 #. module: rlq_survey_report
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_survey_pending__attendance_filter
+#: model:ir.model.fields,field_description:rlq_survey_report.field_event_registration__rlq_attendance
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__attendance_filter
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_coordinator__attendance_filter
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_volunteer_expertise__attendance_filter
+#: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_audience_topics__attendance_filter
+msgid "On site or online"
+msgstr "Présentiel ou virtuel"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_survey_pending__attendance_filter
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_registration_desk__attendance_filter
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_coordinator__attendance_filter
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_volunteer_expertise__attendance_filter
+#: model:ir.model.fields,help:rlq_survey_report.field_rlq_audience_topics__attendance_filter
+msgid "Lists only the people who will be on site (« Présentiel », « Sur place », « Hybride », or « Oui » to « Serez-vous présent à l'ÉTS ? »), only the people online, or only the people whose answers say neither. Read in this order: the answer to the on site or online question of their survey, the roles questions « (en présentiel) » / « (en virtuel) » they answered, then the name of their ticket."
+msgstr "Liste seulement les personnes qui seront en présentiel (« Présentiel », « Sur place », « Hybride », ou « Oui » à « Serez-vous présent à l'ÉTS ? »), seulement les personnes en virtuel, ou seulement celles dont les réponses ne disent ni l'un ni l'autre. Lu dans cet ordre : la réponse à la question présentiel ou virtuel de leur sondage, les questions de rôles « (en présentiel) » / « (en virtuel) » auxquelles elles ont répondu, puis le nom de leur billet."
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_survey_pending__attendance_filter__all
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__attendance_filter__all
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__survey_filter__all
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__survey_filter__all
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__attendance_filter__all
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_expertise__survey_filter__all
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_expertise__attendance_filter__all
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_audience_topics__attendance_filter__all
+msgid "All"
+msgstr "Tous"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_survey_pending__attendance_filter__on_site
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__event_registration__rlq_attendance__on_site
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__attendance_filter__on_site
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__attendance_filter__on_site
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_expertise__attendance_filter__on_site
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_audience_topics__attendance_filter__on_site
+msgid "On site"
+msgstr "Présentiel"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_survey_pending__attendance_filter__online
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__event_registration__rlq_attendance__online
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__attendance_filter__online
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__attendance_filter__online
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_expertise__attendance_filter__online
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_audience_topics__attendance_filter__online
+msgid "Online"
+msgstr "Virtuel"
+
+#. module: rlq_survey_report
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_survey_pending__attendance_filter__unknown
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__event_registration__rlq_attendance__unknown
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__attendance_filter__unknown
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__attendance_filter__unknown
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_expertise__attendance_filter__unknown
+#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_audience_topics__attendance_filter__unknown
+msgid "Not specified"
+msgstr "Non précisé"
+
+#. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_list
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_event_form_rlq_registration_desk
@@ -643,6 +706,11 @@ msgstr "Sondage commencé"
 #: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_expertise__survey_filter__not_started
 msgid "Survey not started"
 msgstr "Sondage non commencé"
+
+#. module: rlq_survey_report
+#: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
+msgid "On site or online not specified"
+msgstr "Présentiel ou virtuel non précisé"
 
 #. module: rlq_survey_report
 #: model_terms:ir.ui.view,arch_db:rlq_survey_report.view_rlq_registration_desk_registration_search
@@ -1107,6 +1175,11 @@ msgid "Name of the participant. Click it to send a message to this person in Odo
 msgstr "Nom du participant. Cliquez dessus pour envoyer un message à cette personne dans Odoo (Discussion). Le tri de cette colonne ignore les majuscules et les accents."
 
 #. module: rlq_survey_report
+#: model:ir.model.fields,help:rlq_survey_report.field_event_registration__rlq_attendance
+msgid "From the answer to the on site or online question of the survey of this person, otherwise from the roles questions « (en présentiel) » / « (en virtuel) » answered, otherwise from the name of the ticket."
+msgstr "D'après la réponse à la question présentiel ou virtuel du sondage de cette personne, sinon d'après les questions de rôles « (en présentiel) » / « (en virtuel) » répondues, sinon d'après le nom du billet."
+
+#. module: rlq_survey_report
 #: model:ir.model,name:rlq_survey_report.model_rlq_pi_confirmation_mixin
 msgid "Confirmation about personal information"
 msgstr "Confirmation concernant les renseignements personnels"
@@ -1163,13 +1236,6 @@ msgstr "N'affiche que les inscriptions qui ont donné cette réponse (ou aucune 
 #: model:ir.model.fields,help:rlq_survey_report.field_rlq_registration_desk__survey_filter
 msgid "Lists only the registrations whose survey is in this state."
 msgstr "Liste seulement les inscriptions dont le sondage est dans cet état."
-
-#. module: rlq_survey_report
-#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_registration_desk__survey_filter__all
-#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_coordinator__survey_filter__all
-#: model:ir.model.fields.selection,name:rlq_survey_report.selection__rlq_volunteer_expertise__survey_filter__all
-msgid "All"
-msgstr "Tous"
 
 #. module: rlq_survey_report
 #: model:ir.model.fields,field_description:rlq_survey_report.field_rlq_registration_desk__sort_by

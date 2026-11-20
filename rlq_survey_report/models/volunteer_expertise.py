@@ -51,6 +51,14 @@ class RlqVolunteerExpertise(models.TransientModel):
     survey_filter = fields.Selection(
         [("all", "All"), ("done", "Survey completed"), ("in_progress", "Survey started"), ("not_started", "Survey not started")],
         string="Survey", default="all", required=True, help="Lists only the volunteers whose survey is in this state.")
+    # v1.145.0: on site or online (event.registration._rlq_attendance_map()); literal here, for scripts/build_fr_po.py.
+    attendance_filter = fields.Selection(
+        [("all", "All"), ("on_site", "On site"), ("online", "Online"), ("unknown", "Not specified")],
+        string="On site or online", default="all", required=True,
+        help="Lists only the people who will be on site (« Présentiel », « Sur place », « Hybride », or « Oui » to « Serez-vous "
+             "présent à l'ÉTS ? »), only the people online, or only the people whose answers say neither. Read in this order: "
+             "the answer to the on site or online question of their survey, the roles questions « (en présentiel) » / « (en "
+             "virtuel) » they answered, then the name of their ticket.")
     sort_by = fields.Selection(
         [("name", "Name"), ("registered", "Registration date"), ("survey", "Survey")],
         string="Sort by", default="name", required=True,
@@ -64,7 +72,7 @@ class RlqVolunteerExpertise(models.TransientModel):
             wizard.display_name = (_("Volunteer expertise: %(event)s", event=wizard.event_id.name) if wizard.event_id
                                    else _("Volunteer expertise"))
 
-    @api.depends("event_id", "survey_filter", "sort_by", "sort_desc")
+    @api.depends("event_id", "survey_filter", "attendance_filter", "sort_by", "sort_desc")
     def _compute_table(self):
         for wizard in self:
             rows, columns, notes = wizard._rlq_table_data()
@@ -73,7 +81,8 @@ class RlqVolunteerExpertise(models.TransientModel):
 
     def _rlq_coordinator(self):
         """A page « Gestion des bénévoles » in memory, for the same volunteers and the same answers."""
-        return self.env["rlq.volunteer.coordinator"].new({"event_id": self.event_id.id, "survey_filter": self.survey_filter})
+        return self.env["rlq.volunteer.coordinator"].new({"event_id": self.event_id.id, "survey_filter": self.survey_filter,
+                                                          "attendance_filter": self.attendance_filter or "all"})
 
     def _rlq_table_data(self):
         """(rows, columns, notes). columns: [{"title", "choices"}] (choices empty: a text question); each row has "answers",
@@ -81,7 +90,10 @@ class RlqVolunteerExpertise(models.TransientModel):
         self.ensure_one()
         if not self.event_id:
             return [], [], []
-        registrations, status, values, chosen = self._rlq_coordinator()._rlq_volunteer_base()
+        coordinator = self._rlq_coordinator()
+        registrations, status, values, chosen = coordinator._rlq_volunteer_base()
+        attendance = coordinator._rlq_volunteer_attendance(registrations, status, values, chosen) \
+            if registrations and self.attendance_filter and self.attendance_filter != "all" else {}
         columns, column_index, by_survey, notes = [], {}, {}, []
         questions = self.env["survey.question"].sudo()
         for survey in {status[r.id][0] for r in registrations if status[r.id][0]}:
@@ -108,6 +120,8 @@ class RlqVolunteerExpertise(models.TransientModel):
         for registration in registrations:
             survey, state, _done = status[registration.id]
             if self.survey_filter and self.survey_filter != "all" and state != self.survey_filter:
+                continue
+            if attendance and not rd.attendance_matches(attendance.get(registration.id), self.attendance_filter):
                 continue
             input_id = chosen.get(registration.id)
             answers = [[] for _c in columns]

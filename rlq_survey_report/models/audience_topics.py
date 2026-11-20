@@ -56,6 +56,14 @@ class RlqAudienceTopics(models.TransientModel):
     ticket_ids = fields.Many2many("event.event.ticket", string="Tickets chosen",
                                   domain="[('event_id', '=', event_id)]",
                                   help="With « Tickets chosen one by one »: only the registrations to these tickets.")
+    # v1.145.0: on site or online (event.registration._rlq_attendance_map()); literal here, for scripts/build_fr_po.py.
+    attendance_filter = fields.Selection(
+        [("all", "All"), ("on_site", "On site"), ("online", "Online"), ("unknown", "Not specified")],
+        string="On site or online", default="all", required=True,
+        help="Lists only the people who will be on site (« Présentiel », « Sur place », « Hybride », or « Oui » to « Serez-vous "
+             "présent à l'ÉTS ? »), only the people online, or only the people whose answers say neither. Read in this order: "
+             "the answer to the on site or online question of their survey, the roles questions « (en présentiel) » / « (en "
+             "virtuel) » they answered, then the name of their ticket.")
     table_html = fields.Html(string="Topics of interest", compute="_compute_table", sanitize=False)
 
     @api.depends("event_id", "scope")
@@ -70,7 +78,7 @@ class RlqAudienceTopics(models.TransientModel):
     def _onchange_event_id(self):
         self.ticket_ids = self.ticket_ids.filtered(lambda ticket: ticket.event_id == self.event_id)
 
-    @api.depends("event_id", "scope", "ticket_ids")
+    @api.depends("event_id", "scope", "ticket_ids", "attendance_filter")
     def _compute_table(self):
         for page in self:
             breakdown, tickets, notes = page._rlq_topics_data()
@@ -98,7 +106,13 @@ class RlqAudienceTopics(models.TransientModel):
         if not registrations:
             return None, [], []
         status = registrations._rlq_survey_status_map()
-        _inputs, _answered, values, chosen = registrations._rlq_desk_participations(status)
+        participations = registrations._rlq_desk_participations(status)
+        _inputs, _answered, values, chosen = participations
+        if self.attendance_filter and self.attendance_filter != "all":                  # v1.145.0
+            attendance = registrations._rlq_attendance_map(status, participations)
+            registrations = registrations.filtered(lambda r: rd.attendance_matches(attendance.get(r.id), self.attendance_filter))
+            if not registrations:
+                return None, [], []
         questions, question_index, by_survey, notes = [], {}, {}, []
         model = self.env["survey.question"].sudo()
         for survey in {status[r.id][0] for r in registrations if status[r.id][0]}:
