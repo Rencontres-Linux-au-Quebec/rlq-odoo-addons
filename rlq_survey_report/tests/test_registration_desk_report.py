@@ -593,6 +593,58 @@ class TestRegistrationDeskReport(unittest.TestCase):
         rows = [{"email": "A@x.org"}, {"email": " a@x.org "}, {"email": "b@x.org"}, {"email": ""}, {}]
         self.assertEqual(rd.unique_people(rows), 4)                          # a@x.org once, two rows without address
 
+    def test_attendance_question(self):
+        """v1.145.0: the on site or online question of a survey, never a roles, hour or meal question."""
+        def q(qid, title, choices=(), is_choice=True):
+            return {"id": qid, "title": title, "choices": list(choices), "is_choice": is_choice}
+        self.assertIsNone(rd.find_attendance_question([]))
+        questions = [q(1, "Rôles pendant l'événement (en présentiel) ?", ["Accueil"]),
+                     q(2, "Heure d'arrivée sur place", ["9 h"]),
+                     q(3, "Serez-vous présent pour le dîner ?", ["Oui", "Non"]),
+                     q(4, "Commentaires en ligne", is_choice=False),
+                     q(5, "Serez-vous présent à l'ÉTS ?", ["Oui", "Non"])]
+        self.assertEqual(rd.find_attendance_question(questions), 5)
+        self.assertEqual(rd.find_attendance_question(questions + [q(6, "Présentiel ou virtuel ?", ["Présentiel", "Virtuel"])]), 6)
+        self.assertEqual(rd.find_attendance_question([q(7, "Comment participerez-vous ?", ["Sur place", "En ligne"]),
+                                                      q(8, "Comment nous avez-vous connus ?", ["En ligne", "Ami"])]), 7)
+        self.assertIsNone(rd.find_attendance_question([q(8, "Comment nous avez-vous connus ?", ["En ligne", "Ami"])]))
+
+    def test_attendance_from_answers(self):
+        """v1.145.0: the answer decides, then a yes / no to a title that asks about on site or online."""
+        self.assertEqual(rd.attendance_from_answers("Mode ?", ["Présentiel"]), "on_site")
+        self.assertEqual(rd.attendance_from_answers("Mode ?", ["Hybride"]), "on_site")
+        self.assertEqual(rd.attendance_from_answers("Mode ?", ["Présentiel", "Virtuel"]), "on_site")
+        self.assertEqual(rd.attendance_from_answers("Mode ?", ["Virtuel"]), "online")
+        self.assertEqual(rd.attendance_from_answers("Mode ?", ["À distance"]), "online")
+        self.assertEqual(rd.attendance_from_answers("Mode ?", ["Présent"]), "on_site")
+        self.assertEqual(rd.attendance_from_answers("Serez-vous présent à l'ÉTS ?", ["Oui"]), "on_site")
+        self.assertEqual(rd.attendance_from_answers("Serez-vous présent à l'ÉTS ?", ["Non"]), "online")
+        self.assertEqual(rd.attendance_from_answers("Participerez-vous en ligne ?", ["Oui, toute la journée"]), "online")
+        self.assertEqual(rd.attendance_from_answers("Participerez-vous en ligne ?", ["No"]), "on_site")
+        self.assertIsNone(rd.attendance_from_answers("Serez-vous présent pour le dîner ?", ["Oui"]))
+        self.assertIsNone(rd.attendance_from_answers("Mode ?", []))
+        self.assertIsNone(rd.attendance_from_answers("Mode ?", ["Peut-être"]))
+
+    def test_attendance_ticket_roles_filter(self):
+        """v1.145.0: name of the ticket, roles answered, and the filter of the pages."""
+        self.assertEqual(rd.ticket_attendance("Visiteur - virtuel"), "online")
+        self.assertEqual(rd.ticket_attendance("Bénévole sur place"), "on_site")
+        self.assertIsNone(rd.ticket_attendance("Visiteur"))
+        self.assertIsNone(rd.ticket_attendance("Présentiel et virtuel"))
+        self.assertEqual(rd.roles_attendance(["online", "on_site"]), "on_site")
+        self.assertEqual(rd.roles_attendance(["online"]), "online")
+        self.assertIsNone(rd.roles_attendance([]))
+        self.assertTrue(rd.attendance_matches("online", "all"))
+        self.assertTrue(rd.attendance_matches(None, ""))
+        self.assertTrue(rd.attendance_matches("on_site", "on_site"))
+        self.assertFalse(rd.attendance_matches("online", "on_site"))
+        self.assertTrue(rd.attendance_matches("unknown", "unknown"))
+        self.assertTrue(rd.attendance_matches(None, "unknown"))
+        self.assertFalse(rd.attendance_matches("on_site", "unknown"))
+        self.assertTrue(rd.is_affirmative_answer("Oui"))
+        self.assertFalse(rd.is_affirmative_answer("Ouistiti"))
+        self.assertFalse(rd.is_affirmative_answer(""))
+
     def test_reconciliation(self):
         self.assertEqual(rd.reconciliation_html([]), "")
         html = rd.reconciliation_html([{"survey": "S<1>", "survey_done": 12, "matched_done": 9, "duplicates": 1,

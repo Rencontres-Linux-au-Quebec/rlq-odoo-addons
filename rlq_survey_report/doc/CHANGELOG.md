@@ -1,5 +1,45 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.145.0
+
+**Short title:** filter "On site or online" (Présentiel ou virtuel) on every RLQ page.
+
+**Reason for the request:** know who will be on site (vs online) in every RLQ form: registration desk, volunteers, volunteer expertise, etc.
+
+**Concurrent changes:** checked before the work and before pushing: no open PR; the only branches ahead of `18.0` are `18.0_event_webapp_plan` (other modules, not `rlq_survey_report`) and `feature/volunteers-export` (already in `18.0`). This branch starts from `18.0` (PR #32 merged).
+
+**Changes:**
+
+- `models/registration_desk_report.py` (pure functions): `find_attendance_question()`, `attendance_from_answers()`, `ticket_attendance()`, `roles_attendance()`, `attendance_matches()`, `is_affirmative_answer()`, `is_roles_title()`, `PRESENCE_PATTERN`, `MEAL_WORDS`.
+- `models/event_registration_desk.py`: `event.registration._rlq_attendance_map()` (fixed number of queries); computed field `rlq_attendance` ("On site or online", searchable: `_search_rlq_attendance()`); field `attendance_filter` and filter in `rlq.registration.desk._rlq_listed()` (list, "Contact the participants", "Open as a list").
+- `models/volunteer_coordinator.py`: field `attendance_filter`; `_rlq_volunteer_attendance()` follows the column "Type" (type question, otherwise the roles questions, otherwise `_rlq_attendance_map()`); filter in `_rlq_table_data()` (table, export, list, contact).
+- `models/volunteer_expertise.py`, `models/audience_topics.py`, `models/event_survey_followup.py` (`rlq.survey.pending`: addresses AND reminders): field `attendance_filter` and filter.
+- `views/event_registration_desk_views.xml`: the filter on the 4 pages; column "On site or online" (optional, shown) in the desk and in "Open as a list"; search filters "On site", "Online", "On site or online not specified". `views/event_survey_followup_views.xml`: the filter, optional column (hidden).
+- `scripts/build_fr_po.py`, `scripts/fr_base.po`, `i18n/fr.po`: French terms (Présentiel ou virtuel, Présentiel, Virtuel, Non précisé).
+- `doc/Guide-utilisateur-rlq_survey_report.html`: new section "Présentiel ou virtuel" (`#presentiel-virtuel`), news v1.145. `doc/NOTES_VALIDATION.md`. `release.py`, `__manifest__.py`.
+- `tests/test_registration_desk_report.py`: 3 new tests.
+
+**How a registration is classified (in this order):**
+
+1. The answer to the on site or online question of the expected survey: a choice question whose title speaks of on site / online / hybrid; otherwise whose choices offer both; otherwise a yes / no question about the presence ("Serez-vous présent à l'ÉTS ?": "Oui" -> on site, "Non" -> online).
+2. The roles questions "... (en présentiel) ?" / "... (en virtuel) ?" answered (on site wins).
+3. The name of the ticket ("Visiteur virtuel").
+4. Otherwise "Not specified".
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:**
+
+- Never taken as the attendance question: the roles questions, the hours of arrival or departure ("Heure d'arrivée sur place"), a meal ("Serez-vous présent pour le dîner ?"), a question whose choices mention only one side ("Comment nous avez-vous connus ? En ligne").
+- "Hybride" and "Présentiel, Virtuel" count as on site, as `is_on_site()` (v1.136.0) and the column "Présentiel" of the volunteers.
+- "Présentiel" never matches "présent" alone: "présentation" is not a presence.
+- Filter "All" (default): nothing is computed, the pages are as fast as before.
+- The field labels and selections are literal in each model, so that `scripts/build_fr_po.py` finds them.
+
+**Checks performed:** standalone tests of run-all.sh; ruff; `scripts/build_fr_po.py`: all terms translated; view XML parsed. No Odoo instance here: the Odoo part is to be checked in production (`doc/NOTES_VALIDATION.md`, v1.145.0).
+
+**Action required from the user:** `-u rlq_survey_report`; points "v1.145.0" of `doc/NOTES_VALIDATION.md`.
+
 ## 18.0.1.144.0
 
 **Short title:** "Non" no longer counted in the totals of "Gestion des bénévoles"; every "§ N" of the guide is a link to its section.

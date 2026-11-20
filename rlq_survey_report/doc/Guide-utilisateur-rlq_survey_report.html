@@ -42,16 +42,16 @@
 <div class="page">
 
 <h1>Guide utilisateur — Rapport de sondage</h1>
-<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.144.0</strong> du 2026-11-18 à 16 h 28 (heure locale, HNE).</p>
+<p class="meta">Module Odoo <code>rlq_survey_report</code> — version <strong>18.0.1.145.0</strong> du 2026-11-20 à 08 h 53 (heure locale, HNE).</p>
 
 <p>Ce module produit un compte-rendu détaillé — à l'écran, en fichier HTML, en PDF ou en Excel — des réponses à un ou plusieurs sondages Odoo, notamment les sondages de satisfaction envoyés après chaque rencontre. Il aide à repérer ce qui va bien, ce qui se dégrade, et à suivre les actions entreprises d'une rencontre à l'autre.</p>
 
 <div class="encadre">
   <p><strong>Nouveautés des trois dernières versions :</strong></p>
   <ul>
+    <li><strong>v1.145</strong> : nouveau filtre <strong>Présentiel ou virtuel</strong> dans toutes les pages Rapports RLQ (bureau d'inscription, gestion et expertises des bénévoles, sujets d'intérêt, sondages non complétés) ; colonne et filtres du même nom dans « Ouvrir en liste » (<a href="#presentiel-virtuel">voir « Présentiel ou virtuel »</a>, <a href="#bureau-inscription">§&nbsp;15</a>).</li>
     <li><strong>v1.144</strong> : dans la gestion des bénévoles, une réponse « Non » (ou « Aucun », « No », « 0 »…) n'est plus comptée dans les totaux ; dans ce guide, chaque renvoi « §&nbsp;N » est un lien vers la section.</li>
     <li><strong>v1.143</strong> : courriel « Vos réponses » non reçu : le lien du sondage envoyé à l'inscription porte maintenant l'adresse de la personne ; chaque participation garde le <em>résultat de l'envoi</em> (ou la raison du non-envoi) et un bouton <em>Envoyer ses réponses par courriel</em> (<a href="#depannage">§&nbsp;18</a>).</li>
-    <li><strong>v1.142</strong> : le bouton « Terminer la session en direct » d'Odoo (cartes de Sondages &rarr; Sondages) ferme sans danger la session d'un sondage d'événement ; colonne <em>Sondage</em> en couleur (rouge : non commencé, orange : commencé, vert : complété) ; colonne « Nom du participant » en double retirée de « Ouvrir en liste ».</li>
   </ul>
   <p>Le détail de chaque version est dans <code>doc/CHANGELOG.md</code>.</p>
 </div>
@@ -474,6 +474,15 @@
   <li><strong>En haut</strong> du bureau d'inscription et du tableau des bénévoles (au-dessus du sommaire et du tableau, depuis la v1.126), une ligne indique le nom du module, sa version, puis la date et l'heure locales de l'affichage avec le fuseau, par exemple : <code>rlq_survey_report 18.0.1.124.0 - affiché le 2026-11-16 21:15:02 EST (heure locale, America/Toronto)</code>. Une capture d'écran dit ainsi quelle version l'a produite et quand.</li>
 </ul>
 
+<h3 id="presentiel-virtuel">Présentiel ou virtuel <span class="pastille">nouveau, v1.145</span></h3>
+<p>Le filtre <strong>Présentiel ou virtuel</strong> (Tous, Présentiel, Virtuel, Non précisé) se trouve dans le bureau d'inscription, la gestion des bénévoles, les expertises des bénévoles, les sujets d'intérêt et les sondages non complétés (<a href="#suivi-sondages">§&nbsp;14</a>). Il limite la page, l'export dans un chiffrier, « Ouvrir en liste », « Contacter les participants » et, dans les sondages non complétés, les <strong>rappels</strong> aux personnes affichées. « Ouvrir en liste » du bureau montre aussi la colonne <strong>Présentiel ou virtuel</strong> et les filtres <em>Présentiel</em>, <em>Virtuel</em> et <em>Présentiel ou virtuel non précisé</em>.</p>
+<p>Pour chaque inscription, le module lit, dans cet ordre (majuscules et accents ignorés) :</p>
+<ol>
+  <li>la réponse à la question <strong>présentiel ou virtuel</strong> du sondage de la personne : une question à choix dont le titre parle de présentiel, virtuel, hybride, en ligne, sur place ou à distance ; sinon une question dont les choix offrent les deux (« Sur place » et « En ligne ») ; sinon une question oui ou non sur la présence, comme « Serez-vous présent à l'ÉTS ? » (« Oui » : présentiel, « Non » : virtuel). Les questions sur les rôles, sur les heures d'arrivée ou de départ et sur un repas (« Serez-vous présent pour le dîner ? ») ne sont jamais prises. « Hybride » ou « Présentiel, Virtuel » compte comme présentiel ;</li>
+  <li>sinon les questions sur les rôles « … (en présentiel) ? » ou « … (en virtuel) ? » auxquelles la personne a répondu (présentiel l'emporte) ;</li>
+  <li>sinon le nom du billet (« Visiteur virtuel », « Bénévole sur place »).</li>
+</ol>
+<p>Sans aucun de ces indices, la personne est « Non précisé ». Dans la gestion et les expertises des bénévoles, le filtre suit la colonne <strong>Type</strong> du tableau.</p>
 <h3 id="benevoles">Gestion des bénévoles <span class="pastille">v1.122, revu en v1.123, renommé en v1.137</span></h3>
 <p>Événements &rarr; Rapports RLQ &rarr; <strong>Gestion des bénévoles</strong> : un tableau pour le coordonnateur des bénévoles. Seules les inscriptions au billet dont le nom contient « bénévole » sont listées, et leurs réponses viennent uniquement du sondage de ce billet. Une ligne par bénévole : nom (lien pour lui écrire sur Odoo), date et heure de l'inscription, état du sondage, type (présentiel ou virtuel), langues parlées, heure d'arrivée et de départ, puis une colonne par choix de <strong>chaque</strong> question sur les rôles, sous le titre de la question (« Rôles pendant l'événement (en présentiel) ? » d'abord). Un <strong>1</strong> marque les rôles choisis (v1.136, au lieu de « X ») ; une réponse libre (« Autre ») est écrite dans la colonne « Autre ». La colonne <strong>Présentiel</strong> (v1.136) vaut 1 quand le bénévole sera sur place (type « Présentiel », « Hybride » ou les deux) ; son total, en haut et en bas, donne le nombre de bénévoles sur place. Sous le tableau : le nombre de bénévoles listés et de <strong>participants uniques (courriel)</strong>.</p>
 <ul>

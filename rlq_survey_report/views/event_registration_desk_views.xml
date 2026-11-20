@@ -29,6 +29,8 @@
                 <field name="rlq_survey_os" optional="hide"/>
                 <field name="rlq_survey_browser" optional="hide"/>
                 <field name="rlq_desk_progress" options="{'allow_order': True}" optional="hide"/>
+                <!-- v1.145.0: on site or online, from the survey (otherwise the roles or the ticket) -->
+                <field name="rlq_attendance" optional="show"/>
                 <!-- v1.135.0: the answers are a link to every answer of the survey of the person -->
                 <field name="rlq_desk_answers_html" options="{'allow_order': True}"/>
                 <field name="rlq_desk_user_input_id" column_invisible="1"/>
@@ -70,6 +72,11 @@
                 <filter name="rlq_survey_in_progress" string="Survey started" domain="[('rlq_survey_state', '=', 'in_progress')]"/>
                 <filter name="rlq_survey_not_started" string="Survey not started" domain="[('rlq_survey_state', '=', 'not_started')]"/>
                 <filter name="rlq_survey_none" string="No survey" domain="[('rlq_survey_state', '=', 'none')]"/>
+                <separator/>
+                <!-- v1.145.0 -->
+                <filter name="rlq_on_site" string="On site" domain="[('rlq_attendance', '=', 'on_site')]"/>
+                <filter name="rlq_online" string="Online" domain="[('rlq_attendance', '=', 'online')]"/>
+                <filter name="rlq_attendance_unknown" string="On site or online not specified" domain="[('rlq_attendance', '=', 'unknown')]"/>
                 <group expand="0" string="Group By">
                     <filter name="rlq_group_ticket" string="Ticket" context="{'group_by': 'event_ticket_id'}"/>
                     <filter name="rlq_group_state" string="Status" context="{'group_by': 'state'}"/>
@@ -103,6 +110,8 @@
                         <group>
                             <field name="search_text" placeholder="Name, e-mail, company, phone, ticket or answer"/>
                             <field name="survey_filter"/>
+                            <!-- v1.145.0: on site or online -->
+                            <field name="attendance_filter"/>
                             <!-- v1.139.0: one answer of a question shown at the desk -->
                             <field name="answer_filter"/>
                             <field name="hide_present"/>
@@ -128,6 +137,8 @@
                             <!-- v1.139.0: hidden in the desk (optional="hide" was not enough: Odoo keeps in the browser the
                                  columns a user showed once); still in « Open as a list » and in « Sort by ». -->
                             <field name="rlq_desk_progress" column_invisible="1"/>
+                            <!-- v1.145.0: on site or online -->
+                            <field name="rlq_attendance" optional="show"/>
                             <!-- v1.135.0: the answers are a link to every answer of the survey of the person -->
                             <field name="rlq_desk_answers_html" options="{'allow_order': True}"/>
                             <field name="rlq_desk_user_input_id" column_invisible="1"/>
@@ -270,6 +281,7 @@
                         <group>
                             <field name="event_id" options="{'no_create': True}" context="{'rlq_recent_first': True}"/>
                             <field name="survey_filter"/>
+                            <field name="attendance_filter"/>
                         </group>
                         <group>
                             <field name="sort_by"/>
@@ -367,6 +379,7 @@
                         <group>
                             <field name="event_id" options="{'no_create': True}" context="{'rlq_recent_first': True}"/>
                             <field name="survey_filter"/>
+                            <field name="attendance_filter"/>
                         </group>
                         <group>
                             <field name="sort_by"/>
@@ -419,6 +432,8 @@
                         </group>
                         <group>
                             <field name="scope"/>
+                            <!-- v1.145.0: on site or online -->
+                            <field name="attendance_filter"/>
                             <!-- v1.139.0: any ticket of the event, chosen one by one -->
                             <field name="ticket_ids" widget="many2many_tags" options="{'no_create': True}"
                                    invisible="scope != 'tickets'"/>

@@ -6,6 +6,16 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -99. Filtre « Présentiel ou virtuel » (v1.145.0)
+
+**À confirmer après `-u rlq_survey_report` :**
+1. Bureau d'inscription : « Présentiel ou virtuel » = Présentiel ne garde que les personnes qui ont répondu « Oui » à « Serez-vous présent à l'ÉTS ? » (ou « Présentiel », « Sur place », « Hybride ») ; Virtuel, les autres réponses ; Non précisé, les personnes sans réponse ni billet parlant.
+2. Gestion des bénévoles et Expertises des bénévoles : le filtre suit la colonne « Type » ; l'export ne contient que les bénévoles affichés.
+3. Sujets d'intérêt : les totaux ne comptent que les personnes du filtre.
+4. Sondages non complétés : avec « Virtuel », les adresses et « Envoyer un rappel » ne touchent que les personnes en virtuel.
+5. Bureau > Ouvrir en liste : colonne « Présentiel ou virtuel » et filtres « Présentiel », « Virtuel », « Présentiel ou virtuel non précisé ».
+6. Interface en anglais : « On site or online », « On site », « Online », « Not specified ».
+
 ## -98. « Non » hors des totaux des bénévoles, liens « § » du guide (v1.144.0)
 
 **À confirmer après `-u rlq_survey_report` :**

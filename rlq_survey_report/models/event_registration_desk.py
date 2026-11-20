@@ -68,6 +68,7 @@ ANSWERS_URL = "/rlq_survey_report/answers/%d"                                   
 STATE_ORDER = {"draft": 0, "open": 1, "done": 2, "cancel": 3}
 RECENT_EVENTS_FIRST = "date_begin desc, id desc"
 DEFAULT_ZONE = "America/Toronto"
+ATTENDANCE_CHOICE_TYPES = ("simple_choice", "multiple_choice")
 
 
 def program_version(env):
@@ -241,6 +242,14 @@ class EventRegistrationDesk(models.Model):
              "ignores case and accents.",
     )
 
+    # v1.145.0: on site or online, from the survey (see _rlq_attendance_map()).
+    rlq_attendance = fields.Selection(
+        [("on_site", "On site"), ("online", "Online"), ("unknown", "Not specified")],
+        string="On site or online", compute="_compute_rlq_attendance", search="_search_rlq_attendance",
+        help="From the answer to the on site or online question of the survey of this person, otherwise from the roles questions "
+             "« (en présentiel) » / « (en virtuel) » answered, otherwise from the name of the ticket.",
+    )
+
     @api.depends("name", "partner_id")
     def _compute_rlq_desk_person(self):
         """v1.131.0: the name, a link to talk to the contact in Odoo (same link as the volunteers' table)."""
@@ -270,6 +279,69 @@ class EventRegistrationDesk(models.Model):
             registration.rlq_desk_answers_html = rd.answers_cell_html(text, ANSWERS_URL % input_id if input_id else None)
             registration.rlq_desk_can_edit_answers = bool(can_edit and input_id)
             registration.rlq_survey_os, registration.rlq_survey_browser = devices.get(input_id, (False, False))
+
+    def _compute_rlq_attendance(self):
+        data = self._origin._rlq_attendance_map()
+        for registration in self:
+            registration.rlq_attendance = data.get(registration._origin.id, "unknown")
+
+    @api.model
+    def _search_rlq_attendance(self, operator, value):
+        """v1.145.0: filters « On site » / « Online » / « On site or online not specified » of « Open as a list »: computed in
+        Python, for the registrations of the event of the desk when the context names one."""
+        if operator not in ("=", "!=", "in", "not in"):
+            raise ValueError("rlq_attendance: unsupported search operator %r" % (operator,))
+        wanted = set(value) if isinstance(value, (list, tuple, set)) else {value}
+        domain = [("state", "!=", "cancel")]
+        if self.env.context.get("rlq_desk_event_id"):
+            domain.append(("event_id", "=", self.env.context["rlq_desk_event_id"]))
+        registrations = self.sudo().with_context(rlq_desk_event_id=False).search(domain)
+        data = registrations._rlq_attendance_map()
+        ids = [rid for rid, kind in data.items() if kind in wanted]
+        return [("id", "in" if operator in ("=", "in") else "not in", ids)]
+
+    def _rlq_attendance_map(self, status=None, participations=None):
+        """v1.145.0: {registration id: « on_site » | « online » | « unknown »} for the whole recordset, a fixed number of queries.
+
+        In this order: the answer to the on site or online question of the expected survey (rd.find_attendance_question(),
+        rd.attendance_from_answers()); the roles questions « ... (en présentiel) ? » / « ... (en virtuel) ? » answered
+        (rd.role_kind(), on site wins); the name of the ticket (rd.ticket_attendance()). status and participations: the
+        results of _rlq_survey_status_map() and _rlq_desk_participations() when the caller already has them."""
+        registrations = self.sudo().filtered("id")
+        if not registrations:
+            return {}
+        status = status if status is not None else registrations._rlq_survey_status_map()
+        _inputs, _answered, values, chosen = (participations if participations is not None
+                                              else registrations._rlq_desk_participations(status))
+        layouts = {}
+        questions = self.env["survey.question"].sudo()
+        for survey in {s for s, _st, _d in status.values() if s}:
+            domain = [("survey_id", "=", survey.id)]
+            if "is_page" in questions._fields:
+                domain.append(("is_page", "=", False))
+            described = [{"id": q.id, "title": q.title or "", "is_choice": q.question_type in ATTENDANCE_CHOICE_TYPES,
+                          "choices": [a.value or "" for a in q.suggested_answer_ids]}
+                         for q in questions.search(domain, order="sequence, id")]
+            found = rd.find_attendance_question(described)
+            titles = {q["id"]: q["title"] for q in described}
+            roles = [(q["id"], rd.role_kind(q["title"])) for q in described
+                     if q["is_choice"] and rd.is_roles_title(q["title"]) and rd.role_kind(q["title"])]
+            layouts[survey.id] = (found, titles.get(found, ""), roles)
+        result = {}
+        for registration in registrations:
+            survey = (status.get(registration.id) or (None,))[0]
+            input_id = chosen.get(registration.id)
+            kind = None
+            if survey and input_id:
+                found, title, roles = layouts[survey.id]
+                if found:
+                    kind = rd.attendance_from_answers(title, values.get((input_id, found), []))
+                if not kind:
+                    kind = rd.roles_attendance([k for qid, k in roles if values.get((input_id, qid))])
+            if not kind and "event_ticket_id" in registration._fields and registration.event_ticket_id:
+                kind = rd.ticket_attendance(registration.event_ticket_id.name)
+            result[registration.id] = kind or "unknown"
+        return result
 
     @api.model
     def _search_rlq_desk_answers(self, operator, value):
@@ -716,6 +788,14 @@ class RlqRegistrationDesk(models.TransientModel):
                                    "the matching registrations are listed (case and accents ignored). The summary always counts "
                                    "the whole event.")
     hide_present = fields.Boolean(string="Hide the people already present", default=False)
+    # v1.145.0: on site or online (event.registration._rlq_attendance_map()); literal here, for scripts/build_fr_po.py.
+    attendance_filter = fields.Selection(
+        [("all", "All"), ("on_site", "On site"), ("online", "Online"), ("unknown", "Not specified")],
+        string="On site or online", default="all", required=True,
+        help="Lists only the people who will be on site (« Présentiel », « Sur place », « Hybride », or « Oui » to « Serez-vous "
+             "présent à l'ÉTS ? »), only the people online, or only the people whose answers say neither. Read in this order: "
+             "the answer to the on site or online question of their survey, the roles questions « (en présentiel) » / « (en "
+             "virtuel) » they answered, then the name of their ticket.")
     # v1.139.0: filter on one answer of a question shown at the desk (« Serez-vous présent à l'ÉTS ? » = « Oui »...).
     answer_filter = fields.Selection(
         selection="_answer_filter_selection", string="Answer",
@@ -797,6 +877,9 @@ class RlqRegistrationDesk(models.TransientModel):
         if self.survey_filter and self.survey_filter != "all":
             status = listed._rlq_survey_status_map()
             listed = listed.filtered(lambda r: status.get(r.id, (None, "none"))[1] == self.survey_filter)
+        if self.attendance_filter and self.attendance_filter != "all":
+            attendance = listed._rlq_attendance_map()
+            listed = listed.filtered(lambda r: rd.attendance_matches(attendance.get(r.id), self.attendance_filter))
         if self.answer_filter and "|" in self.answer_filter:
             question_key, answer_key = self.answer_filter.split("|", 1)
             data = listed._rlq_desk_map()
@@ -829,7 +912,8 @@ class RlqRegistrationDesk(models.TransientModel):
             options.setdefault("%s|" % key, "%s : %s" % (label, no_answer))
         return sorted(options.items(), key=lambda item: (item[0].split("|")[0], item[0].endswith("|"), sort_key(item[1])))
 
-    @api.depends("event_id", "search_text", "hide_present", "survey_filter", "answer_filter", "sort_by", "sort_desc")
+    @api.depends("event_id", "search_text", "hide_present", "survey_filter", "attendance_filter", "answer_filter", "sort_by",
+                 "sort_desc")
     def _compute_desk(self):
         for wizard in self:
             registrations = wizard._rlq_all_registrations()

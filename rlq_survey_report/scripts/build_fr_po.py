@@ -65,6 +65,16 @@ FR = {
     "Survey": "Sondage",
     "Lists only the registrations whose survey is in this state.": "Liste seulement les inscriptions dont le sondage est dans cet état.",
     "All": "Tous",
+    # v1.145.0: filter « On site or online » of every RLQ page
+    "On site": "Présentiel",
+    "Online": "Virtuel",
+    "Not specified": "Non précisé",
+    "On site or online": "Présentiel ou virtuel",
+    "On site or online not specified": "Présentiel ou virtuel non précisé",
+    "From the answer to the on site or online question of the survey of this person, otherwise from the roles questions « (en présentiel) » / « (en virtuel) » answered, otherwise from the name of the ticket.":
+        "D'après la réponse à la question présentiel ou virtuel du sondage de cette personne, sinon d'après les questions de rôles « (en présentiel) » / « (en virtuel) » répondues, sinon d'après le nom du billet.",
+    "Lists only the people who will be on site (« Présentiel », « Sur place », « Hybride », or « Oui » to « Serez-vous présent à l'ÉTS ? »), only the people online, or only the people whose answers say neither. Read in this order: the answer to the on site or online question of their survey, the roles questions « (en présentiel) » / « (en virtuel) » they answered, then the name of their ticket.":
+        "Liste seulement les personnes qui seront en présentiel (« Présentiel », « Sur place », « Hybride », ou « Oui » à « Serez-vous présent à l'ÉTS ? »), seulement les personnes en virtuel, ou seulement celles dont les réponses ne disent ni l'un ni l'autre. Lu dans cet ordre : la réponse à la question présentiel ou virtuel de leur sondage, les questions de rôles « (en présentiel) » / « (en virtuel) » auxquelles elles ont répondu, puis le nom de leur billet.",
     "Survey completed": "Sondage complété",
     "Survey started": "Sondage commencé",
     "Survey not started": "Sondage non commencé",

@@ -19,6 +19,7 @@
                 <field name="rlq_expected_survey_id" optional="show"/>
                 <field name="rlq_survey_state" widget="badge" decoration-danger="rlq_survey_state == 'not_started'" decoration-warning="rlq_survey_state == 'in_progress'" decoration-success="rlq_survey_state == 'done'"/>
                 <field name="rlq_desk_progress" optional="hide"/>
+                        <field name="rlq_attendance" optional="hide"/>
                 <field name="rlq_survey_os" optional="show"/>
                 <field name="rlq_survey_browser" optional="show"/>
                 <field name="create_date" string="Registered on" optional="show" width="150px"/>
@@ -41,6 +42,8 @@
                 <group>
                     <field name="event_ids" widget="many2many_tags" context="{'rlq_recent_first': True}"/>
                     <field name="include_started"/>
+                    <!-- v1.145.0: on site or online; the reminders go to the people listed only -->
+                    <field name="attendance_filter"/>
                 </group>
                 <group>
                     <group>
@@ -64,6 +67,7 @@
                         <field name="rlq_expected_survey_id" optional="hide"/>
                         <field name="rlq_survey_state" widget="badge" decoration-danger="rlq_survey_state == 'not_started'" decoration-warning="rlq_survey_state == 'in_progress'" decoration-success="rlq_survey_state == 'done'"/>
                         <field name="rlq_desk_progress" optional="hide"/>
+                        <field name="rlq_attendance" optional="hide"/>
                         <field name="rlq_survey_os" optional="show"/>
                         <field name="rlq_survey_browser" optional="show"/>
                         <field name="create_date" string="Registered on" optional="show" width="150px"/>
