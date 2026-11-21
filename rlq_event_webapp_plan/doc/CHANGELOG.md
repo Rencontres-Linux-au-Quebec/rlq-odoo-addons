@@ -1,5 +1,23 @@
 # Changelog - rlq_event_webapp_plan
 
+## 18.0.1.4.0
+
+**Short title:** the automatic updates of the pages in the colours of the theme.
+
+**Reason for the request:** event_webapp_plan 18.0.1.10.0 adds the section "Automatic updates" at the bottom of the home and room pages.
+
+**Changes:**
+
+- `static/src/webapp/rlq_theme.scss`: the section on the cream surface under a yellow rule, its title in Bree Serif after a lys (not in text-only mode), light and dark schemes; contrasts noted in the file.
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:** no animation; the text-only mode shows no lys.
+
+**Checks:** see the 18.0.1.10.0 entry of event_webapp_plan.
+
+**Action required:** update the module (`-u rlq_event_webapp_plan`).
+
 ## 18.0.1.3.2
 
 **Short title:** Tux speaks and the block has its frame for a running meeting behind the new tab button.

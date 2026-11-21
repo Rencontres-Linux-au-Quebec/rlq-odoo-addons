@@ -527,6 +527,23 @@ class EventWebappController(http.Controller):
             ),
         }
 
+    def _ewp_refresh_texts(self):
+        """Translated patterns of the rows of the automatic updates,
+        filled in by the page script: %(seconds)s, %(minutes)s, and
+        %(delay)s, itself one of the two "delay" patterns."""
+        _ = request.env._
+        return {
+            "updated_seconds": _("Updated %(seconds)s s ago"),
+            "updated_minutes": _("Updated %(minutes)s min ago"),
+            "next": _("Next in %(delay)s"),
+            "retrying": _("Failed, retrying in %(delay)s"),
+            "busy": _("Updating now"),
+            "paused": _("Paused while the page is hidden"),
+            "stopped": _("Stopped, reload the page"),
+            "delay_seconds": _("%(seconds)s s"),
+            "delay_minutes": _("%(minutes)s min %(seconds)s s"),
+        }
+
     def _ewp_return_path(self):
         """Path and query of the current page, where the preference forms
         send the user back."""
@@ -586,6 +603,7 @@ class EventWebappController(http.Controller):
             "preferences_url": PREFERENCES_URL,
             "return_path": self._ewp_return_path(),
             "messages_json": json.dumps(self._ewp_messages()),
+            "refresh_texts_json": json.dumps(self._ewp_refresh_texts()),
             "is_preview": False,
             "window_label": "",
             "home_url": WEBAPP_ROOT,

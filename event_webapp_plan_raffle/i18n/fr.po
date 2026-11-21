@@ -98,6 +98,7 @@ msgstr "Je suis sur place"
 
 #. module: event_webapp_plan_raffle
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_content
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_refresh_row
 msgid "My prize"
 msgstr "Mon prix"
 

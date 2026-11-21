@@ -64,6 +64,18 @@ msgid "%(drawn)s drawn of %(total)s"
 msgstr ""
 
 #. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "%(minutes)s min %(seconds)s s"
+msgstr ""
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "%(seconds)s s"
+msgstr ""
+
+#. module: event_webapp_plan
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_brand
 msgid "<span class=\"o_ewp_app_label\">Event Web App</span>"
 msgstr ""
@@ -290,6 +302,11 @@ msgid ""
 msgstr ""
 
 #. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_refresh
+msgid "Automatic updates"
+msgstr ""
+
+#. module: event_webapp_plan
 #: model:ir.model.fields.selection,name:event_webapp_plan.selection__res_config_settings__ewp_bbb_display__auto
 msgid ""
 "Automatic: embedded only when the server is on the same site as this web app"
@@ -376,6 +393,11 @@ msgstr ""
 #. module: event_webapp_plan
 #: model:ir.model.fields,help:event_webapp_plan.field_event_webapp_room__color
 msgid "Colour of the room area on the plan, as #RRGGBB."
+msgstr ""
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_refresh
+msgid "Conference"
 msgstr ""
 
 #. module: event_webapp_plan
@@ -578,6 +600,12 @@ msgid "Events"
 msgstr ""
 
 #. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Failed, retrying in %(delay)s"
+msgstr ""
+
+#. module: event_webapp_plan
 #: model:ir.model.fields.selection,name:event_webapp_plan.selection__res_users__ewp_motion__auto
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_preferences
 msgid "Follow the device"
@@ -745,6 +773,11 @@ msgid "Links"
 msgstr ""
 
 #. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_refresh
+msgid "Live rooms"
+msgstr ""
+
+#. module: event_webapp_plan
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_closed_footer
 msgid "Log out"
 msgstr ""
@@ -825,6 +858,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/event_webapp_plan/controllers/main.py:0
 msgid "New winner, %(raffle)s: %(winner)s."
+msgstr ""
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Next in %(delay)s"
 msgstr ""
 
 #. module: event_webapp_plan
@@ -980,6 +1019,12 @@ msgid "Past"
 msgstr ""
 
 #. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Paused while the page is hidden"
+msgstr ""
+
+#. module: event_webapp_plan
 #: model:ir.model.fields,help:event_webapp_plan.field_event_webapp_room__pos_height
 #: model:ir.model.fields,help:event_webapp_plan.field_event_webapp_room__pos_y
 msgid "Percent of the image height."
@@ -1007,6 +1052,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_raffle_view_list_select
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_main
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_refresh
 msgid "Raffles"
 msgstr ""
 
@@ -1214,6 +1260,12 @@ msgstr ""
 #. module: event_webapp_plan
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_layout
 msgid "Skip to main content"
+msgstr ""
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Stopped, reload the page"
 msgstr ""
 
 #. module: event_webapp_plan
@@ -1586,6 +1638,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/event_webapp_plan/controllers/main.py:0
 msgid "Updated %(seconds)s s ago"
+msgstr ""
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Updating now"
 msgstr ""
 
 #. module: event_webapp_plan

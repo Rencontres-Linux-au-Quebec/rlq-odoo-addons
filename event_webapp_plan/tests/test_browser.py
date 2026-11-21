@@ -674,3 +674,181 @@ class TestWebappBrowser(HttpCase):
                 ready="document.readyState === 'complete'",
                 login="ewp_webapp_browser_portal",
             )
+
+    def test_automatic_updates_count_down(self):
+        """The section "Automatic updates" shows once the refreshers
+        report: each row counts down to its next request every second,
+        takes the time of an answer, says a failed answer and its retry,
+        "paused" while the tab is hidden, and "stopped" after a 403. The
+        conference row follows the doubled interval of a failing server."""
+        day = self._conference_day(
+            "Nu Hall", "gl-invented-browser-0006", running=False
+        )
+        event = self.env["event.event"].create(
+            {
+                "name": "Browser Refresh Talk",
+                "date_begin": fields.Datetime.now() - timedelta(hours=1),
+                "date_end": fields.Datetime.now() + timedelta(hours=8),
+            }
+        )
+        day.raffle_ids = [
+            Command.create(
+                {
+                    "name": "Browser Refresh Raffle",
+                    "event_id": event.id,
+                    "draw_ids": [
+                        Command.create(
+                            {"sequence": 1, "prize": "Browser Refresh Mug"}
+                        )
+                    ],
+                }
+            )
+        ]
+        rows = """
+            const section = await wait(() => {
+                const el = document.getElementById("o_ewp_refresh");
+                return el && !el.hidden && el;
+            });
+            check(!section.closest("[aria-live]") && !section.querySelector("[aria-live]"), "live region");
+            const row = (id) => section.querySelector(`li[data-ewp-refresh="${id}"]`);
+            const cell = (id, name) => row(id).querySelector(`.o_ewp_refresh_${name}`);
+            const seconds = (id) => {
+                const match = cell(id, "next").textContent.match(/(?:(\\d+)\\u00a0min\\u00a0)?(\\d+)\\u00a0s$/);
+                return match ? Number(match[1] || 0) * 60 + Number(match[2]) : NaN;
+            };
+            const realFetch = window.fetch;
+            const answer = (part, make) => {
+                window.fetch = (url, options) =>
+                    String(url).includes(part) ? make() : realFetch(url, options);
+            };
+        """
+        self._run(
+            "/webapp_event/%s" % day.id,
+            rows + """
+            const rafflesUrl = document.querySelector("[data-ewp-raffles-url]").dataset.ewpRafflesUrl;
+            // The test code starts once the page is ready, a few seconds
+            // after the page script on a first load: the bounds below
+            // leave room for that.
+            await wait(() => !row("live").hidden && /^Updated \\d+ s ago$/.test(cell("live", "last").textContent));
+            check(!row("raffles").hidden, "raffle row hidden");
+            check(/^Next in \\d+\\u00a0s$/.test(cell("raffles", "next").textContent),
+                "raffles: " + cell("raffles", "next").textContent);
+            const first = seconds("raffles");
+            check(first > 15 && first <= 30, "first countdown " + first);
+            await wait(() => seconds("raffles") === first - 1, 2500);
+            await wait(() => seconds("raffles") === first - 2, 2500);
+            // An answer: the row takes its time and counts from 30 s again.
+            const loaded = Date.parse(cell("raffles", "last").getAttribute("datetime"));
+            document.dispatchEvent(new Event("visibilitychange"));
+            await wait(() => Date.parse(cell("raffles", "last").getAttribute("datetime")) > loaded);
+            check(row("raffles").dataset.ewpRefreshState === "running", "state after the answer");
+            check(seconds("raffles") >= 29, "countdown after the answer " + seconds("raffles"));
+            // A failed answer, in words.
+            answer(rafflesUrl, () => Promise.reject(new TypeError("offline")));
+            document.dispatchEvent(new Event("visibilitychange"));
+            await wait(() => row("raffles").dataset.ewpRefreshState === "error");
+            check(/^Failed, retrying in \\d+\\u00a0s$/.test(cell("raffles", "next").textContent),
+                "error: " + cell("raffles", "next").textContent);
+            // Hidden tab: every row is paused and stops counting.
+            Object.defineProperty(document, "hidden", {configurable: true, get: () => true});
+            document.dispatchEvent(new Event("visibilitychange"));
+            for (const id of ["raffles", "live"]) {
+                check(row(id).dataset.ewpRefreshState === "paused", id + " not paused");
+                check(cell(id, "next").textContent === "Paused while the page is hidden", id + " text");
+            }
+            await sleep(1200);
+            check(cell("raffles", "next").textContent === "Paused while the page is hidden", "rewritten while hidden");
+            delete document.hidden;
+            // 403: stopped for good.
+            answer(rafflesUrl, () => Promise.resolve(new Response("", {status: 403})));
+            document.dispatchEvent(new Event("visibilitychange"));
+            await wait(() => row("raffles").dataset.ewpRefreshState === "stopped");
+            check(cell("raffles", "next").textContent === "Stopped, reload the page", "stopped text");
+            // The live rooms answer the same event through the server:
+            // their row goes from "busy" back to "running", not stopped.
+            await wait(() => row("live").dataset.ewpRefreshState === "running");
+            """,
+            running=False,
+        )
+        self._run(
+            self._room_page(day),
+            rows + """
+            const statusUrl = document.querySelector("[data-ewp-bbb-status-url]").dataset.ewpBbbStatusUrl;
+            await wait(() => !row("conference").hidden);
+            const first = seconds("conference");
+            check(first > 10 && first <= 20, "first countdown " + first);
+            // The server fails: the retry comes after 40 s, then 1 min 20 s.
+            answer(statusUrl, () => Promise.reject(new TypeError("offline")));
+            document.dispatchEvent(new Event("visibilitychange"));
+            await wait(() => row("conference").dataset.ewpRefreshState === "error");
+            check(seconds("conference") > 35 && seconds("conference") <= 40,
+                "first retry: " + cell("conference", "next").textContent);
+            document.dispatchEvent(new Event("visibilitychange"));
+            await wait(() => /1\\u00a0min\\u00a0[0-9]{2}\\u00a0s$/.test(cell("conference", "next").textContent));
+            check(seconds("conference") > 75 && seconds("conference") <= 80,
+                "second retry: " + cell("conference", "next").textContent);
+            check(/^Failed, retrying in 1\\u00a0min\\u00a0[0-9]{2}\\u00a0s$/.test(cell("conference", "next").textContent),
+                "text: " + cell("conference", "next").textContent);
+            """,
+            running=False,
+        )
+
+    def test_automatic_updates_keep_their_lines(self):
+        """Each row of "Automatic updates" keeps its height whatever its
+        cells say, on a phone (320 to 412 px) as on a wide screen: an empty
+        time before the first answer, the longest French and English
+        states, a countdown that goes from "1 min 00 s" to "59 s". The page
+        has no horizontal scroll at any of these widths."""
+        day = self._conference_day(
+            "Xi Hall", "gl-invented-browser-0007", running=False
+        )
+        self._run(
+            HOST_PAGE,
+            """
+            const frame = await openFrame(%(home)r);
+            const doc = frame.contentDocument;
+            const rows = await wait(() => {
+                const shown = [...doc.querySelectorAll("#o_ewp_refresh li[data-ewp-refresh]")]
+                    .filter((li) => !li.hidden);
+                return shown.length && shown;
+            });
+            await doc.fonts.ready;
+            const lasts = ["", "Mis à jour il y a 0 s", "Mis à jour il y a 59 min", "Updated 59 min ago"];
+            const nexts = [
+                ["running", ""],
+                ["running", "Prochaine dans 59\\u00a0s"],
+                ["running", "Prochaine dans 1\\u00a0min\\u00a000\\u00a0s"],
+                ["running", "Next in 4\\u00a0min\\u00a059\\u00a0s"],
+                ["error", "Échec, nouvel essai dans 1\\u00a0min\\u00a019\\u00a0s"],
+                ["error", "Échec, nouvel essai dans 59\\u00a0s"],
+                ["error", "Failed, retrying in 1\\u00a0min\\u00a019\\u00a0s"],
+                ["busy", "Mise à jour en cours"],
+                ["paused", "En pause tant que la page est cachée"],
+                ["stopped", "Arrêtée, rechargez la page"],
+            ];
+            for (const width of [320, 360, 390, 412, 640, 768, 1024, 1280]) {
+                frame.style.width = width + "px";
+                await sleep(200);
+                check(doc.documentElement.scrollWidth <= doc.documentElement.clientWidth,
+                    "horizontal scroll at " + width + " px");
+                // Written and measured in one task: the page script, which
+                // rewrites the cells every second, cannot run in between.
+                for (const row of rows) {
+                    const heights = new Set();
+                    const last = row.querySelector(".o_ewp_refresh_last");
+                    const next = row.querySelector(".o_ewp_refresh_next");
+                    for (const lastText of lasts) {
+                        for (const [state, nextText] of nexts) {
+                            row.dataset.ewpRefreshState = state;
+                            last.textContent = lastText;
+                            next.textContent = nextText;
+                            heights.add(Math.round(row.getBoundingClientRect().height));
+                        }
+                    }
+                    check(heights.size === 1, row.dataset.ewpRefresh + " at " + width + " px: heights "
+                        + [...heights].join(", "));
+                }
+            }
+            """ % {"home": "/webapp_event/%s" % day.id},
+            running=False,
+        )

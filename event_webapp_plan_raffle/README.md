@@ -64,7 +64,8 @@ When the answer changes, the body of the card is replaced (never while the
 focus is inside it: the next change waits until the focus leaves), the
 card shows or hides, and each item whose state is new is said once in the
 shared live region ("Your prize, Morning, draw 3: Choose your prize before
-3:45 PM."). The focus never moves.
+3:45 PM."). The focus never moves. The row "My prize" of the automatic
+updates of the web app counts down to the earliest of these requests.
 
 The two forms post with fetch when the script runs: the block is
 re-rendered, the focus stays on the field or the button, and the result is
@@ -188,7 +189,8 @@ lien ouvert. Quand la réponse change, le corps de la carte est remplacé
 (jamais pendant que le focus y est : le changement attend qu'il en sorte),
 la carte s'affiche ou se masque, et chaque élément dont l'état est nouveau
 est annoncé une fois dans la région live partagée. Le focus ne bouge
-jamais.
+jamais. La ligne « Mon prix » des mises à jour automatiques de l'app web
+compte à rebours jusqu'à la plus proche de ces requêtes.
 
 Les deux formulaires passent par fetch quand le script tourne : le bloc
 est réaffiché, le focus reste sur le champ ou le bouton, et le résultat est

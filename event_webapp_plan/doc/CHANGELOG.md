@@ -1,5 +1,29 @@
 # Changelog - event_webapp_plan
 
+## 18.0.1.10.0
+
+**Short title:** "Automatic updates" section: the refresh timers of the blocks at the bottom of the home and room pages.
+
+**Reason for the request:** the blocks of the pages refresh by themselves at different rates (raffles, live rooms, conference), and nothing told the visitor when the data on screen was fetched or when it would be fetched again.
+
+**Changes:**
+
+- `views/webapp_templates.xml`: template `webapp_refresh`, the section `#o_ewp_refresh` ("Automatic updates", `h2`) called by the layout of the home and room pages just above the display options, hidden with its rows; rows `raffles`, `live` and `conference`; template `webapp_refresh_row` (one row: label, `time.o_ewp_refresh_last`, `.o_ewp_refresh_next`); slot `webapp_slot_refresh` for the rows of other modules; header comment.
+- `controllers/main.py`: `_ewp_refresh_texts()`, the translated patterns of the rows, in `refresh_texts_json` of every page.
+- `static/src/webapp/webapp.js`: the event `ewp:refresh` `{id, state, last, next}`, listened to as soon as the script is evaluated; `setupRefreshBoard()` writes the rows every 500 ms while the tab is visible, "paused" while it is hidden; the raffle, live room and conference refreshers report when they plan, send and get a request (the conference reports the doubled interval of a failing server); delays written with no-break spaces, so "1 min 19 s" never splits; header comment.
+- `static/src/webapp/webapp.scss`: the section, a grid of cells with tabular digits that keep one line each, empty or not: below 640 px the label, the last answer and the next request on three lines of the full width, from 640 px on one line, so neither the first answer nor the countdown moves the row or the display options below it; a failed or stopped refresh in the warm colour beside its words.
+- `README.md`: the section, the slot `webapp_slot_refresh` and the event `ewp:refresh` in Theming.
+- `i18n/fr.po`, `i18n/event_webapp_plan.pot`: the new texts.
+- Tests: `test_controllers.py` (`test_automatic_updates_section`, `test_automatic_updates_in_french`), `test_bbb.py` (`test_automatic_updates_rows_of_the_conference`), `test_browser.py` (`test_automatic_updates_count_down`, `test_automatic_updates_keep_their_lines`).
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:** no interval, request or pause changes: the refreshers only report their times; the label "Updated ... ago" of the raffle card stays. Without script, or for a block that does not poll (a running meeting in the frame), no row shows. The section is not a live region: the countdown is never announced. A row whose id has no element in the page is ignored, a report of an unknown state keeps the previous one.
+
+**Checks:** suites of `event_webapp_plan`, `event_webapp_plan_raffle`, `event_webapp_plan_track` and `rlq_event_webapp_plan` on a fresh database, 187 tests, 0 failed, axe-core included (the Selenium classes skip without selenium in the Odoo environment); the 10 new tests fail without the change; pages checked in a browser in French, light and dark, at 1280 px and 390 px, rows measured from 320 to 1280 px (no horizontal scroll).
+
+**Action required:** update the module (`-u event_webapp_plan`).
+
 ## 18.0.1.9.0
 
 **Short title:** security: BBB secret and meeting choice reserved to the Settings group, room channel access locked, room groups taken back from former moderators.

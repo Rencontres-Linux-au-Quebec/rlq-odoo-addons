@@ -84,7 +84,9 @@ the tab shows again, without reloading the page. Every 5 minutes while the
 tab is visible, it asks the program again
 (`/webapp_event/<day>/agenda`): when the organisers changed it, the
 agenda blocks are replaced (open descriptions stay open; never while the
-focus is inside a block, the next answer applies it then).
+focus is inside a block, the next answer applies it then). The row
+"Agenda" of the automatic updates of the web app counts down to the
+earliest of the next request and the next start or end of a session.
 
 ## Accessibility
 

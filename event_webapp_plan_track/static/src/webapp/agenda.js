@@ -40,6 +40,13 @@
 //   focus is inside one of them: the next answer applies it then. Polling
 //   stops for good on a 403, a 404 or a redirect (day closed, session
 //   expired).
+// - Automatic updates: the agenda reports its times to the footer of
+//   webapp.js (ewp:refresh, id "agenda"). Its last update is the last
+//   answer of the program route, the page load at first, or the last
+//   check of the clock that changed the state of a session; its next one
+//   the earliest of the next program request and the next start or end of
+//   a session (the checks of every minute in between change nothing and
+//   are not counted).
 // - Filter by room: the toggle buttons of form.ewp_track_filter filter
 //   the home card in place (items and empty slots hidden), press the
 //   chosen button, keep the choice in the address (agenda_room, so a
@@ -77,6 +84,13 @@
         document.dispatchEvent(new CustomEvent(name, {bubbles: true, detail}));
     }
 
+    // Without fetch the program is never asked again: no row.
+    function report(detail) {
+        if (window.fetch) {
+            emit("ewp:refresh", {...detail, id: "agenda"});
+        }
+    }
+
     function start() {
         const root = document.body;
         if (!root || !root.classList.contains("o_ewp_webapp")) {
@@ -95,6 +109,19 @@
         const states = new Map();
         const announced = new Set();
         let timer = null;
+        // Planned moments, for the automatic updates: the next start or
+        // end of a session (check of the clock), the next program request.
+        let boundaryDue = null;
+        let refreshDue = null;
+        let stopped = false;
+
+        function planned() {
+            if (stopped) {
+                return;
+            }
+            const moments = [boundaryDue, refreshDue].filter((moment) => moment !== null);
+            report({next: moments.length ? Math.min(...moments) : null});
+        }
 
         function load(list) {
             sessions = (Array.isArray(list) ? list : [])
@@ -194,14 +221,18 @@
         function schedule(now) {
             clearTimeout(timer);
             let delay = TICK_MS;
+            let boundary = Infinity;
             for (const session of sessions) {
                 for (const moment of [session.startMs, session.endMs]) {
                     if (moment > now) {
                         delay = Math.min(delay, moment - now + BOUNDARY_MARGIN_MS);
+                        boundary = Math.min(boundary, moment + BOUNDARY_MARGIN_MS);
                     }
                 }
             }
             timer = setTimeout(() => tick(false), Math.min(delay, MAX_TIMEOUT_MS));
+            boundaryDue = Number.isFinite(boundary) ? boundary : null;
+            planned();
         }
 
         // Checks the clock; `initial` records the states without sending
@@ -210,6 +241,7 @@
             const now = Date.now();
             const map = stateMap(now);
             let speak = false;
+            let changed = false;
             for (const session of sessions) {
                 const state = map.get(session.id) === "next" ? "later" : map.get(session.id);
                 const previous = states.get(session.id);
@@ -217,6 +249,7 @@
                 if (initial || previous === undefined || previous === state) {
                     continue;
                 }
+                changed = true;
                 const detail = {
                     room: session.room_id ? {id: session.room_id, name: session.room_name} : null,
                     track: {id: session.id, title: session.title, start: session.start, end: session.end},
@@ -233,6 +266,9 @@
                 }
             }
             paint(map);
+            if (changed) {
+                report({last: now});
+            }
             schedule(now);
             if (speak && window.ewpCameo) {
                 setTimeout(() => window.ewpCameo.play("speak", {near: CAMEO_NEAR}), CAMEO_DELAY_MS);
@@ -310,7 +346,6 @@
         }
 
         // ---- Program refresh -----------------------------------------
-        let stopped = false;
         let busy = false;
         let refreshTimer = null;
 
@@ -348,6 +383,7 @@
                 return;
             }
             busy = true;
+            report({state: "busy"});
             try {
                 const response = await fetch(box.dataset.ewpAgendaUrl, {
                     credentials: "same-origin",
@@ -355,13 +391,16 @@
                 });
                 if (response.redirected || response.status === 403 || response.status === 404) {
                     stopped = true;
+                    report({state: "stopped", next: null});
                     return;
                 }
                 const type = response.headers.get("Content-Type") || "";
                 if (!response.ok || !type.includes("application/json")) {
+                    report({state: "error"});
                     return;
                 }
                 const data = await response.json();
+                report({state: "running", last: Date.now()});
                 if (!data || data.signature === signature || focusInside()) {
                     return;
                 }
@@ -373,6 +412,7 @@
                 tick(false);
             } catch {
                 // Network error: the next refresh tries again.
+                report({state: "error"});
             } finally {
                 busy = false;
             }
@@ -380,6 +420,7 @@
 
         function scheduleRefresh() {
             clearTimeout(refreshTimer);
+            refreshDue = null;
             if (stopped || document.hidden) {
                 return;
             }
@@ -387,6 +428,8 @@
                 await refresh();
                 scheduleRefresh();
             }, REFRESH_MS);
+            refreshDue = Date.now() + REFRESH_MS;
+            planned();
         }
 
         document.addEventListener("visibilitychange", () => {
@@ -400,6 +443,7 @@
 
         load(parseJson(box.dataset.ewpAgendaSessions, []));
         applyFilter();
+        report({state: "running", last: Date.now()});
         tick(true);
         scheduleRefresh();
     }

@@ -789,6 +789,31 @@ $rlq-mic-flipper: rotate(100deg) scale(0.9, 0.45);
         background: var(--rlq-blue);
     }
 
+    // ---- Automatic updates -------------------------------------------------
+    // A cream band under a yellow rule, its title in Bree Serif after a
+    // lys (not in text-only mode). Light: #6b5340 on #fff7db 6.7, #1b2a44
+    // 13.4, #1f4e9e 7.4, #a4470c 5.6. Dark: #c8d3e8 on #1b2d52 9.0,
+    // #fff6e5 12.7, #ffd75e 9.8, #ffb37a 7.8. No animation.
+    .o_ewp_refresh {
+        border-top: 2px solid var(--rlq-yellow-line);
+        background: var(--ewp-surface-2);
+    }
+
+    .o_ewp_refresh_title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--ewp-accent-text);
+        font-family: var(--ewp-font-head);
+        font-size: 16px;
+        font-weight: 400;
+    }
+
+    &:not(.o_ewp_text_only) .o_ewp_refresh_title::before {
+        content: "";
+        @include rlq-lys(14px);
+    }
+
     // ---- Ornament under the home content ----------------------------------
     .o_rlq_ornament {
         display: flex;

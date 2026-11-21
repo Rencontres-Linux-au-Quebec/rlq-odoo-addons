@@ -1528,6 +1528,86 @@ $ewp-latin-ext: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
         text-align: center;
     }
 
+    // ---- Automatic updates (above the display options) -------------------
+    // One row per refresher: below 640 px the label and its two times each
+    // on a line of the full width, from 640 px the three on one line. Each
+    // cell keeps one line, empty or not: the delays hold no-break spaces
+    // (webapp.js), the columns are wide enough for the longest state, and
+    // the digits have a fixed width (tabular-nums), so neither the first
+    // answer nor the countdown moves the row or what follows it. No
+    // animation, no colour alone: a failed refresh says so in words.
+    .o_ewp_refresh {
+        padding: 12px 16px;
+        border-top: 1px solid var(--ewp-border);
+        background: var(--ewp-surface);
+        color: var(--ewp-muted);
+        font-size: 13px;
+        line-height: 1.4;
+    }
+
+    .o_ewp_refresh_title {
+        max-width: 760px;
+        margin: 0 auto 6px;
+        color: var(--ewp-ink);
+        font-family: var(--ewp-font);
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .o_ewp_refresh_list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 0;
+        list-style: none;
+    }
+
+    .o_ewp_refresh_row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            "label"
+            "last"
+            "next";
+        column-gap: 12px;
+        font-variant-numeric: tabular-nums;
+
+        &[hidden] {
+            display: none;
+        }
+    }
+
+    .o_ewp_refresh_label {
+        grid-area: label;
+        color: var(--ewp-ink);
+        font-weight: 600;
+    }
+
+    .o_ewp_refresh_last {
+        grid-area: last;
+        min-height: 1.4em;
+    }
+
+    .o_ewp_refresh_next {
+        grid-area: next;
+        min-height: 1.4em;
+    }
+
+    .o_ewp_refresh_row[data-ewp-refresh-state="error"] .o_ewp_refresh_next,
+    .o_ewp_refresh_row[data-ewp-refresh-state="stopped"] .o_ewp_refresh_next {
+        color: var(--ewp-warm);
+        font-weight: 600;
+    }
+
+    @media (min-width: 640px) {
+        .o_ewp_refresh_row {
+            grid-template-columns: minmax(8rem, 11rem) 12rem minmax(15rem, 1fr);
+            grid-template-areas: "label last next";
+        }
+    }
+
     // ---- Display options (footer of every page) --------------------------
     .o_ewp_prefs {
         display: flex;
