@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_raffle_sponsor_report_view_pivot" model="ir.ui.view">
+        <field name="name">event.raffle.sponsor.report.pivot</field>
+        <field name="model">event.raffle.sponsor.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Sponsor Report" sample="1">
+                <field name="sponsor_id" type="row" />
+                <field name="qty_offered" type="measure" />
+                <field name="value_offered" type="measure" />
+                <field name="qty_won" type="measure" />
+                <field name="qty_reserved" type="measure" />
+                <field name="qty_delivered" type="measure" />
+                <field name="qty_shipped" type="measure" />
+                <field name="qty_declined" type="measure" />
+                <field name="qty_expired" type="measure" />
+                <field name="value_distributed" type="measure" />
+                <field name="qty_remaining" type="measure" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="event_raffle_sponsor_report_view_graph" model="ir.ui.view">
+        <field name="name">event.raffle.sponsor.report.graph</field>
+        <field name="model">event.raffle.sponsor.report</field>
+        <field name="arch" type="xml">
+            <graph string="Sponsor Report" type="bar" sample="1">
+                <field name="sponsor_id" />
+                <field name="line_type" />
+                <field name="value_distributed" type="measure" />
+            </graph>
+        </field>
+    </record>
+
+    <record id="event_raffle_sponsor_report_view_list" model="ir.ui.view">
+        <field name="name">event.raffle.sponsor.report.list</field>
+        <field name="model">event.raffle.sponsor.report</field>
+        <field name="arch" type="xml">
+            <list string="Sponsor Report" create="false" edit="false" delete="false">
+                <header>
+                    <button
+                        name="action_open_raffle_sponsor_thank_wizard"
+                        type="object"
+                        string="Thank the Sponsors"
+                        class="btn-primary"
+                    />
+                </header>
+                <field name="event_id" />
+                <field name="sponsor_id" />
+                <field name="product_tmpl_id" />
+                <field name="band_id" optional="show" />
+                <field name="line_type" />
+                <field name="date" optional="hide" />
+                <field name="currency_id" column_invisible="1" />
+                <field name="qty_offered" sum="Total" />
+                <field name="value_offered" sum="Total" />
+                <field name="qty_won" sum="Total" />
+                <field name="qty_reserved" sum="Total" optional="show" />
+                <field name="value_reserved" sum="Total" optional="hide" />
+                <field name="qty_shipped" sum="Total" optional="show" />
+                <field name="qty_delivered" sum="Total" optional="show" />
+                <field name="qty_declined" sum="Total" optional="show" />
+                <field name="qty_expired" sum="Total" optional="show" />
+                <field name="qty_purchased" sum="Total" optional="show" />
+                <field name="amount_purchased" sum="Total" optional="show" />
+                <field name="value_distributed" sum="Total" />
+                <field name="qty_remaining" sum="Total" />
+            </list>
+        </field>
+    </record>
+
+    <record id="event_raffle_sponsor_report_view_search" model="ir.ui.view">
+        <field name="name">event.raffle.sponsor.report.search</field>
+        <field name="model">event.raffle.sponsor.report</field>
+        <field name="arch" type="xml">
+            <search string="Sponsor Report">
+                <field name="event_id" />
+                <field name="sponsor_id" />
+                <field name="product_tmpl_id" />
+                <field name="band_id" />
+                <filter string="Offered" name="offered" domain="[('line_type', '=', 'offer')]" />
+                <filter string="Reserved" name="reserved" domain="[('line_type', '=', 'reserved')]" />
+                <filter string="Shipped" name="shipped" domain="[('line_type', '=', 'shipped')]" />
+                <filter string="Handed Over" name="delivered" domain="[('line_type', '=', 'delivered')]" />
+                <filter
+                    string="Declined"
+                    name="declined"
+                    domain="[('line_type', 'in', ('declined', 'declined_unchosen'))]"
+                />
+                <filter
+                    string="Expired"
+                    name="expired"
+                    domain="[('line_type', 'in', ('expired', 'expired_unchosen'))]"
+                />
+                <filter
+                    string="No choice"
+                    name="unchosen"
+                    domain="[('line_type', 'in', ('declined_unchosen', 'expired_unchosen'))]"
+                />
+                <filter string="Bought by Members" name="purchase" domain="[('line_type', '=', 'purchase')]" />
+                <separator />
+                <filter string="Date" name="filter_date" date="date" />
+                <group expand="0" string="Group By">
+                    <filter string="Event" name="group_event" context="{'group_by': 'event_id'}" />
+                    <filter string="Sponsor" name="group_sponsor" context="{'group_by': 'sponsor_id'}" />
+                    <filter string="Prize" name="group_prize" context="{'group_by': 'product_tmpl_id'}" />
+                    <filter string="Token Category" name="group_band" context="{'group_by': 'band_id'}" />
+                    <filter string="State" name="group_state" context="{'group_by': 'line_type'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_event_raffle_sponsor_report" model="ir.actions.act_window">
+        <field name="name">Sponsor Report</field>
+        <field name="res_model">event.raffle.sponsor.report</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="search_view_id" ref="event_raffle_sponsor_report_view_search" />
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">No approved sponsored prize yet</p>
+            <p>
+                For each sponsor, event and prize: what was offered, won, handed over, shipped, declined
+                or bought by members, and the stock left. The claims that ended with no prize chosen
+                have their own lines, with no sponsor.
+            </p>
+        </field>
+    </record>
+</odoo>

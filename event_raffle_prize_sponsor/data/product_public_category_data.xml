@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <!-- Shop category of the approved sponsored prizes: the approval
+             adds a prize to it (see product.template
+             _raffle_sponsored_category_move()). Like any noupdate record,
+             an update of the module creates it again once deleted. -->
+        <record id="public_category_sponsored" model="product.public.category">
+            <field name="name">Sponsored</field>
+        </record>
+    </data>
+</odoo>

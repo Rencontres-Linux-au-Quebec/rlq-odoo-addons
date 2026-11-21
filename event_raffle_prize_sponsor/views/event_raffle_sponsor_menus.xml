@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <menuitem
+        id="menu_event_raffle_prize_to_review"
+        name="Sponsored Prizes to Review"
+        parent="event_raffle.menu_event_raffle_root"
+        action="action_event_raffle_prize_to_review"
+        groups="event.group_event_manager,group_raffle_sponsorship_manager"
+        sequence="31"
+    />
+    <menuitem
+        id="menu_event_raffle_reporting"
+        name="Reporting"
+        parent="event_raffle.menu_event_raffle_root"
+        groups="event.group_event_user,group_raffle_sponsorship_manager"
+        sequence="80"
+    />
+    <menuitem
+        id="menu_event_raffle_sponsor_report"
+        name="Sponsor Report"
+        parent="menu_event_raffle_reporting"
+        action="action_event_raffle_sponsor_report"
+        groups="event.group_event_user,group_raffle_sponsorship_manager"
+        sequence="10"
+    />
+</odoo>

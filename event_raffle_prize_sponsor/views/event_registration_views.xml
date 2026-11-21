@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_registration_view_form_raffle_sponsor" model="ir.ui.view">
+        <field name="name">event.registration.form.raffle.sponsor</field>
+        <field name="model">event.registration</field>
+        <field name="inherit_id" ref="event.view_event_registration_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/widget[@name='web_ribbon']" position="after">
+                <field name="raffle_sponsor_managed" invisible="1" />
+                <field name="raffle_sponsor_account_state" invisible="1" />
+                <div
+                    class="o_raffle_sponsor_no_account alert alert-warning d-flex flex-wrap align-items-center gap-2"
+                    role="alert"
+                    invisible="not is_raffle_sponsor or not raffle_sponsor_managed or raffle_sponsor_account_state != 'none'"
+                >
+                    <span class="flex-grow-1">
+                        This sponsor has no account: they cannot add prizes in the portal.
+                    </span>
+                    <button
+                        name="action_raffle_sponsor_invite"
+                        type="object"
+                        string="Send invitation"
+                        class="btn-primary"
+                        groups="event.group_event_user"
+                    />
+                    <button
+                        name="action_open_raffle_sponsor_invitation_template"
+                        type="object"
+                        string="Invitation email"
+                        icon="fa-envelope-o"
+                        class="btn-link"
+                        groups="mail.group_mail_template_editor,base.group_system"
+                    />
+                </div>
+                <div
+                    class="o_raffle_sponsor_invited alert alert-info d-flex flex-wrap align-items-center gap-2"
+                    role="status"
+                    invisible="not is_raffle_sponsor or not raffle_sponsor_managed or raffle_sponsor_account_state != 'invited'"
+                >
+                    <span class="flex-grow-1">Invitation sent, not accepted yet.</span>
+                    <button
+                        name="action_raffle_sponsor_invite"
+                        type="object"
+                        string="Send invitation"
+                        class="btn-secondary"
+                        groups="event.group_event_user"
+                    />
+                    <button
+                        name="action_open_raffle_sponsor_invitation_template"
+                        type="object"
+                        string="Invitation email"
+                        icon="fa-envelope-o"
+                        class="btn-link"
+                        groups="mail.group_mail_template_editor,base.group_system"
+                    />
+                </div>
+            </xpath>
+            <field name="company_name" position="after">
+                <field name="is_raffle_sponsor" invisible="not raffle_sponsor_managed" />
+                <field name="raffle_sponsor_partner_id" readonly="1" invisible="not is_raffle_sponsor" />
+            </field>
+        </field>
+    </record>
+
+    <record id="event_registration_view_list_raffle_sponsor" model="ir.ui.view">
+        <field name="name">event.registration.list.raffle.sponsor</field>
+        <field name="model">event.registration</field>
+        <field name="inherit_id" ref="event.view_event_registration_tree" />
+        <field name="arch" type="xml">
+            <field name="email" position="after">
+                <field name="is_raffle_sponsor" optional="hide" />
+            </field>
+        </field>
+    </record>
+
+    <record id="event_registration_view_search_raffle_sponsor" model="ir.ui.view">
+        <field name="name">event.registration.search.raffle.sponsor</field>
+        <field name="model">event.registration</field>
+        <field name="inherit_id" ref="event.view_registration_search" />
+        <field name="arch" type="xml">
+            <filter name="attended" position="after">
+                <separator />
+                <filter string="Sponsors" name="raffle_sponsors" domain="[('is_raffle_sponsor', '=', True)]" />
+            </filter>
+        </field>
+    </record>
+</odoo>

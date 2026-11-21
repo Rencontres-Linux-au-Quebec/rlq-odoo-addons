@@ -1,0 +1,71 @@
+// Copyright 2026 TechnoLibre - Mathieu Benoit
+// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+
+// Prizes for raffle in the sponsor portal. Colours are the body's own, as
+// on the other raffle pages. The buttons, fields and choices are 48 px
+// high at least, and the cards wrap at a phone width.
+.o_raffle_sponsor {
+    max-width: 48rem;
+
+    a:focus-visible,
+    .btn:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    [tabindex="-1"]:focus {
+        outline: 3px solid $body-color;
+        outline-offset: 2px;
+        box-shadow: none;
+    }
+
+    .btn,
+    .form-control,
+    .form-select {
+        min-height: 3rem;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-height: 3rem;
+        padding-left: 0;
+
+        .form-check-input {
+            float: none;
+            margin: 0;
+            width: 1.5rem;
+            height: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .form-check-label {
+            flex-grow: 1;
+            padding: 0.75rem 0;
+        }
+    }
+
+    .o_raffle_sponsor_thumb {
+        object-fit: cover;
+    }
+
+    .o_raffle_sponsor_prize_body {
+        min-width: 12rem;
+    }
+
+    .o_raffle_sponsor_details dd {
+        overflow-wrap: anywhere;
+    }
+
+    .o_raffle_sponsor_reason,
+    .o_raffle_sponsor_description {
+        overflow-wrap: anywhere;
+        white-space: pre-line;
+    }
+}
