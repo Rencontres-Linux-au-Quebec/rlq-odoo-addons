@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!-- The delivery method of the prize carts: free, and offered to them
+         only (see sale.order._get_delivery_methods()). -->
+    <record id="product_prize_handover" model="product.product">
+        <field name="name">Raffle prize handover</field>
+        <field name="default_code">RAFFLE_PRIZE_HANDOVER</field>
+        <field name="type">service</field>
+        <field name="categ_id" ref="delivery.product_category_deliveries" />
+        <field name="sale_ok" eval="False" />
+        <field name="purchase_ok" eval="False" />
+        <field name="list_price">0.0</field>
+        <field name="invoice_policy">order</field>
+    </record>
+    <record id="carrier_prize_handover" model="delivery.carrier">
+        <field name="name">Raffle prize handover</field>
+        <field name="fixed_price">0.0</field>
+        <field name="sequence">1</field>
+        <field name="delivery_type">fixed</field>
+        <field name="product_id" ref="product_prize_handover" />
+        <field name="is_published" eval="True" />
+        <field name="is_raffle_prize_carrier" eval="True" />
+    </record>
+</odoo>

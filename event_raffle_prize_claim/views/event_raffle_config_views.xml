@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_raffle_config_view_form_sponsored_shop" model="ir.ui.view">
+        <field name="name">event.raffle.config.form.sponsored.shop</field>
+        <field name="model">event.raffle.config</field>
+        <field name="inherit_id" ref="event_raffle.event_raffle_config_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//p[@name='defaults_note']" position="after">
+                <group string="Sponsored Prizes in the Shop" name="sponsored_shop">
+                    <field name="sponsored_shop_open" />
+                    <field name="sponsored_shop_close_date" />
+                </group>
+                <p class="text-muted" name="sponsored_shop_help">
+                    While the switch is on and the close date, if any, is still ahead, every visitor
+                    of the website shop sees the published sponsored prizes: members buy those sold
+                    to them, the others show as prizes only. Afterwards, only the winners' prize
+                    links show them. To reopen the sales, tick the switch again and move or clear
+                    the date.
+                </p>
+            </xpath>
+        </field>
+    </record>
+</odoo>
