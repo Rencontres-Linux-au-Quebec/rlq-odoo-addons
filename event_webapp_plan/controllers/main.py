@@ -43,6 +43,10 @@ o_ewp_text_only. The body carries o_ewp_motion_<mode> for the animation
 mode in force ("off" in text-only mode), plus o_ewp_motion_paused when the
 user stopped the animations (mode off or text-only mode).
 
+Short address: /w and /w/<id> (auth="public") redirect to /webapp_event
+and /webapp_event/<id> with the same query string; the login check is the
+one of the target.
+
 Extension: _ewp_page_values() returns extra values for the home page and
 the room page, merged last; a module that adds a block to those pages
 overrides it and fills the template slots with the values it returns.
@@ -71,6 +75,9 @@ from ..models.res_users import MOTION_MODES
 _logger = logging.getLogger(__name__)
 
 WEBAPP_ROOT = "/webapp_event"
+# Short address of the web app, easier to type and to say: redirects to
+# WEBAPP_ROOT (see webapp_short()).
+SHORT_ROOT = "/w"
 ICON_URL = "/event_webapp_plan/static/src/webapp/img/icon-%s.png"
 # Colour of the app bar, also used by the browser chrome and the splash
 # screen of the installed app.
@@ -770,6 +777,25 @@ class EventWebappController(http.Controller):
     )
     def webapp_day(self, webapp_id, **kwargs):
         return self._ewp_render_day(self._ewp_webapp_sudo(webapp_id))
+
+    @http.route(
+        [SHORT_ROOT, SHORT_ROOT + "/<int:webapp_id>"],
+        type="http",
+        auth="public",
+        methods=["GET"],
+    )
+    def webapp_short(self, webapp_id=None, **kwargs):
+        """302 redirect of /w to WEBAPP_ROOT and of /w/<id> to the day
+        <id>, the query string kept as is. The route reads nothing:
+        the target route checks the login (an anonymous visitor goes to
+        the login page, then back to the target) and the day."""
+        target = WEBAPP_ROOT
+        if webapp_id is not None:
+            target += f"/{webapp_id}"
+        query = request.httprequest.query_string.decode("latin-1")
+        if query:
+            target += "?" + query
+        return request.redirect(target, code=302)
 
     @http.route(
         WEBAPP_ROOT + "/<int:webapp_id>/room/<int:room_id>",

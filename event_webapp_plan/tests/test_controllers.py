@@ -214,6 +214,43 @@ class TestWebappControllers(HttpCase):
         redirect = parse_qs(location.query).get("redirect", [""])[0]
         self.assertTrue(redirect.startswith("/webapp_event"), redirect)
 
+    def test_short_address_redirects_to_the_web_app(self):
+        # Anonymous: /w sends to /webapp_event, which sends to the login
+        # page; the query string goes along unchanged.
+        self.authenticate(None, None)
+        for url, target in (
+            ("/w", "/webapp_event"),
+            ("/w?lang=fr_CA&a=x%20y", "/webapp_event?lang=fr_CA&a=x%20y"),
+            (
+                f"/w/{self.day_open.id}",
+                f"/webapp_event/{self.day_open.id}",
+            ),
+            (
+                f"/w/{self.day_open.id}?from=poster",
+                f"/webapp_event/{self.day_open.id}?from=poster",
+            ),
+        ):
+            response = self._get(url)
+            self.assertEqual(response.status_code, 302, url)
+            location = urlparse(response.headers["Location"])
+            self.assertEqual(
+                location.path
+                + ("?" + location.query if location.query else ""),
+                target,
+                url,
+            )
+        response = self._get("/webapp_event")
+        self.assertEqual(
+            urlparse(response.headers["Location"]).path, "/web/login"
+        )
+        # Logged in: the redirect is the same and the target page shows.
+        self.authenticate("ewp_webapp_portal", "ewp_webapp_portal")
+        response = self._get(f"/w/{self.day_open.id}")
+        self.assertEqual(response.status_code, 302)
+        response = self._get(response.headers["Location"])
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Open Test Day", response.text)
+
     def test_portal_inside_window_sees_rooms(self):
         self.authenticate("ewp_webapp_portal", "ewp_webapp_portal")
         response = self._get("/webapp_event")

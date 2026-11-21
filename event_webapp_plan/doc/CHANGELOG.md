@@ -1,5 +1,25 @@
 # Changelog - event_webapp_plan
 
+## 18.0.1.11.0
+
+**Short title:** short address `/w` of the web app.
+
+**Reason for the request:** `/webapp_event` is long to type and to say on a poster or out loud; a short address leads to the same pages.
+
+**Changes:**
+
+- `controllers/main.py`: `SHORT_ROOT` and the route `webapp_short()`: `/w` and `/w/<day>` (GET, `auth="public"`) answer a 302 redirect to `/webapp_event` and `/webapp_event/<day>`, the query string kept as is; module docstring.
+- `README.md`: the short address.
+- Tests: `test_controllers.py` (`test_short_address_redirects_to_the_web_app`).
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:** the route reads nothing and checks nothing: the target route sends an anonymous visitor to the login page and back to `/webapp_event`, and checks the day (404, closed page). No route of Odoo 18 or of the addons of the checkout uses `/w`.
+
+**Checks:** full suite of event_webapp_plan, event_webapp_plan_raffle, event_webapp_plan_track and rlq_event_webapp_plan on a fresh database (browser tests skipped without selenium); the new test fails without the route.
+
+**Action required:** restart the server; nothing to update in the database.
+
 ## 18.0.1.10.0
 
 **Short title:** "Automatic updates" section: the refresh timers of the blocks at the bottom of the home and room pages.

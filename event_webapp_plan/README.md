@@ -3,6 +3,9 @@
 Odoo 18.0 module. A mobile, installable web app for one event day at
 `/webapp_event`, reserved to logged-in users (portal or internal).
 Anonymous visitors are sent to the login page and come back after login.
+The short address `/w` (and `/w/<day>`) redirects to `/webapp_event` (and
+`/webapp_event/<day>`) with the same query string, easier to type or to
+print on a poster.
 
 ## What the visitor sees
 
