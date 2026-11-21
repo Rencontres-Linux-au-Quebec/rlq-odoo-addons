@@ -975,6 +975,11 @@ msgid ""
 msgstr ""
 
 #. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__date_planned
+msgid "Planned Date"
+msgstr ""
+
+#. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__pointer_angle
 msgid "Pointer Angle"
 msgstr ""
@@ -1485,6 +1490,13 @@ msgstr ""
 #. module: event_raffle
 #: model_terms:ir.ui.view,arch_db:event_raffle.res_config_settings_view_form
 msgid "Wheel"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle__date_planned
+msgid ""
+"When the raffle is planned. The event day web app lists it on the day whose "
+"opening window holds this moment."
 msgstr ""
 
 #. module: event_raffle

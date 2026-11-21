@@ -1,5 +1,31 @@
 # Changelog - event_webapp_plan
 
+## 18.0.1.12.0
+
+**Short title:** raffles of the day pre-filled from the planned date of each raffle or the dates of its event.
+
+**Reason for the request:** adding an event to a day did not add its raffles, each one was listed by hand. Listing every raffle of the event instead would bring the raffles of the other days of a multi-day event, and their winners, into the web app.
+
+**Changes:**
+
+- `models/event_webapp.py`: `raffle_fits_day()`: a non-test raffle of a listed event fits a day when its planned date (`event_raffle`, `date_planned`) falls inside the window, bounds included, or, without planned date, when its event begins and ends inside the window. `create()` and `write()` (on `event_ids`, `date_start`, `date_end`) add, as the current user, the raffles that start to fit, found as superuser and kept when the user may read them; a raffle the same write takes off stays off. `copy()` keeps the raffle list of the original (context key `ewp_no_raffle_fill`). Onchange `_onchange_ewp_raffle_ids()` shows the additions before saving; the non-stored field `ewp_raffle_proposed_ids` remembers them in the form, so a raffle removed by hand is neither proposed again in the same edit nor added back on save. Help of `raffle_ids`.
+- `models/event_raffle.py` (new): `create()` and `write()` (on `date_planned`, `event_id`, `is_test`) link the raffle, as superuser, to the days, archived ones included, that it starts to fit.
+- `views/event_webapp_views.xml`: hint above the raffle list of the day form, column **Planned Date** in the raffle lists of the day and of the selection dialog.
+- `i18n/fr.po`, `i18n/event_webapp_plan.pot`: the new texts.
+- `README.md`: Configuration, raffles of the day.
+- Tests: `test_raffle_fill.py` (new).
+
+**Safeguards and edge cases:**
+
+- Additions only: nothing leaves a day automatically. A raffle removed by hand comes back only when it stops fitting and fits again (a new event, a new window, a new planned date on another day).
+- A test raffle never joins; a test raffle turned real joins the days it fits.
+- A change of the dates of an event adds nothing: the pre-fill follows the day and the raffle only.
+- The raffle side writes as superuser because the user who saves a raffle seldom may write the days; it only adds that raffle to days that already list its event.
+
+**Checks:** full suite of event_webapp_plan, event_webapp_plan_raffle, event_webapp_plan_track, rlq_event_webapp_plan and event_raffle on a fresh database (browser tests skipped without selenium); each new test fails without the pre-fill; `msgfmt -c` on the catalogues.
+
+**Action required:** update `event_raffle` and the module (`-u event_raffle,event_webapp_plan`). The raffle lists of the existing days do not change: the pre-fill runs at the next change of a day or of a raffle.
+
 ## 18.0.1.11.0
 
 **Short title:** short address `/w` of the web app.

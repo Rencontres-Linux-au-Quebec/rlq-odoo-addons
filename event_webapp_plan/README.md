@@ -43,7 +43,7 @@ day:
 | Announcement | rich text shown at the top of the page |
 | Links | label, URL, description, ordered by drag and drop |
 | Events | `event.event` records of the day |
-| Raffles | `event.raffle` records of the day |
+| Raffles | `event.raffle` records of the day, pre-filled (see below) |
 | Plan & Rooms | plan image, visual room editor, list of rooms |
 
 **Visual room editor**: select a room in the side list (or click its area),
@@ -109,6 +109,32 @@ rooms: the visitors of the original do not enter the copy. The button
 **Create missing chat channels** recreates the group and the channel of a
 room that lost them. The optional column **Access group** of the room list
 shows the group.
+
+**Raffles of the day**: the raffle block of the web app shows the raffles
+listed on the day, and only those. The list is pre-filled, then edited by
+hand. A raffle of an event listed on the day joins the day when:
+
+- its **Planned Date** (field of `event_raffle`) falls inside the opening
+  window, bounds included; a raffle of an event held over several days
+  thus joins the day of its draw only;
+- without planned date, its event begins and ends inside the window: a
+  one-day event brings its raffles, an event held over several days waits
+  for their planned dates.
+
+A test raffle never joins. The pre-fill runs when a raffle starts to fit a
+day: the day gains the raffle's event, the window of the day moves, or the
+raffle is created or gets a new planned date, event or test flag. In the
+form, adding an event or moving the window shows the raffles at once,
+before saving. Nothing is ever removed automatically: a raffle removed by
+hand stays off through any later write that leaves its fit unchanged,
+such as adding another event, renaming the day, or a new planned date
+inside the same day. A change of the event's own dates adds nothing. A
+duplicated day keeps the raffle list of the original as it is.
+
+The day side searches the candidate raffles as superuser, then adds only
+those the user who saves the day may read (company rules). The raffle
+side adds the saved raffle as superuser, to the days that already list its
+event: the user who saves a raffle seldom may write the days.
 
 **Default day**: `/webapp_event` shows the active day that is open now,
 else the next one to open, else the one that closed most recently.

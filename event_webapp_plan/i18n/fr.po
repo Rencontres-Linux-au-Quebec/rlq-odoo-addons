@@ -189,6 +189,23 @@ msgstr ""
 "modérateurs et les administrateurs voient cette page."
 
 #. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+msgid ""
+"A raffle of a listed event joins the day when\n"
+"                                its planned date falls inside the opening\n"
+"                                window or, without planned date, when its\n"
+"                                event lies entirely inside it. Test raffles\n"
+"                                never join. A raffle removed by hand stays off\n"
+"                                until a change of the day or of the raffle makes\n"
+"                                it fit anew."
+msgstr ""
+"Un tirage d'un événement de la liste rejoint la journée quand sa date "
+"prévue tombe dans la fenêtre d'ouverture ou, sans date prévue, quand son "
+"événement se tient en entier dans cette fenêtre. Les tirages de test ne la "
+"rejoignent jamais. Un tirage retiré à la main reste retiré jusqu'à ce qu'un "
+"changement de la journée ou du tirage le fasse correspondre de nouveau."
+
+#. module: event_webapp_plan
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_raffles_content
 msgid "Absent"
 msgstr "Absent"
@@ -568,6 +585,11 @@ msgstr "Glissez sur le plan pour dessiner la zone de"
 #: code:addons/event_webapp_plan/controllers/main.py:0
 msgid "Event"
 msgstr "Événement"
+
+#. module: event_webapp_plan
+#: model:ir.model,name:event_webapp_plan.model_event_raffle
+msgid "Event Raffle"
+msgstr "Tirage d'événement"
 
 #. module: event_webapp_plan
 #: model:ir.module.category,name:event_webapp_plan.module_category_event_webapp
@@ -1133,6 +1155,24 @@ msgstr "Plan et salles"
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_refresh
 msgid "Raffles"
 msgstr "Tirages"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__ewp_raffle_proposed_ids
+msgid "Raffles proposed in the form"
+msgstr "Tirages proposés dans le formulaire"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp__raffle_ids
+msgid ""
+"Raffles shown on the web app. A raffle of a listed event is added when its "
+"planned date falls inside the opening window or, without planned date, when "
+"its event lies entirely inside it; test raffles never are. Nothing is "
+"removed automatically."
+msgstr ""
+"Tirages affichés dans l'application web. Un tirage d'un événement de la "
+"liste est ajouté quand sa date prévue tombe dans la fenêtre d'ouverture ou, "
+"sans date prévue, quand son événement se tient en entier dans cette fenêtre "
+"; les tirages de test ne le sont jamais. Rien n'est retiré automatiquement."
 
 #. module: event_webapp_plan
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form

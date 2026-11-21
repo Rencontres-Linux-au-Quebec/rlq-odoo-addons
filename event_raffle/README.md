@@ -15,8 +15,14 @@ button sur l'événement affiche la liste des gagnants.
 
 ## Configuration
 
-Aucune configuration requise. Par activité de tirage, l'onglet **Paramètres**
-regroupe les réglages :
+Aucune configuration requise. Sous l'événement, le champ facultatif **Date
+prévue** dit quand le tirage doit avoir lieu. Le module ne s'en sert pas
+lui-même : il s'affiche en colonne facultative dans la liste des tirages,
+et l'application web de journée d'événement (`event_webapp_plan`) s'en sert
+pour ajouter le tirage à la journée qui contient ce moment. Un tirage
+dupliqué n'en garde pas la date prévue.
+
+Par activité de tirage, l'onglet **Paramètres** regroupe les réglages :
 
 - **Tirage de test** (décoché par défaut) : marque un tirage de répétition
   ou d'essai. Le formulaire affiche alors un ruban **Test**, et la liste des
@@ -236,6 +242,11 @@ L'effet est surtout pensé pour le mode **plein écran** (projection).
 
 ## Changes
 
+- **18.0.1.9.0** : champ facultatif **Date prévue** sur le tirage, sous
+  l'événement dans le formulaire et en colonne facultative de la liste ;
+  non copié à la duplication. À la mise à jour, un tirage existant qui a
+  un événement reçoit la date de début de cet événement ; les autres restent
+  sans date.
 - **18.0.1.8.0** : les valeurs par défaut des tirages passent dans les
   **Paramètres** généraux, bloc **Tirage**, avec les mêmes libellés et les
   mêmes contrôles (annonce sans canal, discussion directe refusées). Le menu

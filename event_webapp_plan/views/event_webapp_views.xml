@@ -134,6 +134,18 @@
                             </field>
                         </page>
                         <page string="Raffles" name="page_raffles">
+                            <div class="text-muted mb-2">
+                                A raffle of a listed event joins the day when
+                                its planned date falls inside the opening
+                                window or, without planned date, when its
+                                event lies entirely inside it. Test raffles
+                                never join. A raffle removed by hand stays off
+                                until a change of the day or of the raffle makes
+                                it fit anew.
+                            </div>
+                            <!-- Memory of the onchange: see
+                                 event.webapp.ewp_raffle_proposed_ids. -->
+                            <field name="ewp_raffle_proposed_ids" invisible="1" force_save="1" />
                             <field
                                 name="raffle_ids"
                                 context="{'list_view_ref': 'event_webapp_plan.event_raffle_view_list_select'}"
@@ -141,6 +153,7 @@
                                 <list>
                                     <field name="name" />
                                     <field name="event_id" />
+                                    <field name="date_planned" />
                                     <field name="state" />
                                 </list>
                             </field>
@@ -221,6 +234,7 @@
             <list string="Raffles">
                 <field name="name" />
                 <field name="event_id" />
+                <field name="date_planned" />
                 <field name="state" />
             </list>
         </field>

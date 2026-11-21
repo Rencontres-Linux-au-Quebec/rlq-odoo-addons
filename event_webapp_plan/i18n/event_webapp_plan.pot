@@ -158,6 +158,18 @@ msgid ""
 msgstr ""
 
 #. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+msgid ""
+"A raffle of a listed event joins the day when\n"
+"                                its planned date falls inside the opening\n"
+"                                window or, without planned date, when its\n"
+"                                event lies entirely inside it. Test raffles\n"
+"                                never join. A raffle removed by hand stays off\n"
+"                                until a change of the day or of the raffle makes\n"
+"                                it fit anew."
+msgstr ""
+
+#. module: event_webapp_plan
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_raffles_content
 msgid "Absent"
 msgstr ""
@@ -515,6 +527,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/event_webapp_plan/controllers/main.py:0
 msgid "Event"
+msgstr ""
+
+#. module: event_webapp_plan
+#: model:ir.model,name:event_webapp_plan.model_event_raffle
+msgid "Event Raffle"
 msgstr ""
 
 #. module: event_webapp_plan
@@ -1054,6 +1071,20 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_main
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_refresh
 msgid "Raffles"
+msgstr ""
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__ewp_raffle_proposed_ids
+msgid "Raffles proposed in the form"
+msgstr ""
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp__raffle_ids
+msgid ""
+"Raffles shown on the web app. A raffle of a listed event is added when its "
+"planned date falls inside the opening window or, without planned date, when "
+"its event lies entirely inside it; test raffles never are. Nothing is "
+"removed automatically."
 msgstr ""
 
 #. module: event_webapp_plan

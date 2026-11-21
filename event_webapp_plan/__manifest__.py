@@ -32,7 +32,9 @@ day, reserved to logged-in users (portal or internal):
   server is on the same site as the web app (a display setting can force
   the page or a new tab), else behind a button that opens it in a new
   tab;
-* the raffle draws of the day (module event_raffle), refreshed live.
+* the raffle draws of the day (module event_raffle), refreshed live;
+  the raffles of the day are pre-filled from the planned date of each
+  raffle, or from the dates of its event, and edited by hand.
 
 The backend application "Event Web App" configures each day: its opening
 window (start and end), announcement, links, events, raffles, plan image
@@ -62,7 +64,7 @@ Copyright (C) 2026 Rencontres Linux au Québec contributors
 GNU Affero General Public License v3 or later (http://www.gnu.org/licenses/agpl)
 """
     ),
-    "version": "18.0.1.11.0",
+    "version": "18.0.1.12.0",
     "category": "Marketing/Events",
     "author": (
         "Services-Conseils Linux Inc. (info@rencontres-linux.quebec), "
