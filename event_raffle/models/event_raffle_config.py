@@ -1,6 +1,7 @@
 # Copyright 2026 TechnoLibre - Mathieu Benoit
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
 
 from .event_raffle import (
     BELLY_LOGO_SELECTION,
@@ -8,6 +9,7 @@ from .event_raffle import (
     POINTER_ANGLE_SELECTION,
     THEME_SELECTION,
     TUX_ANIMATION_SELECTION,
+    _check_announce_channel_choice,
 )
 
 
@@ -71,6 +73,82 @@ class EventRaffleConfig(models.Model):
         string="Default Flag Text",
         default="Vive le logiciel libre",
     )
+
+    # Messages of a new raffle. The labels are those of the raffle fields
+    # they fill; event.raffle reads them in its _settings_* defaults.
+    default_notify_winner_auto = fields.Boolean(
+        string="Notify the Winner Automatically",
+        default=False,
+        help="Value of this option on each new raffle: after each draw, "
+        "OdooBot sends the notification message to the winner. The "
+        "existing raffles keep their own value.",
+    )
+    default_notify_winner_message = fields.Text(
+        string="Notification Message",
+        help="Notification message of each new raffle. Empty, a new raffle "
+        "gets the standard message, in the language of the user who "
+        "creates it. It takes the placeholders of the raffle message: "
+        "{winner} or {gagnant}, {number} or {numéro}, {raffle} or "
+        "{tirage}, {prize} or {prix}, and {link} or {lien}, the prize link "
+        "when the draw has one. A placeholder without a value disappears.",
+    )
+    default_announce_channel_auto = fields.Boolean(
+        string="Announce Each Draw in a Channel",
+        default=False,
+        help="Value of this option on each new raffle: after each draw, "
+        "OdooBot posts the channel message in the discussion channel. A "
+        "new raffle has it on only while the discussion channel below is "
+        "active. The existing raffles keep their own value.",
+    )
+    default_announce_channel_id = fields.Many2one(
+        "discuss.channel",
+        string="Discussion Channel",
+        ondelete="set null",
+        domain="[('channel_type', 'in', ('channel', 'group'))]",
+        help="Discussion channel of each new raffle, channel or group chat "
+        "of Discuss. A channel archived or deleted since is not given to "
+        "the new raffles.",
+    )
+    default_announce_channel_message = fields.Text(
+        string="Channel Message",
+        help="Channel message of each new raffle. Empty, a new raffle gets "
+        "the standard message, in the language of the user who creates "
+        "it. {winner} or {gagnant} gives the winner name shown on the "
+        "draw, {number} or {numéro} the draw number, {raffle} or {tirage} "
+        "the raffle name, {prize} or {prix} the prize of the draw, {link} "
+        "or {lien} the prize link when the draw has one. A placeholder "
+        "without a value disappears, and so do its parentheses when it "
+        "stands alone in them, such as ({prize}).",
+    )
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            _check_announce_channel_choice(
+                self, vals.get("default_announce_channel_id")
+            )
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if "default_announce_channel_id" in vals:
+            _check_announce_channel_choice(
+                self, vals["default_announce_channel_id"]
+            )
+        return super().write(vals)
+
+    @api.constrains(
+        "default_announce_channel_auto", "default_announce_channel_id"
+    )
+    def _check_default_announce_channel(self):
+        for config in self.filtered("default_announce_channel_auto"):
+            if not config.default_announce_channel_id:
+                raise ValidationError(
+                    self.env._(
+                        "Choose the discussion channel where the new raffles "
+                        "announce each draw, or stop announcing the draws by "
+                        "default."
+                    )
+                )
 
     @api.depends_context("lang")
     def _compute_display_name(self):

@@ -36,11 +36,59 @@ regroupe les réglages :
   *Canon à confettis*, *Canon à feux d'artifice*, *Fanfare de trompette*
   (avec musique), *Jonglage de diabolo*, ou *Aléatoire* (une au hasard à
   chaque tir).
+- **Notifier le gagnant automatiquement** (section *Notification du
+  gagnant*, désactivé par défaut) : après chaque tir, **OdooBot** envoie au
+  gagnant le **Message notification**, champ qui n'apparaît qu'une fois la
+  case cochée, modifiable et alors obligatoire (défaut : *« Vous avez gagné
+  un prix, venez le réclamer ! {lien} »*). Il accepte les mêmes paramètres
+  que le **Message canal** ci-dessous. L'envoi suit les règles du bouton
+  **Notifier** (étape 6 de *Usage*) : clavardage privé, sinon courriel. Un
+  gagnant qu'on ne peut joindre n'empêche pas le tir : il ne reçoit rien et
+  une note sur le tir l'explique ; sa colonne *Notifié* reste décochée.
+- **Annoncer chaque tir dans un canal de discussion** (section *Annonce dans
+  un canal*, désactivé par défaut) : après chaque tir, **OdooBot** publie le
+  **Message canal** dans le **Canal de discussion** choisi (un canal ou une
+  discussion de groupe de *Discussion*). Les deux champs n'apparaissent
+  qu'une fois la case cochée, et deviennent alors obligatoires. L'utilisateur
+  qui fait le tir n'a pas à être membre du canal. Le message accepte des
+  paramètres, en français ou en anglais : `{gagnant}` / `{winner}` (le nom du
+  gagnant tel qu'affiché sur le tir et la roue), `{numéro}` / `{number}` (le
+  numéro du tir), `{tirage}` / `{raffle}` (le nom du tirage), `{prix}` /
+  `{prize}` (le lot saisi sur la roue ; avec *event_raffle_prize*, sinon la
+  catégorie de jeton du tir) et `{lien}` / `{link}` (le lien de prix du tir,
+  avec *event_raffle_prize_claim* ; il n'ouvre la réclamation qu'au compte
+  du gagnant connecté). Défaut : *« Tir #{numéro} : {gagnant} a gagné !
+  ({prix}) {lien} »*. Un paramètre sans valeur disparaît avec l'espace qui
+  le précède, et un paramètre seul entre parenthèses disparaît avec elles,
+  d'où *« Tir #3 : Alice a gagné ! »* sans lot ni lien. Une accolade isolée
+  ou un nom inconnu reste tel quel. Un canal archivé ou
+  supprimé, ou une publication refusée, n'empêche pas le tir : une note sur
+  le tir l'explique. OdooBot publie au nom du superutilisateur un texte que
+  les utilisateurs du tirage écrivent : l'utilisateur qui choisit le canal
+  doit pouvoir le lire (canal ouvert à ses groupes, discussion de groupe
+  dont il est membre), sinon l'enregistrement est refusé. Une discussion
+  directe n'est jamais acceptée : ni au choix, ni à la publication, qui
+  laisse alors une note sur le tir.
 
 Le menu **Tirage → Paramètres** définit les valeurs par défaut (thème,
 célébration, animation, etc.) appliquées à chaque nouveau tirage. Le gagnant
 **reste sur la roue** après un tir et n'est retiré du pool qu'au **tir suivant**.
 Les noms longs sont **répartis sur plusieurs lignes** (max 4) dans la roue.
+
+Sa section **Messages** donne aussi les valeurs de départ de chaque nouveau
+tirage : **Notifier le gagnant automatiquement**, **Message notification**,
+**Annoncer chaque tir dans un canal de discussion**, **Canal de discussion**
+et **Message canal**. Un message laissé vide donne le message standard, dans
+la langue de l'utilisateur qui crée le tirage. Annoncer par défaut exige un
+canal ; un canal archivé ou supprimé depuis, ou que l'utilisateur qui crée
+le tirage ne peut pas lire, n'est pas repris, et l'annonce reste alors
+désactivée sur le nouveau tirage. Les tirages existants gardent leurs
+valeurs.
+
+Un tirage appartient à sa **société** : le tirage, ses participants, ses
+tirs et leurs notifications ne se lisent que dans les sociétés où
+l'utilisateur travaille (règles d'enregistrement globales, comme celles
+d'Odoo). Un tirage sans société se lit de partout.
 
 La roue a un **cadre en bois** et un **pion à chaque intersection** ; la flèche
 dévie quand un pion passe dessous, puis **revient droite** en douceur à l'arrêt. Sous le gagnant, un panneau **Historique des
@@ -85,6 +133,32 @@ d'outils, le champ *Lot* est à gauche, le **gagnant est centré**, et le bouton
    **« Quitter le plein écran »** revient à la vue précédente).
 5. Enchaîner avec **« Prochain tirage »**. Marquer un gagnant **absent** depuis le tir
    (une note/activité peut être ajoutée dans le chatter).
+6. **Notifier le gagnant** : dans l'onglet **Tirs**, ouvrir la ligne du tir puis
+   cliquer **« Notifier »**. L'assistant choisit l'expéditeur (**OdooBot** par
+   défaut, ou **Moi**, l'utilisateur courant ; jamais un autre utilisateur) et
+   propose un message modifiable, par défaut *« Vous avez gagné un prix, venez
+   le réclamer ! {lien} »*, ou le **Message notification** du tirage quand
+   celui-ci notifie ses gagnants automatiquement. Les paramètres du message
+   (`{gagnant}`, `{lien}`, etc.) sont remplacés à l'envoi. L'envoi dépend du
+   gagnant :
+   - son contact a un **compte utilisateur interne** actif : un **clavardage
+     privé** dans *Discussion*, la conversation directe entre l'expéditeur et
+     le gagnant, créée au besoin ;
+   - sinon, s'il a un **courriel** (celui du contact, ou celui saisi sur le tir) :
+     le même message par **courriel**. Un utilisateur **portail** passe par
+     ici : il n'a pas accès à *Discussion* et un clavardage ne lui parviendrait
+     pas ;
+   - sinon : l'assistant explique pourquoi et n'offre pas de bouton *Envoyer*.
+
+   Un gagnant **absent** peut être notifié : c'est l'usage principal. Chaque
+   envoi est consigné sur le tir (section *Notifications* du formulaire) et
+   laisse une note dans le chatter. Les listes des tirs et des gagnants
+   affichent, après *Date*, les colonnes **Notifié**, **Lu** (le gagnant a vu
+   la dernière notification par clavardage ; jamais coché pour un courriel)
+   et **Notifications** (le nombre d'envois). Peut notifier qui peut modifier
+   les tirs (groupe *Événements / Utilisateur*). Les notifications ne se
+   créent ni ne se modifient à la main : seul l'assistant les écrit, après
+   ses vérifications ; un gestionnaire peut en supprimer une.
 
 ## Animations de Tux
 
@@ -140,6 +214,30 @@ L'effet est surtout pensé pour le mode **plein écran** (projection).
 
 - Tux est modélisé procéduralement (primitives three.js) pour ressembler à la
   mascotte ; aucun fichier 3D externe n'est requis.
+
+## Changes
+
+- **18.0.1.6.0** : paramètre `{lien}` / `{link}`, le lien de prix du tir,
+  dans le **Message canal** et dans le **Message notification**, qui accepte
+  désormais tous les paramètres du message canal, à l'envoi automatique
+  comme dans l'assistant **Notifier**. Un paramètre sans valeur disparaît
+  sans laisser d'espace. Nouveaux messages par défaut, terminés par
+  `{lien}` ; à la mise à jour, un tirage dont le message est encore
+  exactement un ancien défaut (anglais ou français) reçoit le nouveau dans
+  la même langue, un message modifié reste tel quel.
+- **18.0.1.4.0** : réglage **Notifier le gagnant automatiquement** et
+  champ **Message notification** dans l'onglet *Paramètres* du tirage :
+  OdooBot envoie le message à chaque gagnant après le tir, par clavardage
+  privé ou par courriel, et le consigne sur le tir comme le bouton
+  **Notifier**. Avec `event_raffle_prize_claim`, le gagnant reçoit ce
+  message d'abord, puis le lien de prix. À la mise à jour, le message des
+  tirages existants est écrit dans la langue de leur créateur, ou de leur
+  société quand le créateur n'existe plus.
+- **18.0.1.3.0** : bouton **Notifier** sur le tir. Notification du gagnant
+  par clavardage privé (OdooBot ou l'utilisateur courant) quand il a un
+  compte interne, sinon par courriel (y compris un utilisateur portail) ;
+  suivi par tir (colonnes *Notifié*, *Lu* et compteur *Notifications*),
+  écrit par l'assistant seul.
 
 ## Bug Tracker
 

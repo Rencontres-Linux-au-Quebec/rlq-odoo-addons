@@ -3,7 +3,7 @@
 import random
 
 from odoo import _, api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from odoo.tools import sql
 
 THEME_SELECTION = [
@@ -42,29 +42,66 @@ POINTER_ANGLE_SELECTION = [
     ("180", "Bottom (180°)"),
     ("-90", "Left (-90°)"),
 ]
+# Discuss channel types where OdooBot announces the draws. A direct chat
+# is never one: it belongs to its two members.
+ANNOUNCE_CHANNEL_TYPES = ("channel", "group")
+
+
+def _config_value(records, field, fallback):
+    """Return `field` of the raffle default-settings singleton.
+
+    `fallback` comes back instead when the singleton is missing, or while
+    the registry loads and its column is not in database yet.
+    """
+    cfg = records.env.ref(
+        "event_raffle.raffle_config_singleton", raise_if_not_found=False
+    )
+    if not cfg:
+        return fallback
+    # Adding a field to an already-installed database calls the defaults
+    # from _init_column(), to fill the new column on the rows already there.
+    # event.raffle is auto-init'd before event.raffle.config -- class
+    # registration order, which event_raffle_config.py importing this
+    # module pins -- so the twin column on the singleton may not exist in
+    # database yet, and reading it would abort the upgrade. Only while
+    # loading: once the registry is ready this costs nothing.
+    if not records.env.registry.ready and not sql.column_exists(
+        records.env.cr, cfg._table, field
+    ):
+        return fallback
+    return cfg[field]
+
+
+def _check_announce_channel_choice(records, channel_id):
+    """Refuse `channel_id` as the announcement channel that the env user
+    sets on `records`.
+
+    OdooBot posts in that channel as superuser at each draw, with a text
+    the raffle's users write: the user must be able to read the channel,
+    and it must be a channel or a group chat (ANNOUNCE_CHANNEL_TYPES).
+    The superuser skips the read check, not the type check. An empty
+    `channel_id` passes. Raises AccessError or ValidationError.
+    """
+    if not channel_id:
+        return
+    channel = records.env["discuss.channel"].browse(channel_id)
+    if not records.env.su:
+        channel.check_access("read")
+    if channel.sudo().channel_type not in ANNOUNCE_CHANNEL_TYPES:
+        raise ValidationError(
+            records.env._(
+                "%s is not a channel or a group chat: the draws are "
+                "announced in one of those only.",
+                channel.sudo().name,
+            )
+        )
 
 
 def _default(field, fallback):
     """Field default reading the raffle default-settings singleton."""
 
     def getter(self):
-        cfg = self.env.ref(
-            "event_raffle.raffle_config_singleton", raise_if_not_found=False
-        )
-        if not cfg:
-            return fallback
-        # Adding a field to an already-installed database calls this from
-        # _init_column(), to fill the new column on the rows already there.
-        # event.raffle is auto-init'd before event.raffle.config -- class
-        # registration order, which event_raffle_config.py importing this
-        # module pins -- so the twin column on the singleton may not exist
-        # in database yet, and reading it would abort the upgrade. Only
-        # while loading: once the registry is ready this costs nothing.
-        if not self.env.registry.ready and not sql.column_exists(
-            self.env.cr, cfg._table, field
-        ):
-            return fallback
-        return getattr(cfg, field)
+        return _config_value(self, field, fallback)
 
     return getter
 
@@ -187,6 +224,154 @@ class EventRaffle(models.Model):
         help="Effect played when a winner is announced. 'Random' picks "
         "one at random at each draw.",
     )
+    notify_winner_auto = fields.Boolean(
+        string="Notify the Winner Automatically",
+        default=_default("default_notify_winner_auto", False),
+        help="After each draw, OdooBot sends the notification message to "
+        "the winner: a private chat in Discuss when the winner contact has "
+        "an internal user account, an email otherwise. A winner with "
+        "neither gets no message, and a note on the draw says so.",
+    )
+    notify_winner_message = fields.Text(
+        string="Notification Message",
+        default=lambda self: self._settings_notify_winner_message(),
+        help="Message sent to each winner when the winner is notified "
+        "automatically. While that is on, the Notify button of a draw "
+        "proposes it too. It takes the placeholders of the channel "
+        "message: {winner} or {gagnant}, {number} or {numéro}, {raffle} or "
+        "{tirage}, {prize} or {prix}, and {link} or {lien}, the prize link "
+        "when the draw has one. A placeholder without a value disappears.",
+    )
+
+    announce_channel_auto = fields.Boolean(
+        string="Announce Each Draw in a Channel",
+        default=lambda self: self._settings_announce_channel_auto(),
+        help="After each draw, OdooBot posts the channel message in the "
+        "discussion channel, which the user who draws does not need to "
+        "join. An archived or deleted channel gets no message, and a note "
+        "on the draw says so.",
+    )
+    announce_channel_id = fields.Many2one(
+        "discuss.channel",
+        string="Discussion Channel",
+        default=lambda self: self._settings_announce_channel(),
+        ondelete="set null",
+        domain="[('channel_type', 'in', ('channel', 'group'))]",
+        help="Channel or group chat of Discuss where OdooBot announces each "
+        "draw.",
+    )
+    announce_channel_message = fields.Text(
+        string="Channel Message",
+        default=lambda self: self._settings_announce_channel_message(),
+        help="Text posted in the channel after each draw. {winner} or "
+        "{gagnant} gives the winner name shown on the draw, {number} or "
+        "{numéro} the draw number, {raffle} or {tirage} the raffle name, "
+        "{prize} or {prix} the prize of the draw, {link} or {lien} the "
+        "prize link when the draw has one. A placeholder without a value "
+        "disappears, and so do its parentheses when it stands alone in "
+        "them, such as ({prize}). Any other text in braces stays as typed.",
+    )
+
+    def _default_notify_winner_message(self):
+        """Return the standard notification message in the env language.
+
+        A model method rather than an inline default, so the term resolves to
+        this module's translations from any caller: the field default, the
+        notify wizard and the migrations, whose upgrade env has no language.
+        The link is empty unless a module gives the draw one, and an empty
+        placeholder disappears.
+        """
+        return self.env._("You won a prize, come and claim it! {link}")
+
+    def _default_announce_channel_message(self):
+        """Return the standard channel message in the env language.
+
+        A model method for the same reason as the notification message: the
+        field default and the migrations share it. The prize sits in
+        parentheses, so a draw without a prize drops it.
+        """
+        return self.env._("Draw #{number}: {winner} won! ({prize}) {link}")
+
+    # The defaults below read the messages section of the raffle default
+    # settings. They only fill a new raffle: a raffle keeps its values when
+    # the settings change afterwards.
+
+    def _settings_notify_winner_message(self):
+        """Return the notification message of a new raffle.
+
+        The message of the default settings when it holds text, the
+        standard message in the env language otherwise: a new raffle never
+        gets an empty message from the settings.
+        """
+        message = _config_value(self, "default_notify_winner_message", False)
+        if (message or "").strip():
+            return message
+        return self._default_notify_winner_message()
+
+    def _settings_announce_channel_message(self):
+        """Return the channel message of a new raffle.
+
+        The message of the default settings when it holds text, the
+        standard message in the env language otherwise.
+        """
+        message = _config_value(
+            self, "default_announce_channel_message", False
+        )
+        if (message or "").strip():
+            return message
+        return self._default_announce_channel_message()
+
+    def _settings_announce_channel(self):
+        """Return the id of the default channel, False unless the user who
+        creates the raffle could choose it.
+
+        A channel archived since it was chosen is left out, as a deleted one
+        is, which the settings no longer reference, and so is a channel of a
+        type that announces nothing (ANNOUNCE_CHANNEL_TYPES). A user who
+        may not read the channel does not get it either: the raffle would
+        then post in it a message that user writes, as
+        _check_announce_channel_choice() refuses. The superuser reads every
+        channel.
+        """
+        channel = _config_value(self, "default_announce_channel_id", False)
+        if not channel:
+            return False
+        channel_sudo = channel.sudo()
+        if (
+            not channel_sudo.active
+            or channel_sudo.channel_type not in ANNOUNCE_CHANNEL_TYPES
+        ):
+            return False
+        if not self.env.su and not channel.with_env(self.env).has_access(
+            "read"
+        ):
+            return False
+        return channel.id
+
+    def _settings_announce_channel_auto(self):
+        """Return whether a new raffle announces its draws in a channel.
+
+        On when the default settings say so and their channel is active:
+        without a channel to post in, the announcement stays off, which
+        keeps the new raffle valid against _check_announce_channel().
+        """
+        return bool(
+            _config_value(self, "default_announce_channel_auto", False)
+            and self._settings_announce_channel()
+        )
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            _check_announce_channel_choice(
+                self, vals.get("announce_channel_id")
+            )
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if "announce_channel_id" in vals:
+            _check_announce_channel_choice(self, vals["announce_channel_id"])
+        return super().write(vals)
 
     @api.depends(
         "participant_ids",
@@ -198,6 +383,42 @@ class EventRaffle(models.Model):
             rec.participant_count = len(rec.participant_ids)
             rec.eligible_count = len(rec.participant_ids.filtered("eligible"))
             rec.draw_count = len(rec.draw_ids)
+
+    @api.constrains("notify_winner_auto", "notify_winner_message")
+    def _check_notify_winner_message(self):
+        for rec in self:
+            if (
+                rec.notify_winner_auto
+                and not (rec.notify_winner_message or "").strip()
+            ):
+                raise ValidationError(
+                    self.env._(
+                        "Write the notification message sent to the winners, "
+                        "or stop notifying them automatically."
+                    )
+                )
+
+    @api.constrains(
+        "announce_channel_auto",
+        "announce_channel_id",
+        "announce_channel_message",
+    )
+    def _check_announce_channel(self):
+        for rec in self.filtered("announce_channel_auto"):
+            if not rec.announce_channel_id:
+                raise ValidationError(
+                    self.env._(
+                        "Choose the discussion channel where each draw is "
+                        "announced, or stop announcing the draws."
+                    )
+                )
+            if not (rec.announce_channel_message or "").strip():
+                raise ValidationError(
+                    self.env._(
+                        "Write the message posted in the channel after each "
+                        "draw, or stop announcing the draws."
+                    )
+                )
 
     def action_include_all(self):
         self.participant_ids.write({"excluded": False})
@@ -270,6 +491,25 @@ class EventRaffle(models.Model):
             "params": {"raffle_id": self.id},
         }
 
+    def _draw_next_values(self, winner, sequence, prize, prize_description):
+        """Return the values of the draw that action_draw_next() creates.
+
+        `winner` is the drawn participant and `sequence` the draw number. A
+        module that stores more on each draw extends these values: the draw
+        then holds them from its creation, before the winner notification
+        and the channel announcement read it.
+        """
+        self.ensure_one()
+        return {
+            "raffle_id": self.id,
+            "sequence": sequence,
+            "winner_participant_id": winner.id,
+            "winner_name": winner.name,
+            "winner_email": winner.email,
+            "prize": prize or False,
+            "prize_description": prize_description or False,
+        }
+
     def action_draw_next(self, prize=False, prize_description=False):
         self.ensure_one()
         # Serialize concurrent draws on the same raffle (the wheel can be
@@ -295,19 +535,12 @@ class EventRaffle(models.Model):
         winner_index = eligible.ids.index(winner.id)
         sequence = len(self.draw_ids) + 1
         draw = self.env["event.raffle.draw"].create(
-            {
-                "raffle_id": self.id,
-                "sequence": sequence,
-                "winner_participant_id": winner.id,
-                "winner_name": winner.name,
-                "winner_email": winner.email,
-                "prize": prize or False,
-                "prize_description": prize_description or False,
-            }
+            self._draw_next_values(winner, sequence, prize, prize_description)
         )
         # Do NOT mark the new winner as removed yet (see above).
         if self.state == "draft":
             self.state = "in_progress"
+        draw._draw_messages_send()
         return {
             "draw_id": draw.id,
             "winner": {"id": winner.id, "name": winner.name},

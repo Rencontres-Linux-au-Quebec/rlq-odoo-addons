@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Multi-company: a raffle and the records under it belong to the
+         raffle's company, and a raffle without one to every company.
+         Global rules, as Odoo's own company rules: they bind every user
+         but the superuser, whatever the groups grant. -->
+    <record id="event_raffle_rule_company" model="ir.rule">
+        <field name="name">Raffle: allowed companies</field>
+        <field name="model_id" ref="model_event_raffle" />
+        <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+    </record>
+    <record id="event_raffle_participant_rule_company" model="ir.rule">
+        <field name="name">Raffle participant: allowed companies</field>
+        <field name="model_id" ref="model_event_raffle_participant" />
+        <field name="domain_force">[('raffle_id.company_id', 'in', company_ids + [False])]</field>
+    </record>
+    <record id="event_raffle_draw_rule_company" model="ir.rule">
+        <field name="name">Raffle draw: allowed companies</field>
+        <field name="model_id" ref="model_event_raffle_draw" />
+        <field name="domain_force">[('raffle_id.company_id', 'in', company_ids + [False])]</field>
+    </record>
+    <record id="event_raffle_draw_notification_rule_company" model="ir.rule">
+        <field name="name">Raffle draw notification: allowed companies</field>
+        <field name="model_id" ref="model_event_raffle_draw_notification" />
+        <field name="domain_force">[('draw_id.raffle_id.company_id', 'in', company_ids + [False])]</field>
+    </record>
+</odoo>

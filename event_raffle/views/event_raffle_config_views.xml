@@ -26,7 +26,30 @@
                             <field name="default_flag_text" />
                         </group>
                     </group>
-                    <p class="text-muted">These values are applied by default when a new raffle is created.</p>
+                    <group string="Messages" name="messages">
+                        <group string="Winner Notification" name="winner_notification">
+                            <field name="default_notify_winner_auto" />
+                            <field
+                                name="default_notify_winner_message"
+                                placeholder="You won a prize, come and claim it! {link}"
+                            />
+                        </group>
+                        <group string="Channel Announcement" name="announce_channel">
+                            <field name="default_announce_channel_auto" />
+                            <field
+                                name="default_announce_channel_id"
+                                required="default_announce_channel_auto"
+                                options="{'no_create': True}"
+                            />
+                            <field
+                                name="default_announce_channel_message"
+                                placeholder="Draw #{number}: {winner} won! ({prize}) {link}"
+                            />
+                        </group>
+                    </group>
+                    <p class="text-muted" name="defaults_note">
+                        These values are applied by default when a new raffle is created.
+                    </p>
                 </sheet>
             </form>
         </field>

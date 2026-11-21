@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-05 06:35+0000\n"
-"PO-Revision-Date: 2026-10-05 06:35+0000\n"
+"POT-Creation-Date: 2026-11-16 05:55+0000\n"
+"PO-Revision-Date: 2026-11-16 05:55+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -47,6 +47,20 @@ msgid "# Winners"
 msgstr ""
 
 #. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/models/event_raffle_draw.py:0
+msgid "%s is not a channel or a group chat."
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/models/event_raffle.py:0
+msgid ""
+"%s is not a channel or a group chat: the draws are announced in one of those"
+" only."
+msgstr ""
+
+#. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__is_absent
 msgid "Absent"
 msgstr ""
@@ -82,10 +96,38 @@ msgid "Activity Type Icon"
 msgstr ""
 
 #. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle__announce_channel_auto
+msgid ""
+"After each draw, OdooBot posts the channel message in the discussion "
+"channel, which the user who draws does not need to join. An archived or "
+"deleted channel gets no message, and a note on the draw says so."
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle__notify_winner_auto
+msgid ""
+"After each draw, OdooBot sends the notification message to the winner: a "
+"private chat in Discuss when the winner contact has an internal user "
+"account, an email otherwise. A winner with neither gets no message, and a "
+"note on the draw says so."
+msgstr ""
+
+#. module: event_raffle
 #: model:ir.model.fields,help:event_raffle.field_event_raffle__tux_animation
 msgid ""
 "Animation that Tux plays before each draw. 'Rotate' cycles through all the "
 "available animations."
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__announce_channel_auto
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_announce_channel_auto
+msgid "Announce Each Draw in a Channel"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle_draw__notified
+msgid "At least one notification was sent to the winner."
 msgstr ""
 
 #. module: event_raffle
@@ -106,6 +148,7 @@ msgid "Bottom (180°)"
 msgstr ""
 
 #. module: event_raffle
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_draw_notify_wizard_form
 #: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_start_wizard_form
 msgid "Cancel"
 msgstr ""
@@ -119,6 +162,63 @@ msgstr ""
 #. module: event_raffle
 #: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
 msgid "Celebration & Animation"
+msgstr ""
+
+#. module: event_raffle
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_view_form
+msgid "Channel Announcement"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__announce_channel_message
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_announce_channel_message
+msgid "Channel Message"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle_config__default_announce_channel_message
+msgid ""
+"Channel message of each new raffle. Empty, a new raffle gets the standard "
+"message, in the language of the user who creates it. {winner} or {gagnant} "
+"gives the winner name shown on the draw, {number} or {numéro} the draw "
+"number, {raffle} or {tirage} the raffle name, {prize} or {prix} the prize of"
+" the draw, {link} or {lien} the prize link when the draw has one. A "
+"placeholder without a value disappears, and so do its parentheses when it "
+"stands alone in them, such as ({prize})."
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle__announce_channel_id
+msgid "Channel or group chat of Discuss where OdooBot announces each draw."
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notification__channel__chat
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notify_wizard__delivery__chat
+msgid "Chat"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle_draw_notification__message_id
+msgid ""
+"Chat message posted in Discuss, or the message behind the queued email."
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/models/event_raffle.py:0
+msgid ""
+"Choose the discussion channel where each draw is announced, or stop "
+"announcing the draws."
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/models/event_raffle_config.py:0
+msgid ""
+"Choose the discussion channel where the new raffles announce each draw, or "
+"stop announcing the draws by default."
 msgstr ""
 
 #. module: event_raffle
@@ -159,9 +259,16 @@ msgid "Context..."
 msgstr ""
 
 #. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__discuss_channel_id
+msgid "Conversation"
+msgstr ""
+
+#. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__create_uid
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__create_uid
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__create_uid
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__create_uid
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__create_uid
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_participant__create_uid
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_start_wizard__create_uid
 msgid "Created by"
@@ -171,6 +278,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__create_date
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__create_date
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__create_date
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__create_date
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__create_date
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_participant__create_date
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_start_wizard__create_date
 msgid "Created on"
@@ -190,6 +299,7 @@ msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__date
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__date
 msgid "Date"
 msgstr ""
 
@@ -267,6 +377,17 @@ msgid "Default Winner Celebration"
 msgstr ""
 
 #. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__channel
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__delivery
+msgid "Delivery"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__delivery_info
+msgid "Delivery Info"
+msgstr ""
+
+#. module: event_raffle
 #. odoo-javascript
 #: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
 msgid "Description:"
@@ -279,9 +400,24 @@ msgid "Diabolo juggling"
 msgstr ""
 
 #. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__announce_channel_id
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_announce_channel_id
+msgid "Discussion Channel"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle_config__default_announce_channel_id
+msgid ""
+"Discussion channel of each new raffle, channel or group chat of Discuss. A "
+"channel archived or deleted since is not given to the new raffles."
+msgstr ""
+
+#. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__display_name
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__display_name
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__display_name
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__display_name
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__display_name
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_participant__display_name
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_start_wizard__display_name
 msgid "Display Name"
@@ -298,6 +434,8 @@ msgid "Draft"
 msgstr ""
 
 #. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__draw_id
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__draw_id
 #: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_draw_view_form
 msgid "Draw"
 msgstr ""
@@ -311,6 +449,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/event_raffle/models/event_raffle_draw.py:0
 msgid "Draw #%s"
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/models/event_raffle.py:0
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
+msgid "Draw #{number}: {winner} won! ({prize}) {link}"
 msgstr ""
 
 #. module: event_raffle
@@ -338,7 +483,10 @@ msgid "Eligible:"
 msgstr ""
 
 #. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__mail_id
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_participant__email
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notification__channel__email
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notify_wizard__delivery__email
 msgid "Email"
 msgstr ""
 
@@ -449,6 +597,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__id
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__id
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__id
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__id
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__id
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_participant__id
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_start_wizard__id
 msgid "ID"
@@ -504,6 +654,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__write_uid
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__write_uid
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__write_uid
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__write_uid
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__write_uid
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_participant__write_uid
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_start_wizard__write_uid
 msgid "Last Updated by"
@@ -513,6 +665,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__write_date
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__write_date
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__write_date
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__write_date
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__write_date
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_participant__write_date
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_start_wizard__write_date
 msgid "Last Updated on"
@@ -558,14 +712,36 @@ msgid "Mark Present"
 msgstr ""
 
 #. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notify_wizard__sender__me
+msgid "Me"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__body
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__body
+msgid "Message"
+msgstr ""
+
+#. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__message_has_error
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__message_has_error
 msgid "Message Delivery error"
 msgstr ""
 
 #. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle__notify_winner_message
+msgid ""
+"Message sent to each winner when the winner is notified automatically. While"
+" that is on, the Notify button of a draw proposes it too. It takes the "
+"placeholders of the channel message: {winner} or {gagnant}, {number} or "
+"{numéro}, {raffle} or {tirage}, {prize} or {prix}, and {link} or {lien}, the"
+" prize link when the draw has one. A placeholder without a value disappears."
+msgstr ""
+
+#. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__message_ids
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__message_ids
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
 msgid "Messages"
 msgstr ""
 
@@ -581,6 +757,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__name
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_participant__name
 msgid "Name"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle_draw_notification__recipient
+msgid ""
+"Name of the winner contact, or the email address the notification was sent "
+"to."
 msgstr ""
 
 #. module: event_raffle
@@ -632,6 +815,78 @@ msgid "Not enough participants left for a draw"
 msgstr ""
 
 #. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notify_wizard__delivery__none
+msgid "Not possible"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__notify_winner_message
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_notify_winner_message
+msgid "Notification Message"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle_config__default_notify_winner_message
+msgid ""
+"Notification message of each new raffle. Empty, a new raffle gets the "
+"standard message, in the language of the user who creates it. It takes the "
+"placeholders of the raffle message: {winner} or {gagnant}, {number} or "
+"{numéro}, {raffle} or {tirage}, {prize} or {prix}, and {link} or {lien}, the"
+" prize link when the draw has one. A placeholder without a value disappears."
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
+msgid "Notification sent by chat by %s."
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
+msgid "Notification sent by email by %s."
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__notification_count
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_draw_view_form
+msgid "Notifications"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__notification_ids
+msgid "Notifications Sent"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__notified
+msgid "Notified"
+msgstr ""
+
+#. module: event_raffle
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_draw_view_form
+msgid "Notify"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model,name:event_raffle.model_event_raffle_draw_notify_wizard
+msgid "Notify a Raffle Winner"
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/models/event_raffle_draw.py:0
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_draw_notify_wizard_form
+msgid "Notify the Winner"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__notify_winner_auto
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_notify_winner_auto
+msgid "Notify the Winner Automatically"
+msgstr ""
+
+#. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__message_needaction_counter
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__message_needaction_counter
 msgid "Number of Actions"
@@ -661,6 +916,16 @@ msgid "Number of messages with delivery error"
 msgstr ""
 
 #. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle_draw__notification_count
+msgid "Number of notifications sent to the winner from this draw."
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notify_wizard__sender__odoobot
+msgid "OdooBot"
+msgstr ""
+
+#. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__participant_ids
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_start_wizard__copy_strategy
 #: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_view_form
@@ -674,6 +939,15 @@ msgid "Peace"
 msgstr ""
 
 #. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle_draw_notify_wizard__body
+msgid ""
+"Placeholders are replaced when the message is sent: {winner} or {gagnant}, "
+"{number} or {numéro}, {raffle} or {tirage}, {prize} or {prix}, and {link} or"
+" {lien}, the prize link when the draw has one. A placeholder without a value"
+" disappears."
+msgstr ""
+
+#. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__pointer_angle
 msgid "Pointer Angle"
 msgstr ""
@@ -684,6 +958,11 @@ msgid ""
 "Position of the pointer on the wheel, in degrees clockwise from the top: 0 "
 "at the top, 90 on the right, 180 at the bottom, -90 on the left. The winner "
 "stops under the pointer."
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__message_id
+msgid "Posted Message"
 msgstr ""
 
 #. module: event_raffle
@@ -772,6 +1051,11 @@ msgid "Raffle Draw"
 msgstr ""
 
 #. module: event_raffle
+#: model:ir.model,name:event_raffle.model_event_raffle_draw_notification
+msgid "Raffle Draw Notification"
+msgstr ""
+
+#. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_start_wizard__name
 msgid "Raffle Name"
 msgstr ""
@@ -829,6 +1113,18 @@ msgid "Rave (lasers)"
 msgstr ""
 
 #. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__notification_read
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__is_read
+msgid "Read"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__recipient
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__recipient
+msgid "Recipient"
+msgstr ""
+
+#. module: event_raffle
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_start_wizard__copy_strategy__registered_and_present
 msgid "Registered and present"
 msgstr ""
@@ -866,6 +1162,21 @@ msgstr ""
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__tux_animation__rotate
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_tux_animation__rotate
 msgid "Rotate (cycle through all)"
+msgstr ""
+
+#. module: event_raffle
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_draw_notify_wizard_form
+msgid "Send"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__sender
+msgid "Send as"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__author_id
+msgid "Sender"
 msgstr ""
 
 #. module: event_raffle
@@ -958,12 +1269,80 @@ msgid ""
 msgstr ""
 
 #. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle__announce_channel_message
+msgid ""
+"Text posted in the channel after each draw. {winner} or {gagnant} gives the "
+"winner name shown on the draw, {number} or {numéro} the draw number, "
+"{raffle} or {tirage} the raffle name, {prize} or {prix} the prize of the "
+"draw, {link} or {lien} the prize link when the draw has one. A placeholder "
+"without a value disappears, and so do its parentheses when it stands alone "
+"in them, such as ({prize}). Any other text in braces stays as typed."
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/models/event_raffle_draw.py:0
+msgid "The automatic notification could not be sent: %s"
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/models/event_raffle_draw.py:0
+msgid "The draw could not be announced in the channel: %s"
+msgstr ""
+
+#. module: event_raffle
 #. odoo-python
 #: code:addons/event_raffle/wizard/event_raffle_start_wizard.py:0
 msgid ""
 "The event '%s' has no questionnaire question: no attendee can have filled in"
 " the questionnaire. Add a question of type Selection or Text Input, or "
 "choose another type of participants."
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
+msgid "The message is empty."
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
+msgid ""
+"The winner has an internal user account: the message is sent as a private "
+"chat in Discuss."
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
+msgid ""
+"The winner has neither an internal user account nor an email address, so no "
+"notification can be sent. Add an email to the draw or to the winner contact "
+"first."
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
+msgid ""
+"The winner has no internal user account (a portal account does not see "
+"Discuss): the message is sent by email."
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle_draw__notification_read
+msgid ""
+"The winner has seen the latest chat notification in Discuss. An email "
+"notification never counts as read."
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle_draw_notification__is_read
+msgid ""
+"The winner has seen this chat message in Discuss. Always unticked for an "
+"email, whose reading Odoo cannot know."
 msgstr ""
 
 #. module: event_raffle
@@ -1003,6 +1382,23 @@ msgstr ""
 #: model:ir.model.fields,help:event_raffle.field_event_raffle__activity_exception_decoration
 #: model:ir.model.fields,help:event_raffle.field_event_raffle_draw__activity_exception_decoration
 msgid "Type of the exception activity on record."
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle_config__default_announce_channel_auto
+msgid ""
+"Value of this option on each new raffle: after each draw, OdooBot posts the "
+"channel message in the discussion channel. A new raffle has it on only while"
+" the discussion channel below is active. The existing raffles keep their own"
+" value."
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle_config__default_notify_winner_auto
+msgid ""
+"Value of this option on each new raffle: after each draw, OdooBot sends the "
+"notification message to the winner. The existing raffles keep their own "
+"value."
 msgstr ""
 
 #. module: event_raffle
@@ -1066,6 +1462,12 @@ msgid "Winner Name"
 msgstr ""
 
 #. module: event_raffle
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_view_form
+msgid "Winner Notification"
+msgstr ""
+
+#. module: event_raffle
 #. odoo-python
 #: code:addons/event_raffle/models/event_raffle_draw.py:0
 msgid "Winner marked absent."
@@ -1095,9 +1497,44 @@ msgid ""
 msgstr ""
 
 #. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/models/event_raffle.py:0
+msgid ""
+"Write the message posted in the channel after each draw, or stop announcing "
+"the draws."
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/models/event_raffle.py:0
+msgid ""
+"Write the notification message sent to the winners, or stop notifying them "
+"automatically."
+msgstr ""
+
+#. module: event_raffle
 #. odoo-javascript
 #: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
 msgid "Yes"
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
+msgid "You cannot send a chat message to yourself. Choose OdooBot."
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/models/event_raffle.py:0
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
+msgid "You won a prize, come and claim it! {link}"
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
+msgid "You won a prize: %s"
 msgstr ""
 
 #. module: event_raffle
@@ -1110,6 +1547,18 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/event_raffle/static/src/wheel/raffle_wheel.xml:0
 msgid "raffle@tux: ~"
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/models/event_raffle_draw.py:0
+msgid "the discussion channel %s is archived."
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/models/event_raffle_draw.py:0
+msgid "the raffle has no discussion channel."
 msgstr ""
 
 #. module: event_raffle

@@ -62,6 +62,9 @@
                                     <field name="comment" />
                                     <field name="is_absent" />
                                     <field name="date" />
+                                    <field name="notified" optional="show" />
+                                    <field name="notification_read" optional="show" />
+                                    <field name="notification_count" optional="show" />
                                     <field name="name" optional="hide" />
                                     <field name="partner_id" optional="hide" />
                                     <field name="winner_participant_id" optional="hide" />
@@ -86,6 +89,28 @@
                                     name="flag_text"
                                     placeholder="Vive le logiciel libre"
                                     invisible="tux_animation not in ('rotate', 'flag')"
+                                />
+                            </group>
+                            <group string="Winner Notification" name="winner_notification">
+                                <field name="notify_winner_auto" />
+                                <field
+                                    name="notify_winner_message"
+                                    invisible="not notify_winner_auto"
+                                    required="notify_winner_auto"
+                                />
+                            </group>
+                            <group string="Channel Announcement" name="announce_channel">
+                                <field name="announce_channel_auto" />
+                                <field
+                                    name="announce_channel_id"
+                                    invisible="not announce_channel_auto"
+                                    required="announce_channel_auto"
+                                    options="{'no_create': True}"
+                                />
+                                <field
+                                    name="announce_channel_message"
+                                    invisible="not announce_channel_auto"
+                                    required="announce_channel_auto"
                                 />
                             </group>
                         </page>

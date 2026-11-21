@@ -14,6 +14,9 @@
                 <field name="comment" />
                 <field name="is_absent" />
                 <field name="date" />
+                <field name="notified" optional="show" />
+                <field name="notification_read" optional="show" />
+                <field name="notification_count" optional="show" />
                 <field name="name" optional="hide" />
                 <field name="partner_id" optional="hide" />
                 <field name="winner_participant_id" optional="hide" />
@@ -43,6 +46,12 @@
                         class="btn-secondary"
                         invisible="not is_absent"
                     />
+                    <button
+                        name="action_open_notify_wizard"
+                        type="object"
+                        string="Notify"
+                        class="btn-secondary"
+                    />
                 </header>
                 <sheet>
                     <group>
@@ -61,6 +70,9 @@
                             <field name="date" />
                             <field name="prize_received" />
                             <field name="prize_received_date" />
+                            <field name="notified" />
+                            <field name="notification_read" />
+                            <field name="notification_count" />
                         </group>
                     </group>
                     <group string="Comment">
@@ -69,6 +81,18 @@
                             nolabel="1"
                             placeholder="Prize hand-over, contact details, follow-up..."
                         />
+                    </group>
+                    <group string="Notifications" invisible="not notification_ids">
+                        <field name="notification_ids" nolabel="1" colspan="2" readonly="1">
+                            <list>
+                                <field name="date" />
+                                <field name="channel" />
+                                <field name="author_id" />
+                                <field name="recipient" />
+                                <field name="body" />
+                                <field name="is_read" />
+                            </list>
+                        </field>
                     </group>
                 </sheet>
                 <chatter />

@@ -9,3 +9,7 @@ access_event_raffle_start_wizard_user,event.raffle.start.wizard user,model_event
 access_event_raffle_start_wizard_manager,event.raffle.start.wizard manager,model_event_raffle_start_wizard,event.group_event_manager,1,1,1,1
 access_event_raffle_config_user,event.raffle.config user,model_event_raffle_config,event.group_event_user,1,0,0,0
 access_event_raffle_config_manager,event.raffle.config manager,model_event_raffle_config,event.group_event_manager,1,1,1,0
+access_event_raffle_draw_notification_user,event.raffle.draw.notification user,model_event_raffle_draw_notification,event.group_event_user,1,0,0,0
+access_event_raffle_draw_notification_manager,event.raffle.draw.notification manager,model_event_raffle_draw_notification,event.group_event_manager,1,0,0,1
+access_event_raffle_draw_notify_wizard_user,event.raffle.draw.notify.wizard user,model_event_raffle_draw_notify_wizard,event.group_event_user,1,1,1,0
+access_event_raffle_draw_notify_wizard_manager,event.raffle.draw.notify.wizard manager,model_event_raffle_draw_notify_wizard,event.group_event_manager,1,1,1,1
