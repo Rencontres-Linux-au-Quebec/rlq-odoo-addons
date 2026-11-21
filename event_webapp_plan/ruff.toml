@@ -1,0 +1,18 @@
+# Configuration de ruff pour event_webapp_plan.
+#
+# Volontairement RESTREINTE aux règles qui détectent de vrais bogues : erreurs
+# de syntaxe (E9), erreurs d'instruction (E7), imports mal placés (E4), pyflakes
+# (F : noms indéfinis, imports et variables inutilisés...) et bugbear (B : pièges
+# classiques). Le style (longueur de ligne, tri des imports) relève de black et
+# isort, réglés dans le pyproject.toml du dépôt ERPLibre.
+target-version = "py310"   # Odoo 18 exige Python 3.10 ou plus
+line-length = 79
+
+[lint]
+select = ["E4", "E7", "E9", "F", "B"]
+
+[lint.per-file-ignores]
+# Odoo EXIGE ces imports : c'est ainsi que les modèles sont chargés.
+"__init__.py" = ["F401"]
+# Le manifeste est un simple dictionnaire, pas du code à exécuter.
+"__manifest__.py" = ["B018"]

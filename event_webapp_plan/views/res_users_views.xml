@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
+    Copyright (C) 2026 Rencontres Linux au Québec contributors
+    License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+
+    The display preferences of the event web app in the "My Preferences"
+    form of internal users. Portal users switch them from the web app.
+-->
+<odoo>
+    <record id="view_users_form_simple_modif_ewp" model="ir.ui.view">
+        <field name="name">res.users.preferences.event_webapp_plan</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form_simple_modif" />
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='signature']" position="before">
+                <group name="ewp_preferences" string="Event web app">
+                    <field name="ewp_text_only" readonly="0" />
+                    <field name="ewp_motion" readonly="0" widget="radio" />
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

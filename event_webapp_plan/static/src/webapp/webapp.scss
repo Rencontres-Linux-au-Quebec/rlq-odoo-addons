@@ -1,0 +1,2158 @@
+// Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
+// Copyright (C) 2026 Rencontres Linux au Québec contributors
+// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+//
+// Style of the event web app pages. The bundle is loaded only by those pages,
+// and every rule still sits under the body class .o_ewp_webapp so that the
+// file stays harmless if another bundle ever includes it. Mobile first: the
+// base rules target a phone, the media queries widen the layout (640 px:
+// tablet, 1024 px: wide screen with the side column).
+// Colours are CSS custom properties; the dark scheme only swaps their values.
+// The app bars are dark in both schemes.
+//
+// Accessibility: the skip links show on focus only; the display options
+// (footer .o_ewp_prefs) are toggle buttons whose pressed state is drawn as a
+// check box (text-only mode) or a radio dot (animation mode), not by colour
+// alone. Every animation and transition under the body stops with the body
+// classes o_ewp_motion_off and o_ewp_motion_paused (mode "off" or text-only
+// mode), and with prefers-reduced-motion under o_ewp_motion_auto; the mode
+// "on" (o_ewp_motion_on) keeps them whatever the device asks. A theme puts
+// its animations inside @include ewp-motion-allowed (below), the one rule
+// set of that condition. The body class o_ewp_text_only lays every page
+// out as one column and swaps the icons for their text.
+//
+// Fonts: Inter (text) and Space Grotesk (headings), variable woff2 files of
+// the latin and latin-ext subsets served from the module (fonts/, SIL Open
+// Font License 1.1, texts beside them, files of the @fontsource-variable npm
+// packages). No request leaves the Odoo server. The family names carry a
+// prefix so that they never collide with a font of another bundle. The
+// font URLs are relative: the asset bundle rewrites a relative url()
+// against the folder of this file.
+
+$ewp-latin: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F,
+    U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+$ewp-latin-ext: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF,
+    U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+
+@font-face {
+    font-family: "Ewp Inter";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 100 900;
+    src: url("fonts/inter-latin-ext-wght-normal.woff2") format("woff2");
+    unicode-range: $ewp-latin-ext;
+}
+
+@font-face {
+    font-family: "Ewp Inter";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 100 900;
+    src: url("fonts/inter-latin-wght-normal.woff2") format("woff2");
+    unicode-range: $ewp-latin;
+}
+
+@font-face {
+    font-family: "Ewp Space Grotesk";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 300 700;
+    src: url("fonts/space-grotesk-latin-ext-wght-normal.woff2") format("woff2");
+    unicode-range: $ewp-latin-ext;
+}
+
+@font-face {
+    font-family: "Ewp Space Grotesk";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 300 700;
+    src: url("fonts/space-grotesk-latin-wght-normal.woff2") format("woff2");
+    unicode-range: $ewp-latin;
+}
+
+// Rules that apply only while animations may run, written once: on the
+// body (.o_ewp_webapp) under the mode "on", or under the mode "auto" while
+// the device does not ask for reduced motion. The mixin takes the body as
+// its parent selector: @include it directly inside .o_ewp_webapp { }.
+@mixin ewp-motion-allowed {
+    &.o_ewp_motion_on {
+        @content;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        &.o_ewp_motion_auto {
+            @content;
+        }
+    }
+}
+
+.o_ewp_webapp {
+    --ewp-ground: #f4f5f1;
+    --ewp-surface: #ffffff;
+    --ewp-surface-2: #f4f5f1;
+    --ewp-surface-hover: #e9ebe5;
+    --ewp-border: #daddd6;
+    --ewp-rule: #eceee9;
+    --ewp-dashed: #b9bfb5;
+    --ewp-ink: #15191e;
+    --ewp-ink-soft: #2a3036;
+    --ewp-muted: #545b63;
+    --ewp-accent: #1d5fa8;
+    --ewp-accent-hover: #164a84;
+    // Background of a hovered button, under white text: the dark scheme
+    // keeps it, unlike --ewp-accent-hover, which is link text there.
+    --ewp-button-hover: #164a84;
+    --ewp-accent-text: #1d5fa8;
+    --ewp-warm: #b4470f;
+    --ewp-warm-soft: #fbebdd;
+    --ewp-success: #1e7a4c;
+    --ewp-success-soft: #e1f2e8;
+    --ewp-success-text: #1e5e3c;
+    --ewp-preview-bg: #fff1c7;
+    --ewp-preview-text: #5c4300;
+    --ewp-preview-line: #e8d48f;
+    --ewp-plan-ground: #e7eae3;
+    --ewp-room-default: #2a9d8f;
+    --ewp-focus: #1d5fa8;
+    // App bars, closed page and video band: dark in both schemes.
+    --ewp-bar: #15191e;
+    --ewp-bar-2: #2b3138;
+    --ewp-bar-3: #22282f;
+    --ewp-bar-line: #4a525b;
+    --ewp-bar-muted: #c9ced4;
+    --ewp-bar-focus: #f5c04a;
+    --ewp-bar-ink: #ffffff;
+    --ewp-dot-open: #9be2b9;
+    --ewp-dot-closed: #f5c04a;
+    --ewp-video: #0e1114;
+    --ewp-video-2: #1b2026;
+    --ewp-video-black: #000000;
+    // Text on an accent button; the "Live" pill.
+    --ewp-on-accent: #ffffff;
+    --ewp-live: #b4470f;
+    --ewp-live-ink: #ffffff;
+    // Room numbers and labels laid on the plan image, and the ring of a
+    // highlighted area.
+    --ewp-plan-label-bg: #ffffff;
+    --ewp-plan-label-ink: #15191e;
+    --ewp-hotspot-ring: rgba(255, 255, 255, 0.85);
+    --ewp-font: "Ewp Inter", Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --ewp-font-head: "Ewp Space Grotesk", "Space Grotesk", var(--ewp-font);
+    --ewp-radius-2xs: 4px;
+    --ewp-radius-xs: 8px;
+    --ewp-radius-sm: 10px;
+    --ewp-radius-md: 12px;
+    --ewp-radius: 14px;
+    --ewp-radius-lg: 16px;
+    --ewp-radius-xl: 18px;
+    --ewp-radius-pill: 999px;
+
+    margin: 0;
+    min-height: 100vh;
+    background: var(--ewp-ground);
+    color: var(--ewp-ink);
+    font-family: var(--ewp-font);
+    font-size: 16px;
+    line-height: 1.45;
+    -webkit-text-size-adjust: 100%;
+    color-scheme: light dark;
+    overflow-wrap: break-word;
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    a {
+        color: var(--ewp-accent-text);
+    }
+
+    a:hover {
+        color: var(--ewp-accent-hover);
+    }
+
+    a:focus-visible,
+    button:focus-visible,
+    iframe:focus-visible,
+    [tabindex]:focus-visible {
+        outline: 3px solid var(--ewp-focus);
+        outline-offset: 2px;
+    }
+
+    // Targets of the skip links and of a script focus (main, a heading):
+    // the focus moves there to set the reading position, it is not a
+    // control.
+    [tabindex="-1"]:focus {
+        outline: none;
+    }
+
+    // ---- Skip links: hidden until focused --------------------------------
+    .o_ewp_skip {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+
+        &:focus {
+            position: fixed;
+            top: 8px;
+            left: 8px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            width: auto;
+            height: auto;
+            min-height: 44px;
+            padding: 0 16px;
+            overflow: visible;
+            clip: auto;
+            border-radius: var(--ewp-radius-md);
+            background: var(--ewp-surface);
+            color: var(--ewp-accent-text);
+            font-weight: 600;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+        }
+    }
+
+    // ---- Animations: stopped on demand -----------------------------------
+    &.o_ewp_motion_off,
+    &.o_ewp_motion_paused {
+        *,
+        *::before,
+        *::after {
+            animation: none !important;
+            transition: none !important;
+            scroll-behavior: auto !important;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        &.o_ewp_motion_auto {
+            *,
+            *::before,
+            *::after {
+                animation: none !important;
+                transition: none !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    }
+
+    h1,
+    h2,
+    h3 {
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    h1,
+    h2 {
+        font-family: var(--ewp-font-head);
+    }
+
+    h2 {
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    h3 {
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    // Line icons: stroked with the text colour.
+    .o_ewp_icon {
+        flex: none;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .o_ewp_icon_warm {
+        color: var(--ewp-warm);
+    }
+
+    // Read by screen readers, invisible on screen.
+    .o_ewp_sr_only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    .o_ewp_hint {
+        margin: 0;
+        color: var(--ewp-muted);
+        font-size: 14px;
+    }
+
+    // ---- Preview banner (moderators outside the window) ------------------
+    .o_ewp_preview_banner {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 16px;
+        background: var(--ewp-preview-bg);
+        color: var(--ewp-preview-text);
+        border-bottom: 1px solid var(--ewp-preview-line);
+        font-size: 14px;
+
+        .o_ewp_icon {
+            margin-top: 1px;
+            stroke-width: 2;
+        }
+
+        strong {
+            font-weight: 600;
+        }
+    }
+
+    // ---- Dark app bars ---------------------------------------------------
+    .o_ewp_topbar,
+    .o_ewp_closed {
+        --ewp-focus: var(--ewp-bar-focus);
+        background: var(--ewp-bar);
+        color: var(--ewp-bar-ink);
+
+        a {
+            color: var(--ewp-bar-ink);
+        }
+    }
+
+    .o_ewp_logo {
+        grid-area: logo;
+        display: flex;
+        width: 36px;
+        height: 36px;
+        border-radius: var(--ewp-radius-sm);
+        overflow: hidden;
+        background: var(--ewp-accent);
+
+        img {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    .o_ewp_app_label {
+        grid-area: label;
+        align-self: center;
+        color: var(--ewp-bar-muted);
+        font-size: 13px;
+        letter-spacing: 0.02em;
+    }
+
+    // Home header: logo, label and user on the first row, then the day.
+    .o_ewp_dayhead {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        grid-template-areas:
+            "logo label user"
+            "title title title"
+            "meta meta meta";
+        align-items: center;
+        column-gap: 10px;
+        row-gap: 8px;
+        padding: 16px 16px 20px;
+        padding-top: calc(16px + env(safe-area-inset-top));
+    }
+
+    .o_ewp_user {
+        grid-area: user;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .o_ewp_avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--ewp-bar-2);
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .o_ewp_user_name {
+        display: none;
+        color: var(--ewp-bar-muted);
+        font-size: 14px;
+    }
+
+    .o_ewp_user_role::before {
+        content: "\00B7\00A0";
+    }
+
+    .o_ewp_logout {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 44px;
+        min-height: 44px;
+        border-radius: var(--ewp-radius-sm);
+        text-decoration: none;
+
+        &,
+        &:hover {
+            color: var(--ewp-bar-muted);
+        }
+    }
+
+    .o_ewp_logout_text {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+    }
+
+    .o_ewp_day_title {
+        grid-area: title;
+        margin-top: 6px;
+        font-size: 28px;
+        line-height: 1.15;
+        font-weight: 700;
+    }
+
+    .o_ewp_day_meta {
+        grid-area: meta;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .o_ewp_window {
+        color: var(--ewp-bar-muted);
+        font-size: 14px;
+    }
+
+    // ---- Pills -----------------------------------------------------------
+    .o_ewp_pill {
+        display: inline-flex;
+        flex: none;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        border-radius: var(--ewp-radius-pill);
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.2;
+        white-space: nowrap;
+    }
+
+    .o_ewp_pill_dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .o_ewp_pill_open {
+        background: var(--ewp-success);
+        color: var(--ewp-bar-ink);
+
+        .o_ewp_pill_dot {
+            background: var(--ewp-dot-open);
+        }
+    }
+
+    .o_ewp_pill_closed {
+        background: var(--ewp-bar-2);
+        color: var(--ewp-bar-ink);
+
+        .o_ewp_pill_dot {
+            background: var(--ewp-dot-closed);
+        }
+    }
+
+    .o_ewp_pill_video {
+        gap: 4px;
+        padding: 3px 8px;
+        background: var(--ewp-warm-soft);
+        color: var(--ewp-warm);
+        font-size: 12px;
+
+        .o_ewp_icon {
+            stroke-width: 2;
+        }
+    }
+
+    .o_ewp_pill_onair {
+        padding: 4px 9px;
+        background: var(--ewp-live);
+        color: var(--ewp-live-ink);
+        font-size: 12px;
+
+        .o_ewp_pill_dot {
+            width: 7px;
+            height: 7px;
+            background: var(--ewp-live-ink);
+        }
+    }
+
+    // ---- Home page -------------------------------------------------------
+    // On phones the column wrappers vanish (display: contents) and the
+    // cards follow the DOM order, which is the reading order.
+    .o_ewp_main {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 16px;
+        padding-bottom: calc(24px + env(safe-area-inset-bottom));
+    }
+
+    .o_ewp_column {
+        display: contents;
+    }
+
+    .o_ewp_card {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-width: 0;
+        padding: 16px;
+        background: var(--ewp-surface);
+        border: 1px solid var(--ewp-border);
+        border-radius: var(--ewp-radius);
+    }
+
+    .o_ewp_card_head {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .o_ewp_card_head_row {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .o_ewp_card_title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .o_ewp_message {
+        margin: 16px;
+        padding: 32px 16px;
+        text-align: center;
+
+        p {
+            margin: 0;
+        }
+    }
+
+    // ---- Announcement ----------------------------------------------------
+    .o_ewp_announcement {
+        gap: 10px;
+    }
+
+    .o_ewp_rich {
+        color: var(--ewp-ink-soft);
+        font-size: 15px;
+        line-height: 1.55;
+
+        p {
+            margin: 0 0 0.6em;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        > :last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    // ---- Links -----------------------------------------------------------
+    .o_ewp_links_card {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-width: 0;
+    }
+
+    ul.o_ewp_links,
+    ul.o_ewp_rooms,
+    ol.o_ewp_events,
+    ol.o_ewp_draws {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .o_ewp_links {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+
+        li {
+            display: flex;
+            min-width: 0;
+        }
+    }
+
+    .o_ewp_link {
+        display: flex;
+        flex: 1;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        min-width: 0;
+        min-height: 48px;
+        padding: 10px 12px;
+        background: var(--ewp-surface);
+        border: 1px solid var(--ewp-border);
+        border-radius: var(--ewp-radius-md);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+
+        &,
+        &:hover {
+            color: var(--ewp-ink);
+        }
+
+        &:hover {
+            border-color: var(--ewp-accent);
+        }
+
+        .o_ewp_icon {
+            color: var(--ewp-muted);
+            stroke-width: 2;
+        }
+    }
+
+    .o_ewp_link_text {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    .o_ewp_link_hint {
+        color: var(--ewp-muted);
+        font-size: 12px;
+        font-weight: 400;
+    }
+
+    // ---- Plan and rooms --------------------------------------------------
+    .o_ewp_plan {
+        position: relative;
+        border-radius: var(--ewp-radius-sm);
+        overflow: hidden;
+        background: var(--ewp-plan-ground);
+    }
+
+    .o_ewp_plan_image {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    // An area turns by --ewp-room-rotate (set by the server for a turned
+    // room) around its centre. The browser hit-tests the turned shape, and
+    // the rings (box-shadow) and the corner marks of other modules follow
+    // it; .o_ewp_plan clips the corners that leave the image. A theme that
+    // adds a transform to the area keeps this rotation in its value.
+    .o_ewp_hotspot {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid var(--ewp-room-color, var(--ewp-room-default));
+        border-radius: var(--ewp-radius-2xs);
+        text-decoration: none;
+        transform: rotate(var(--ewp-room-rotate, 0deg));
+        transition: box-shadow 0.15s ease;
+        // Size container of its label: see .o_ewp_hotspot_label.
+        container-type: size;
+
+        &::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: var(--ewp-room-color, var(--ewp-room-default));
+            opacity: 0.2;
+            transition: opacity 0.15s ease;
+        }
+
+        &:hover::before,
+        &:focus-visible::before,
+        &.o_ewp_hotspot_active::before {
+            opacity: 0.4;
+        }
+
+        &:hover,
+        &:focus-visible,
+        &.o_ewp_hotspot_active {
+            z-index: 2;
+            box-shadow: 0 0 0 3px var(--ewp-hotspot-ring);
+        }
+    }
+
+    // Room whose meeting runs (data-ewp-live, set by the page script): a
+    // ring in the live colour, still, so the signal never rests on motion;
+    // a theme may animate it.
+    .o_ewp_hotspot[data-ewp-live] {
+        box-shadow: 0 0 0 3px var(--ewp-live);
+
+        &:hover,
+        &:focus-visible,
+        &.o_ewp_hotspot_active {
+            box-shadow: 0 0 0 3px var(--ewp-hotspot-ring), 0 0 0 6px var(--ewp-live);
+        }
+    }
+
+    .o_ewp_room_link[data-ewp-live] .o_ewp_pill_video,
+    .o_ewp_pill_live[hidden] {
+        display: none;
+    }
+
+    // Phones show the room number on the plan, wide screens its name.
+    .o_ewp_hotspot_number {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--ewp-plan-label-bg);
+        color: var(--ewp-plan-label-ink);
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    // The number and the label turn back by the angle of their area, so
+    // they stay level and readable. They never take the pointer: a label
+    // wider than the turned shape lies over the neighbours, and the click
+    // there belongs to the area under it, not to the room of the label.
+    .o_ewp_hotspot_number,
+    .o_ewp_hotspot_label {
+        transform: rotate(calc(-1 * var(--ewp-room-rotate, 0deg)));
+        pointer-events: none;
+    }
+
+    // At rest, the label fits the level line across the centre of the
+    // turned shape: for an area w x h turned by a, that line is
+    // min(w / |cos a|, h / |sin a|) long, capped here at w as for a level
+    // area. max(sin, -sin, 0.01) is |sin a| without abs(), never 0. A
+    // browser without container units or sin() keeps max-width: 100%.
+    .o_ewp_hotspot_label {
+        position: relative;
+        display: none;
+        max-width: 100%;
+        max-width: #{"min(100cqw, 100cqh / max(sin(var(--ewp-room-rotate, 0deg)), -1 * sin(var(--ewp-room-rotate, 0deg)), 0.01))"};
+        padding: 4px 10px;
+        border-radius: var(--ewp-radius-pill);
+        background: var(--ewp-plan-label-bg);
+        color: var(--ewp-plan-label-ink);
+        font-size: 15px;
+        font-weight: 700;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    // A room narrower than its name truncates the label at rest; the
+    // highlighted room shows it in full, drawn above its neighbours.
+    .o_ewp_hotspot:hover .o_ewp_hotspot_label,
+    .o_ewp_hotspot:focus-visible .o_ewp_hotspot_label,
+    .o_ewp_hotspot.o_ewp_hotspot_active .o_ewp_hotspot_label {
+        max-width: none;
+        overflow: visible;
+    }
+
+    .o_ewp_rooms {
+        display: grid;
+        gap: 8px;
+    }
+
+    .o_ewp_room_link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 52px;
+        height: 100%;
+        padding: 8px 12px;
+        border-radius: var(--ewp-radius-sm);
+        background: var(--ewp-surface-2);
+        text-decoration: none;
+
+        &,
+        &:hover {
+            color: var(--ewp-ink);
+        }
+
+        &:hover,
+        &.o_ewp_room_active {
+            background: var(--ewp-surface-hover);
+        }
+
+        .o_ewp_chevron {
+            color: var(--ewp-muted);
+            stroke-width: 2;
+        }
+    }
+
+    .o_ewp_room_badge {
+        display: flex;
+        flex: none;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: var(--ewp-radius-xs);
+        background: var(--ewp-room-color, var(--ewp-room-default));
+        color: var(--ewp-room-ink, var(--ewp-on-accent));
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .o_ewp_room_text {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .o_ewp_room_name {
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .o_ewp_room_description {
+        color: var(--ewp-muted);
+        font-size: 13px;
+    }
+
+    // ---- Events ----------------------------------------------------------
+    .o_ewp_events {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .o_ewp_event {
+        display: flex;
+        gap: 12px;
+        padding: 10px 0;
+        border-top: 1px solid var(--ewp-rule);
+    }
+
+    .o_ewp_event_time {
+        flex: none;
+        width: 6.25rem;
+        color: var(--ewp-accent-text);
+        font-size: 13px;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .o_ewp_event_text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .o_ewp_event_name {
+        font-size: 15px;
+        font-weight: 500;
+    }
+
+    .o_ewp_event_address {
+        color: var(--ewp-muted);
+        font-size: 13px;
+    }
+
+    // ---- Raffles ---------------------------------------------------------
+    .o_ewp_updated {
+        color: var(--ewp-muted);
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    .o_ewp_raffles {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .o_ewp_raffles_apply {
+        align-self: flex-start;
+        border: 0;
+        font-family: inherit;
+        cursor: pointer;
+
+        &[hidden] {
+            display: none;
+        }
+    }
+
+    .o_ewp_raffle {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+
+        & + .o_ewp_raffle {
+            padding-top: 16px;
+            border-top: 1px solid var(--ewp-rule);
+        }
+    }
+
+    .o_ewp_raffle_head {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .o_ewp_raffle_title {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .o_ewp_raffle_progress {
+        color: var(--ewp-muted);
+        font-size: 13px;
+    }
+
+    .o_ewp_badge {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: var(--ewp-radius-pill);
+        background: var(--ewp-surface-2);
+        color: var(--ewp-ink);
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.2;
+        white-space: nowrap;
+    }
+
+    .o_ewp_state_in_progress {
+        background: var(--ewp-warm-soft);
+        color: var(--ewp-warm);
+    }
+
+    .o_ewp_state_done {
+        background: var(--ewp-success-soft);
+        color: var(--ewp-success-text);
+    }
+
+    .o_ewp_badge_absent {
+        flex: none;
+        background: var(--ewp-preview-bg);
+        color: var(--ewp-preview-text);
+    }
+
+    .o_ewp_draws {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .o_ewp_draw {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border: 1px solid transparent;
+        border-radius: var(--ewp-radius-sm);
+        background: var(--ewp-surface-2);
+    }
+
+    .o_ewp_draw_done {
+        background: var(--ewp-success-soft);
+    }
+
+    .o_ewp_draw_absent {
+        background: var(--ewp-surface-2);
+    }
+
+    .o_ewp_draw_pending {
+        border: 1px dashed var(--ewp-dashed);
+    }
+
+    .o_ewp_draw_seq {
+        display: flex;
+        flex: none;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--ewp-surface);
+        border: 1px solid var(--ewp-border);
+        font-size: 13px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .o_ewp_draw_body {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .o_ewp_draw_prize {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .o_ewp_draw_prize_description,
+    .o_ewp_to_draw {
+        color: var(--ewp-muted);
+        font-size: 13px;
+    }
+
+    .o_ewp_draw_winner {
+        color: var(--ewp-success-text);
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .o_ewp_draw_time {
+        margin-left: 4px;
+        color: var(--ewp-muted);
+        font-size: 12px;
+        font-weight: 400;
+    }
+
+    .o_ewp_draw_absent .o_ewp_draw_winner {
+        color: var(--ewp-muted);
+    }
+
+    .o_ewp_draw_absent .o_ewp_winner_name {
+        text-decoration: line-through;
+    }
+
+    // ---- Buttons ---------------------------------------------------------
+    .o_ewp_button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 48px;
+        padding: 0 20px;
+        border-radius: var(--ewp-radius-md);
+        background: var(--ewp-accent);
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 600;
+
+        &,
+        &:hover {
+            color: var(--ewp-on-accent);
+        }
+
+        &:hover {
+            background: var(--ewp-button-hover);
+        }
+
+        .o_ewp_icon {
+            stroke-width: 2;
+        }
+    }
+
+    .o_ewp_button_outline {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px;
+        padding: 0 16px;
+        border: 1px solid var(--ewp-bar-line);
+        border-radius: var(--ewp-radius-md);
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    // ---- Room page -------------------------------------------------------
+    .o_ewp_appbar {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 8px 8px 12px;
+        padding-top: calc(8px + env(safe-area-inset-top));
+
+        .o_ewp_pill_onair {
+            margin-right: 8px;
+        }
+    }
+
+    .o_ewp_back {
+        display: flex;
+        flex: none;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        min-width: 44px;
+        min-height: 44px;
+        border-radius: var(--ewp-radius-sm);
+        text-decoration: none;
+
+        .o_ewp_icon {
+            stroke-width: 2;
+        }
+    }
+
+    .o_ewp_back_text {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+    }
+
+    .o_ewp_appbar_text {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .o_ewp_room_title {
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    .o_ewp_appbar .o_ewp_room_description {
+        margin: 0;
+        color: var(--ewp-bar-muted);
+        font-size: 13px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .o_ewp_room_body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .o_ewp_chat_section {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    .o_ewp_chat {
+        display: block;
+        width: 100%;
+        border: 0;
+        background: var(--ewp-surface);
+    }
+
+    // ---- Conference (BigBlueButton) --------------------------------------
+    // Phones: a dark band with the 16:9 video and its caption bar.
+    .o_ewp_bbb {
+        --ewp-focus: var(--ewp-bar-focus);
+        display: flex;
+        flex: none;
+        flex-direction: column;
+        background: var(--ewp-video);
+        color: var(--ewp-bar-muted);
+    }
+
+    // The frame holds the whole client (audio dialog, echo test, toolbar),
+    // not a picture: below 1024 px the band is at least min(60dvh, 28rem)
+    // tall, more than 16:9 gives a phone. The frame is placed absolutely,
+    // so it fills the band whatever sets its height. min() is interpolated
+    // for the Sass compiler, which would evaluate it with mixed units.
+    // max-width: Firefox transfers min-height through aspect-ratio into
+    // a minimum width, wider than a phone without it.
+    .o_ewp_video {
+        position: relative;
+        max-width: 100%;
+        aspect-ratio: 16 / 9;
+        min-height: #{"min(60vh, 28rem)"};
+        min-height: #{"min(60dvh, 28rem)"};
+        background: var(--ewp-video-2);
+
+        // Text-only mode, until "Show the video conference".
+        &[hidden] {
+            display: none;
+        }
+    }
+
+    // Text-only mode: the explanation and the button that show the frame.
+    .o_ewp_bbb_ondemand {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 16px;
+
+        .o_ewp_hint {
+            color: var(--ewp-bar-muted);
+        }
+
+        &[hidden] {
+            display: none;
+        }
+    }
+
+    .o_ewp_bbb_show {
+        border: 0;
+        font-family: inherit;
+        cursor: pointer;
+    }
+
+    .o_ewp_bbb_frame {
+        position: absolute;
+        inset: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        background: var(--ewp-video-black);
+
+        // Hidden by the page script once the user leaves the meeting.
+        &[hidden] {
+            display: none;
+        }
+    }
+
+    // Focus in the conference frame (moved there by "Join again" or "Show
+    // the video conference", or by the keyboard): the frame passes it to
+    // its document and matches neither :focus nor :focus-visible, and from
+    // 1024 px its box clips what lies outside the frame (overflow:
+    // hidden). The ring goes around that box instead, outside its border,
+    // where no ancestor clips it, as long as the focus is in the frame.
+    .o_ewp_video:focus-within {
+        outline: 3px solid var(--ewp-focus);
+        outline-offset: 2px;
+    }
+
+    .o_ewp_bbb_moved:not([hidden]),
+    .o_ewp_bbb_left:not([hidden]) {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 24px 16px;
+        text-align: center;
+
+        p {
+            margin: 0;
+        }
+
+        .o_ewp_hint {
+            color: var(--ewp-bar-muted);
+        }
+    }
+
+    // Dark box on every width: the yellow focus ring of the dark bars,
+    // also where the caption bar of wide screens uses the accent.
+    .o_ewp_bbb_left {
+        --ewp-focus: var(--ewp-bar-focus);
+    }
+
+    .o_ewp_bbb_rejoin {
+        margin-top: 10px;
+        border: 0;
+        font-family: inherit;
+        line-height: 1.2;
+        cursor: pointer;
+    }
+
+    .o_ewp_video_bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 0 12px;
+    }
+
+    .o_ewp_video_caption {
+        min-width: 0;
+        font-size: 12px;
+    }
+
+    .o_ewp_bbb_newtab {
+        display: inline-flex;
+        flex: none;
+        align-items: center;
+        gap: 6px;
+        min-height: 44px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+
+        &,
+        &:hover {
+            color: var(--ewp-bar-ink);
+        }
+
+        .o_ewp_icon {
+            stroke-width: 2;
+        }
+    }
+
+    .o_ewp_bbb_notice {
+        margin: 0;
+        padding: 10px 16px;
+        background: var(--ewp-preview-bg);
+        color: var(--ewp-preview-text);
+        font-size: 14px;
+    }
+
+    .o_ewp_bbb_waiting {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        min-height: 9rem;
+        padding: 24px 16px;
+        text-align: center;
+
+        p {
+            margin: 0;
+        }
+
+        .o_ewp_hint {
+            color: var(--ewp-bar-muted);
+        }
+    }
+
+    .o_ewp_bbb_waiting_title {
+        color: var(--ewp-bar-ink);
+        font-weight: 600;
+    }
+
+    // New tab button, with its hint under it. A running meeting gets a
+    // title and a larger button: it is the main action of the page.
+    .o_ewp_bbb_tab {
+        gap: 10px;
+    }
+
+    .o_ewp_bbb_tab_live {
+        min-height: 12rem;
+
+        .o_ewp_bbb_waiting_title {
+            font-size: 18px;
+        }
+
+        .o_ewp_bbb_join {
+            min-height: 56px;
+            padding: 0 28px;
+            font-size: 18px;
+        }
+    }
+
+    // Room page: a column as tall as the viewport, in which the chat takes
+    // whatever the app bar, the preview banner and the video leave, so the
+    // Discuss composer at its bottom stays on screen. dvh follows the
+    // visible viewport on mobile browsers, vh is the fallback. Below the
+    // minimum height, the page scrolls instead of squeezing the chat.
+    &.o_ewp_webapp_room {
+        .o_ewp_app {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        .o_ewp_room_body {
+            flex: 1 1 auto;
+            width: 100%;
+            min-height: 0;
+        }
+
+        .o_ewp_chat_section {
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+
+        .o_ewp_chat {
+            flex: 1 1 auto;
+            min-height: 16rem;
+        }
+    }
+
+    // ---- Closed page (full-screen, dark) ---------------------------------
+    // The page fills the viewport and leaves the display options in view
+    // at its bottom.
+    &.o_ewp_webapp_closed {
+        background: var(--ewp-bar);
+
+        .o_ewp_app {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        .o_ewp_prefs {
+            --ewp-focus: var(--ewp-bar-focus);
+            border-top-color: var(--ewp-bar-line);
+            background: var(--ewp-bar);
+            color: var(--ewp-bar-ink);
+        }
+
+        .o_ewp_pref_toggle {
+            border-color: var(--ewp-bar-line);
+        }
+    }
+
+    .o_ewp_closed {
+        display: flex;
+        flex: 1 0 auto;
+        flex-direction: column;
+        gap: 24px;
+        width: 100%;
+        max-width: 560px;
+        margin: 0 auto;
+        padding: 16px;
+        padding-top: calc(16px + env(safe-area-inset-top));
+        padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    }
+
+    .o_ewp_closed_brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .o_ewp_closed_body {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        justify-content: center;
+        gap: 24px;
+    }
+
+    .o_ewp_closed_icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 64px;
+        height: 64px;
+        border-radius: var(--ewp-radius-xl);
+        background: var(--ewp-bar-2);
+    }
+
+    .o_ewp_closed_text {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        h1 {
+            font-size: 30px;
+            line-height: 1.15;
+            font-weight: 700;
+        }
+
+        p {
+            margin: 0;
+            color: var(--ewp-bar-muted);
+            font-size: 16px;
+            line-height: 1.5;
+        }
+    }
+
+    .o_ewp_window_grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin: 0;
+        padding: 16px;
+        border-radius: var(--ewp-radius);
+        background: var(--ewp-bar-3);
+
+        div {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        dt {
+            color: var(--ewp-bar-muted);
+            font-size: 12px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        dd {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+    }
+
+    .o_ewp_closed_footer {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .o_ewp_signed_in {
+        margin: 0;
+        color: var(--ewp-bar-muted);
+        font-size: 13px;
+        text-align: center;
+    }
+
+    // ---- Display options (footer of every page) --------------------------
+    .o_ewp_prefs {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 16px;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
+        border-top: 1px solid var(--ewp-border);
+        background: var(--ewp-surface);
+        color: var(--ewp-ink);
+    }
+
+    .o_ewp_pref_form {
+        margin: 0;
+    }
+
+    // A toggle button: a box draws the pressed state with a check mark,
+    // aria-pressed tells it to assistive technologies.
+    .o_ewp_pref_toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 44px;
+        padding: 0 16px;
+        border: 1px solid var(--ewp-border);
+        border-radius: var(--ewp-radius-pill);
+        background: transparent;
+        color: inherit;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.2;
+        cursor: pointer;
+    }
+
+    // The box: ::before; the check mark of the pressed state: ::after,
+    // drawn inside the box (16 px from the left padding).
+    .o_ewp_pref_toggle {
+        position: relative;
+
+        &::before {
+            content: "";
+            flex: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid currentColor;
+            border-radius: var(--ewp-radius-2xs);
+        }
+
+        &[aria-pressed="true"]::after {
+            content: "";
+            position: absolute;
+            left: 22px;
+            top: 50%;
+            width: 6px;
+            height: 11px;
+            margin-top: -7px;
+            border: solid currentColor;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+    }
+
+    // Animation mode: three buttons in one group, the pressed one drawn as
+    // a radio dot (::after) in its ring (::before).
+    .o_ewp_motion_form {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .o_ewp_motion_choices {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .o_ewp_motion_label {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .o_ewp_motion_choice {
+        gap: 8px;
+        padding: 0 14px;
+
+        &::before {
+            border-radius: 50%;
+        }
+
+        &[aria-pressed="true"] {
+            border-color: currentColor;
+        }
+
+        &[aria-pressed="true"]::after {
+            left: 19px;
+            width: 8px;
+            height: 8px;
+            margin-top: -4px;
+            border: 0;
+            border-radius: 50%;
+            background: currentColor;
+            transform: none;
+        }
+    }
+
+    // Shown under the mode "auto" while the device asks for reduced
+    // motion: the animations are off, the button turns them on.
+    .o_ewp_motion_hint {
+        display: none;
+        flex-basis: 100%;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin: 0;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        &.o_ewp_motion_auto .o_ewp_motion_hint {
+            display: flex;
+        }
+    }
+
+    .o_ewp_motion_hint_on {
+        min-height: 44px;
+        padding: 0 16px;
+        border: 0;
+        border-radius: var(--ewp-radius-pill);
+        background: var(--ewp-accent);
+        color: var(--ewp-on-accent);
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+
+        &:hover {
+            background: var(--ewp-button-hover);
+        }
+    }
+
+    // ---- Text-only mode --------------------------------------------------
+    // One column on every width, no icon: the labels the icons stood for
+    // are shown as text.
+    &.o_ewp_text_only {
+        .o_ewp_icon {
+            display: none;
+        }
+
+        .o_ewp_avatar {
+            display: none;
+        }
+
+        .o_ewp_user_name {
+            display: inline;
+        }
+
+        // The back link shows its text: the bar wraps rather than squeeze
+        // the room name.
+        .o_ewp_appbar {
+            flex-wrap: wrap;
+        }
+
+        .o_ewp_logout_text,
+        .o_ewp_back_text {
+            position: static;
+            width: auto;
+            height: auto;
+            overflow: visible;
+            clip: auto;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
+        // The new tab cue the external link icon stood for, as text;
+        // "Open in a new tab" already says it.
+        :not(.o_ewp_bbb_newtab) > .o_ewp_external_text {
+            position: static;
+            width: auto;
+            height: auto;
+            margin: 0;
+            overflow: visible;
+            clip: auto;
+            white-space: normal;
+        }
+
+        .o_ewp_home {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            max-width: 760px;
+        }
+
+        .o_ewp_column {
+            display: contents;
+        }
+
+        .o_ewp_room_body_split {
+            display: flex;
+            flex-direction: column;
+            max-width: 760px;
+        }
+
+        .o_ewp_rooms {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .o_ewp_room_link .o_ewp_room_name {
+            text-decoration: underline;
+        }
+
+        .o_ewp_events {
+            display: flex;
+        }
+
+        .o_ewp_links {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+
+    // ---- Tablets ---------------------------------------------------------
+    @media (min-width: 640px) {
+        .o_ewp_rooms {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    // ---- Wide screens ----------------------------------------------------
+    @media (min-width: 1024px) {
+        .o_ewp_preview_banner {
+            align-items: center;
+            padding: 10px 32px;
+        }
+
+        h2 {
+            font-size: 20px;
+        }
+
+        // Home header on one band: logo, label over the day, state, user.
+        .o_ewp_dayhead {
+            // The title keeps 14rem at least and the rest of the free space;
+            // the state and opening hours stop at 22rem and wrap inside.
+            grid-template-columns: auto minmax(14rem, 1fr) fit-content(22rem) auto;
+            grid-template-areas:
+                "logo label meta user"
+                "logo title meta user";
+            column-gap: 14px;
+            row-gap: 2px;
+            padding: 20px 32px;
+
+            .o_ewp_logo {
+                width: 44px;
+                height: 44px;
+                border-radius: var(--ewp-radius-md);
+            }
+
+            .o_ewp_app_label {
+                align-self: end;
+            }
+
+            .o_ewp_day_meta {
+                justify-content: flex-end;
+                margin-left: 10px;
+            }
+        }
+
+        .o_ewp_day_title {
+            align-self: start;
+            margin: 0;
+            font-size: 26px;
+        }
+
+        .o_ewp_user {
+            gap: 16px;
+            margin-left: 6px;
+        }
+
+        .o_ewp_avatar {
+            display: none;
+        }
+
+        .o_ewp_user_name {
+            display: inline;
+        }
+
+        .o_ewp_logout {
+            padding: 0 14px;
+            border: 1px solid var(--ewp-bar-line);
+
+            &,
+            &:hover {
+                color: var(--ewp-bar-ink);
+            }
+
+            .o_ewp_icon {
+                display: none;
+            }
+        }
+
+        .o_ewp_logout_text,
+        .o_ewp_back_text {
+            position: static;
+            width: auto;
+            height: auto;
+            overflow: visible;
+            clip: auto;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        // Plan and events in the main column, the rest in an aside.
+        .o_ewp_main {
+            max-width: 1440px;
+            padding: 28px 32px 40px;
+        }
+
+        // The main column spans both rows; the second row, flexible,
+        // takes the height the first column leaves, so the raffles follow
+        // the links right away.
+        .o_ewp_home {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 380px;
+            grid-template-rows: auto 1fr;
+            grid-template-areas:
+                "main side-top"
+                "main side-bottom";
+            align-items: start;
+            gap: 0 24px;
+        }
+
+        .o_ewp_column {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            min-width: 0;
+        }
+
+        .o_ewp_column_main {
+            grid-area: main;
+        }
+
+        .o_ewp_column_side_top {
+            grid-area: side-top;
+        }
+
+        .o_ewp_column_side_bottom {
+            grid-area: side-bottom;
+        }
+
+        .o_ewp_column_side_top ~ .o_ewp_column_side_bottom {
+            margin-top: 24px;
+        }
+
+        // Lead cards of a theme (o_ewp_home_lead, set only when there are
+        // some): a row of their own over the main column, which starts
+        // right under them. The first row holds the lead cards alone, so
+        // its height is theirs; the announcement and the links span it and
+        // the second row, and the raffles start under whichever of the
+        // lead cards and the announcement and links ends lower.
+        .o_ewp_home_lead {
+            grid-template-rows: auto auto 1fr;
+            grid-template-areas:
+                "lead side-top"
+                "main side-top"
+                "main side-bottom";
+        }
+
+        .o_ewp_column_lead {
+            grid-area: lead;
+        }
+
+        .o_ewp_column_lead ~ .o_ewp_column_main {
+            margin-top: 24px;
+        }
+
+        // Without announcement and links, the raffles span every row, so
+        // they stay at the top of the side column.
+        .o_ewp_column_lead + .o_ewp_column_main + .o_ewp_column_side_bottom {
+            grid-row: 1 / -1;
+        }
+
+        .o_ewp_card {
+            padding: 20px;
+            border-radius: var(--ewp-radius-lg);
+        }
+
+        .o_ewp_plan_card {
+            gap: 16px;
+        }
+
+        .o_ewp_plan_card .o_ewp_card_head {
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 4px 16px;
+        }
+
+        .o_ewp_hotspot_number {
+            display: none;
+        }
+
+        .o_ewp_hotspot_label {
+            display: block;
+        }
+
+        .o_ewp_rooms {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .o_ewp_room_link {
+            min-height: 56px;
+            padding: 10px 12px;
+
+            .o_ewp_chevron {
+                display: none;
+            }
+        }
+
+        .o_ewp_room_name {
+            font-size: 14px;
+        }
+
+        .o_ewp_events {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            column-gap: 24px;
+        }
+
+        .o_ewp_event {
+            gap: 14px;
+            padding: 12px 0;
+        }
+
+        .o_ewp_event_time {
+            width: 8.5rem;
+            font-size: 14px;
+        }
+
+        // Links: a card with one row per link.
+        .o_ewp_links_card {
+            gap: 8px;
+            padding: 20px;
+            background: var(--ewp-surface);
+            border: 1px solid var(--ewp-border);
+            border-radius: var(--ewp-radius-lg);
+
+            h2 {
+                margin-bottom: 4px;
+            }
+        }
+
+        .o_ewp_links {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .o_ewp_link {
+            min-height: 44px;
+            padding: 0 4px;
+            background: none;
+            border: 0;
+            border-bottom: 1px solid var(--ewp-rule);
+            border-radius: 0;
+            font-size: 15px;
+
+            &,
+            &:hover,
+            .o_ewp_icon {
+                color: var(--ewp-accent-text);
+            }
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        // Room: app bar on one line, video on the left, chat column of
+        // 380 px on the right, both as tall as the space left.
+        .o_ewp_appbar {
+            gap: 16px;
+            padding: 14px 24px;
+
+            .o_ewp_pill_onair {
+                margin-right: 0;
+                padding: 5px 11px;
+                font-size: 13px;
+            }
+
+            .o_ewp_user_name {
+                display: inline;
+            }
+        }
+
+        .o_ewp_back {
+            padding: 0 12px 0 6px;
+            border: 1px solid var(--ewp-bar-line);
+        }
+
+        .o_ewp_room_title {
+            font-size: 22px;
+        }
+
+        .o_ewp_room_body {
+            gap: 20px;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 20px 24px;
+        }
+
+        .o_ewp_room_body_split {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 380px;
+            align-items: stretch;
+            max-width: none;
+        }
+
+        // A block of the room page slot spans both columns, under them.
+        .o_ewp_room_body_split > :not(.o_ewp_bbb):not(.o_ewp_chat_section) {
+            grid-column: 1 / -1;
+        }
+
+        .o_ewp_chat {
+            border: 1px solid var(--ewp-border);
+            border-radius: var(--ewp-radius);
+        }
+
+        // No dark band here: the controls of the block lie on the page
+        // ground and take the focus ring of the page (inherit), the one
+        // each colour scheme sets on the body, not the yellow of the bars.
+        .o_ewp_bbb {
+            gap: 10px;
+            background: none;
+            color: var(--ewp-muted);
+            --ewp-focus: inherit;
+        }
+
+        // Text-only mode: the explanation lies on the page ground here,
+        // not on the dark band of phones.
+        .o_ewp_bbb_ondemand {
+            padding: 0;
+
+            .o_ewp_hint {
+                color: var(--ewp-muted);
+            }
+        }
+
+        .o_ewp_video {
+            flex: 1 1 auto;
+            min-height: 20rem;
+            aspect-ratio: auto;
+            padding: 0;
+            border-radius: var(--ewp-radius);
+            overflow: hidden;
+        }
+
+        .o_ewp_video_bar {
+            padding: 0;
+        }
+
+        .o_ewp_video_caption {
+            font-size: 13px;
+        }
+
+        .o_ewp_bbb_newtab {
+            font-size: 14px;
+
+            &,
+            &:hover {
+                color: var(--ewp-accent-text);
+            }
+        }
+
+        .o_ewp_bbb_notice {
+            border-radius: var(--ewp-radius-sm);
+        }
+
+        // Dark box: the yellow focus ring of the dark bars, not the accent
+        // of the light caption bar.
+        .o_ewp_bbb_waiting {
+            --ewp-focus: var(--ewp-bar-focus);
+            flex: 1 1 auto;
+            border-radius: var(--ewp-radius);
+            background: var(--ewp-video-2);
+        }
+
+        .o_ewp_message {
+            margin: 0;
+        }
+    }
+
+    // ---- Dark scheme -----------------------------------------------------
+    @media (prefers-color-scheme: dark) {
+        --ewp-ground: #0f1215;
+        --ewp-surface: #1a1f25;
+        --ewp-surface-2: #232930;
+        --ewp-surface-hover: #2c333b;
+        --ewp-border: #2e353d;
+        --ewp-rule: #2a3037;
+        --ewp-dashed: #4a525b;
+        --ewp-ink: #e8ebee;
+        --ewp-ink-soft: #d5dadf;
+        --ewp-muted: #a3aab2;
+        --ewp-accent-text: #8db8ea;
+        --ewp-accent-hover: #b3d0f2;
+        --ewp-warm: #f2a06e;
+        --ewp-warm-soft: #3a2416;
+        --ewp-success-soft: #15301f;
+        --ewp-success-text: #8fd9ae;
+        --ewp-preview-bg: #3a2f0a;
+        --ewp-preview-text: #ffe08a;
+        --ewp-preview-line: #5c4b12;
+        --ewp-plan-ground: #232930;
+        --ewp-focus: #8db8ea;
+    }
+}

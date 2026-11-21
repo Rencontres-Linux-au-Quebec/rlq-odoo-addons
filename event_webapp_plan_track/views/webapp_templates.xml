@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
+    Copyright (C) 2026 Rencontres Linux au Québec contributors
+    License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+
+    Agenda blocks of the event web app, through the slots of
+    event_webapp_plan. They read only the plain values of the controller
+    (agenda_*), never a model:
+
+    - webapp_slot_home_cards: the "Agenda" card of the home page, sessions
+      grouped by start time (an ordered list of slots, each with a heading,
+      holding the list of its sessions), and the filter by room, a GET form
+      of toggle buttons (aria-pressed) that works without script;
+    - webapp_slot_room_item: under each room of the room list, its session
+      in progress or its next one;
+    - webapp_slot_room_main: "In this room" on a room page, the state of the
+      room and its sessions, each description in a details element.
+
+    Every time is a <time datetime> with its offset. The badges "Now" and
+    "Next" are text, never a colour alone; the page script shows or hides
+    them (attribute hidden) as the clock moves, and swaps the blocks
+    .ewp_track_agenda_body and .ewp_track_room_body when the program
+    changes. The element carrying data-ewp-agenda-url holds the data of
+    the script: the sessions (JSON), the translated messages and the
+    signature of the program.
+-->
+<odoo>
+    <!-- Title of a session and its two badges, one shown at most. -->
+    <template id="agenda_session_title" name="Event web app agenda: session title">
+        <span class="ewp_track_title_text" t-out="session['title']"/>
+        <span class="ewp_track_badge ewp_track_badge_now" t-att-hidden="None if session['state'] == 'now' else 'hidden'"><span class="o_ewp_sr_only">, </span>Now</span>
+        <span class="ewp_track_badge ewp_track_badge_next" t-att-hidden="None if session['state'] == 'next' else 'hidden'"><span class="o_ewp_sr_only">, </span>Next</span>
+    </template>
+
+    <!-- One session, an item of a list. session_level: 4 under the time
+         headings of the home card, 3 in the room block. show_room: the
+         room line (left out on the page of that room). show_description:
+         the description, collapsed. -->
+    <template id="agenda_session" name="Event web app agenda: session">
+        <li class="ewp_track_session"
+            t-att-data-ewp-track-id="session['id']"
+            t-att-data-ewp-room-id="session['room_id'] or None"
+            t-att-data-ewp-state="session['state']"
+            t-att-hidden="'hidden' if session.get('hidden') else None">
+            <h4 t-if="session_level == 4" class="ewp_track_title"><t t-call="event_webapp_plan_track.agenda_session_title"/></h4>
+            <h3 t-else="" class="ewp_track_title"><t t-call="event_webapp_plan_track.agenda_session_title"/></h3>
+            <p class="ewp_track_meta">
+                <span class="ewp_track_when">
+                    <time t-att-datetime="session['start']" t-out="session['start_label']"/><span aria-hidden="true"> – </span><span class="o_ewp_sr_only"> to </span><time t-att-datetime="session['end']" t-out="session['end_label']"/>
+                </span>
+                <span t-if="show_room and session['room_name']" class="ewp_track_where">
+                    <span class="o_ewp_sr_only">Room:</span>
+                    <a t-if="session['room_url']" class="ewp_track_room_link" t-att-href="session['room_url']" t-out="session['room_name']"/>
+                    <t t-else="" t-out="session['room_name']"/>
+                </span>
+            </p>
+            <p t-if="session['speaker']" class="ewp_track_speaker">
+                <span class="o_ewp_sr_only">Speaker:</span>
+                <span class="ewp_track_speaker_name" t-out="session['speaker']"/><t t-if="session['function']">, <span class="ewp_track_function" t-out="session['function']"/></t>
+            </p>
+            <p t-if="session['tags']" class="ewp_track_tags">
+                <span class="o_ewp_sr_only">Tags:</span>
+                <t t-foreach="session['tags']" t-as="tag">
+                    <span class="ewp_track_tag" t-out="tag"/><span t-if="not tag_last" class="o_ewp_sr_only">,</span>
+                </t>
+            </p>
+            <details t-if="show_description and session['description']" class="ewp_track_details">
+                <summary>Description<span class="o_ewp_sr_only">: <t t-out="session['title']"/></span></summary>
+                <div class="o_ewp_rich" t-out="session['description']"/>
+            </details>
+        </li>
+    </template>
+
+    <!-- Body of the home card, rendered again by the JSON route. -->
+    <template id="agenda_content" name="Event web app agenda: home card body">
+        <ol class="ewp_track_slots" role="list">
+            <li t-foreach="agenda_groups" t-as="group" class="ewp_track_slot"
+                t-att-hidden="'hidden' if group['hidden'] else None">
+                <h3 class="ewp_track_slot_time"><time t-att-datetime="group['start']" t-out="group['label']"/></h3>
+                <ul class="ewp_track_sessions" role="list">
+                    <t t-foreach="group['sessions']" t-as="session">
+                        <t t-call="event_webapp_plan_track.agenda_session">
+                            <t t-set="session_level" t-value="4"/>
+                            <t t-set="show_room" t-value="True"/>
+                        </t>
+                    </t>
+                </ul>
+            </li>
+        </ol>
+    </template>
+
+    <template id="agenda_card" inherit_id="event_webapp_plan.webapp_slot_home_cards" name="Event web app agenda: home card">
+        <xpath expr="." position="inside">
+            <section t-if="ewp_page == 'home' and agenda_sessions" id="ewp_track_agenda"
+                     class="o_ewp_card ewp_track_agenda" aria-labelledby="ewp_track_h_agenda"
+                     t-att-data-ewp-agenda-url="agenda_url"
+                     t-att-data-ewp-agenda-messages="agenda_messages_json"
+                     t-att-data-ewp-agenda-sessions="agenda_sessions_json"
+                     t-att-data-ewp-signature="agenda_signature">
+                <div class="o_ewp_card_head">
+                    <h2 id="ewp_track_h_agenda">Agenda</h2>
+                    <p class="o_ewp_hint">Times in the time zone of the event: <t t-out="agenda_tz"/>.</p>
+                </div>
+                <form t-if="agenda_filters" class="ewp_track_filter" method="get"
+                      t-att-action="'%s#ewp_track_agenda' % agenda_filter_action">
+                    <div class="ewp_track_filter_choices" role="group" aria-labelledby="ewp_track_filter_label">
+                        <span id="ewp_track_filter_label" class="ewp_track_filter_label">Show the sessions of</span>
+                        <button type="submit" class="o_ewp_pref_toggle ewp_track_filter_choice" t-att-name="agenda_filter_param" value=""
+                                t-att-aria-pressed="'false' if agenda_selected else 'true'">All rooms</button>
+                        <button t-foreach="agenda_filters" t-as="choice" type="submit" class="o_ewp_pref_toggle ewp_track_filter_choice"
+                                t-att-name="agenda_filter_param" t-att-value="choice['id']"
+                                t-att-aria-pressed="'true' if agenda_selected == choice['id'] else 'false'"
+                                t-out="choice['name']"/>
+                    </div>
+                </form>
+                <div class="ewp_track_agenda_body">
+                    <t t-call="event_webapp_plan_track.agenda_content"/>
+                </div>
+            </section>
+        </xpath>
+    </template>
+
+    <!-- Under a room of the home room list: "Now: ..." or "Next at ...:
+         ...", hidden once the room has nothing left for the day. -->
+    <template id="agenda_room_item" inherit_id="event_webapp_plan.webapp_slot_room_item" name="Event web app agenda: room list line">
+        <xpath expr="." position="inside">
+            <t t-set="agenda_status" t-value="(agenda_rooms_status or {}).get(room['id'])"/>
+            <span t-if="agenda_status" class="ewp_track_room_session"
+                  t-att-data-ewp-track-room="room['id']"
+                  t-att-data-ewp-state="agenda_status['state'] or None"
+                  t-att-hidden="None if agenda_status['text'] else 'hidden'"
+                  t-out="agenda_status['text']"/>
+        </xpath>
+    </template>
+
+    <!-- Body of the room block, rendered again by the JSON route. The
+         state line says "No more session in this room today." rather than
+         vanishing (data-ewp-track-none). -->
+    <template id="agenda_room_content" name="Event web app agenda: room block body">
+        <t t-if="agenda_room['sessions']">
+            <p class="ewp_track_room_status"
+               t-att-data-ewp-track-room="agenda_room['id']"
+               data-ewp-track-none="1"
+               t-att-data-ewp-state="agenda_room['status']['state'] or None"
+               t-out="agenda_room['status']['text']"/>
+            <ol class="ewp_track_sessions" role="list">
+                <t t-foreach="agenda_room['sessions']" t-as="session">
+                    <t t-call="event_webapp_plan_track.agenda_session">
+                        <t t-set="session_level" t-value="3"/>
+                        <t t-set="show_room" t-value="False"/>
+                        <t t-set="show_description" t-value="True"/>
+                    </t>
+                </t>
+            </ol>
+        </t>
+        <p t-else="" class="o_ewp_hint">No session is planned in this room for this day.</p>
+    </template>
+
+    <template id="agenda_room_section" inherit_id="event_webapp_plan.webapp_slot_room_main" name="Event web app agenda: room block">
+        <xpath expr="." position="inside">
+            <section t-if="agenda_room" id="ewp_track_room" class="o_ewp_card ewp_track_room"
+                     aria-labelledby="ewp_track_h_room"
+                     t-att-data-ewp-agenda-url="agenda_room['url']"
+                     t-att-data-ewp-agenda-room="agenda_room['id']"
+                     t-att-data-ewp-agenda-messages="agenda_messages_json"
+                     t-att-data-ewp-agenda-sessions="agenda_sessions_json"
+                     t-att-data-ewp-signature="agenda_signature">
+                <h2 id="ewp_track_h_room">In this room</h2>
+                <div class="ewp_track_room_body">
+                    <t t-call="event_webapp_plan_track.agenda_room_content"/>
+                </div>
+            </section>
+        </xpath>
+    </template>
+</odoo>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
+  Copyright (C) 2026 Rencontres Linux au Québec contributors
+  License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+
+  Draw form: beside the attendance mode, whether the winner declared
+  being on site in the event web app, read only and for information.
+-->
+<odoo>
+    <record id="event_raffle_draw_view_form" model="ir.ui.view">
+        <field name="name">event.raffle.draw.form (event_webapp_plan_raffle)</field>
+        <field name="model">event.raffle.draw</field>
+        <field name="inherit_id" ref="event_raffle_prize.event_raffle_draw_view_form_prize" />
+        <field name="arch" type="xml">
+            <field name="attendance_mode" position="after">
+                <field name="winner_attendance_declared" invisible="not winner_participant_id" />
+                <field
+                    name="winner_attendance_declared_date"
+                    invisible="not winner_attendance_declared"
+                />
+            </field>
+        </field>
+    </record>
+</odoo>

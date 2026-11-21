@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
+  Copyright (C) 2026 Rencontres Linux au Québec contributors
+  License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+
+  Event day form: the track location of each room, in the room list under
+  the plan editor, and a read-only "Agenda" tab with the tracks the web app
+  shows for the day. Locations are created in the Events application
+  (Configuration > Track Locations), hence no creation from the room list.
+-->
+<odoo>
+    <record id="event_webapp_view_form" model="ir.ui.view">
+        <field name="name">event.webapp.form (event_webapp_plan_track)</field>
+        <field name="model">event.webapp</field>
+        <field name="inherit_id" ref="event_webapp_plan.event_webapp_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='room_ids']/list/field[@name='name']" position="after">
+                <field name="track_location_id" options="{'no_create': True}" />
+            </xpath>
+            <xpath expr="//page[@name='page_plan']" position="after">
+                <page string="Agenda" name="page_agenda">
+                    <div class="text-muted mb-2">
+                        Published tracks of the events of the day, held
+                        during its opening window. A track appears in the
+                        agenda of the room that follows its location.
+                    </div>
+                    <field name="track_ids" readonly="1">
+                        <list>
+                            <field name="date" />
+                            <field name="date_end" optional="hide" />
+                            <field name="name" />
+                            <field name="location_id" />
+                            <field name="partner_name" />
+                            <field name="event_id" optional="hide" />
+                            <field name="stage_id" optional="hide" />
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

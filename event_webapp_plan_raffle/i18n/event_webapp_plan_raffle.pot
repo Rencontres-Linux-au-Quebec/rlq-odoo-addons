@@ -1,0 +1,227 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* event_webapp_plan_raffle
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-18 23:04+0000\n"
+"PO-Revision-Date: 2026-11-18 23:04+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: event_webapp_plan_raffle
+#. odoo-python
+#: code:addons/event_webapp_plan_raffle/controllers/main.py:0
+msgid "%(raffle)s, draw %(number)s"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_content
+msgid "<span class=\"ewp_prize_label\">Carrier:</span>"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_content
+msgid "<span class=\"ewp_prize_label\">Offered by</span>"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_content
+msgid "<span class=\"ewp_prize_label\">Shown as:</span>"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_content
+msgid "<span class=\"ewp_prize_label\">Tracking number:</span>"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_content
+msgid "<span class=\"o_ewp_sr_only\">Prize:</span>"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_content
+msgid "<span class=\"o_ewp_sr_only\">Token category:</span>"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_content
+msgid "Choose my prize"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#. odoo-python
+#: code:addons/event_webapp_plan_raffle/controllers/main.py:0
+msgid "Choose your prize before %(time)s."
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#. odoo-python
+#: code:addons/event_webapp_plan_raffle/controllers/main.py:0
+msgid "Declared at %(time)s."
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model:ir.model.fields,field_description:event_webapp_plan_raffle.field_event_raffle_draw__winner_attendance_declared
+#: model:ir.model.fields,field_description:event_webapp_plan_raffle.field_event_registration__attendance_declared
+msgid "Declared on site"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model:ir.model.fields,field_description:event_webapp_plan_raffle.field_event_raffle_draw__winner_attendance_declared_date
+#: model:ir.model.fields,field_description:event_webapp_plan_raffle.field_event_registration__attendance_declared_date
+msgid "Declared on site at"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model:ir.model,name:event_webapp_plan_raffle.model_event_registration
+msgid "Event Registration"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model:ir.model,name:event_webapp_plan_raffle.model_event_webapp
+msgid "Event Web App Day"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.presence_content
+msgid "I am on site"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_content
+msgid "My prize"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.presence_card
+msgid "On site"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_content
+msgid "Public name"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model:ir.model,name:event_webapp_plan_raffle.model_event_raffle_draw
+msgid "Raffle Draw"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_content
+msgid "Save the public name"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.presence_content
+msgid ""
+"Tell the organizers that you are at the event. For information only: your "
+"attendance is recorded when your ticket is scanned at the welcome desk."
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model:ir.model.fields,help:event_webapp_plan_raffle.field_event_registration__attendance_declared
+msgid ""
+"The attendee said in the event web app that they are on site. Information "
+"only: the raffles take the attendance from the check-in scan."
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#. odoo-python
+#: code:addons/event_webapp_plan_raffle/controllers/main.py:0
+msgid ""
+"The link to choose your prize has expired. Ask the organizers of the raffle."
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#. odoo-python
+#: code:addons/event_webapp_plan_raffle/controllers/main.py:0
+msgid "The time to choose this prize is over."
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model:ir.model.fields,help:event_webapp_plan_raffle.field_event_raffle_draw__winner_attendance_declared
+msgid ""
+"The winner said in the event web app that they are on site. Information "
+"only: the attendance comes from the check-in scan."
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_content
+msgid ""
+"The winners page shows your public name, a nickname if you like, or your "
+"full name when you leave it empty."
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#. odoo-python
+#: code:addons/event_webapp_plan_raffle/controllers/main.py:0
+msgid "You are marked on site."
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#. odoo-python
+#: code:addons/event_webapp_plan_raffle/controllers/main.py:0
+msgid "You are no longer marked on site."
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#. odoo-python
+#: code:addons/event_webapp_plan_raffle/controllers/main.py:0
+msgid "You declined this prize."
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#. odoo-python
+#: code:addons/event_webapp_plan_raffle/controllers/main.py:0
+msgid "You received your prize."
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#. odoo-python
+#: code:addons/event_webapp_plan_raffle/controllers/main.py:0
+msgid "You won this draw. The organizers will send you how to get your prize."
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_content
+msgid "Your name on the winners page"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#. odoo-python
+#: code:addons/event_webapp_plan_raffle/controllers/main.py:0
+msgid "Your prize was handed over to you."
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#. odoo-python
+#: code:addons/event_webapp_plan_raffle/controllers/main.py:0
+msgid "Your prize was sent to you by email."
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#. odoo-python
+#: code:addons/event_webapp_plan_raffle/controllers/main.py:0
+msgid "Your prize was shipped."
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#. odoo-python
+#: code:addons/event_webapp_plan_raffle/controllers/main.py:0
+msgid "Your prize, %(title)s: %(status)s"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#. odoo-python
+#: code:addons/event_webapp_plan_raffle/controllers/main.py:0
+msgid "Your public name is saved."
+msgstr ""

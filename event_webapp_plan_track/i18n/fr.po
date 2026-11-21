@@ -1,0 +1,182 @@
+# Translation of Odoo Server.
+# This file contains the French translation of the following modules:
+# 	* event_webapp_plan_track
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-15 07:02+0000\n"
+"PO-Revision-Date: 2026-11-15 07:02+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: event_webapp_plan_track
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_track.agenda_session
+msgid "<span aria-hidden=\"true\"> – </span><span class=\"o_ewp_sr_only\"> to </span>"
+msgstr ""
+"<span aria-hidden=\"true\"> – </span><span class=\"o_ewp_sr_only\"> à "
+"</span>"
+
+#. module: event_webapp_plan_track
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_track.agenda_session_title
+msgid "<span class=\"o_ewp_sr_only\">, </span>Next"
+msgstr "<span class=\"o_ewp_sr_only\">, </span>À suivre"
+
+#. module: event_webapp_plan_track
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_track.agenda_session_title
+msgid "<span class=\"o_ewp_sr_only\">, </span>Now"
+msgstr "<span class=\"o_ewp_sr_only\">, </span>Maintenant"
+
+#. module: event_webapp_plan_track
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_track.agenda_session
+msgid "<span class=\"o_ewp_sr_only\">Room:</span>"
+msgstr "<span class=\"o_ewp_sr_only\">Salle :</span>"
+
+#. module: event_webapp_plan_track
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_track.agenda_session
+msgid "<span class=\"o_ewp_sr_only\">Speaker:</span>"
+msgstr "<span class=\"o_ewp_sr_only\">Intervenant :</span>"
+
+#. module: event_webapp_plan_track
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_track.agenda_session
+msgid "<span class=\"o_ewp_sr_only\">Tags:</span>"
+msgstr "<span class=\"o_ewp_sr_only\">Étiquettes :</span>"
+
+#. module: event_webapp_plan_track
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_track.agenda_card
+msgid ""
+"<span id=\"ewp_track_filter_label\" class=\"ewp_track_filter_label\">Show "
+"the sessions of</span>"
+msgstr ""
+"<span id=\"ewp_track_filter_label\" "
+"class=\"ewp_track_filter_label\">Afficher les séances de</span>"
+
+#. module: event_webapp_plan_track
+#: model:ir.model.fields,field_description:event_webapp_plan_track.field_event_webapp__track_ids
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_track.agenda_card
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_track.event_webapp_view_form
+msgid "Agenda"
+msgstr "Agenda"
+
+#. module: event_webapp_plan_track
+#. odoo-python
+#: code:addons/event_webapp_plan_track/controllers/main.py:0
+msgid "Agenda of %(room)s, sessions shown: %(count)s."
+msgstr "Agenda de %(room)s, séances affichées : %(count)s."
+
+#. module: event_webapp_plan_track
+#. odoo-python
+#: code:addons/event_webapp_plan_track/controllers/main.py:0
+msgid "Agenda of all rooms, sessions shown: %(count)s."
+msgstr "Agenda de toutes les salles, séances affichées : %(count)s."
+
+#. module: event_webapp_plan_track
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_track.agenda_card
+msgid "All rooms"
+msgstr "Toutes les salles"
+
+#. module: event_webapp_plan_track
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_track.agenda_session
+msgid "Description"
+msgstr "Description"
+
+#. module: event_webapp_plan_track
+#: model:ir.model,name:event_webapp_plan_track.model_event_webapp
+msgid "Event Web App Day"
+msgstr "Journée de l'application web d'événement"
+
+#. module: event_webapp_plan_track
+#: model:ir.model,name:event_webapp_plan_track.model_event_webapp_room
+msgid "Event Web App Room"
+msgstr "Salle de l'application web d'événement"
+
+#. module: event_webapp_plan_track
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_track.agenda_room_section
+msgid "In this room"
+msgstr "Dans cette salle"
+
+#. module: event_webapp_plan_track
+#: model:ir.model.fields,help:event_webapp_plan_track.field_event_webapp_room__track_location_id
+msgid ""
+"Location of the event tracks held in this room: the web app shows them in "
+"the agenda of the room. One room per location and per day."
+msgstr ""
+"Lieu des présentations de l'événement tenues dans cette salle : "
+"l'application web les affiche dans l'agenda de la salle. Une salle par lieu "
+"et par journée."
+
+#. module: event_webapp_plan_track
+#. odoo-python
+#: code:addons/event_webapp_plan_track/controllers/main.py:0
+msgid "Next at %(time)s: %(title)s"
+msgstr "Ensuite à %(time)s : %(title)s"
+
+#. module: event_webapp_plan_track
+#. odoo-python
+#: code:addons/event_webapp_plan_track/controllers/main.py:0
+msgid "No more session in this room today."
+msgstr "Plus aucune séance dans cette salle aujourd'hui."
+
+#. module: event_webapp_plan_track
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_track.agenda_room_content
+msgid "No session is planned in this room for this day."
+msgstr "Aucune séance n'est prévue dans cette salle pour cette journée."
+
+#. module: event_webapp_plan_track
+#. odoo-python
+#: code:addons/event_webapp_plan_track/controllers/main.py:0
+msgid "Now in this room: %(title)s."
+msgstr "Maintenant dans cette salle : %(title)s."
+
+#. module: event_webapp_plan_track
+#. odoo-python
+#: code:addons/event_webapp_plan_track/controllers/main.py:0
+msgid "Now: %(title)s"
+msgstr "Maintenant : %(title)s"
+
+#. module: event_webapp_plan_track
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_track.event_webapp_view_form
+msgid ""
+"Published tracks of the events of the day, held\n"
+"                        during its opening window. A track appears in the\n"
+"                        agenda of the room that follows its location."
+msgstr ""
+"Présentations publiées des événements de la journée, tenues\n"
+"                        pendant sa période d'ouverture. Une présentation "
+"paraît dans\n"
+"                        l'agenda de la salle qui suit son lieu."
+
+#. module: event_webapp_plan_track
+#: model:ir.model.fields,help:event_webapp_plan_track.field_event_webapp__track_ids
+msgid ""
+"Published tracks of the events of the day, held during its opening window, "
+"cancelled ones left out."
+msgstr ""
+"Présentations publiées des événements de la journée, tenues pendant sa "
+"période d'ouverture, sans celles qui sont annulées."
+
+#. module: event_webapp_plan_track
+#. odoo-python
+#: code:addons/event_webapp_plan_track/models/event_webapp_room.py:0
+msgid ""
+"The track location %(location)s already serves the room %(room)s of this "
+"day: a location serves one room per day."
+msgstr ""
+"Le lieu de présentation %(location)s sert déjà la salle %(room)s de cette "
+"journée : un lieu sert une seule salle par journée."
+
+#. module: event_webapp_plan_track
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_track.agenda_card
+msgid "Times in the time zone of the event:"
+msgstr "Heures dans le fuseau horaire de l'événement :"
+
+#. module: event_webapp_plan_track
+#: model:ir.model.fields,field_description:event_webapp_plan_track.field_event_webapp_room__track_location_id
+msgid "Track location"
+msgstr "Lieu de présentation"

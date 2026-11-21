@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Event Web App Plan - Agenda</title></head>
+<body style="font-family:system-ui,sans-serif;max-width:60rem;margin:auto;padding:1rem;line-height:1.6">
+<h1>Event Web App Plan - Agenda</h1>
+<p>The agenda of an event day in the web app at <code>/webapp_event</code> (module <code>event_webapp_plan</code>), read from the tracks of the events (module <code>website_event_track</code>): the program is typed once.</p>
+<ul>
+  <li>each room of the plan follows one track location, one room per location and per day;</li>
+  <li>the home page lists the published sessions of the day by start time, with their room, speaker and tags, the session in progress marked "Now" and the next ones "Next", and a filter by room that works without script;</li>
+  <li>under each room of the room list, its session in progress or its next one;</li>
+  <li>a room page lists the sessions of the room and announces the one that starts while the visitor is there.</li>
+</ul>
+<p>Times show in the time zone of the event and follow the clock without reloading the page. Headings, lists, <code>&lt;time&gt;</code> elements, text-only mode, no animation: the accessibility of the web app (WCAG 2.2 AA) is kept.</p>
+<p>License AGPL-3.0 or later. Copyright (C) 2026 Services-Conseils Linux Inc., Rencontres Linux au Québec contributors.</p>
+</body></html>

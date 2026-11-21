@@ -1,0 +1,1902 @@
+# Translation of Odoo Server.
+# This file contains the French translation of the following modules:
+# 	* event_webapp_plan
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-21 05:52+0000\n"
+"PO-Revision-Date: 2026-11-14 10:47+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: event_webapp_plan
+#: model:ir.module.category,description:event_webapp_plan.module_category_event_webapp
+msgid ""
+"\n"
+"            Access to the event day web app (/webapp_event) and to its\n"
+"            configuration.\n"
+"        "
+msgstr ""
+"\n"
+"            Accès à l'application web de la journée d'événement (/"
+"webapp_event) et à sa configuration.\n"
+"        "
+
+#. module: event_webapp_plan
+#: model:res.groups,comment:event_webapp_plan.group_event_webapp_manager
+msgid ""
+"\n"
+"            Creates and edits the event days: opening window, announcement,\n"
+"            links, events, raffles, plan and rooms.\n"
+"        "
+msgstr ""
+"\n"
+"            Crée et modifie les journées d'événement : plage d'ouverture, "
+"annonce, liens, événements, tirages, plan et salles.\n"
+"        "
+
+#. module: event_webapp_plan
+#: model:ir.module.category,description:event_webapp_plan.module_category_event_webapp_room
+msgid ""
+"\n"
+"            One group per room of the event web app: the users who entered\n"
+"            the room page, allowed to read and write in its chat.\n"
+"        "
+msgstr ""
+"\n"
+"            Un groupe par salle de l'application web d'événement : les "
+"utilisateurs qui sont entrés dans la page de la salle, autorisés à lire et à "
+"écrire dans sa discussion.\n"
+"        "
+
+#. module: event_webapp_plan
+#: model:res.groups,comment:event_webapp_plan.group_event_webapp_moderator
+msgid ""
+"\n"
+"            Reads the event days, sees the web app outside its opening\n"
+"            window, to test it, and reads every room chat.\n"
+"        "
+msgstr ""
+"\n"
+"            Consulte les journées d'événement, voit l'application web en "
+"dehors de sa plage d'ouverture, pour la tester, et lit la discussion de "
+"chaque salle.\n"
+"        "
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "%(count)s new winners in the raffles."
+msgstr "%(count)s nouveaux gagnants dans les tirages."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "%(drawn)s drawn of %(total)s"
+msgstr "%(drawn)s tirés sur %(total)s"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_brand
+msgid "<span class=\"o_ewp_app_label\">Event Web App</span>"
+msgstr "<span class=\"o_ewp_app_label\">Application web d'événement</span>"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid "<span class=\"o_ewp_back_text\">Back to the plan</span>"
+msgstr "<span class=\"o_ewp_back_text\">Retour au plan</span>"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_logout
+msgid "<span class=\"o_ewp_logout_text\">Log out</span>"
+msgstr "<span class=\"o_ewp_logout_text\">Se déconnecter</span>"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_main
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid ""
+"<span class=\"o_ewp_pill_dot\" aria-hidden=\"true\"/><span "
+"class=\"o_ewp_sr_only\">Conference:</span> Live"
+msgstr ""
+"<span class=\"o_ewp_pill_dot\" aria-hidden=\"true\"/><span "
+"class=\"o_ewp_sr_only\">Conférence :</span> En direct"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_main
+msgid "<span class=\"o_ewp_pill_dot\" aria-hidden=\"true\"/>In progress"
+msgstr "<span class=\"o_ewp_pill_dot\" aria-hidden=\"true\"/>En cours"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_main
+msgid "<span class=\"o_ewp_pill_dot\" aria-hidden=\"true\"/>Not open yet"
+msgstr ""
+"<span class=\"o_ewp_pill_dot\" aria-hidden=\"true\"/>Pas encore ouverte"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_main
+msgid "<span class=\"o_ewp_pill_dot\" aria-hidden=\"true\"/>Over"
+msgstr "<span class=\"o_ewp_pill_dot\" aria-hidden=\"true\"/>Terminée"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_icon_external
+msgid ""
+"<span class=\"o_ewp_sr_only o_ewp_external_text\">(opens in a new tab)</span>"
+msgstr ""
+"<span class=\"o_ewp_sr_only o_ewp_external_text\">(s'ouvre dans un nouvel "
+"onglet)</span>"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_main
+msgid "<span class=\"o_ewp_sr_only\">State of the day:</span>"
+msgstr "<span class=\"o_ewp_sr_only\">État de la journée :</span>"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid "<span class=\"o_ewp_video_caption\">Video conference</span>"
+msgstr "<span class=\"o_ewp_video_caption\">Visioconférence</span>"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_raffles_content
+msgid "<span class=\"o_ewp_winner_label\">Winner:</span>"
+msgstr "<span class=\"o_ewp_winner_label\">Gagnant·e :</span>"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.res_config_settings_view_form
+msgid "<span class=\"text-muted\">A secret is saved.</span>"
+msgstr "<span class=\"text-muted\">Un secret est enregistré.</span>"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_preferences
+msgid ""
+"<span id=\"o_ewp_motion_label\" class=\"o_ewp_motion_label\">Animations</"
+"span>"
+msgstr ""
+"<span id=\"o_ewp_motion_label\" class=\"o_ewp_motion_label\">Animations</"
+"span>"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_preferences
+msgid "<span>Your device asks for less motion, animations are off.</span>"
+msgstr ""
+"<span>Votre appareil demande moins de mouvement, les animations sont "
+"arrêtées.</span>"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_layout
+msgid ""
+"<strong>Preview outside opening hours.</strong> Only moderators and "
+"administrators see this page."
+msgstr ""
+"<strong>Aperçu en dehors des heures d'ouverture.</strong> Seuls les "
+"modérateurs et les administrateurs voient cette page."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_raffles_content
+msgid "Absent"
+msgstr "Absent"
+
+#. module: event_webapp_plan
+#: model:ir.model,name:event_webapp_plan.model_res_groups
+msgid "Access Groups"
+msgstr "Groupes d'accès"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__access_group_id
+msgid "Access group"
+msgstr "Groupe d'accès"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__message_needaction
+msgid "Action Needed"
+msgstr "Action requise"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__active
+msgid "Active"
+msgstr "Actif"
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+msgid "Add the rooms in the list below, then draw them on the plan."
+msgstr ""
+"Ajoutez les salles dans la liste ci-dessous, puis dessinez-les sur le plan."
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_res_config_settings__ewp_bbb_server_url
+msgid ""
+"Address of the BigBlueButton server, as printed by \"bbb-conf --secret\" on "
+"the server."
+msgstr ""
+"Adresse du serveur BigBlueButton, telle qu'affichée par « bbb-conf --"
+"secret » sur le serveur."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+#: model:res.groups,name:event_webapp_plan.group_event_webapp_manager
+msgid "Administrator"
+msgstr "Administrateur"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields.selection,name:event_webapp_plan.selection__res_config_settings__ewp_bbb_display__frame
+msgid "Always embedded in the room page"
+msgstr "Toujours intégrée à la page de la salle"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields.selection,name:event_webapp_plan.selection__res_config_settings__ewp_bbb_display__tab
+msgid "Always in a new tab"
+msgstr "Toujours dans un nouvel onglet"
+
+#. module: event_webapp_plan
+#: model_terms:ir.actions.act_window,help:event_webapp_plan.event_webapp_action
+msgid ""
+"An event day is the web app shown at /webapp_event: an\n"
+"                announcement, links, the events and raffles of the day, and\n"
+"                the site plan with one chat per room."
+msgstr ""
+"Une journée d'événement est l'application web affichée à /webapp_event : une "
+"annonce, des liens, les événements et les tirages de la journée, et le plan "
+"du site avec une discussion par salle."
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+msgid "Angle (°)"
+msgstr "Angle (°)"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp_room__pos_rotation
+msgid ""
+"Angle of the area in degrees, clockwise around its centre, from -180 "
+"(excluded) to 180."
+msgstr ""
+"Angle de la zone en degrés, dans le sens horaire autour de son centre, de "
+"-180 (exclu) à 180."
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+msgid "Angle of the area in degrees, clockwise, from -180 to 180"
+msgstr "Angle de la zone en degrés, dans le sens horaire, de -180 à 180"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Animations are paused."
+msgstr "Les animations sont en pause."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Animations are playing."
+msgstr "Les animations sont actives."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid ""
+"Animations follow the device, which asks for less motion: they are paused."
+msgstr ""
+"Les animations suivent l'appareil, qui demande moins de mouvement : elles "
+"sont en pause."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Animations follow the device: they are playing."
+msgstr "Les animations suivent l'appareil : elles sont actives."
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__announcement
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_main
+msgid "Announcement"
+msgstr "Annonce"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_search
+msgid "Archived"
+msgstr "Archivée"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Area %(number)s on the plan, %(where)s."
+msgstr "Zone %(number)s du plan, %(where)s."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_bbb_meetings_view_form
+msgid "Assign"
+msgstr "Attribuer"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__message_attachment_count
+msgid "Attachment Count"
+msgstr "Nombre de pièces jointes"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp_room__access_group_id
+msgid ""
+"Authorized group of the chat channel. The room page gives it to every logged-"
+"in visitor of the room, and it is never taken back. Created automatically "
+"with the room."
+msgstr ""
+"Groupe autorisé du canal de discussion. La page de la salle le donne à "
+"chaque visiteur connecté de la salle, et il ne lui est jamais retiré. Créé "
+"automatiquement avec la salle."
+
+#. module: event_webapp_plan
+#: model:ir.model.fields.selection,name:event_webapp_plan.selection__res_config_settings__ewp_bbb_display__auto
+msgid ""
+"Automatic: embedded only when the server is on the same site as this web app"
+msgstr ""
+"Automatique : intégrée seulement quand le serveur est sur le même site que "
+"cette application web"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__bbb_meeting_id
+msgid "BBB meeting ID"
+msgstr "ID de réunion BBB"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_bbb_left
+msgid "Back to the room"
+msgstr "Retour à la salle"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp__date_start
+msgid "Before this moment, only moderators and administrators see the web app."
+msgstr ""
+"Avant ce moment, seuls les modérateurs et les administrateurs voient "
+"l'application web."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.res_config_settings_view_form
+msgid "BigBlueButton"
+msgstr "BigBlueButton"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_res_config_settings__ewp_bbb_server_url
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.res_config_settings_view_form
+msgid "BigBlueButton server"
+msgstr "Serveur BigBlueButton"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__bbb_configured
+msgid "BigBlueButton server set"
+msgstr "Serveur BigBlueButton configuré"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__channel_id
+msgid "Chat channel"
+msgstr "Canal de discussion"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+msgid "Check again whether the conference URL can be shown in the page"
+msgstr ""
+"Vérifier de nouveau si l'URL de la conférence peut s'afficher dans la page"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__bbb_frame_checked
+msgid "Checked on"
+msgstr "Vérifiée le"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_main
+msgid "Choose a room to enter it."
+msgstr "Choisissez une salle pour y entrer."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/event_webapp_bbb_meetings.py:0
+msgid "Choose the room that joins this meeting."
+msgstr "Choisissez la salle qui rejoint cette réunion."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_bbb_meetings_view_form
+msgid "Close"
+msgstr "Fermer"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__date_end
+msgid "Closes on"
+msgstr "Ferme le"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_closed
+msgid "Closing"
+msgstr "Fermeture"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__color
+msgid "Color"
+msgstr "Couleur"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp_room__color
+msgid "Colour of the room area on the plan, as #RRGGBB."
+msgstr "Couleur de la zone de la salle sur le plan, au format #RRGGBB."
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__bbb_room_url
+msgid "Conference URL"
+msgstr "URL de la conférence"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Conference left - %(room)s - %(day)s"
+msgstr "Conférence quittée - %(room)s - %(day)s"
+
+#. module: event_webapp_plan
+#: model:ir.model,name:event_webapp_plan.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
+
+#. module: event_webapp_plan
+#: model:ir.ui.menu,name:event_webapp_plan.menu_event_webapp_config
+msgid "Configuration"
+msgstr "Configuration"
+
+#. module: event_webapp_plan
+#: model_terms:ir.actions.act_window,help:event_webapp_plan.event_webapp_action
+msgid "Create an event day"
+msgstr "Créer une journée d'événement"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+msgid "Create missing chat channels"
+msgstr "Créer les canaux de discussion manquants"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__create_uid
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meeting_line__create_uid
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meetings__create_uid
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_link__create_uid
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__create_date
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meeting_line__create_date
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meetings__create_date
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_link__create_date
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_link__description
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__description
+msgid "Description"
+msgstr "Description"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp_room__channel_id
+msgid ""
+"Discuss channel embedded in the room page, open to the members of the access "
+"group of the room. Created automatically with the room."
+msgstr ""
+"Canal Discussion intégré à la page de la salle, ouvert aux membres du groupe "
+"d'accès de la salle. Créé automatiquement avec la salle."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid "Discussion"
+msgstr "Discussion"
+
+#. module: event_webapp_plan
+#: model:ir.model,name:event_webapp_plan.model_discuss_channel
+msgid "Discussion Channel"
+msgstr "Canal de discussion"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Discussion: %(room)s"
+msgstr "Discussion : %(room)s"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__display_name
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meeting_line__display_name
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meetings__display_name
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_link__display_name
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_preferences
+msgid "Display options"
+msgstr "Options d'affichage"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_layout
+msgid "Display options: text-only mode"
+msgstr "Options d'affichage : mode texte seul"
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+msgid ""
+"Drag inside the area to move it, a handle to resize it, the round knob to "
+"rotate it (Shift: 1° steps)."
+msgstr ""
+"Glissez dans la zone pour la déplacer, sur une poignée pour la "
+"redimensionner, sur le bouton rond pour la faire pivoter (Maj : pas de 1°)."
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+msgid "Drag on the plan to draw the area of"
+msgstr "Glissez sur le plan pour dessiner la zone de"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Event"
+msgstr "Événement"
+
+#. module: event_webapp_plan
+#: model:ir.module.category,name:event_webapp_plan.module_category_event_webapp
+#: model:ir.ui.menu,name:event_webapp_plan.menu_event_webapp_root
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.res_config_settings_view_form
+msgid "Event Web App"
+msgstr "Application web d'événement"
+
+#. module: event_webapp_plan
+#: model:ir.model,name:event_webapp_plan.model_event_webapp_bbb_meeting_line
+msgid "Event Web App BigBlueButton Meeting"
+msgstr "Réunion BigBlueButton de l'application web d'événement"
+
+#. module: event_webapp_plan
+#: model:ir.model,name:event_webapp_plan.model_event_webapp_bbb_meetings
+msgid "Event Web App BigBlueButton Meetings"
+msgstr "Réunions BigBlueButton de l'application web d'événement"
+
+#. module: event_webapp_plan
+#: model:ir.model,name:event_webapp_plan.model_event_webapp
+msgid "Event Web App Day"
+msgstr "Journée de l'application web d'événement"
+
+#. module: event_webapp_plan
+#: model:ir.model,name:event_webapp_plan.model_event_webapp_link
+msgid "Event Web App Link"
+msgstr "Lien de l'application web d'événement"
+
+#. module: event_webapp_plan
+#: model:ir.model,name:event_webapp_plan.model_event_webapp_room
+msgid "Event Web App Room"
+msgstr "Salle de l'application web d'événement"
+
+#. module: event_webapp_plan
+#: model:ir.module.category,name:event_webapp_plan.module_category_event_webapp_room
+msgid "Event Web App Rooms"
+msgstr "Salles de l'application web d'événement"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meeting_line__webapp_id
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meetings__webapp_id
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_link__webapp_id
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__webapp_id
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+msgid "Event day"
+msgstr "Journée d'événement"
+
+#. module: event_webapp_plan
+#: model:ir.actions.act_window,name:event_webapp_plan.event_webapp_action
+#: model:ir.ui.menu,name:event_webapp_plan.menu_event_webapp_days
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_list
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_search
+msgid "Event days"
+msgstr "Journées d'événement"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.view_users_form_simple_modif_ewp
+msgid "Event web app"
+msgstr "Application web d'événement"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_res_users__ewp_motion
+msgid "Event web app: animations"
+msgstr "Application web d'événement : animations"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_res_users__ewp_room_visit_group_ids
+msgid "Event web app: rooms entered"
+msgstr "Application web d'événement : salles visitées"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_res_users__ewp_text_only
+msgid "Event web app: text-only mode"
+msgstr "Application web d'événement : mode texte seul"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__event_ids
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+msgid "Events"
+msgstr "Événements"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields.selection,name:event_webapp_plan.selection__res_users__ewp_motion__auto
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_preferences
+msgid "Follow the device"
+msgstr "Suivre l'appareil"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_res_users__ewp_motion
+msgid ""
+"Follow the device: the event web app shows its animations unless the device "
+"asks for less motion. On: it shows them even then. Off: it stops every "
+"animation and no longer replaces the raffle results on its own."
+msgstr ""
+"Suivre l'appareil : l'application web d'événement montre ses animations, "
+"sauf si l'appareil demande moins de mouvement. Activées : elle les montre "
+"même dans ce cas. Arrêtées : elle arrête toutes les animations et ne "
+"remplace plus d'elle-même les résultats des tirages."
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__message_follower_ids
+msgid "Followers"
+msgstr "Abonnés"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Abonnés (partenaires)"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.res_config_settings_view_form
+msgid "Forget the secret"
+msgstr "Oublier le secret"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp__date_end
+msgid "From this moment, only moderators and administrators see the web app."
+msgstr ""
+"À partir de ce moment, seuls les modérateurs et les administrateurs voient "
+"l'application web."
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp__announcement
+msgid "General announcement shown at the top of the web app."
+msgstr "Annonce générale affichée en haut de l'application web."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+msgid "General announcement shown at the top of the web app..."
+msgstr "Annonce générale affichée en haut de l'application web..."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_search
+msgid "Group By"
+msgstr "Regrouper par"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__has_message
+msgid "Has Message"
+msgstr "A des messages"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__pos_height
+msgid "Height (%)"
+msgstr "Hauteur (%)"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Home - %(day)s"
+msgstr "Accueil - %(day)s"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__id
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meeting_line__id
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meetings__id
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_link__id
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__id
+msgid "ID"
+msgstr "ID"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Si coché, de nouveaux messages demandent votre attention."
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp__message_has_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Si coché, certains messages ont une erreur de livraison."
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp_room__bbb_meeting_id
+msgid ""
+"Internal meetingID of the BigBlueButton meeting of the room, for instance "
+"the meeting of a Greenlight room (button Running BBB meetings of the event "
+"day). Used when the BigBlueButton server and its shared secret are set in "
+"the settings. The meeting must be started by its host: the web app never "
+"creates it. Only the Settings group chooses it; an event administrator may "
+"clear it."
+msgstr ""
+"Identifiant interne (meetingID) de la réunion BigBlueButton de la salle, par "
+"exemple la réunion d'une salle Greenlight (bouton Réunions BBB en cours de "
+"la journée d'événement). Utilisé quand le serveur BigBlueButton et son "
+"secret partagé sont définis dans les paramètres. La réunion doit être "
+"démarrée par son hôte : l'application web ne la crée jamais. Seul le groupe "
+"Paramètres la choisit ; un administrateur d'événement peut la vider."
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__message_is_follower
+msgid "Is Follower"
+msgstr "Est abonné"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid "It opens in a new tab: this page and its discussion stay open."
+msgstr ""
+"Elle s'ouvre dans un nouvel onglet : cette page et sa discussion restent "
+"ouvertes."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid "Join again"
+msgstr "Rejoindre de nouveau"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid "Join the conference"
+msgstr "Rejoindre la conférence"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid "Join the video conference"
+msgstr "Rejoindre la visioconférence"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.res_config_settings_view_form
+msgid ""
+"Joins the meeting of a room directly in the room page. Run \"sudo bbb-conf --"
+"secret\" on the server to get its URL and its shared secret."
+msgstr ""
+"Permet de rejoindre la réunion d'une salle directement dans la page de la "
+"salle. Exécutez « sudo bbb-conf --secret » sur le serveur pour obtenir son "
+"URL et son secret partagé."
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_link__name
+msgid "Label"
+msgstr "Libellé"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__write_uid
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meeting_line__write_uid
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meetings__write_uid
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_link__write_uid
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__write_date
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meeting_line__write_date
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meetings__write_date
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_link__write_date
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.res_config_settings_view_form
+msgid "Leave empty to keep the saved secret"
+msgstr "Laisser vide pour garder le secret enregistré"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__pos_x
+msgid "Left (%)"
+msgstr "Gauche (%)"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__link_ids
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_main
+msgid "Links"
+msgstr "Liens"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_closed_footer
+msgid "Log out"
+msgstr "Se déconnecter"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+msgid ""
+"Logged-in users (portal or internal) see the web app\n"
+"                        between the opening and the closing moment. "
+"Moderators\n"
+"                        and administrators see it at any time, to test it."
+msgstr ""
+"Les utilisateurs connectés (portail ou internes) voient l'application web "
+"entre le moment d'ouverture et le moment de fermeture. Les modérateurs et "
+"les administrateurs la voient en tout temps, pour la tester."
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meeting_line__meeting_name
+msgid "Meeting"
+msgstr "Réunion"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meetings__meeting_count
+msgid "Meeting Count"
+msgstr "Nombre de réunions"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meeting_line__meeting_id
+msgid "Meeting ID"
+msgstr "ID de réunion"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meetings__line_ids
+msgid "Meetings"
+msgstr "Réunions"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_bbb_meetings_view_form
+msgid ""
+"Meetings currently known by the BigBlueButton server. A\n"
+"                    Greenlight room appears here once its host has started\n"
+"                    it. Choose a room, then assign: the room page joins\n"
+"                    that meeting."
+msgstr ""
+"Réunions actuellement connues du serveur BigBlueButton. Une salle Greenlight "
+"apparaît ici une fois que son hôte l'a démarrée. Choisissez une salle, puis "
+"attribuez : la page de la salle rejoint alors cette réunion."
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__message_has_error
+msgid "Message Delivery error"
+msgstr "Erreur de livraison du message"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__message_ids
+msgid "Messages"
+msgstr "Messages"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+#: model:res.groups,name:event_webapp_plan.group_event_webapp_moderator
+msgid "Moderator"
+msgstr "Modérateur"
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+msgid "Move"
+msgstr "Déplacer"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__name
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "New winner, %(raffle)s, %(prize)s: %(winner)s."
+msgstr "Nouveau gagnant, %(raffle)s, %(prize)s : %(winner)s."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "New winner, %(raffle)s: %(winner)s."
+msgstr "Nouveau gagnant, %(raffle)s : %(winner)s."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_raffles_content
+msgid "No draw planned yet."
+msgstr "Aucun tirage prévu pour l'instant."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "No event day"
+msgstr "Aucune journée d'événement"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_none
+msgid "No event day is configured"
+msgstr "Aucune journée d'événement n'est configurée"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_bbb_meetings_view_form
+msgid "No meeting is running on the server."
+msgstr "Aucune réunion n'est en cours sur le serveur."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_raffles_content
+msgid "No raffle for this day yet."
+msgstr "Aucun tirage pour cette journée pour l'instant."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.res_config_settings_view_form
+msgid "No secret is saved."
+msgstr "Aucun secret n'est enregistré."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Not open yet - %(day)s"
+msgstr "Pas encore ouverte - %(day)s"
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+msgid "Not placed on the plan yet"
+msgstr "Pas encore placée sur le plan"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Nombre d'actions"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__message_has_error_counter
+msgid "Number of errors"
+msgstr "Nombre d'erreurs"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Nombre de messages qui demandent une action"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Nombre de messages avec une erreur de livraison"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields.selection,name:event_webapp_plan.selection__res_users__ewp_motion__off
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_preferences
+msgid "Off"
+msgstr "Arrêtées"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Offline"
+msgstr "Hors ligne"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields.selection,name:event_webapp_plan.selection__res_users__ewp_motion__on
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_preferences
+msgid "On"
+msgstr "Activées"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/res_config_settings.py:0
+msgid "Only administrators can change the settings"
+msgstr "Seuls les administrateurs peuvent modifier les paramètres"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/event_webapp_room.py:0
+msgid ""
+"Only the Settings group lists the meetings of the BigBlueButton server and "
+"chooses the meeting of a room."
+msgstr ""
+"Seul le groupe Paramètres liste les réunions du serveur BigBlueButton et "
+"choisit la réunion d'une salle."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid "Open in a new tab"
+msgstr "Ouvrir dans un nouvel onglet"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__is_open
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+msgid "Open now"
+msgstr "Ouverte maintenant"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+msgid "Open the web app"
+msgstr "Ouvrir l'application web"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_closed
+msgid "Opening"
+msgstr "Ouverture"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_layout
+msgid "Opening hours:"
+msgstr "Heures d'ouverture :"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_search
+msgid "Opening month"
+msgstr "Mois d'ouverture"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+msgid "Opening window"
+msgstr "Plage d'ouverture"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__date_start
+msgid "Opens on"
+msgstr "Ouvre le"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Over - %(day)s"
+msgstr "Terminée - %(day)s"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meeting_line__participant_count
+msgid "Participants"
+msgstr "Participants"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_search
+msgid "Past"
+msgstr "Passées"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp_room__pos_height
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp_room__pos_y
+msgid "Percent of the image height."
+msgstr "Pourcentage de la hauteur de l'image."
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp_room__pos_width
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp_room__pos_x
+msgid "Percent of the image width."
+msgstr "Pourcentage de la largeur de l'image."
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+msgid "Placed on the plan"
+msgstr "Placée sur le plan"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+msgid "Plan & Rooms"
+msgstr "Plan et salles"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__raffle_ids
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_raffle_view_list_select
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_main
+msgid "Raffles"
+msgstr "Tirages"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+msgid "Re-check"
+msgstr "Revérifier"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_bbb_meetings_view_form
+msgid "Refresh"
+msgstr "Actualiser"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid "Reload this page to bring it back here."
+msgstr "Rechargez cette page pour la ramener ici."
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+msgid "Remove from the plan"
+msgstr "Retirer du plan"
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+msgid "Resize"
+msgstr "Redimensionner"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meeting_line__room_id
+msgid "Room"
+msgstr "Salle"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__room_count
+msgid "Room Count"
+msgstr "Nombre de salles"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_res_users__ewp_room_visit_group_ids
+msgid ""
+"Room groups given by a visit of the room page outside the Moderator role. "
+"They stay when the user leaves that role; the other room groups go."
+msgstr ""
+"Groupes de salle donnés par une visite de la page de la salle hors du rôle "
+"Modérateur. Ils restent quand l'utilisateur quitte ce rôle ; les autres "
+"groupes de salle partent."
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.js:0
+msgid "Room plan editor"
+msgstr "Éditeur du plan des salles"
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__room_ids
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_list
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_main
+msgid "Rooms"
+msgstr "Salles"
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+msgid "Rotate (Shift: 1° steps)"
+msgstr "Pivoter (Maj : pas de 1°)"
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+msgid "Rotate left"
+msgstr "Pivoter à gauche"
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+msgid "Rotate left by 15° (Shift: 1°)"
+msgstr "Pivoter à gauche de 15° (Maj : 1°)"
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+msgid "Rotate right"
+msgstr "Pivoter à droite"
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+msgid "Rotate right by 15° (Shift: 1°)"
+msgstr "Pivoter à droite de 15° (Maj : 1°)"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__pos_rotation
+msgid "Rotation (deg)"
+msgstr "Rotation (°)"
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+msgid "Rotation of the area"
+msgstr "Rotation de la zone"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meeting_line__running
+msgid "Running"
+msgstr "En cours"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/event_webapp_bbb_meetings.py:0
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_bbb_meetings_view_form
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+msgid "Running BBB meetings"
+msgstr "Réunions BBB en cours"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_res_config_settings__ewp_bbb_secret_set
+msgid "Secret saved"
+msgstr "Secret enregistré"
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+msgid "Select a room, then drag on the plan to draw its area."
+msgstr ""
+"Sélectionnez une salle, puis glissez sur le plan pour dessiner sa zone."
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_link__sequence
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__sequence
+msgid "Sequence"
+msgstr "Séquence"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/event_webapp_room.py:0
+msgid ""
+"Set the BigBlueButton server and its shared secret in the settings first."
+msgstr ""
+"Définissez d'abord le serveur BigBlueButton et son secret partagé dans les "
+"paramètres."
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+msgid "Set the angle back to 0°"
+msgstr "Remettre l'angle à 0°"
+
+#. module: event_webapp_plan
+#: model:ir.actions.act_window,name:event_webapp_plan.event_webapp_settings_action
+#: model:ir.ui.menu,name:event_webapp_plan.menu_event_webapp_settings
+msgid "Settings"
+msgstr "Paramètres"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_res_config_settings__ewp_bbb_secret
+msgid "Shared secret"
+msgstr "Secret partagé"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_res_config_settings__ewp_bbb_secret
+msgid ""
+"Shared secret of the BigBlueButton server, as printed by \"bbb-conf --"
+"secret\" on the server. Never shown again once saved: type a new one to "
+"replace it."
+msgstr ""
+"Secret partagé du serveur BigBlueButton, tel qu'affiché par « bbb-conf --"
+"secret » sur le serveur. Une fois enregistré, il n'est plus jamais affiché : "
+"tapez-en un nouveau pour le remplacer."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_main
+msgid "Show the latest results"
+msgstr "Afficher les derniers résultats"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid "Show the video conference"
+msgstr "Afficher la visioconférence"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__bbb_frameable
+msgid "Shown in the page"
+msgstr "Affichée dans la page"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_closed_footer
+msgid "Signed in as"
+msgstr "Connecté·e en tant que"
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__plan_image
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_main
+msgid "Site plan"
+msgstr "Plan du site"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_main
+msgid "Site plan."
+msgstr "Plan du site."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_main
+msgid "Site plan. The rooms are listed after the plan, as links."
+msgstr ""
+"Plan du site. Les salles sont énumérées après le plan, sous forme de liens."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_layout
+msgid "Skip to main content"
+msgstr "Aller au contenu principal"
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+msgid "Straighten"
+msgstr "Remettre droit"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_preferences
+msgid "Text-only mode"
+msgstr "Mode texte seul"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Text-only mode is off."
+msgstr "Le mode texte seul est désactivé."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Text-only mode is on."
+msgstr "Le mode texte seul est activé."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_closed
+msgid "Thank you for taking part!"
+msgstr "Merci d'y avoir participé!"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp__bbb_configured
+msgid ""
+"The BigBlueButton server URL and its shared secret are set in the settings."
+msgstr ""
+"L'URL du serveur BigBlueButton et son secret partagé sont définis dans les "
+"paramètres."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/event_webapp_room.py:0
+msgid ""
+"The BigBlueButton server answered with the HTTP status %(status)s. Check its "
+"URL in the settings."
+msgstr ""
+"Le serveur BigBlueButton a répondu avec le statut HTTP %(status)s. Vérifiez "
+"son URL dans les paramètres."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/event_webapp_room.py:0
+msgid ""
+"The BigBlueButton server cannot be reached. Check its URL in the settings."
+msgstr ""
+"Le serveur BigBlueButton est injoignable. Vérifiez son URL dans les "
+"paramètres."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/res_config_settings.py:0
+msgid "The BigBlueButton server must be an http or https address."
+msgstr "Le serveur BigBlueButton doit être une adresse http ou https."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/event_webapp_room.py:0
+msgid "The BigBlueButton server refused the request: %(key)s %(message)s"
+msgstr "Le serveur BigBlueButton a refusé la requête : %(key)s %(message)s"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/event_webapp_room.py:0
+msgid ""
+"The BigBlueButton server refused the shared secret. Check the secret in the "
+"settings."
+msgstr ""
+"Le serveur BigBlueButton a refusé le secret partagé. Vérifiez le secret dans "
+"les paramètres."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/event_webapp_room.py:0
+msgid ""
+"The access group of a room is created and managed by the room itself; it "
+"cannot be set by hand."
+msgstr ""
+"Le groupe d'accès d'une salle est créé et géré par la salle elle-même; on ne "
+"peut pas le choisir à la main."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/discuss_channel.py:0
+msgid ""
+"The access to the chat of an event web app room is managed by the room: only "
+"the Settings group may change its authorized group, its auto-subscribed "
+"groups or archive it."
+msgstr ""
+"L'accès à la discussion d'une salle de l'application web d'événement est "
+"géré par la salle : seul le groupe Paramètres peut modifier son groupe "
+"autorisé, ses groupes abonnés automatiquement ou l'archiver."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/event_webapp_room.py:0
+msgid ""
+"The answer of the server is not a BigBlueButton answer. Check its URL in the "
+"settings."
+msgstr ""
+"La réponse du serveur n'est pas une réponse BigBlueButton. Vérifiez son URL "
+"dans les paramètres."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/event_webapp_room.py:0
+msgid "The area of the room %(name)s cannot have a negative position or size."
+msgstr ""
+"La zone de la salle %(name)s ne peut pas avoir une position ou une taille "
+"négative."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/event_webapp_room.py:0
+msgid ""
+"The area of the room %(name)s goes beyond the plan image (position plus size "
+"above 100%%)."
+msgstr ""
+"La zone de la salle %(name)s dépasse l'image du plan (position plus taille "
+"supérieure à 100 %%)."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/event_webapp_room.py:0
+msgid ""
+"The channel %(channel)s already serves another room: each room needs a chat "
+"of its own."
+msgstr ""
+"Le canal %(channel)s sert déjà à une autre salle : chaque salle a besoin de "
+"sa propre discussion."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/event_webapp_room.py:0
+msgid ""
+"The channel %(channel)s is restricted to the group %(group)s. Only a channel "
+"open to everybody, or already restricted to the group of the room %(name)s, "
+"can be linked to it."
+msgstr ""
+"Le canal %(channel)s est réservé au groupe %(group)s. Seul un canal ouvert à "
+"tout le monde, ou déjà réservé au groupe de la salle %(name)s, peut lui être "
+"lié."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/event_webapp_room.py:0
+msgid ""
+"The chat of the room %(name)s must be a Discuss channel, not a private "
+"conversation or a thread."
+msgstr ""
+"La discussion de la salle %(name)s doit être un canal Discussion, et non une "
+"conversation privée ou un fil de discussion."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/event_webapp.py:0
+msgid "The closing moment of %(name)s must be after its opening moment."
+msgstr "Le moment de fermeture de %(name)s doit suivre son moment d'ouverture."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/event_webapp_room.py:0
+msgid ""
+"The conference URL of the room %(name)s must be an http or https web address."
+msgstr ""
+"L'URL de la conférence de la salle %(name)s doit être une adresse web http "
+"ou https."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "The conference has ended."
+msgstr "La conférence est terminée."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid "The conference has not started yet."
+msgstr "La conférence n'a pas encore commencé."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "The conference has started."
+msgstr "La conférence a commencé."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid "The conference is open in another tab."
+msgstr "La conférence est ouverte dans un autre onglet."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "The conference of %(room)s is live."
+msgstr "La conférence de %(room)s est en direct."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid ""
+"The conference opens in its own player, which has its own keyboard shortcuts "
+"and screen reader support."
+msgstr ""
+"La conférence s'ouvre dans son propre lecteur, qui a ses propres raccourcis "
+"clavier et sa prise en charge des lecteurs d'écran."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid "The discussion of this room is not open to your account."
+msgstr "La discussion de cette salle n'est pas ouverte à votre compte."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid ""
+"The event web app needs a network connection. Try again once you are back "
+"online."
+msgstr ""
+"L'application web de l'événement a besoin d'une connexion réseau. Réessayez "
+"une fois de retour en ligne."
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_res_users__ewp_text_only
+msgid ""
+"The event web app shows its content as linear text: no site plan image, no "
+"animation and no decorative image. The rooms stay a list of links and the "
+"video conference opens on demand."
+msgstr ""
+"L'application web d'événement présente son contenu en texte linéaire : ni "
+"image du plan du site, ni animation, ni image décorative. Les salles restent "
+"une liste de liens et la visioconférence s'ouvre sur demande."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/res_groups.py:0
+msgid ""
+"The group %(groups)s gives access to the chat of an event web app room. "
+"Deleting it would open that chat to everybody, anonymous visitors included."
+msgstr ""
+"Le groupe %(groups)s donne accès à la discussion d'une salle de "
+"l'application web d'événement. Le supprimer ouvrirait cette discussion à "
+"tout le monde, y compris aux visiteurs anonymes."
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp_room__bbb_frameable
+msgid ""
+"The headers of the conference URL let the web app show it in the page (X-"
+"Frame-Options and Content-Security-Policy frame-ancestors). Checked when the "
+"URL changes and by the button Re-check."
+msgstr ""
+"Les en-têtes de l'URL de la conférence permettent à l'application web de "
+"l'afficher dans la page (X-Frame-Options et frame-ancestors de Content-"
+"Security-Policy). Vérifié quand l'URL change et par le bouton Revérifier."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_closed
+msgid ""
+"The plan, the rooms and the discussions are open during the day. Come back "
+"at the opening."
+msgstr ""
+"Le plan, les salles et les discussions sont accessibles pendant la journée. "
+"Revenez à l'ouverture."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid ""
+"The raffle results are no longer updated. Reload the page to see the latest "
+"draws."
+msgstr ""
+"Les résultats des tirages ne sont plus mis à jour. Rechargez la page pour "
+"voir les derniers tirages."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid ""
+"The raffle results changed. Use the button \"Show the latest results\" to "
+"see them."
+msgstr ""
+"Les résultats des tirages ont changé. Utilisez le bouton « Afficher les "
+"derniers résultats » pour les voir."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "The raffles were updated: %(drawn)s drawn of %(total)s."
+msgstr "Les tirages ont été mis à jour : %(drawn)s tirés sur %(total)s."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/event_webapp_bbb_meetings.py:0
+msgid "The room must belong to this event day."
+msgstr "La salle doit appartenir à cette journée d'événement."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.res_config_settings_view_form
+msgid ""
+"The rooms will stop joining their meeting through the server. Forget the "
+"secret?"
+msgstr ""
+"Les salles cesseront de rejoindre leur réunion par le serveur. Oublier le "
+"secret?"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/models/event_webapp_room.py:0
+msgid "The rotation of a room area must be a finite number."
+msgstr "La rotation de la zone d'une salle doit être un nombre fini."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid "The video conference is live."
+msgstr "La visioconférence est en direct."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid "The video conference server does not answer at the moment."
+msgstr "Le serveur de visioconférence ne répond pas pour le moment."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.res_config_settings_view_form
+msgid ""
+"The video conference server keeps the session of each participant in a "
+"cookie, which browsers refuse in a page embedded from another site (Safari "
+"always refuses it). Automatic embeds the conference only when its server is "
+"on the same site as this web app, and otherwise opens it in a new tab."
+msgstr ""
+"Le serveur de visioconférence garde la session de chaque participant dans un "
+"témoin (cookie), que les navigateurs refusent dans une page intégrée depuis "
+"un autre site (Safari le refuse toujours). Le mode automatique intègre la "
+"conférence seulement quand son serveur est sur le même site que cette "
+"application web, et l'ouvre sinon dans un nouvel onglet."
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_res_config_settings__ewp_bbb_display
+msgid ""
+"The video conference server keeps the session of each participant in a "
+"cookie. Browsers refuse that cookie when the conference is embedded in a "
+"page of another site, and Safari always refuses it: the conference then "
+"fails to load in the room page. The automatic mode embeds it only when the "
+"server is on the same site as this web app, and otherwise shows a button "
+"that opens it in a new tab, the room page and its discussion staying open."
+msgstr ""
+"Le serveur de visioconférence garde la session de chaque participant dans un "
+"témoin (cookie). Les navigateurs refusent ce témoin quand la conférence est "
+"intégrée à une page d'un autre site, et Safari le refuse toujours : la "
+"conférence ne se charge alors pas dans la page de la salle. Le mode "
+"automatique l'intègre seulement quand le serveur est sur le même site que "
+"cette application web, et affiche sinon un bouton qui l'ouvre dans un nouvel "
+"onglet, la page de la salle et sa discussion restant ouvertes."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_none
+msgid "There is no event day to show at the moment. Come back later."
+msgstr ""
+"Il n'y a aucune journée d'événement à afficher pour le moment. Revenez plus "
+"tard."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid "This page reloads by itself as soon as the conference starts."
+msgstr "Cette page se recharge d'elle-même dès que la conférence commence."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid "This room has no discussion yet."
+msgstr "Cette salle n'a pas encore de discussion."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_raffles_content
+msgid "To be drawn"
+msgstr "À tirer"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_search
+msgid "Today and later"
+msgstr "Aujourd'hui et après"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_main
+msgid "Today's events"
+msgstr "Événements de la journée"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__pos_y
+msgid "Top (%)"
+msgstr "Haut (%)"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp__is_open
+msgid "True between the opening and the closing moment."
+msgstr "Vrai entre le moment d'ouverture et le moment de fermeture."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_preferences
+msgid "Turn them on"
+msgstr "Les activer"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_link__url
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.res_config_settings_view_form
+msgid "URL"
+msgstr "URL"
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.js:0
+msgid "Unnamed room"
+msgstr "Salle sans nom"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Updated %(minutes)s min ago"
+msgstr "Mis à jour il y a %(minutes)s min"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Updated %(seconds)s s ago"
+msgstr "Mis à jour il y a %(seconds)s s"
+
+#. module: event_webapp_plan
+#. odoo-javascript
+#: code:addons/event_webapp_plan/static/src/backend/room_plan_editor.xml:0
+msgid "Upload a site plan image above, then draw the rooms on it."
+msgstr ""
+"Téléversez une image du plan du site ci-dessus, puis dessinez-y les salles."
+
+#. module: event_webapp_plan
+#: model:ir.model,name:event_webapp_plan.model_res_users
+msgid "User"
+msgstr "Utilisateur"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_main
+msgid "Video <span class=\"o_ewp_sr_only\">conference</span>"
+msgstr "Vidéo <span class=\"o_ewp_sr_only\">(visioconférence)</span>"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid "Video conference"
+msgstr "Visioconférence"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_res_config_settings__ewp_bbb_display
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.res_config_settings_view_form
+msgid "Video conference display"
+msgstr "Affichage de la visioconférence"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Video conference: %(room)s"
+msgstr "Visioconférence : %(room)s"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp_room__bbb_room_url
+msgid ""
+"Web address of the conference (http or https), used when no meeting ID can "
+"be joined through the server. Shown in the page when its headers allow it, "
+"else opened in a new tab."
+msgstr ""
+"Adresse web de la conférence (http ou https), utilisée quand aucun ID de "
+"réunion ne peut être rejoint par le serveur. Affichée dans la page quand ses "
+"en-têtes le permettent, sinon ouverte dans un nouvel onglet."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+msgid "Web app"
+msgstr "Application web"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__webapp_url
+msgid "Web app URL"
+msgstr "URL de l'application web"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__website_message_ids
+msgid "Website Messages"
+msgstr "Messages du site web"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp__website_message_ids
+msgid "Website communication history"
+msgstr "Historique des communications du site web"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__pos_width
+msgid "Width (%)"
+msgstr "Largeur (%)"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_bbb_meeting_line__wizard_id
+msgid "Wizard"
+msgstr "Assistant"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "You are offline"
+msgstr "Vous êtes hors ligne"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_bbb_left
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_room
+msgid "You left the conference."
+msgstr "Vous avez quitté la conférence."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "at the bottom"
+msgstr "en bas"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "at the top"
+msgstr "en haut"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+msgid "e.g. Annual meeting day"
+msgstr "p. ex. Journée de la rencontre annuelle"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.res_config_settings_view_form
+msgid "https://bbb.example.org/bigbluebutton/"
+msgstr "https://bbb.example.org/bigbluebutton/"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "in the bottom left corner"
+msgstr "en bas à gauche"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "in the bottom right corner"
+msgstr "en bas à droite"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "in the centre"
+msgstr "au centre"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "in the top left corner"
+msgstr "en haut à gauche"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "in the top right corner"
+msgstr "en haut à droite"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_closed
+msgid "is not open yet"
+msgstr "n'est pas encore ouverte"
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_closed
+msgid "is over"
+msgstr "est terminée"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "on the left"
+msgstr "à gauche"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "on the right"
+msgstr "à droite"

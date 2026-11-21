@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
+    Copyright (C) 2026 Rencontres Linux au Québec contributors
+    License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+
+    Rencontres Linux theme of the /webapp_event pages (design version 3,
+    "Pause café animée"). Everything goes through the hooks of
+    event_webapp_plan: the brand template, the slots (mascot, banner, home
+    lead) and two xpaths on the home page (vector Tux in the raffle card,
+    ornament after the main content). The slots are not rendered in
+    text-only mode; the home lead slot is, and its card then drops its
+    image.
+
+    Every picture added here is decorative and hidden from assistive
+    technologies, except the raster Tux and the poster, whose alternative
+    text describes them. The vector Tux (template tux_svg) is aria-hidden:
+    the shared live region of the page already announces what changes its
+    pose. The lys icons are CSS masks (rlq_theme.scss), not images.
+-->
+<odoo>
+    <!-- Brand of the app bars: the round Tux avatar in place of the app
+         icon; the app label of event_webapp_plan stays. -->
+    <template id="webapp_brand" inherit_id="event_webapp_plan.webapp_brand" name="RLQ web app: brand">
+        <xpath expr="//span[hasclass('o_ewp_logo')]" position="replace">
+            <span t-if="not text_only" class="o_ewp_logo o_rlq_logo" aria-hidden="true">
+                <img src="/rlq_event_webapp_plan/static/src/webapp/img/tux-avatar.jpg" alt="" width="40" height="40"/>
+            </span>
+        </xpath>
+    </template>
+
+    <!-- Vector Tux, an original drawing in the classic shape, with a
+         fleur-de-lys on the belly and a lys mug. Parameters: tux_state
+         (pose: idle, greeting, sipping, celebrate, sleeping, coffee, code,
+         speak, wave, walk or peek; rlq_theme.js changes it through
+         data-rlq-tux) and tux_class (size and colours of the place).
+         viewBox 140 x 148: the penguin stands in the left 125 units; the
+         top left corner holds the speech bubble, the top right one the
+         Zzz, the confetti, the code glyphs and the live dot. Each moving
+         part is a group with its own class, hidden until a pose shows it:
+         the face (eyes and beak), the feet, the laptop and its screen
+         glow, the code glyphs, the hand microphone and its sound waves.
+         The glyphs are strokes, not text, so the drawing holds nothing to
+         read. The poses and animations are in rlq_theme.scss. No id, so
+         the drawing can appear several times on a page. -->
+    <template id="tux_svg" name="RLQ web app: vector Tux">
+        <svg t-attf-class="o_rlq_tux #{tux_class or ''}" viewBox="0 0 140 148" aria-hidden="true" focusable="false"
+             t-att-data-rlq-tux="tux_state or 'idle'">
+            <g class="o_rlq_tux_body">
+                <ellipse cx="62" cy="96" rx="40" ry="42" class="o_rlq_tux_black"/>
+                <ellipse cx="62" cy="44" rx="30" ry="32" class="o_rlq_tux_black"/>
+                <ellipse cx="62" cy="100" rx="28" ry="35" class="o_rlq_tux_white"/>
+                <g class="o_rlq_tux_lys" transform="translate(49 84) scale(0.26)">
+                    <path d="M50 4C40 18 36 32 42 46C44 52 46 56 46 62H54C54 56 56 52 58 46C64 32 60 18 50 4Z"/>
+                    <path d="M44 62C40 50 30 40 20 42C8 44 6 58 14 64C18 67 24 66 26 62C22 62 18 58 20 54C23 49 32 52 36 62Z"/>
+                    <path d="M56 62C60 50 70 40 80 42C92 44 94 58 86 64C82 67 76 66 74 62C78 62 82 58 80 54C77 49 68 52 64 62Z"/>
+                    <rect x="30" y="62" width="40" height="7" rx="2"/>
+                    <path d="M46 70C46 80 42 88 36 94H44C48 90 50 84 50 80C50 84 52 90 56 94H64C58 88 54 80 54 70Z"/>
+                </g>
+                <g class="o_rlq_tux_face">
+                    <g class="o_rlq_tux_eye o_rlq_tux_eye_l">
+                        <ellipse cx="52" cy="41" rx="9.5" ry="12.5" class="o_rlq_tux_white"/>
+                        <ellipse cx="54.5" cy="44" rx="4.2" ry="5.6" class="o_rlq_tux_black o_rlq_tux_pupil"/>
+                        <circle cx="55.8" cy="42" r="1.4" class="o_rlq_tux_glint"/>
+                    </g>
+                    <g class="o_rlq_tux_eye o_rlq_tux_eye_r">
+                        <ellipse cx="72" cy="41" rx="9.5" ry="12.5" class="o_rlq_tux_white"/>
+                        <ellipse cx="69.5" cy="44" rx="4.2" ry="5.6" class="o_rlq_tux_black o_rlq_tux_pupil"/>
+                        <circle cx="70.8" cy="42" r="1.4" class="o_rlq_tux_glint"/>
+                    </g>
+                    <path d="M51 57Q62 68 73 57Q62 61 51 57Z" class="o_rlq_tux_beak_low"/>
+                    <path d="M48 55Q62 46 76 55Q62 63 48 55Z" class="o_rlq_tux_beak"/>
+                </g>
+                <g class="o_rlq_tux_foot o_rlq_tux_foot_l">
+                    <ellipse cx="44" cy="139" rx="15" ry="6" class="o_rlq_tux_beak"/>
+                </g>
+                <g class="o_rlq_tux_foot o_rlq_tux_foot_r">
+                    <ellipse cx="80" cy="139" rx="15" ry="6" class="o_rlq_tux_beak"/>
+                </g>
+                <ellipse cx="62" cy="92" rx="27" ry="9" class="o_rlq_tux_glow"/>
+                <g class="o_rlq_tux_laptop">
+                    <rect x="36" y="100" width="52" height="32" rx="3" class="o_rlq_tux_lid"/>
+                    <g class="o_rlq_tux_sticker" transform="translate(54 107) scale(0.17)">
+                        <path d="M50 4C40 18 36 32 42 46C44 52 46 56 46 62H54C54 56 56 52 58 46C64 32 60 18 50 4Z"/>
+                        <path d="M44 62C40 50 30 40 20 42C8 44 6 58 14 64C18 67 24 66 26 62C22 62 18 58 20 54C23 49 32 52 36 62Z"/>
+                        <path d="M56 62C60 50 70 40 80 42C92 44 94 58 86 64C82 67 76 66 74 62C78 62 82 58 80 54C77 49 68 52 64 62Z"/>
+                        <rect x="30" y="62" width="40" height="7" rx="2"/>
+                        <path d="M46 70C46 80 42 88 36 94H44C48 90 50 84 50 80C50 84 52 90 56 94H64C58 88 54 80 54 70Z"/>
+                    </g>
+                    <path d="M28 132H96L91 138H33Z" class="o_rlq_tux_deck"/>
+                </g>
+                <g class="o_rlq_tux_flip_r">
+                    <path d="M94 72C108 84 112 104 106 118C100 112 94 100 90 88Z" class="o_rlq_tux_black"/>
+                </g>
+                <g class="o_rlq_tux_handmic">
+                    <path d="M75 85L80 70" class="o_rlq_tux_mic_handle"/>
+                    <circle cx="81" cy="65" r="6.5" class="o_rlq_tux_mic_head"/>
+                    <path d="M75.5 63H86.5M75.5 67H86.5" class="o_rlq_tux_mic_grille"/>
+                </g>
+                <g class="o_rlq_tux_mug">
+                    <g class="o_rlq_tux_steam">
+                        <path d="M13 95c-3-4 3-7 0-11c-2-3 1-5 0-7"/>
+                        <path d="M19 93c-3-4 3-7 0-11c-2-3 1-5 0-7"/>
+                        <path d="M25 95c-3-4 3-7 0-11c-2-3 1-5 0-7"/>
+                    </g>
+                    <path d="M30 104q7 0 7 6q0 6-7 6" class="o_rlq_tux_handle"/>
+                    <rect x="8" y="100" width="22" height="20" rx="3" class="o_rlq_tux_mug_body"/>
+                    <ellipse cx="19" cy="100.5" rx="11" ry="2.5" class="o_rlq_tux_coffee"/>
+                    <g class="o_rlq_tux_mug_lys" transform="translate(13.5 103.5) scale(0.11)">
+                        <path d="M50 4C40 18 36 32 42 46C44 52 46 56 46 62H54C54 56 56 52 58 46C64 32 60 18 50 4Z"/>
+                        <path d="M44 62C40 50 30 40 20 42C8 44 6 58 14 64C18 67 24 66 26 62C22 62 18 58 20 54C23 49 32 52 36 62Z"/>
+                        <path d="M56 62C60 50 70 40 80 42C92 44 94 58 86 64C82 67 76 66 74 62C78 62 82 58 80 54C77 49 68 52 64 62Z"/>
+                        <rect x="30" y="62" width="40" height="7" rx="2"/>
+                        <path d="M46 70C46 80 42 88 36 94H44C48 90 50 84 50 80C50 84 52 90 56 94H64C58 88 54 80 54 70Z"/>
+                    </g>
+                </g>
+                <g class="o_rlq_tux_flip_l">
+                    <path d="M30 72C16 84 12 104 18 118C24 112 30 100 34 88Z" class="o_rlq_tux_black"/>
+                </g>
+            </g>
+            <g class="o_rlq_tux_waves">
+                <path d="M93 58q5 7 0 14"/>
+                <path d="M99 53q8 12 0 24"/>
+                <path d="M105 48q11 17 0 34"/>
+            </g>
+            <g class="o_rlq_tux_bubble">
+                <path d="M8 3H32A6 6 0 0 1 38 9V21A6 6 0 0 1 32 27H25L18 34L17 27H8A6 6 0 0 1 2 21V9A6 6 0 0 1 8 3Z" class="o_rlq_tux_bubble_box"/>
+                <circle cx="11" cy="15" r="2.6" class="o_rlq_tux_dot"/>
+                <circle cx="20" cy="15" r="2.6" class="o_rlq_tux_dot"/>
+                <circle cx="29" cy="15" r="2.6" class="o_rlq_tux_dot"/>
+            </g>
+            <g class="o_rlq_tux_glyphs">
+                <path d="M102 88c-3 0-3 2-3 4v1c0 1-1 2-2 2c1 0 2 1 2 2v1c0 2 0 4 3 4M109 88c3 0 3 2 3 4v1c0 1 1 2 2 2c-1 0-2 1-2 2v1c0 2 0 4-3 4" class="o_rlq_tux_glyph"/>
+                <path d="M118 90l-5 5 5 5M121 101l4-12M128 90l5 5-5 5" class="o_rlq_tux_glyph"/>
+                <path d="M104 89c-1-2-6-2-6 1c0 3 6 2 6 5c0 3-5 3-6 1M101 87v12M107 100h6" class="o_rlq_tux_glyph"/>
+                <path d="M116 93a3 3 0 1 0 0.1 0M119 92v8c0 3-5 3-6 1M123 92v7M123 89v0.1M127 88v10c0 1 1 2 3 1M125 92h5" class="o_rlq_tux_glyph"/>
+            </g>
+            <g class="o_rlq_tux_zzz">
+                <path d="M100 34h8l-8 9h8"/>
+                <path d="M112 20h10l-10 11h10"/>
+                <path d="M124 4h12l-12 13h12"/>
+            </g>
+            <g class="o_rlq_tux_confetti">
+                <rect x="10" y="10" width="6" height="3" rx="1" class="o_rlq_tux_c_yellow"/>
+                <rect x="30" y="2" width="5" height="5" rx="1" class="o_rlq_tux_c_orange"/>
+                <rect x="52" y="6" width="6" height="3" rx="1" class="o_rlq_tux_c_cream"/>
+                <rect x="78" y="0" width="5" height="5" rx="1" class="o_rlq_tux_c_yellow"/>
+                <rect x="98" y="12" width="6" height="3" rx="1" class="o_rlq_tux_c_orange"/>
+                <rect x="118" y="4" width="5" height="5" rx="1" class="o_rlq_tux_c_cream"/>
+                <rect x="20" y="28" width="5" height="5" rx="1" class="o_rlq_tux_c_cream"/>
+                <rect x="108" y="30" width="6" height="3" rx="1" class="o_rlq_tux_c_yellow"/>
+            </g>
+            <g class="o_rlq_tux_live">
+                <circle cx="124" cy="34" r="7" class="o_rlq_tux_live_ring"/>
+                <circle cx="124" cy="34" r="7" class="o_rlq_tux_live_dot"/>
+            </g>
+        </svg>
+    </template>
+
+    <!-- Pose of the vector Tux for the state of the page, so that the page
+         is right before the script runs, and without it: sipping before
+         the opening, asleep after the closing, waving on the "conference
+         left" page and on a room page rendered after a leave, speaking into the microphone while the room meeting
+         runs, drinking a coffee while it waits, idle otherwise. -->
+    <template id="tux_for_page" name="RLQ web app: vector Tux of the page">
+        <t t-call="rlq_event_webapp_plan.tux_svg">
+            <t t-set="tux_state" t-value="'sipping' if day_state == 'before' else 'sleeping' if day_state == 'after' else 'wave' if ewp_page == 'bbb_left' or (bbb and bbb.get('left')) else 'speak' if bbb and bbb.get('live') else 'coffee' if bbb and bbb.get('state') == 'waiting' else 'idle'"/>
+        </t>
+    </template>
+
+    <!-- Mascot slot: rising lys flakes behind every bar; the drawing of
+         the Tux cameos, in an inert template element that rlq_theme.js
+         copies for each cameo (nothing of it is rendered or read); on the
+         home page the string lights, the tagline and the raster Tux with
+         its steam; Tux with its coffee on the "not open yet" page; the
+         vector Tux on the room bar and on the other full-screen pages. -->
+    <template id="webapp_slot_mascot" inherit_id="event_webapp_plan.webapp_slot_mascot" name="RLQ web app: mascots">
+        <xpath expr="." position="inside">
+            <span class="o_rlq_flakes" aria-hidden="true">
+                <span class="o_rlq_flake"/><span class="o_rlq_flake"/><span class="o_rlq_flake"/>
+                <span class="o_rlq_flake"/><span class="o_rlq_flake"/><span class="o_rlq_flake"/>
+                <span class="o_rlq_flake"/><span class="o_rlq_flake"/><span class="o_rlq_flake"/>
+            </span>
+            <template class="o_rlq_tux_source">
+                <t t-call="rlq_event_webapp_plan.tux_svg">
+                    <t t-set="tux_class" t-value="'o_rlq_tux_cameo'"/>
+                </t>
+            </template>
+            <t t-if="ewp_page == 'home'">
+                <span class="o_rlq_lights" aria-hidden="true">
+                    <span class="o_rlq_bulb"/><span class="o_rlq_bulb"/><span class="o_rlq_bulb"/><span class="o_rlq_bulb"/><span class="o_rlq_bulb"/>
+                    <span class="o_rlq_bulb"/><span class="o_rlq_bulb"/><span class="o_rlq_bulb"/><span class="o_rlq_bulb"/><span class="o_rlq_bulb"/>
+                </span>
+                <p class="o_rlq_eyebrow">GNU/Linux · Québec</p>
+                <t t-call="rlq_event_webapp_plan.tux_raster">
+                    <t t-set="tux_raster_class" t-value="'o_rlq_hero'"/>
+                </t>
+            </t>
+            <t t-elif="ewp_page == 'room'">
+                <t t-call="rlq_event_webapp_plan.tux_for_page">
+                    <t t-set="tux_class" t-value="'o_rlq_tux_bar'"/>
+                </t>
+            </t>
+            <div t-elif="ewp_page == 'closed' and day_state == 'before'" class="o_rlq_closed_figure">
+                <t t-call="rlq_event_webapp_plan.tux_raster">
+                    <t t-set="tux_raster_class" t-value="'o_rlq_closed_tux'"/>
+                </t>
+                <p class="o_rlq_brewing">The coffee is brewing...</p>
+            </div>
+            <div t-else="" class="o_rlq_closed_figure">
+                <t t-call="rlq_event_webapp_plan.tux_for_page">
+                    <t t-set="tux_class" t-value="'o_rlq_tux_large'"/>
+                </t>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Raster Tux with its coffee (image supplied by the organisers) and
+         three wisps of steam over the mug. -->
+    <template id="tux_raster" name="RLQ web app: Tux with a coffee">
+        <span t-attf-class="o_rlq_tux_photo #{tux_raster_class or ''}">
+            <img src="/rlq_event_webapp_plan/static/src/webapp/img/tux-cafe.jpg" width="480" height="540"
+                 alt="Tux, the GNU/Linux penguin, with a fleur-de-lys on its belly and a cup of coffee in its flipper"/>
+            <svg class="o_rlq_steam" viewBox="0 0 20 40" aria-hidden="true" focusable="false"><path d="M10 38C4 30 16 24 10 16C6 10 12 6 10 2"/></svg>
+            <svg class="o_rlq_steam" viewBox="0 0 20 40" aria-hidden="true" focusable="false"><path d="M10 38C4 30 16 24 10 16C6 10 12 6 10 2"/></svg>
+            <svg class="o_rlq_steam" viewBox="0 0 20 40" aria-hidden="true" focusable="false"><path d="M10 38C4 30 16 24 10 16C6 10 12 6 10 2"/></svg>
+        </span>
+    </template>
+
+    <!-- Banner slot: the yellow rule and the ribbon of words. Screen
+         readers get the words once, as a sentence; the moving copies are
+         hidden from them, and marked so that no cameo covers them. The track holds six copies of the words and
+         slides by one copy per loop (rlq_theme.scss), so it still covers
+         a band of about 3600 px at the end of each loop. While the ribbon
+         stands still, the first copy alone shows, wrapped on several
+         lines. The button, named by aria-label as it shows an icon only,
+         pauses the ribbon alone; it is hidden while every animation is
+         paused. -->
+    <template id="webapp_slot_banner" inherit_id="event_webapp_plan.webapp_slot_banner" name="RLQ web app: ribbon">
+        <xpath expr="." position="inside">
+            <div class="o_rlq_band">
+                <p class="o_ewp_sr_only">Convivial, informative, fun: friendly chats, tips and tricks, questions and debates.</p>
+                <div class="o_rlq_marquee" aria-hidden="true" data-ewp-cameo-avoid="">
+                    <div class="o_rlq_marquee_track">
+                        <div t-foreach="range(6)" t-as="copy" class="o_rlq_copy">
+                            <div class="o_rlq_word">Convivial</div>
+                            <div class="o_rlq_word">Informative</div>
+                            <div class="o_rlq_word">Fun</div>
+                            <div class="o_rlq_word">Friendly chats</div>
+                            <div class="o_rlq_word">Tips and tricks</div>
+                            <div class="o_rlq_word">Questions and debates</div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="o_rlq_marquee_toggle" aria-pressed="false"
+                        aria-label="Pause the scrolling words">
+                    <svg class="o_rlq_marquee_icon o_rlq_marquee_icon_pause" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="3" y="2" width="3.5" height="12" rx="1"/><rect x="9.5" y="2" width="3.5" height="12" rx="1"/></svg>
+                    <svg class="o_rlq_marquee_icon o_rlq_marquee_icon_play" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 2.5v11l9.5-5.5z"/></svg>
+                </button>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Home lead slot: the Pause Café Linux card, when the day shows it.
+         It comes first on phones, before the announcement, and tops the
+         main column on wide screens. In text-only mode it keeps its
+         heading and text, without the poster. -->
+    <template id="webapp_slot_home_lead" inherit_id="event_webapp_plan.webapp_slot_home_lead" name="RLQ web app: poster card">
+        <xpath expr="." position="inside">
+            <section t-if="rlq_show_poster" class="o_ewp_card o_rlq_poster" aria-labelledby="o_rlq_h_poster">
+                <div t-if="not text_only" class="o_rlq_poster_media">
+                    <img class="o_rlq_poster_image" src="/rlq_event_webapp_plan/static/src/webapp/img/pause-cafe-linux.jpg"
+                         width="864" height="576"
+                         alt="Pause Café Linux poster: Tux with a fleur-de-lys and a cup of coffee in a warm café"/>
+                    <span class="o_rlq_pendant" aria-hidden="true"/>
+                </div>
+                <div class="o_rlq_poster_body">
+                    <h2 id="o_rlq_h_poster">Pause Café Linux</h2>
+                    <p>Every Friday at noon (Eastern time) on BigBlueButton. Let's chat about Linux over a virtual coffee!</p>
+                    <ul class="o_rlq_tags" role="list">
+                        <li>Friendly chats</li>
+                        <li>Tips and tricks</li>
+                        <li>Questions and debates</li>
+                    </ul>
+                </div>
+            </section>
+        </xpath>
+    </template>
+
+    <!-- Home page: the vector Tux in the raffle card, where it celebrates
+         the new winners, and the ornament under the content, whose words
+         no cameo covers. -->
+    <template id="webapp_page_main" inherit_id="event_webapp_plan.webapp_page_main" name="RLQ web app: home page">
+        <xpath expr="//span[hasclass('o_ewp_updated')]" position="before">
+            <t t-if="not text_only" t-call="rlq_event_webapp_plan.tux_for_page">
+                <t t-set="tux_class" t-value="'o_rlq_tux_card'"/>
+            </t>
+        </xpath>
+        <xpath expr="//main[@id='o_ewp_main']" position="after">
+            <div t-if="not text_only" class="o_rlq_ornament" aria-hidden="true">
+                <div class="o_rlq_ornament_line">
+                    <span class="o_rlq_rule_line"/>
+                    <span class="o_rlq_lys"/>
+                    <span class="o_rlq_lys o_rlq_lys_big o_rlq_spin"/>
+                    <span class="o_rlq_lys"/>
+                    <span class="o_rlq_rule_line"/>
+                </div>
+                <div class="o_rlq_ornament_words" data-ewp-cameo-avoid="">Convivial · Informative · Fun</div>
+            </div>
+        </xpath>
+    </template>
+</odoo>

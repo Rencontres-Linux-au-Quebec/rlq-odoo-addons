@@ -1,0 +1,2481 @@
+// Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
+// Copyright (C) 2026 Rencontres Linux au Québec contributors
+// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+//
+// Rencontres Linux theme of the event web app (design version 3, "Pause
+// café animée"), loaded after webapp.scss of event_webapp_plan in the bundle
+// event_webapp_plan.assets_webapp. It sets the custom properties of the
+// pages (light and dark scheme), restyles the bars and cards, and draws the
+// parts the slots add (views/webapp_templates.xml).
+//
+// Motion: every animation of this file sits in one block,
+// @include ewp-motion-allowed of event_webapp_plan, at the end: it applies
+// under the animation mode "on", and under "auto" while the device does not
+// ask for reduced motion. The rules of event_webapp_plan also set every
+// animation and transition to none under the mode "off" and in text-only
+// mode (body classes o_ewp_motion_off, o_ewp_motion_paused). The poses of
+// the vector Tux are static transforms outside that block, so a paused
+// page still shows the pose of the moment.
+//
+// Text-only mode: the slots are not rendered; the rules here that would
+// add a picture (lys icons, bar motif) skip .o_ewp_text_only.
+//
+// Font: Bree Serif (headings), woff2 files of the latin and latin-ext
+// subsets from the @fontsource/bree-serif npm package, served from fonts/
+// (SIL Open Font License 1.1, text beside the files). Bree Serif has one
+// weight, 400: the headings use it, never a synthesised bold. The url()
+// paths are relative to this file, as the asset bundle rewrites them.
+
+$rlq-latin: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F,
+    U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+$rlq-latin-ext: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF,
+    U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+
+@font-face {
+    font-family: "Rlq Bree Serif";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400;
+    src: url("fonts/bree-serif-latin-ext-400-normal.woff2") format("woff2");
+    unicode-range: $rlq-latin-ext;
+}
+
+@font-face {
+    font-family: "Rlq Bree Serif";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400;
+    src: url("fonts/bree-serif-latin-400-normal.woff2") format("woff2");
+    unicode-range: $rlq-latin;
+}
+
+// A lys drawn in the text colour: the glyph is a mask over currentColor.
+@mixin rlq-lys($size) {
+    display: inline-block;
+    flex: none;
+    width: $size;
+    height: $size;
+    background-color: currentColor;
+    -webkit-mask: url("img/lys.svg") center / contain no-repeat;
+    mask: url("img/lys.svg") center / contain no-repeat;
+}
+
+// Copies of the words in the ribbon track (views/webapp_templates.xml).
+$rlq-marquee-copies: 6;
+
+// A ribbon that stands still (every animation paused, reduced motion,
+// or its own button) shows the first copy of the words, wrapped on
+// as many lines as needed, so that no word stays out of the band. The
+// animation of the track sits under the mode class of the body
+// (ewp-motion-allowed), as specific as the button pause: !important keeps
+// the ribbon still.
+@mixin rlq-still-ribbon {
+    .o_rlq_marquee {
+        overflow: visible;
+    }
+
+    .o_rlq_marquee_track {
+        width: auto;
+        transform: none;
+        animation: none !important;
+    }
+
+    .o_rlq_copy {
+        flex: 1 1 auto;
+        flex-wrap: wrap;
+        row-gap: 4px;
+        padding: 0 14px;
+
+        & + .o_rlq_copy {
+            display: none;
+        }
+    }
+}
+
+// Sipping pose of the vector Tux (units of the viewBox, around the pivots
+// set below): the mug centre goes from (19, 110) to (52, 70), its rim
+// against the beak; the left flipper, shortened along its length, turns
+// from its shoulder (30, 74) so that its tip, (18, 118) at rest, lands at
+// about (51, 81), under the bottom of the mug.
+$rlq-sip-mug: translate(33px, -40px) rotate(14deg);
+$rlq-sip-flipper: rotate(-100deg) scale(0.9, 0.45);
+// Coffee: the mug tilted further at the beak for the sip itself.
+$rlq-sip-tilt: translate(31px, -42px) rotate(34deg);
+
+// Code pose: each flipper turns from its shoulder so that its tip, (18,
+// 118) and (106, 118) at rest, lands on the lid of the laptop, at about
+// (45, 117) and (79, 117); the typing lifts it a few degrees.
+$rlq-type-left: rotate(-35deg);
+$rlq-type-right: rotate(35deg);
+
+// Speak pose: the right flipper mirrors the sipping one, its tip at about
+// (73, 81), under the handle of the microphone (75, 85 to 80, 70), whose
+// head stands beside the beak.
+$rlq-mic-flipper: rotate(100deg) scale(0.9, 0.45);
+
+// Blue of the bars under the lys motif.
+@mixin rlq-motif {
+    background-color: var(--ewp-bar);
+    background-image: url("img/lys-motif.svg");
+    background-size: 72px 72px;
+}
+
+.o_ewp_webapp {
+    // Theme colours, named once; the tokens of event_webapp_plan below
+    // point to them. Contrast (WCAG AA) of each text pair is noted.
+    --rlq-blue: #1f4e9e;
+    --rlq-navy: #163b78;
+    --rlq-yellow: #ffcb2e;
+    --rlq-yellow-line: #f0b800;
+    --rlq-cream: #fff6e5;
+    --rlq-sky: #d6e1f3;
+    --rlq-steel: #9db4dd;
+    --rlq-bar-line: #3e6bb8;
+    --rlq-card-line: #f0d98c;
+    --rlq-shimmer: #fffbe6;
+    --rlq-glow: rgba(31, 78, 158, 0.55);
+    --rlq-glow-off: rgba(31, 78, 158, 0);
+    // Pulse of a live room on the plan, in the "Live" colour #a4470c.
+    --rlq-live-glow: rgba(164, 71, 12, 0.55);
+    --rlq-live-glow-off: rgba(164, 71, 12, 0);
+
+    --ewp-ground: #fff7db;
+    --ewp-surface: #ffffff;
+    --ewp-surface-2: #fff7db;
+    --ewp-surface-hover: #fff1bf;
+    --ewp-border: var(--rlq-card-line);
+    --ewp-rule: #f5e7b5;
+    --ewp-dashed: var(--rlq-steel);
+    // #1b2a44 on #fff7db: 13.4; #6b5340 on #fff7db: 6.7, on white 7.2.
+    --ewp-ink: #1b2a44;
+    --ewp-ink-soft: #3d2a1c;
+    --ewp-muted: #6b5340;
+    // #1f4e9e on white: 7.9, on #fff7db: 7.4.
+    --ewp-accent: var(--rlq-blue);
+    --ewp-accent-hover: var(--rlq-navy);
+    --ewp-button-hover: var(--rlq-navy);
+    --ewp-accent-text: var(--rlq-blue);
+    // #a4470c on white: 6.0; on #fbe3cf: 4.9.
+    --ewp-warm: #a4470c;
+    --ewp-warm-soft: #fbe3cf;
+    // Winner rows: #163b78 on #ffefb0: 9.4.
+    --ewp-success: var(--rlq-navy);
+    --ewp-success-soft: #ffefb0;
+    --ewp-success-text: var(--rlq-navy);
+    --ewp-preview-bg: #fbebc4;
+    --ewp-preview-text: #5c4300;
+    --ewp-preview-line: #e8cf8f;
+    --ewp-plan-ground: #e4ecf8;
+    --ewp-room-default: var(--rlq-blue);
+    --ewp-focus: var(--rlq-blue);
+    // Bars: #fff6e5 on the motif 6.5, #d6e1f3 5.3, #ffcb2e 4.6.
+    --ewp-bar: var(--rlq-blue);
+    --ewp-bar-2: var(--rlq-navy);
+    --ewp-bar-3: var(--rlq-navy);
+    --ewp-bar-line: var(--rlq-steel);
+    --ewp-bar-muted: var(--rlq-sky);
+    --ewp-bar-focus: var(--rlq-yellow);
+    --ewp-bar-ink: var(--rlq-cream);
+    --ewp-dot-open: var(--rlq-navy);
+    --ewp-dot-closed: var(--rlq-yellow);
+    --ewp-video: #0f2347;
+    --ewp-video-2: var(--rlq-navy);
+    --ewp-on-accent: #ffffff;
+    // "Live": white on #a4470c, 6.0.
+    --ewp-live: #a4470c;
+    --ewp-live-ink: #ffffff;
+    --ewp-plan-label-bg: #ffffff;
+    --ewp-plan-label-ink: #1b2a44;
+    --ewp-font-head: "Rlq Bree Serif", "Bree Serif", Georgia, serif;
+    // Steam of the vector Tux and its Zzz, on a light card; its code
+    // glyphs and sound waves.
+    --rlq-tux-steam: var(--rlq-steel);
+    --rlq-tux-glyph: var(--rlq-blue);
+    --rlq-tux-glyph-halo: #ffffff;
+
+    // ---- Headings: Bree Serif, its single weight -------------------------
+    h1,
+    h2,
+    .o_ewp_day_title,
+    .o_ewp_room_title,
+    .o_ewp_closed_text h1 {
+        font-weight: 400;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    // ---- Lys icons -------------------------------------------------------
+    .o_rlq_lys {
+        @include rlq-lys(14px);
+    }
+
+    .o_rlq_lys_big {
+        width: 24px;
+        height: 24px;
+        color: var(--ewp-accent-text);
+    }
+
+    // Lys before the headings of the links, plan and events cards, and
+    // before the room name.
+    &:not(.o_ewp_text_only) {
+        .o_ewp_links_card h2,
+        .o_ewp_plan_card h2,
+        .o_ewp_events_card h2 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            &::before {
+                content: "";
+                @include rlq-lys(18px);
+                color: var(--ewp-accent-text);
+            }
+        }
+
+        .o_ewp_room_title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            &::before {
+                content: "";
+                @include rlq-lys(16px);
+                color: var(--rlq-yellow);
+            }
+        }
+
+        .o_ewp_window_grid dt {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            &::before {
+                content: "";
+                @include rlq-lys(12px);
+            }
+        }
+    }
+
+    // ---- Bars: lys motif, rising flakes ----------------------------------
+    // Each bar is a stacking context (isolation), so the flakes, at
+    // z-index -1, paint over its background and under its text and
+    // controls.
+    .o_ewp_topbar {
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+    }
+
+    &:not(.o_ewp_text_only) .o_ewp_topbar {
+        @include rlq-motif;
+    }
+
+    // The flakes fill their bar (or the whole main block of a closed
+    // page, their nearest positioned ancestor) and rise from below, behind
+    // the content.
+    .o_rlq_flakes {
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    // Nine lys of 14 to 24 px, yellow and white, spread across the bar.
+    .o_rlq_flake {
+        position: absolute;
+        bottom: -28px;
+        @include rlq-lys(18px);
+        color: var(--rlq-yellow);
+        opacity: 0;
+
+        @each $index, $left, $size,
+            $colour
+                in (
+                    1 4% 18px yellow,
+                    2 15% 14px white,
+                    3 27% 22px yellow,
+                    4 39% 15px white,
+                    5 51% 24px yellow,
+                    6 63% 14px white,
+                    7 74% 20px yellow,
+                    8 85% 16px white,
+                    9 95% 21px yellow
+                )
+        {
+            &:nth-child(#{$index}) {
+                left: $left;
+                width: $size;
+                height: $size;
+                @if $colour == white {
+                    color: #ffffff;
+                }
+            }
+        }
+    }
+
+    .o_ewp_logo.o_rlq_logo {
+        width: 40px;
+        height: 40px;
+        border: 2px solid var(--rlq-yellow);
+        border-radius: 50%;
+        background: var(--rlq-navy);
+
+        img {
+            object-fit: cover;
+        }
+    }
+
+    // ---- Home header ------------------------------------------------------
+    // Phone: string lights, brand and user, then the tagline, the day and
+    // its state on the left of Tux, who stands on the yellow rule.
+    &:not(.o_ewp_text_only) .o_ewp_dayhead {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        grid-template-areas:
+            "lights lights lights"
+            "logo label user"
+            "eyebrow eyebrow hero"
+            "title title hero"
+            "meta meta hero";
+        column-gap: 10px;
+        row-gap: 8px;
+        padding: 0 16px;
+        padding-top: env(safe-area-inset-top);
+
+        // The title shares the width with Tux: smaller on narrow phones,
+        // and long words break at a hyphen rather than anywhere.
+        .o_ewp_day_title {
+            align-self: start;
+            margin: 0;
+            color: var(--rlq-cream);
+            font-size: #{"clamp(24px, 7.4vw, 32px)"};
+            line-height: 1.08;
+            hyphens: auto;
+        }
+
+        .o_ewp_day_meta {
+            flex-direction: column;
+            align-items: flex-start;
+            align-self: start;
+            gap: 6px;
+            padding-bottom: 18px;
+        }
+    }
+
+    .o_rlq_lights {
+        grid-area: lights;
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        height: 26px;
+        padding: 0 4px;
+        border-top: 1px solid var(--rlq-bar-line);
+    }
+
+    .o_rlq_bulb {
+        width: 9px;
+        height: 11px;
+        border-radius: 5px 5px 6px 6px;
+        background: #ffd27a;
+        box-shadow: 0 0 10px 3px rgba(255, 190, 90, 0.65);
+
+        @each $index, $drop in (1: 2px, 2: 6px, 3: 9px, 4: 11px, 5: 12px, 6: 12px, 7: 11px, 8: 9px, 9: 6px, 10: 2px) {
+            &:nth-child(#{$index}) {
+                margin-top: $drop;
+            }
+        }
+    }
+
+    // The tagline and the "coffee is brewing" line open on a turning lys
+    // (::before, so that the text stays one translatable term).
+    .o_rlq_eyebrow::before,
+    .o_rlq_brewing::before {
+        content: "";
+        @include rlq-lys(14px);
+    }
+
+    .o_rlq_brewing::before {
+        width: 18px;
+        height: 18px;
+    }
+
+    .o_rlq_eyebrow {
+        grid-area: eyebrow;
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        align-self: end;
+        gap: 6px;
+        margin: 0;
+        color: var(--rlq-yellow);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    // Tux with a coffee: the picture, cut round at the top, and three
+    // wisps of steam over the mug (positions in percent of the picture).
+    .o_rlq_tux_photo {
+        position: relative;
+        display: block;
+        flex: none;
+        width: 150px;
+        height: 168px;
+        transform-origin: 50% 100%;
+
+        img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top;
+            border-radius: 75px 75px 0 0;
+        }
+    }
+
+    .o_rlq_steam {
+        position: absolute;
+        width: 14px;
+        height: 30px;
+        fill: none;
+        stroke: var(--rlq-cream);
+        stroke-width: 3;
+        stroke-linecap: round;
+        opacity: 0;
+
+        &:nth-of-type(1) {
+            left: 13.4%;
+            top: 45.2%;
+        }
+
+        &:nth-of-type(2) {
+            left: 21.4%;
+            top: 42.9%;
+        }
+
+        &:nth-of-type(3) {
+            left: 29.4%;
+            top: 45.2%;
+        }
+    }
+
+    .o_rlq_hero {
+        grid-area: hero;
+        align-self: end;
+        width: #{"min(150px, 36vw)"};
+        height: auto;
+        aspect-ratio: 150 / 168;
+        margin-left: 6px;
+    }
+
+    // ---- Pills -------------------------------------------------------------
+    // Open: #163b78 on #ffcb2e, 7.2. Closed: #fff6e5 on #163b78, 10.1.
+    .o_ewp_pill_open {
+        background: var(--rlq-yellow);
+        color: var(--rlq-navy);
+        font-weight: 700;
+    }
+
+    .o_ewp_pill_closed {
+        background: var(--rlq-navy);
+        color: var(--rlq-cream);
+    }
+
+    // ---- Band: yellow rule and ribbon of words ----------------------------
+    // #163b78 on #ffcb2e: 7.2; the button focus ring (#1f4e9e): 5.2.
+    .o_rlq_band {
+        --ewp-focus: var(--rlq-navy);
+        display: flex;
+        align-items: stretch;
+        border-top: 4px solid var(--rlq-yellow);
+        background: var(--rlq-yellow);
+        color: var(--rlq-navy);
+    }
+
+    .o_rlq_marquee {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        padding: 9px 0;
+        border-top: 1px solid var(--rlq-yellow-line);
+        font-family: var(--ewp-font-head);
+        font-size: 15px;
+        line-height: 1.4;
+    }
+
+    .o_rlq_marquee_track {
+        display: flex;
+        width: max-content;
+    }
+
+    .o_rlq_copy {
+        display: flex;
+        flex: none;
+    }
+
+    .o_rlq_word {
+        display: inline-flex;
+        align-items: center;
+        gap: 14px;
+        padding-right: 14px;
+        white-space: nowrap;
+
+        &::after {
+            content: "";
+            @include rlq-lys(14px);
+            color: var(--rlq-blue);
+        }
+    }
+
+    .o_rlq_marquee_toggle {
+        display: flex;
+        flex: none;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        min-height: 44px;
+        padding: 0;
+        border: 0;
+        border-top: 1px solid var(--rlq-yellow-line);
+        border-left: 1px solid var(--rlq-yellow-line);
+        background: var(--rlq-yellow);
+        color: var(--rlq-navy);
+        cursor: pointer;
+
+        &:hover {
+            background: #ffd75e;
+        }
+    }
+
+    .o_rlq_marquee_icon {
+        fill: currentColor;
+    }
+
+    .o_rlq_marquee_icon_play,
+    .o_rlq_marquee_toggle[aria-pressed="true"] .o_rlq_marquee_icon_pause {
+        display: none;
+    }
+
+    .o_rlq_marquee_toggle[aria-pressed="true"] .o_rlq_marquee_icon_play {
+        display: block;
+    }
+
+    // With every animation paused, the ribbon stands still: no button.
+    &.o_ewp_motion_paused .o_rlq_marquee_toggle,
+    &[data-ewp-motion="paused"] .o_rlq_marquee_toggle {
+        display: none;
+    }
+
+    &.o_ewp_motion_paused,
+    &[data-ewp-motion="paused"],
+    .o_rlq_marquee_paused {
+        @include rlq-still-ribbon;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        &.o_ewp_motion_auto {
+            .o_rlq_marquee_toggle {
+                display: none;
+            }
+
+            @include rlq-still-ribbon;
+        }
+    }
+
+    // ---- Cards -------------------------------------------------------------
+    .o_ewp_link,
+    .o_ewp_room_link {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(22, 59, 120, 0.18);
+        }
+    }
+
+    .o_ewp_rich {
+        color: var(--ewp-ink-soft);
+    }
+
+    // Pause Café Linux card: navy, the poster on top with a swinging lys
+    // pendant. #ffcb2e on #163b78: 7.2; #d6e1f3: 8.3; white on #2b5cb0: 6.4.
+    .o_rlq_poster {
+        gap: 0;
+        padding: 0;
+        overflow: hidden;
+        border: 0;
+        border-radius: var(--ewp-radius-lg);
+        background: var(--rlq-navy);
+        color: var(--rlq-cream);
+        --ewp-focus: var(--rlq-yellow);
+    }
+
+    .o_rlq_poster_media {
+        position: relative;
+        aspect-ratio: 3 / 2;
+        overflow: hidden;
+    }
+
+    .o_rlq_poster_image {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .o_rlq_pendant {
+        position: absolute;
+        top: 0;
+        right: 16px;
+        width: 30px;
+        height: 46px;
+        color: var(--rlq-yellow);
+        transform-origin: 50% 0;
+
+        &::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 14px;
+            width: 2px;
+            height: 12px;
+            background: currentColor;
+        }
+
+        &::after {
+            content: "";
+            position: absolute;
+            top: 10px;
+            left: 0;
+            @include rlq-lys(30px);
+        }
+    }
+
+    .o_rlq_poster_body {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 14px 16px 16px;
+
+        h2 {
+            color: var(--rlq-yellow);
+            font-size: 22px;
+        }
+
+        p {
+            margin: 0;
+            color: var(--rlq-sky);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    }
+
+    ul.o_rlq_tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        li {
+            padding: 4px 9px;
+            border-radius: var(--ewp-radius-pill);
+            background: #2b5cb0;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 600;
+        }
+    }
+
+    // ---- Raffles -----------------------------------------------------------
+    .o_ewp_raffles_card .o_ewp_card_title .o_ewp_icon {
+        transform-origin: 50% 0;
+    }
+
+    .o_ewp_draw_done:not(.o_ewp_draw_absent) {
+        background: linear-gradient(
+            100deg,
+            var(--ewp-success-soft) 35%,
+            var(--rlq-shimmer) 50%,
+            var(--ewp-success-soft) 65%
+        );
+        background-size: 250% 100%;
+
+        .o_ewp_draw_winner {
+            font-weight: 600;
+        }
+    }
+
+    // ---- Room page ---------------------------------------------------------
+    .o_ewp_appbar .o_ewp_room_title {
+        color: var(--rlq-cream);
+    }
+
+    .o_ewp_bbb .o_ewp_video,
+    .o_ewp_bbb .o_ewp_bbb_tab_live {
+        border: 4px solid var(--rlq-navy);
+    }
+
+    // ---- Closed pages ------------------------------------------------------
+    &.o_ewp_webapp_closed:not(.o_ewp_text_only) {
+        @include rlq-motif;
+
+        .o_ewp_closed,
+        .o_ewp_prefs {
+            background: transparent;
+        }
+    }
+
+    // The closed page holds the flakes (in .o_ewp_closed_body, which
+    // stays unpositioned so that they fill the whole block).
+    .o_ewp_closed {
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+    }
+
+    .o_ewp_closed_icon {
+        display: none;
+    }
+
+    .o_rlq_closed_figure {
+        display: flex;
+        align-items: flex-end;
+        gap: 14px;
+    }
+
+    .o_rlq_closed_tux {
+        img {
+            border: 2px solid var(--rlq-yellow);
+            border-radius: 75px 75px 14px 14px;
+        }
+    }
+
+    .o_rlq_brewing {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+        padding-bottom: 8px;
+        color: var(--rlq-yellow);
+        font-family: var(--ewp-font-head);
+        font-size: 18px;
+    }
+
+    .o_ewp_closed_text h1 {
+        color: var(--rlq-cream);
+    }
+
+    // Opening and closing: #ffcb2e on #163b78, 7.2.
+    .o_ewp_window_grid {
+        border: 1px solid var(--rlq-bar-line);
+
+        dt {
+            color: var(--rlq-yellow);
+            font-weight: 600;
+        }
+    }
+
+    &:not(.o_ewp_text_only) .o_ewp_closed_footer::before {
+        content: "";
+        height: 6px;
+        border-top: 2px solid var(--rlq-yellow);
+        border-radius: 3px;
+        background: var(--rlq-blue);
+    }
+
+    // ---- Ornament under the home content ----------------------------------
+    .o_rlq_ornament {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 0 16px 24px;
+    }
+
+    .o_rlq_ornament_line {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        color: #e8b923;
+
+        .o_rlq_lys:not(.o_rlq_lys_big) {
+            width: 16px;
+            height: 16px;
+        }
+    }
+
+    .o_rlq_rule_line {
+        flex: 1;
+        height: 1px;
+        background: var(--rlq-card-line);
+    }
+
+    .o_rlq_ornament_words {
+        color: var(--ewp-muted);
+        font-family: var(--ewp-font-head);
+        font-size: 16px;
+    }
+
+    // ---- Vector Tux --------------------------------------------------------
+    // Sizes of the places; the drawing keeps its 140 x 148 ratio.
+    .o_rlq_tux {
+        display: block;
+        flex: none;
+        overflow: visible;
+        color: var(--rlq-tux-steam);
+
+        * {
+            transform-box: view-box;
+        }
+    }
+
+    .o_rlq_tux_bar {
+        --rlq-tux-steam: var(--rlq-cream);
+        --rlq-tux-glyph: var(--rlq-yellow);
+        --rlq-tux-glyph-halo: var(--rlq-navy);
+        position: relative;
+        width: 46px;
+        height: 49px;
+        margin: 0 4px;
+    }
+
+    .o_rlq_tux_card {
+        width: 52px;
+        height: 55px;
+        margin-left: auto;
+    }
+
+    .o_rlq_tux_large {
+        --rlq-tux-steam: var(--rlq-cream);
+        --rlq-tux-glyph: var(--rlq-yellow);
+        --rlq-tux-glyph-halo: var(--rlq-navy);
+        width: 150px;
+        height: 159px;
+    }
+
+    .o_rlq_tux_black {
+        fill: #16181d;
+    }
+
+    .o_rlq_tux_white {
+        fill: #fbf6ea;
+    }
+
+    .o_rlq_tux_glint {
+        fill: #ffffff;
+    }
+
+    .o_rlq_tux_beak {
+        fill: #f5a623;
+    }
+
+    .o_rlq_tux_beak_low {
+        fill: #e08a12;
+    }
+
+    .o_rlq_tux_lys {
+        fill: var(--rlq-blue);
+    }
+
+    .o_rlq_tux_mug_body,
+    .o_rlq_tux_handle {
+        fill: #9a5b2c;
+    }
+
+    .o_rlq_tux_handle {
+        fill: none;
+        stroke: #9a5b2c;
+        stroke-width: 3;
+    }
+
+    .o_rlq_tux_coffee {
+        fill: #3b2412;
+    }
+
+    .o_rlq_tux_mug_lys {
+        fill: var(--rlq-cream);
+    }
+
+    .o_rlq_tux_steam path {
+        fill: none;
+        stroke: var(--rlq-tux-steam);
+        stroke-width: 2.8;
+        stroke-linecap: round;
+    }
+
+    // Laptop seen from the front of its lid, a lys sticker on it, and the
+    // glow of its screen on the belly.
+    .o_rlq_tux_lid {
+        fill: #c9d1dc;
+        stroke: #6f7d92;
+        stroke-width: 1.5;
+    }
+
+    .o_rlq_tux_sticker {
+        fill: var(--rlq-blue);
+    }
+
+    .o_rlq_tux_deck {
+        fill: #8d99ab;
+        stroke: #6f7d92;
+        stroke-width: 1;
+    }
+
+    .o_rlq_tux_glow {
+        fill: #bfe3ff;
+    }
+
+    // Code glyphs and sound waves: strokes in the glyph colour, on a halo
+    // that keeps them readable over a card, a bar or the page.
+    .o_rlq_tux_glyphs,
+    .o_rlq_tux_waves {
+        filter: drop-shadow(0 0 1px var(--rlq-tux-glyph-halo)) drop-shadow(0 0 1px var(--rlq-tux-glyph-halo));
+    }
+
+    .o_rlq_tux_glyph {
+        fill: none;
+        stroke: var(--rlq-tux-glyph);
+        stroke-width: 2.4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .o_rlq_tux_mic_handle {
+        fill: none;
+        stroke: #2b2f38;
+        stroke-width: 5;
+        stroke-linecap: round;
+    }
+
+    .o_rlq_tux_mic_head {
+        fill: #c0c7d2;
+        stroke: #4b5462;
+        stroke-width: 1.5;
+    }
+
+    .o_rlq_tux_mic_grille {
+        fill: none;
+        stroke: #4b5462;
+        stroke-width: 1;
+    }
+
+    .o_rlq_tux_waves path {
+        fill: none;
+        stroke: var(--rlq-tux-glyph);
+        stroke-width: 3;
+        stroke-linecap: round;
+    }
+
+    .o_rlq_tux_bubble_box {
+        fill: #ffffff;
+        stroke: var(--rlq-navy);
+        stroke-width: 1.8;
+        stroke-linejoin: round;
+    }
+
+    .o_rlq_tux_dot {
+        fill: var(--rlq-navy);
+    }
+
+    .o_rlq_tux_zzz path {
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 3;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    // Each piece of confetti, glyph and dot turns or grows around its own
+    // centre.
+    .o_rlq_tux_confetti rect,
+    .o_rlq_tux_glyph,
+    .o_rlq_tux_dot {
+        transform-box: fill-box;
+        transform-origin: center;
+    }
+
+    .o_rlq_tux_c_yellow {
+        fill: var(--rlq-yellow);
+    }
+
+    .o_rlq_tux_c_orange {
+        fill: #e4572e;
+    }
+
+    .o_rlq_tux_c_cream {
+        fill: #ffffff;
+        stroke: var(--rlq-blue);
+        stroke-width: 0.8;
+    }
+
+    .o_rlq_tux_live_dot {
+        fill: var(--ewp-live);
+        stroke: var(--rlq-cream);
+        stroke-width: 1.5;
+    }
+
+    .o_rlq_tux_live_ring {
+        fill: none;
+        stroke: var(--ewp-live);
+        stroke-width: 2;
+        opacity: 0;
+    }
+
+    // Pivots of the moving parts, in units of the viewBox.
+    .o_rlq_tux_body {
+        transform-origin: 62px 145px;
+    }
+
+    .o_rlq_tux_face {
+        transform-origin: 62px 64px;
+    }
+
+    .o_rlq_tux_eye_l {
+        transform-origin: 52px 41px;
+    }
+
+    .o_rlq_tux_eye_r {
+        transform-origin: 72px 41px;
+    }
+
+    .o_rlq_tux_beak_low {
+        transform-origin: 62px 58px;
+    }
+
+    .o_rlq_tux_foot_l {
+        transform-origin: 44px 139px;
+    }
+
+    .o_rlq_tux_foot_r {
+        transform-origin: 80px 139px;
+    }
+
+    .o_rlq_tux_flip_l {
+        transform-origin: 30px 74px;
+    }
+
+    .o_rlq_tux_flip_r {
+        transform-origin: 94px 74px;
+    }
+
+    .o_rlq_tux_mug {
+        transform-origin: 19px 110px;
+    }
+
+    .o_rlq_tux_laptop {
+        transform-origin: 62px 138px;
+    }
+
+    .o_rlq_tux_handmic {
+        transform-origin: 75px 85px;
+    }
+
+    .o_rlq_tux_waves {
+        transform-origin: 90px 65px;
+    }
+
+    .o_rlq_tux_bubble {
+        transform-origin: 18px 34px;
+    }
+
+    .o_rlq_tux_live_ring {
+        transform-origin: 124px 34px;
+    }
+
+    // Parts that only some poses show.
+    .o_rlq_tux_live,
+    .o_rlq_tux_zzz,
+    .o_rlq_tux_confetti,
+    .o_rlq_tux_glow,
+    .o_rlq_tux_laptop,
+    .o_rlq_tux_glyphs,
+    .o_rlq_tux_handmic,
+    .o_rlq_tux_waves,
+    .o_rlq_tux_bubble {
+        opacity: 0;
+    }
+
+    .o_rlq_tux_laptop {
+        transform: translateY(24px);
+    }
+
+    .o_rlq_tux_handmic {
+        transform: translate(14px, 30px) rotate(30deg);
+    }
+
+    .o_rlq_tux_body,
+    .o_rlq_tux_face,
+    .o_rlq_tux_eye,
+    .o_rlq_tux_flip_l,
+    .o_rlq_tux_flip_r,
+    .o_rlq_tux_mug,
+    .o_rlq_tux_live,
+    .o_rlq_tux_zzz,
+    .o_rlq_tux_confetti,
+    .o_rlq_tux_glow,
+    .o_rlq_tux_laptop,
+    .o_rlq_tux_glyphs,
+    .o_rlq_tux_handmic,
+    .o_rlq_tux_waves,
+    .o_rlq_tux_bubble {
+        transition: transform 0.4s ease, opacity 0.4s ease;
+    }
+
+    // Poses, each one readable while still. greeting and wave: the right
+    // flipper up; sipping and coffee: the left flipper brought across the
+    // chest (shortened, as seen from the front), its tip under the mug,
+    // whose rim tilts against the beak, eyes half closed; celebrate: both
+    // flippers up, mug put away, confetti; sleeping: eyes shut, head down,
+    // Zzz; code: the laptop on the lap, both flippers on its keys, eyes
+    // down on the screen, its glow and the code glyphs; speak: the hand
+    // microphone at the beak in the right flipper, the beak open, sound
+    // waves, a speech bubble and the live dot; walk and peek: the mug
+    // put away, the motion is the whole figure (cameos, below).
+    .o_rlq_tux[data-rlq-tux="greeting"] .o_rlq_tux_flip_r,
+    .o_rlq_tux[data-rlq-tux="wave"] .o_rlq_tux_flip_r {
+        transform: rotate(-135deg);
+    }
+
+    .o_rlq_tux[data-rlq-tux="sipping"],
+    .o_rlq_tux[data-rlq-tux="coffee"] {
+        .o_rlq_tux_mug {
+            transform: $rlq-sip-mug;
+        }
+
+        .o_rlq_tux_flip_l {
+            transform: $rlq-sip-flipper;
+        }
+
+        .o_rlq_tux_eye {
+            transform: scaleY(0.55);
+        }
+
+        .o_rlq_tux_steam {
+            opacity: 0;
+        }
+    }
+
+    .o_rlq_tux[data-rlq-tux="celebrate"] {
+        .o_rlq_tux_flip_l {
+            transform: rotate(130deg);
+        }
+
+        .o_rlq_tux_flip_r {
+            transform: rotate(-130deg);
+        }
+
+        .o_rlq_tux_mug {
+            opacity: 0;
+        }
+
+        .o_rlq_tux_confetti {
+            opacity: 1;
+        }
+    }
+
+    .o_rlq_tux[data-rlq-tux="sleeping"] {
+        .o_rlq_tux_body {
+            transform: rotate(-3deg);
+        }
+
+        .o_rlq_tux_eye {
+            transform: scaleY(0.12);
+        }
+
+        .o_rlq_tux_steam {
+            opacity: 0;
+        }
+
+        .o_rlq_tux_zzz {
+            opacity: 1;
+        }
+    }
+
+    .o_rlq_tux[data-rlq-tux="code"] {
+        .o_rlq_tux_mug {
+            opacity: 0;
+        }
+
+        .o_rlq_tux_laptop {
+            opacity: 1;
+            transform: none;
+        }
+
+        .o_rlq_tux_glow {
+            opacity: 0.55;
+        }
+
+        .o_rlq_tux_glyphs {
+            opacity: 1;
+        }
+
+        .o_rlq_tux_flip_l {
+            transform: $rlq-type-left;
+        }
+
+        .o_rlq_tux_flip_r {
+            transform: $rlq-type-right;
+        }
+
+        .o_rlq_tux_face {
+            transform: translateY(3px);
+        }
+
+        .o_rlq_tux_eye {
+            transform: scaleY(0.7);
+        }
+    }
+
+    .o_rlq_tux[data-rlq-tux="speak"] {
+        .o_rlq_tux_mug {
+            opacity: 0;
+        }
+
+        .o_rlq_tux_handmic,
+        .o_rlq_tux_waves,
+        .o_rlq_tux_bubble,
+        .o_rlq_tux_live {
+            opacity: 1;
+        }
+
+        .o_rlq_tux_handmic {
+            transform: none;
+        }
+
+        .o_rlq_tux_flip_r {
+            transform: $rlq-mic-flipper;
+        }
+
+        .o_rlq_tux_beak_low {
+            transform: translateY(3px);
+        }
+    }
+
+    .o_rlq_tux[data-rlq-tux="walk"],
+    .o_rlq_tux[data-rlq-tux="peek"] {
+        .o_rlq_tux_mug {
+            opacity: 0;
+        }
+    }
+
+    .o_rlq_tux[data-rlq-tux="walk"] {
+        .o_rlq_tux_flip_l {
+            transform: rotate(18deg);
+        }
+
+        .o_rlq_tux_flip_r {
+            transform: rotate(-18deg);
+        }
+    }
+
+    // ---- Tux cameos ----------------------------------------------------------
+    // Inside a cameo of event_webapp_plan (rlq_theme.js): the stage fills
+    // the square of the cameo and holds the drawing. walk: the figure, a
+    // little smaller, paces from one side of the square to the other;
+    // peek: the stage clips the figure, which rises from its bottom edge
+    // to show its head and goes down again.
+    .o_rlq_cameo_stage {
+        position: relative;
+        width: 100%;
+        height: 100%;
+
+        .o_rlq_tux_cameo {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    .o_rlq_cameo_walk .o_rlq_tux_cameo {
+        inset: 10% 10% 0;
+        width: 80%;
+        height: 90%;
+    }
+
+    .o_rlq_cameo_peek {
+        overflow: hidden;
+        border-radius: 0 0 8px 8px;
+
+        .o_rlq_tux_cameo {
+            transform: translateY(42%);
+        }
+    }
+
+    // ---- Wide screens ------------------------------------------------------
+    @media (min-width: 1024px) {
+        h2 {
+            font-size: 22px;
+        }
+
+        // Home header on one band: Tux on the left, label and tagline over
+        // the day name, then the state and the user.
+        &:not(.o_ewp_text_only) .o_ewp_dayhead {
+            grid-template-columns: auto auto minmax(0, 1fr) fit-content(17rem) auto;
+            grid-template-areas:
+                "hero label eyebrow meta user"
+                "hero title title meta user";
+            column-gap: 16px;
+            row-gap: 6px;
+            padding: 16px 32px 0;
+
+            .o_ewp_logo {
+                display: none;
+            }
+
+            .o_ewp_app_label {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                align-self: end;
+                color: var(--rlq-yellow);
+                font-size: 13px;
+                font-weight: 600;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+
+                &::before {
+                    content: "";
+                    @include rlq-lys(15px);
+                }
+            }
+
+            .o_ewp_day_title {
+                font-size: 40px;
+                line-height: 1.1;
+                padding-bottom: 24px;
+            }
+
+            .o_ewp_day_meta,
+            .o_ewp_user {
+                align-self: end;
+                padding-bottom: 28px;
+            }
+
+            .o_ewp_day_meta {
+                flex-direction: row;
+                align-items: center;
+            }
+        }
+
+        .o_rlq_lights {
+            display: none;
+        }
+
+        .o_rlq_eyebrow {
+            gap: 8px;
+            font-size: 13px;
+            white-space: nowrap;
+
+            // A middle dot after the app label, in place of the lys.
+            &::before {
+                width: auto;
+                height: auto;
+                background: none;
+                -webkit-mask: none;
+                mask: none;
+                content: "\00B7";
+            }
+        }
+
+        .o_rlq_hero {
+            width: 128px;
+            margin-left: 0;
+
+            img {
+                border-radius: 64px 64px 0 0;
+            }
+        }
+
+        .o_rlq_marquee {
+            padding: 7px 0;
+            font-size: 14px;
+        }
+
+        // Room bar: Tux right after the back link.
+        .o_ewp_appbar {
+            .o_ewp_back {
+                order: -2;
+            }
+
+            .o_rlq_tux_bar {
+                order: -1;
+                width: 52px;
+                height: 55px;
+                margin: -4px 0;
+            }
+        }
+
+        // The poster on the left of its text, not across the column.
+        .o_rlq_poster {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+            align-items: center;
+        }
+
+        .o_rlq_poster_media {
+            height: 100%;
+        }
+
+        .o_rlq_poster_body {
+            gap: 10px;
+            padding: 20px 24px;
+
+            h2 {
+                font-size: 24px;
+            }
+        }
+
+        .o_ewp_bbb .o_ewp_video,
+        .o_ewp_bbb .o_ewp_bbb_tab_live {
+            border-width: 8px;
+        }
+    }
+
+    // ---- Dark scheme -------------------------------------------------------
+    // The bars stay blue. Texts on the surfaces: #fff6e5 on #0e1830 16.4,
+    // #c8d3e8 on #1b2d52 9.0, #ffd75e on #152442 11.1, #ffe08a on #3a3210
+    // 9.9, #ffb37a on #3e2412 8.2.
+    @media (prefers-color-scheme: dark) {
+        --ewp-ground: #0e1830;
+        --ewp-surface: #152442;
+        --ewp-surface-2: #1b2d52;
+        --ewp-surface-hover: #22386a;
+        --ewp-border: #2e4675;
+        --ewp-rule: #253a63;
+        --ewp-dashed: #4a6396;
+        --ewp-ink: var(--rlq-cream);
+        --ewp-ink-soft: #f1e6cf;
+        --ewp-muted: #c8d3e8;
+        --ewp-accent-text: #ffd75e;
+        --ewp-accent-hover: #ffe38f;
+        --ewp-warm: #ffb37a;
+        --ewp-warm-soft: #3e2412;
+        --ewp-success-soft: #3a3210;
+        --ewp-success-text: #ffe08a;
+        --ewp-preview-bg: #3a2f0a;
+        --ewp-preview-text: #ffe08a;
+        --ewp-preview-line: #5c4b12;
+        --ewp-plan-ground: #1b2d52;
+        --ewp-focus: var(--rlq-yellow);
+        --rlq-card-line: #2e4675;
+        --rlq-shimmer: #4d4318;
+        --rlq-glow: rgba(255, 203, 46, 0.5);
+        --rlq-glow-off: rgba(255, 203, 46, 0);
+        --rlq-tux-steam: var(--rlq-sky);
+        --rlq-tux-glyph: var(--rlq-yellow);
+        --rlq-tux-glyph-halo: var(--rlq-navy);
+
+        .o_rlq_ornament_line {
+            color: var(--rlq-yellow);
+        }
+
+        // The black of the vector Tux would melt into the dark surface of
+        // the raffle card and of the page (#16181d on #152442, 1.1:1): a
+        // light halo follows the outline of the whole drawing, raised
+        // flippers included, in the card and in the cameos.
+        .o_rlq_tux_card,
+        .o_rlq_tux_cameo {
+            filter: drop-shadow(0 0 1px var(--rlq-sky)) drop-shadow(0 0 1px var(--rlq-sky));
+        }
+    }
+
+    // ---- Animations --------------------------------------------------------
+    // Played under the mode "on", or "auto" without reduced motion (this
+    // block); stopped by the mode "off" and the text-only mode
+    // (event_webapp_plan).
+    @include ewp-motion-allowed {
+        // Each bulb dims and glows again in 1.8 s, a third of the string
+        // at a time: well under three flashes a second.
+        .o_rlq_bulb {
+            animation: rlq-twinkle 1.8s ease-in-out infinite;
+
+            &:nth-child(3n) {
+                animation-delay: 0.6s;
+            }
+
+            &:nth-child(3n + 1) {
+                animation-delay: 1.2s;
+            }
+        }
+
+        .o_rlq_flake {
+            animation: rlq-rise 8s linear infinite;
+
+            @each $index, $delay,
+                $duration
+                    in (
+                        1 0s 8s,
+                        2 3.2s 10s,
+                        3 5.6s 8s,
+                        4 1.5s 11s,
+                        5 4.4s 8s,
+                        6 2.4s 9s,
+                        7 6.4s 9s,
+                        8 0.8s 10s,
+                        9 3.8s 8s
+                    )
+            {
+                &:nth-child(#{$index}) {
+                    animation-delay: $delay;
+                    animation-duration: $duration;
+                }
+            }
+        }
+
+        .o_rlq_spin,
+        .o_rlq_eyebrow::before,
+        .o_rlq_brewing::before {
+            animation: rlq-spin 14s linear infinite;
+        }
+
+        // On wide screens the tagline opens on a still middle dot.
+        @media (min-width: 1024px) {
+            .o_rlq_eyebrow::before {
+                animation: none;
+            }
+        }
+
+        .o_rlq_tux_photo {
+            animation: rlq-bob 3s ease-in-out infinite;
+        }
+
+        .o_rlq_steam {
+            animation: rlq-steam 2.8s ease-out infinite;
+
+            &:nth-of-type(2) {
+                animation-delay: 0.9s;
+            }
+
+            &:nth-of-type(3) {
+                animation-delay: 1.8s;
+            }
+        }
+
+        .o_rlq_marquee_track {
+            animation: rlq-marquee 30s linear infinite;
+        }
+
+        // Hovering or focusing the band holds the ribbon, as its button
+        // does.
+        .o_rlq_band:hover .o_rlq_marquee_track,
+        .o_rlq_band:focus-within .o_rlq_marquee_track,
+        .o_rlq_marquee_paused .o_rlq_marquee_track {
+            animation-play-state: paused;
+        }
+
+        .o_ewp_pill_open .o_ewp_pill_dot {
+            animation: rlq-pulse-navy 1.6s ease-out infinite;
+        }
+
+        .o_ewp_pill_onair .o_ewp_pill_dot {
+            animation: rlq-pulse-cream 1.6s ease-out infinite;
+        }
+
+        // Cards come up one after the other.
+        .o_ewp_card,
+        .o_ewp_links_card {
+            animation: rlq-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+        }
+
+        .o_ewp_links_card {
+            animation-delay: 0.15s;
+        }
+
+        .o_rlq_poster {
+            animation-delay: 0.2s;
+        }
+
+        .o_ewp_plan_card {
+            animation-delay: 0.25s;
+        }
+
+        .o_ewp_events_card {
+            animation-delay: 0.35s;
+        }
+
+        .o_ewp_raffles_card {
+            animation-delay: 0.45s;
+        }
+
+        .o_rlq_poster_image {
+            animation: rlq-zoom 16s ease-in-out infinite;
+        }
+
+        .o_rlq_pendant,
+        .o_ewp_raffles_card .o_ewp_card_title .o_ewp_icon {
+            animation: rlq-swing 3s ease-in-out infinite;
+        }
+
+        .o_ewp_draw_done:not(.o_ewp_draw_absent) {
+            animation: rlq-shimmer 3.5s linear infinite;
+        }
+
+        // The conference frame glows while the meeting runs, and so does
+        // the area of a live room on the plan (data-ewp-live, set by
+        // event_webapp_plan; its "Live" pill pulses with the on-air one).
+        .o_ewp_bbb[data-ewp-bbb-state="running"] .o_ewp_video {
+            animation: rlq-glow 2s ease-in-out infinite;
+        }
+
+        .o_ewp_hotspot[data-ewp-live]:not(:hover):not(:focus-visible):not(.o_ewp_hotspot_active) {
+            animation: rlq-room-live 2s ease-in-out infinite;
+        }
+
+        // Vector Tux, by pose. Awake: blinks, breathes with a sway, steam
+        // over the mug, and the idle Tux flaps a flipper now and then.
+        .o_rlq_tux {
+            .o_rlq_tux_eye {
+                animation: rlq-blink 4s ease-in-out infinite;
+            }
+
+            .o_rlq_tux_body {
+                animation: rlq-breathe 3.2s ease-in-out infinite;
+            }
+
+            .o_rlq_tux_steam path {
+                animation: rlq-tux-steam 2.4s ease-out infinite;
+
+                &:nth-child(2) {
+                    animation-delay: 0.8s;
+                }
+
+                &:nth-child(3) {
+                    animation-delay: 1.6s;
+                }
+            }
+        }
+
+        .o_rlq_tux[data-rlq-tux="idle"] .o_rlq_tux_flip_r {
+            animation: rlq-flap 5s ease-in-out infinite;
+        }
+
+        // greeting and wave: eight swings of the flipper (4 s), then the
+        // flipper stays up.
+        .o_rlq_tux[data-rlq-tux="greeting"],
+        .o_rlq_tux[data-rlq-tux="wave"] {
+            .o_rlq_tux_flip_r {
+                animation: rlq-wave 0.5s ease-in-out 8 alternate;
+            }
+
+            .o_rlq_tux_body {
+                animation: rlq-sway 1.8s ease-in-out infinite;
+            }
+        }
+
+        // sipping (5 s a sip) and coffee (3.6 s): lifts the mug, tips the
+        // head back and the mug further for the sip, eyes shut, puts the
+        // mug down; the steam rises while the mug is down.
+        .o_rlq_tux[data-rlq-tux="sipping"],
+        .o_rlq_tux[data-rlq-tux="coffee"] {
+            --rlq-sip-period: 3.6s;
+
+            .o_rlq_tux_mug {
+                animation: rlq-sip-mug var(--rlq-sip-period) ease-in-out infinite;
+            }
+
+            .o_rlq_tux_flip_l {
+                animation: rlq-sip-flipper var(--rlq-sip-period) ease-in-out infinite;
+            }
+
+            .o_rlq_tux_eye {
+                animation: rlq-sip-eyes var(--rlq-sip-period) ease-in-out infinite;
+            }
+
+            .o_rlq_tux_face {
+                animation: rlq-sip-face var(--rlq-sip-period) ease-in-out infinite;
+            }
+
+            .o_rlq_tux_body {
+                animation: rlq-sip-body var(--rlq-sip-period) ease-in-out infinite;
+            }
+
+            .o_rlq_tux_steam {
+                animation: rlq-sip-steam var(--rlq-sip-period) ease-in-out infinite;
+            }
+        }
+
+        .o_rlq_tux[data-rlq-tux="sipping"] {
+            --rlq-sip-period: 5s;
+        }
+
+        // code: the laptop slides up onto the lap, the flippers type in
+        // turn, the eyes follow the screen, whose glow pulses, and code
+        // glyphs float up and fade.
+        .o_rlq_tux[data-rlq-tux="code"] {
+            .o_rlq_tux_laptop {
+                animation: rlq-laptop-in 0.6s cubic-bezier(0.2, 0.8, 0.3, 1.2) both;
+            }
+
+            .o_rlq_tux_flip_l {
+                animation: rlq-type-left 0.4s ease-in-out infinite alternate;
+            }
+
+            .o_rlq_tux_flip_r {
+                animation: rlq-type-right 0.4s ease-in-out -0.2s infinite alternate;
+            }
+
+            .o_rlq_tux_face {
+                animation: rlq-read 1.6s ease-in-out infinite;
+            }
+
+            .o_rlq_tux_body {
+                animation: rlq-nod 0.8s ease-in-out infinite;
+            }
+
+            .o_rlq_tux_glow {
+                animation: rlq-screen 1.4s ease-in-out infinite alternate;
+            }
+
+            .o_rlq_tux_glyph {
+                animation: rlq-glyph 2.4s ease-out infinite both;
+
+                @for $index from 2 through 4 {
+                    &:nth-child(#{$index}) {
+                        animation-delay: #{($index - 1) * 0.6}s;
+                    }
+                }
+            }
+        }
+
+        // speak: the beak opens and closes at the microphone, which moves
+        // a little, sound waves leave it, the bubble shows its dots one
+        // after the other, the live dot pulses.
+        .o_rlq_tux[data-rlq-tux="speak"] {
+            .o_rlq_tux_beak_low {
+                animation: rlq-talk 0.36s ease-in-out infinite alternate;
+            }
+
+            .o_rlq_tux_handmic {
+                animation: rlq-mic 1.6s ease-in-out infinite;
+            }
+
+            .o_rlq_tux_body {
+                animation: rlq-sway 1.8s ease-in-out infinite;
+            }
+
+            .o_rlq_tux_waves path {
+                animation: rlq-voice 1.2s ease-out infinite both;
+
+                &:nth-child(2) {
+                    animation-delay: 0.3s;
+                }
+
+                &:nth-child(3) {
+                    animation-delay: 0.6s;
+                }
+            }
+
+            .o_rlq_tux_bubble {
+                animation: rlq-bubble 2.4s ease-in-out infinite;
+            }
+
+            .o_rlq_tux_dot {
+                animation: rlq-dot 1.2s ease-in-out infinite;
+
+                &:nth-child(3) {
+                    animation-delay: 0.2s;
+                }
+
+                &:nth-child(4) {
+                    animation-delay: 0.4s;
+                }
+            }
+
+            .o_rlq_tux_live_ring {
+                animation: rlq-live-ring 1.6s ease-out infinite;
+            }
+        }
+
+        .o_rlq_tux[data-rlq-tux="celebrate"] {
+            .o_rlq_tux_body {
+                animation: rlq-jump 0.6s ease-in-out infinite;
+            }
+
+            .o_rlq_tux_flip_l {
+                animation: rlq-cheer-left 0.3s ease-in-out infinite alternate;
+            }
+
+            .o_rlq_tux_flip_r {
+                animation: rlq-cheer-right 0.3s ease-in-out infinite alternate;
+            }
+
+            .o_rlq_tux_eye {
+                animation: none;
+            }
+
+            .o_rlq_tux_confetti rect {
+                animation: rlq-confetti 1.6s linear infinite;
+
+                @for $index from 2 through 8 {
+                    &:nth-child(#{$index}) {
+                        animation-delay: #{$index * 0.17}s;
+                    }
+                }
+            }
+        }
+
+        .o_rlq_tux[data-rlq-tux="sleeping"] {
+            .o_rlq_tux_body {
+                animation: rlq-sleep 4s ease-in-out infinite;
+            }
+
+            .o_rlq_tux_eye {
+                animation: none;
+            }
+
+            .o_rlq_tux_zzz path {
+                animation: rlq-zzz 3s ease-in infinite;
+
+                &:nth-child(2) {
+                    animation-delay: 1s;
+                }
+
+                &:nth-child(3) {
+                    animation-delay: 2s;
+                }
+            }
+        }
+
+        // walk: the body waddles on alternate feet.
+        .o_rlq_tux[data-rlq-tux="walk"] {
+            .o_rlq_tux_body {
+                animation: rlq-waddle 0.5s ease-in-out infinite alternate;
+            }
+
+            .o_rlq_tux_foot_l {
+                animation: rlq-step 0.5s ease-in-out infinite alternate;
+            }
+
+            .o_rlq_tux_foot_r {
+                animation: rlq-step 0.5s ease-in-out -0.5s infinite alternate;
+            }
+        }
+
+        .o_rlq_tux[data-rlq-tux="peek"] .o_rlq_tux_face {
+            animation: rlq-look 2.8s ease-in-out infinite;
+        }
+
+        // Tux cameos: the walking figure paces across its square and turns
+        // back; the peeking one rises from the bottom edge, looks around
+        // and hides, which is its entrance (no growing from the centre).
+        .o_rlq_cameo_walk .o_rlq_tux_cameo {
+            animation: rlq-pace 4s linear infinite;
+        }
+
+        .o_rlq_cameo_peek .o_rlq_tux_cameo {
+            animation: rlq-peek 2.8s ease-in-out infinite both;
+        }
+
+        .o_ewp_cameo.o_ewp_cameo_do_peek[data-ewp-actor^="rlq-tux"] {
+            animation: none;
+        }
+    }
+}
+
+// A bulb dims to a fifth and shrinks, then glows brighter than at rest.
+@keyframes rlq-twinkle {
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1.1);
+        box-shadow: 0 0 14px 5px rgba(255, 190, 90, 0.8);
+    }
+    50% {
+        opacity: 0.2;
+        transform: scale(0.6);
+        box-shadow: 0 0 2px 0 rgba(255, 190, 90, 0.2);
+    }
+}
+
+@keyframes rlq-rise {
+    0% {
+        transform: translateY(0) rotate(0) scale(0.8);
+        opacity: 0;
+    }
+    12% {
+        opacity: 0.95;
+    }
+    70% {
+        opacity: 0.85;
+    }
+    100% {
+        transform: translateY(-260px) rotate(50deg) scale(1.1);
+        opacity: 0;
+    }
+}
+
+@keyframes rlq-steam {
+    0% {
+        transform: translateY(8px) scaleX(1);
+        opacity: 0;
+    }
+    25% {
+        opacity: 0.95;
+    }
+    100% {
+        transform: translateY(-44px) scaleX(1.8);
+        opacity: 0;
+    }
+}
+
+// Raster Tux: rises 7 px and rocks 4 degrees each way on its feet; the
+// row above it on a phone is 8 px away.
+@keyframes rlq-bob {
+    0%,
+    100% {
+        transform: translateY(0) rotate(-4deg);
+    }
+    50% {
+        transform: translateY(-7px) rotate(4deg);
+    }
+}
+
+// One loop slides the track by one copy of the words.
+@keyframes rlq-marquee {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(percentage(-1 / $rlq-marquee-copies));
+    }
+}
+
+@keyframes rlq-pulse-navy {
+    0% {
+        box-shadow: 0 0 0 0 rgba(22, 59, 120, 0.7);
+    }
+    100% {
+        box-shadow: 0 0 0 9px rgba(22, 59, 120, 0);
+    }
+}
+
+@keyframes rlq-pulse-cream {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 246, 229, 0.8);
+    }
+    100% {
+        box-shadow: 0 0 0 9px rgba(255, 246, 229, 0);
+    }
+}
+
+@keyframes rlq-up {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes rlq-glow {
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 var(--rlq-glow);
+    }
+    50% {
+        box-shadow: 0 0 0 7px var(--rlq-glow-off);
+    }
+}
+
+@keyframes rlq-room-live {
+    0%,
+    100% {
+        box-shadow: 0 0 0 3px var(--ewp-live), 0 0 0 3px var(--rlq-live-glow);
+    }
+    50% {
+        box-shadow: 0 0 0 3px var(--ewp-live), 0 0 0 10px var(--rlq-live-glow-off);
+    }
+}
+
+@keyframes rlq-shimmer {
+    from {
+        background-position: 200% 0;
+    }
+    to {
+        background-position: -200% 0;
+    }
+}
+
+@keyframes rlq-swing {
+    0%,
+    100% {
+        transform: rotate(-8deg);
+    }
+    50% {
+        transform: rotate(8deg);
+    }
+}
+
+@keyframes rlq-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes rlq-zoom {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.06);
+    }
+}
+
+@keyframes rlq-blink {
+    0%,
+    90%,
+    100% {
+        transform: scaleY(1);
+    }
+    94% {
+        transform: scaleY(0.1);
+    }
+}
+
+@keyframes rlq-breathe {
+    0%,
+    100% {
+        transform: scale(1) rotate(0);
+    }
+    25% {
+        transform: scale(1.02) rotate(-2.5deg);
+    }
+    50% {
+        transform: scale(1.045) rotate(0);
+    }
+    75% {
+        transform: scale(1.02) rotate(2.5deg);
+    }
+}
+
+@keyframes rlq-sway {
+    0%,
+    100% {
+        transform: rotate(-3deg);
+    }
+    50% {
+        transform: rotate(3deg);
+    }
+}
+
+@keyframes rlq-flap {
+    0%,
+    80%,
+    100% {
+        transform: none;
+    }
+    85%,
+    95% {
+        transform: rotate(-35deg);
+    }
+    90% {
+        transform: rotate(-10deg);
+    }
+}
+
+@keyframes rlq-tux-steam {
+    0% {
+        transform: translateY(4px) scaleX(1);
+        opacity: 0;
+    }
+    30% {
+        opacity: 0.95;
+    }
+    100% {
+        transform: translateY(-16px) scaleX(1.4);
+        opacity: 0;
+    }
+}
+
+@keyframes rlq-wave {
+    from {
+        transform: rotate(-105deg);
+    }
+    to {
+        transform: rotate(-160deg);
+    }
+}
+
+@keyframes rlq-sip-mug {
+    0%,
+    12%,
+    90%,
+    100% {
+        transform: none;
+    }
+    30%,
+    76% {
+        transform: $rlq-sip-mug;
+    }
+    42%,
+    62% {
+        transform: $rlq-sip-tilt;
+    }
+}
+
+@keyframes rlq-sip-flipper {
+    0%,
+    12%,
+    90%,
+    100% {
+        transform: none;
+    }
+    30%,
+    76% {
+        transform: $rlq-sip-flipper;
+    }
+}
+
+@keyframes rlq-sip-eyes {
+    0%,
+    30%,
+    76%,
+    100% {
+        transform: scaleY(1);
+    }
+    42%,
+    62% {
+        transform: scaleY(0.15);
+    }
+}
+
+@keyframes rlq-sip-face {
+    0%,
+    30%,
+    76%,
+    100% {
+        transform: none;
+    }
+    42%,
+    62% {
+        transform: translateY(-2px) rotate(-9deg);
+    }
+}
+
+@keyframes rlq-sip-body {
+    0%,
+    30%,
+    76%,
+    100% {
+        transform: none;
+    }
+    42%,
+    62% {
+        transform: rotate(-4deg);
+    }
+}
+
+@keyframes rlq-sip-steam {
+    0%,
+    14%,
+    88%,
+    100% {
+        opacity: 1;
+    }
+    26%,
+    80% {
+        opacity: 0;
+    }
+}
+
+@keyframes rlq-laptop-in {
+    from {
+        transform: translateY(24px);
+        opacity: 0;
+    }
+    to {
+        transform: none;
+        opacity: 1;
+    }
+}
+
+@keyframes rlq-type-left {
+    from {
+        transform: $rlq-type-left;
+    }
+    to {
+        transform: rotate(-26deg);
+    }
+}
+
+@keyframes rlq-type-right {
+    from {
+        transform: $rlq-type-right;
+    }
+    to {
+        transform: rotate(26deg);
+    }
+}
+
+@keyframes rlq-read {
+    0%,
+    100% {
+        transform: translate(-2px, 3px);
+    }
+    50% {
+        transform: translate(2px, 3px);
+    }
+}
+
+@keyframes rlq-nod {
+    0%,
+    100% {
+        transform: rotate(-1.5deg);
+    }
+    50% {
+        transform: rotate(1.5deg);
+    }
+}
+
+@keyframes rlq-screen {
+    from {
+        opacity: 0.35;
+    }
+    to {
+        opacity: 0.75;
+    }
+}
+
+@keyframes rlq-glyph {
+    0% {
+        transform: translate(-6px, 8px) scale(0.6);
+        opacity: 0;
+    }
+    20% {
+        opacity: 1;
+    }
+    75% {
+        opacity: 0.9;
+    }
+    100% {
+        transform: translate(4px, -56px) scale(1.15);
+        opacity: 0;
+    }
+}
+
+@keyframes rlq-talk {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(5px);
+    }
+}
+
+@keyframes rlq-mic {
+    0%,
+    100% {
+        transform: rotate(-4deg);
+    }
+    50% {
+        transform: rotate(4deg);
+    }
+}
+
+@keyframes rlq-voice {
+    0% {
+        transform: translateX(-4px);
+        opacity: 0;
+    }
+    40% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(7px);
+        opacity: 0;
+    }
+}
+
+@keyframes rlq-bubble {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    15% {
+        transform: scale(1.06);
+        opacity: 1;
+    }
+    25%,
+    80% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+}
+
+@keyframes rlq-dot {
+    0%,
+    60%,
+    100% {
+        transform: translateY(0);
+        opacity: 0.35;
+    }
+    30% {
+        transform: translateY(-3px);
+        opacity: 1;
+    }
+}
+
+@keyframes rlq-jump {
+    0%,
+    100% {
+        transform: translateY(0) scale(1.04, 0.96);
+    }
+    50% {
+        transform: translateY(-14px) scale(0.97, 1.03);
+    }
+}
+
+@keyframes rlq-cheer-left {
+    from {
+        transform: rotate(120deg);
+    }
+    to {
+        transform: rotate(150deg);
+    }
+}
+
+@keyframes rlq-cheer-right {
+    from {
+        transform: rotate(-120deg);
+    }
+    to {
+        transform: rotate(-150deg);
+    }
+}
+
+@keyframes rlq-confetti {
+    0% {
+        transform: translateY(-12px) rotate(0);
+        opacity: 0;
+    }
+    15% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(56px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+@keyframes rlq-sleep {
+    0%,
+    100% {
+        transform: rotate(-3deg) scale(1);
+    }
+    50% {
+        transform: rotate(-3deg) scale(1.04);
+    }
+}
+
+@keyframes rlq-zzz {
+    0% {
+        transform: translate(-6px, 10px) scale(0.7);
+        opacity: 0;
+    }
+    30% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(8px, -12px) scale(1.1);
+        opacity: 0;
+    }
+}
+
+@keyframes rlq-live-ring {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(2.2);
+        opacity: 0;
+    }
+}
+
+@keyframes rlq-waddle {
+    from {
+        transform: rotate(-6deg);
+    }
+    to {
+        transform: rotate(6deg);
+    }
+}
+
+@keyframes rlq-step {
+    from {
+        transform: none;
+    }
+    to {
+        transform: translateY(-6px) rotate(-12deg);
+    }
+}
+
+@keyframes rlq-look {
+    0%,
+    30%,
+    75%,
+    100% {
+        transform: none;
+    }
+    40%,
+    50% {
+        transform: translateX(-4px);
+    }
+    58%,
+    68% {
+        transform: translateX(4px);
+    }
+}
+
+// Walking cameo: from the left of the square to its right, a turn (the
+// figure narrows to nothing and widens mirrored), and back.
+@keyframes rlq-pace {
+    0% {
+        transform: translateX(-10%) scaleX(1);
+    }
+    45% {
+        transform: translateX(10%) scaleX(1);
+    }
+    50% {
+        transform: translateX(10%) scaleX(-1);
+    }
+    95% {
+        transform: translateX(-10%) scaleX(-1);
+    }
+    100% {
+        transform: translateX(-10%) scaleX(1);
+    }
+}
+
+// Peeking cameo: up from below the bottom edge of its square to show the
+// head, a pause, and down again.
+@keyframes rlq-peek {
+    0%,
+    100% {
+        transform: translateY(100%);
+    }
+    22%,
+    72% {
+        transform: translateY(40%);
+    }
+    28% {
+        transform: translateY(36%);
+    }
+}

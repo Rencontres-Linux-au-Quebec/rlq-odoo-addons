@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Event Web App Plan</title></head>
+<body style="font-family:system-ui,sans-serif;max-width:60rem;margin:auto;padding:1rem;line-height:1.6">
+<h1>Event Web App Plan</h1>
+<p>A mobile web app for one event day at <code>/webapp_event</code>, installable on the home screen of a phone and reserved to logged-in users (portal or internal):</p>
+<ul>
+  <li>a general announcement and links about the event;</li>
+  <li>the events of the day;</li>
+  <li>the site plan with clickable rooms; each room page embeds its Discuss channel, joined automatically; each room has its own access group, given on entering the room and kept afterwards, so the chat stays readable once the day is over and closed to anonymous visitors;</li>
+  <li>a BigBlueButton conference per room, next to the chat: the room joins its meeting through the BigBlueButton API (role moderator for the Moderator group, viewer otherwise) and shows it in the page, or shows its conference URL in the page when the headers of that page allow it, else behind a button that opens it in a new tab;</li>
+  <li>the raffle draws of the day, refreshed live.</li>
+</ul>
+<p>The <strong>Event Web App</strong> application configures each day: opening window, announcement, links, events, raffles, plan image, and the rooms drawn on the plan with a visual editor. Outside the opening window, only the <em>Moderator</em> and <em>Administrator</em> groups see the page, to test it; they read every room chat.</p>
+<p>A theme module can restyle every page without copying it: empty template slots (brand, mascot, banner, home cards, footer), CSS custom properties for every colour, font and radius, DOM events for the state of the day, of the conference and of the raffle draws, and the page state on the body. See the "Theming" section of README.md.</p>
+<hr>
+<p lang="fr">Application web mobile pour une journée d'événement à <code>/webapp_event</code> : annonce générale, liens, événements de la journée, plan du site avec salles cliquables et clavardage par salle, visioconférence BigBlueButton par salle à côté du clavardage, tirages de la journée. Chaque salle a son groupe d'accès, donné en entrant dans la salle et conservé ensuite : le clavardage reste lisible après la journée et fermé aux visiteurs anonymes. Réservée aux utilisateurs connectés ; hors de la plage d'ouverture, seuls les modérateurs et administrateurs la voient.</p>
+<p>© 2026 Services-Conseils Linux Inc. (info@rencontres-linux.quebec) · Rencontres Linux au Québec contributors · AGPL-3 or later / AGPL-3 ou ultérieure</p>
+</body></html>

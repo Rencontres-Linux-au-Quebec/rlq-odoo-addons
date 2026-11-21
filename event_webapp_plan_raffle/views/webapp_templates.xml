@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
+    Copyright (C) 2026 Rencontres Linux au Québec contributors
+    License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+
+    Raffle prize blocks of the event web app, through the slot
+    webapp_slot_home_cards of event_webapp_plan. They read only the plain
+    values of the controller (prize_*, presence), never a model:
+
+    - "My prize" (#ewp_prize_card, first of the slot: priority 8): one item
+      per draw won by the user, its state in words, the button "Choose my
+      prize" while the prize link is open, then the public name form. When
+      the user won nothing, only its box #ewp_prize_box is there, empty
+      and hidden: no heading enters the outline of the page. The page
+      script (static/src/webapp/prize.js) asks data-ewp-prize-url for the
+      content of the box and shows it when a draw comes in. Each item carries
+      data-ewp-prize-draw, data-ewp-prize-state, data-ewp-prize-deadline
+      (ISO 8601, while the link is open) and data-ewp-prize-say, the
+      sentence the live region says when the state changes.
+    - "On site" (#ewp_presence, after the other cards: priority 20): a
+      toggle button (aria-pressed), for the users registered to an event of
+      the day; information only.
+
+    Both forms post with the CSRF token and work without script.
+
+    The raffle block of event_webapp_plan gets the status of each prize in
+    data-ewp-prize-status (chosen, to_choose, declined, expired), beside
+    the text that says it.
+-->
+<odoo>
+    <!-- The "My prize" card, nothing without a draw; rendered again by
+         the JSON routes in #ewp_prize_box. -->
+    <template id="prize_content" name="Event web app raffle: my prize body">
+        <section t-if="prize_lines" id="ewp_prize_card" class="o_ewp_card ewp_prize_card"
+                 aria-labelledby="ewp_prize_h_card">
+            <h2 id="ewp_prize_h_card" tabindex="-1">My prize</h2>
+            <div class="ewp_prize_body">
+                <p t-if="prize_notice" class="ewp_prize_notice" role="status" t-out="prize_notice"/>
+                <ul class="ewp_prize_list" role="list">
+                    <li t-foreach="prize_lines" t-as="line" class="ewp_prize_item"
+                        t-att-data-ewp-prize-draw="line['id']"
+                        t-att-data-ewp-prize-state="line['state']"
+                        t-att-data-ewp-prize-deadline="line['deadline'] or None"
+                        t-att-data-ewp-prize-say="line['say']">
+                        <h3 class="ewp_prize_title" t-out="line['title']"/>
+                        <p t-if="line['prize']" class="ewp_prize_name">
+                            <span class="o_ewp_sr_only">Prize:</span>
+                            <span t-out="line['prize']"/>
+                        </p>
+                        <p t-if="line['sponsor'] or line['category']" class="ewp_prize_meta">
+                            <span t-if="line['sponsor']" class="ewp_prize_sponsor">
+                                <span class="ewp_prize_label">Offered by</span>
+                                <span t-out="line['sponsor']"/>
+                            </span>
+                            <span t-if="line['category']" class="ewp_prize_category">
+                                <span class="o_ewp_sr_only">Token category:</span>
+                                <span t-out="line['category']"/>
+                            </span>
+                        </p>
+                        <p class="ewp_prize_status" t-out="line['status']"/>
+                        <p t-if="line['tracking']" class="ewp_prize_tracking">
+                            <span class="ewp_prize_label">Tracking number:</span>
+                            <span class="ewp_prize_tracking_ref" t-out="line['tracking']"/>
+                        </p>
+                        <p t-if="line['carrier']" class="ewp_prize_carrier">
+                            <span class="ewp_prize_label">Carrier:</span>
+                            <span t-out="line['carrier']"/>
+                        </p>
+                        <a t-if="line['link_url']" class="o_ewp_button ewp_prize_choose" t-att-href="line['link_url']">
+                            Choose my prize<span class="o_ewp_sr_only">, <t t-out="line['title']"/></span>
+                        </a>
+                    </li>
+                </ul>
+                <div class="ewp_prize_public">
+                    <h3 id="ewp_prize_h_name">Your name on the winners page</h3>
+                    <p id="ewp_prize_name_help" class="o_ewp_hint">
+                        The winners page shows your public name, a nickname if you like, or your full name when you leave it empty.
+                    </p>
+                    <p class="ewp_prize_shown">
+                        <span class="ewp_prize_label">Shown as:</span>
+                        <strong class="ewp_prize_shown_name" t-out="prize_public_shown"/>
+                    </p>
+                    <form class="ewp_prize_form ewp_prize_name_form" method="post"
+                          t-att-action="prize_public_name_url" data-ewp-prize-form="prize">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <label for="ewp_prize_name_input" class="ewp_prize_field_label">Public name</label>
+                        <input id="ewp_prize_name_input" class="ewp_prize_input" type="text" name="public_name"
+                               autocomplete="nickname" t-att-maxlength="prize_public_name_max"
+                               t-att-value="prize_public_name" aria-describedby="ewp_prize_name_help"/>
+                        <button id="ewp_prize_save" type="submit" class="o_ewp_button ewp_prize_save">Save the public name</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </template>
+
+    <template id="prize_card" inherit_id="event_webapp_plan.webapp_slot_home_cards" priority="8"
+              name="Event web app raffle: my prize card">
+        <xpath expr="." position="inside">
+            <div t-if="ewp_page == 'home' and prize_url" id="ewp_prize_box" class="ewp_prize_box"
+                 t-att-hidden="None if prize_lines else 'hidden'"
+                 t-att-data-ewp-prize-url="prize_url"
+                 t-att-data-ewp-signature="prize_signature">
+                <t t-call="event_webapp_plan_raffle.prize_content"/>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Body of the "On site" block, rendered again by its route. -->
+    <template id="presence_content" name="Event web app raffle: on site body">
+        <p id="ewp_presence_help" class="o_ewp_hint">
+            Tell the organizers that you are at the event. For information only: your attendance is recorded when your ticket is scanned at the welcome desk.
+        </p>
+        <p t-if="presence['notice']" class="ewp_prize_notice" role="status" t-out="presence['notice']"/>
+        <form class="ewp_prize_form ewp_presence_form" method="post" t-att-action="presence['url']"
+              data-ewp-prize-form="presence">
+            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+            <button type="submit" id="ewp_presence_toggle" class="o_ewp_pref_toggle ewp_presence_toggle"
+                    name="on_site" t-att-value="'0' if presence['declared'] else '1'"
+                    t-att-aria-pressed="'true' if presence['declared'] else 'false'"
+                    aria-describedby="ewp_presence_help">I am on site</button>
+        </form>
+        <p t-if="presence['time']" class="ewp_presence_time" t-out="presence['time']"/>
+    </template>
+
+    <!-- The raffle block: the status of the prize of a drawn draw, for
+         the style; the text says it in words. -->
+    <template id="raffles_prize_status" inherit_id="event_webapp_plan.webapp_raffles_content"
+              name="Event web app raffle: prize status">
+        <xpath expr="//span[hasclass('o_ewp_draw_prize')]" position="attributes">
+            <attribute name="t-att-data-ewp-prize-status">draw.get('prize_status')</attribute>
+        </xpath>
+    </template>
+
+    <template id="presence_card" inherit_id="event_webapp_plan.webapp_slot_home_cards" priority="20"
+              name="Event web app raffle: on site">
+        <xpath expr="." position="inside">
+            <section t-if="ewp_page == 'home' and presence" id="ewp_presence"
+                     class="o_ewp_card ewp_presence" aria-labelledby="ewp_presence_h">
+                <h2 id="ewp_presence_h">On site</h2>
+                <div class="ewp_presence_body">
+                    <t t-call="event_webapp_plan_raffle.presence_content"/>
+                </div>
+            </section>
+        </xpath>
+    </template>
+</odoo>
