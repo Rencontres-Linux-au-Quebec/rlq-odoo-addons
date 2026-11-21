@@ -20,7 +20,8 @@
       sentence the live region says when the state changes.
     - "On site" (#ewp_presence, after the other cards: priority 20): a
       toggle button (aria-pressed), for the users registered to an event of
-      the day; information only.
+      the day; information only. The controller gives no presence value
+      while the setting "On-site card" is off: the block is not rendered.
 
     Both forms post with the CSRF token and work without script.
 

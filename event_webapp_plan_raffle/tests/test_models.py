@@ -5,11 +5,14 @@
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or (at your option) any later version. (http://www.gnu.org/licenses/agpl)
 """Model tests: the draws of a day won by a contact, the registrations of
-a contact, and the self-declared attendance, which never changes the
-attendance of the raffles. Every name below is invented for the tests."""
+a contact, the self-declared attendance, which never changes the
+attendance of the raffles, and the setting "On-site card" (off by
+default, written by the settings form). Every name below is invented for
+the tests."""
 
 from odoo.tests import TransactionCase, tagged
 
+from ..models.res_config_settings import PARAM_ONSITE_CARD
 from .common import PrizeWebappMixin
 
 
@@ -125,3 +128,43 @@ class TestPrizeWebappModels(PrizeWebappMixin, TransactionCase):
             [*modules, "event_webapp_plan_raffle"], ["fr_CA"], overwrite=True
         )
         self.assertEqual(names(), expected)
+
+
+@tagged("post_install", "-at_install")
+class TestOnsiteCardSetting(TransactionCase):
+    def _param(self):
+        return (
+            self.env["ir.config_parameter"].sudo().get_param(PARAM_ONSITE_CARD)
+        )
+
+    def test_onsite_card_is_off_by_default(self):
+        # The module ships no value: a new database has no parameter.
+        self.assertFalse(self._param())
+        self.assertFalse(self.env["event.webapp"]._ewp_onsite_card_enabled())
+        self.assertFalse(
+            self.env["res.config.settings"].create({}).ewp_onsite_card
+        )
+
+    def test_onsite_card_setting_writes_the_parameter(self):
+        arch = self.env["res.config.settings"].get_view(view_type="form")[
+            "arch"
+        ]
+        self.assertIn('name="ewp_onsite_card"', arch)
+        settings = self.env["res.config.settings"].create(
+            {"ewp_onsite_card": True}
+        )
+        settings.set_values()
+        self.assertEqual(self._param(), "True")
+        self.assertTrue(self.env["event.webapp"]._ewp_onsite_card_enabled())
+        self.assertTrue(
+            self.env["res.config.settings"].create({}).ewp_onsite_card
+        )
+        settings = self.env["res.config.settings"].create(
+            {"ewp_onsite_card": False}
+        )
+        settings.set_values()
+        self.assertFalse(self._param())
+        self.assertFalse(self.env["event.webapp"]._ewp_onsite_card_enabled())
+        # Anything but a true value reads as off.
+        self.env["ir.config_parameter"].set_param(PARAM_ONSITE_CARD, "maybe")
+        self.assertFalse(self.env["event.webapp"]._ewp_onsite_card_enabled())

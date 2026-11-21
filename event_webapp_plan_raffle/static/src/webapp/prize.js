@@ -31,6 +31,8 @@
 //   focus goes back to the same field or button, and its message is said
 //   in the live region. Without fetch, or on an answer that is not JSON,
 //   the form is posted as is and the server redirects back to the page.
+//   The "On site" form is in the page only while the setting "On-site
+//   card" is ticked; without it, nothing here touches that block.
 (function () {
     "use strict";
 

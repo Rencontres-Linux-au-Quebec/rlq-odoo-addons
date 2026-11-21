@@ -9,7 +9,8 @@
     "summary": (
         'Raffle prizes in the event day web app: a "My prize" card for '
         "the logged-in winner, the public name of the winners page, and "
-        'a self-declared "I am on site" toggle, for information only.'
+        'an optional self-declared "I am on site" toggle, for information '
+        "only."
     ),
     "description": (
         """
@@ -30,7 +31,9 @@ event_raffle_prize_handover and the modules it builds on):
   block of the web app show instead of the full name;
 * an "I am on site" toggle lets an attendee say they are at the event;
   the registration and the draw show it, for information only: the
-  attendance of the raffles still comes from the check-in scan.
+  attendance of the raffles still comes from the check-in scan. The
+  setting "On-site card" (Settings > Event Web App, off by default) shows
+  or hides it for every day.
 
 The pages keep the accessibility of the web app: headings, lists, forms
 that work without script, one live region, text-only mode.
@@ -42,7 +45,7 @@ Copyright (C) 2026 Rencontres Linux au Québec contributors
 GNU Affero General Public License v3 or later (http://www.gnu.org/licenses/agpl)
 """
     ),
-    "version": "18.0.1.1.0",
+    "version": "18.0.1.2.0",
     "category": "Marketing/Events",
     "author": (
         "Services-Conseils Linux Inc. (info@rencontres-linux.quebec), "
@@ -55,6 +58,7 @@ GNU Affero General Public License v3 or later (http://www.gnu.org/licenses/agpl)
     "data": [
         "views/event_registration_views.xml",
         "views/event_raffle_draw_views.xml",
+        "views/res_config_settings_views.xml",
         "views/webapp_templates.xml",
     ],
     "assets": {

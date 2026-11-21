@@ -1,5 +1,30 @@
 # Changelog - event_webapp_plan_raffle
 
+## 18.0.1.2.0
+
+**Short title:** the "On site" card becomes a setting, off by default.
+
+**Reason for the request:** the self-declared attendance is information only, and an event that does not want it had no way to hide the card.
+
+**Changes:**
+
+- `models/res_config_settings.py` (new): `PARAM_ONSITE_CARD` (`event_webapp_plan_raffle.onsite_card`) and the field `ewp_onsite_card` ("On-site card"), a boolean config parameter for every day.
+- `views/res_config_settings_views.xml` (new): block "Home page" in the app "Event Web App" of the settings (view of `event_webapp_plan`), the checkbox and its help.
+- `models/event_webapp.py`: `_ewp_onsite_card_enabled()`, the parameter read as superuser, False when missing.
+- `controllers/main.py`: `_ewp_presence_values()` gives no block while the setting is off; the route `presence` answers 404 then, before any other check.
+- `views/webapp_templates.xml`, `static/src/webapp/prize.js`: comments; the template already renders nothing without presence values, and the script acts on a form only once it is submitted.
+- `i18n/fr.po`, `i18n/event_webapp_plan_raffle.pot`: the new texts.
+- `README.md`, `static/description/index.html`: the setting.
+- Tests: `test_models.py` (`TestOnsiteCardSetting`: off by default, the settings form writes and clears the parameter), `test_controllers.py` (`test_presence_off_hides_the_card_and_refuses_the_route`; the class ticks the setting), `test_selenium_prize.py` (the class ticks the setting).
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:** the module ships no value of the parameter, so a database that updates the module hides the card until an administrator ticks it. Turning it off keeps `attendance_declared` and its time on the registrations: the backend list, form and draw still show them, and the card shows them again once it is back. The check-in scan and the attendance mode of the raffles do not depend on it.
+
+**Checks:** full suite of event_webapp_plan, event_webapp_plan_raffle, event_webapp_plan_track and rlq_event_webapp_plan on a fresh database (browser tests skipped without selenium); each new test fails without its change; `msgfmt -c` on the catalogues.
+
+**Action required:** update the module (`-u event_webapp_plan_raffle`), then tick **Settings > Event Web App > Home page > On-site card** to keep the card.
+
 ## 18.0.1.1.0
 
 **Short title:** the "My prize" card reports its refresh times to the automatic updates of the web app.

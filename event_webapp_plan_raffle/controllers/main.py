@@ -22,7 +22,12 @@ webapp_slot_home_cards:
   its box stays empty and hidden, and the page script fills it when a draw
   comes in.
 - "On site" (presence): the self-declared attendance of the registrations
-  of the current user to the events of the day, a toggle button.
+  of the current user to the events of the day, a toggle button. The
+  block exists only while the setting "On-site card" is ticked
+  (event.webapp._ewp_onsite_card_enabled()): otherwise the page renders
+  no block and the presence route answers 404, as for a route that does
+  not exist; the declared attendance already saved stays on the
+  registrations.
 
 Access: every route runs as the logged-in user, reads the day through the
 sudo record of the parent controller once _ewp_can_view() allowed the
@@ -43,7 +48,7 @@ shows the prize of each winner as the winners page does, the prize to
 choose included (_ewp_raffle_values()).
 """
 
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, NotFound
 
 from odoo import http
 from odoo.http import request
@@ -226,8 +231,10 @@ class EventWebappRaffleController(EventWebappController):
 
     def _ewp_presence_values(self, webapp, tz, notice=""):
         """Values of the "On site" block: {"declared", "time", "url",
-        "notice"}, or False when the current user has no registration to
-        the events of the day."""
+        "notice"}, or False when the setting "On-site card" is off or the
+        current user has no registration to the events of the day."""
+        if not webapp._ewp_onsite_card_enabled():
+            return False
         registrations = webapp._ewp_partner_registrations(
             request.env.user.partner_id
         )
@@ -369,7 +376,10 @@ class EventWebappRaffleController(EventWebappController):
         """Write the self-declared attendance (``on_site`` "1" or "0") on
         the registrations of the current user to the events of the day;
         another value changes nothing. It never changes the state of a
-        registration, which the check-in scan sets."""
+        registration, which the check-in scan sets. 404 while the setting
+        "On-site card" is off, before any other check."""
+        if not request.env["event.webapp"]._ewp_onsite_card_enabled():
+            raise NotFound()
         webapp = self._ewp_allowed_day(webapp_id)
         registrations = webapp._ewp_partner_registrations(
             request.env.user.partner_id

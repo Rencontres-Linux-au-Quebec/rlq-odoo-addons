@@ -10,7 +10,9 @@ states of the claim with the pick-up location, the e-mail and the
 tracking number), its JSON route (anonymous, closed day, unknown day),
 the public name form (CSRF, own contact only, the raffle block), the
 "On site" toggle (CSRF, own registrations only, the attendance mode
-unchanged), the text-only mode and French.
+unchanged, absent with its route while the setting "On-site card" is
+off), the text-only mode and French. The class ticks the setting; the
+test of the setting off clears it.
 
 Every name below is invented for the tests."""
 
@@ -23,6 +25,7 @@ from lxml import html as lxml_html
 from odoo import Command, fields
 from odoo.tests import HttpCase, tagged
 
+from ..models.res_config_settings import PARAM_ONSITE_CARD
 from .common import PrizeWebappMixin
 
 # In the browser: wait(fn, ms) polls `fn` until it returns a truthy value,
@@ -61,6 +64,7 @@ class TestPrizeWebappControllers(PrizeWebappMixin, HttpCase):
         cls._webapp_setup("ewp_prize_http")
         cls.winner = cls._participant_of(cls.winner_user)
         cls.other = cls._participant_of(cls.other_user)
+        cls.env["ir.config_parameter"].set_param(PARAM_ONSITE_CARD, True)
 
     # ------------------------------------------------------------------
     # Helpers
@@ -420,6 +424,40 @@ class TestPrizeWebappControllers(PrizeWebappMixin, HttpCase):
         self.assertFalse(any(registrations.mapped("attendance_declared")))
         self.assertEqual(remote.attendance_mode, "virtual")
         self.assertEqual(self.winner.attendance_mode, "onsite")
+
+    def test_presence_off_hides_the_card_and_refuses_the_route(self):
+        registration = self.winner.registration_id
+        self.env["ir.config_parameter"].set_param(PARAM_ONSITE_CARD, False)
+        self._login(self.winner_user)
+        page, text = self._page()
+        self.assertNotIn("ewp_presence", text)
+        self.assertNotIn("I am on site", text)
+        csrf = self._csrf(page)
+        for as_json in (False, True):
+            response = self._post(
+                "/presence",
+                {"csrf_token": csrf, "on_site": "1"},
+                as_json=as_json,
+            )
+            self.assertEqual(response.status_code, 404)
+        self.assertFalse(registration.attendance_declared)
+        # A declaration saved while the card was on is kept, and shows
+        # again once the card is back.
+        self.env["ir.config_parameter"].set_param(PARAM_ONSITE_CARD, True)
+        page, _text = self._page()
+        response = self._post(
+            "/presence", {"csrf_token": self._csrf(page), "on_site": "1"}
+        )
+        self.assertEqual(response.status_code, 303)
+        self.env["ir.config_parameter"].set_param(PARAM_ONSITE_CARD, False)
+        _page, text = self._page()
+        self.assertNotIn("ewp_presence", text)
+        self.assertTrue(registration.attendance_declared)
+        self.assertTrue(registration.attendance_declared_date)
+        self.env["ir.config_parameter"].set_param(PARAM_ONSITE_CARD, True)
+        page, _text = self._page()
+        button = page.xpath("//button[@id='ewp_presence_toggle']")[0]
+        self.assertEqual(button.get("aria-pressed"), "true")
 
     def test_presence_needs_a_registration_of_the_day(self):
         user = self._portal_user("ewp_prize_http_nobody", "Nora Nobody")

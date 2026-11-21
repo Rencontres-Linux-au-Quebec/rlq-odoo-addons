@@ -52,6 +52,14 @@ msgid "<span class=\"o_ewp_sr_only\">Token category:</span>"
 msgstr ""
 
 #. module: event_webapp_plan_raffle
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.res_config_settings_view_form
+msgid ""
+"Attendees tell the organizers that they are at the event. For information "
+"only: the attendance of the raffles comes from the check-in scan at the "
+"welcome desk."
+msgstr ""
+
+#. module: event_webapp_plan_raffle
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_content
 msgid "Choose my prize"
 msgstr ""
@@ -60,6 +68,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/event_webapp_plan_raffle/controllers/main.py:0
 msgid "Choose your prize before %(time)s."
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model:ir.model,name:event_webapp_plan_raffle.model_res_config_settings
+msgid "Config Settings"
 msgstr ""
 
 #. module: event_webapp_plan_raffle
@@ -91,6 +104,11 @@ msgid "Event Web App Day"
 msgstr ""
 
 #. module: event_webapp_plan_raffle
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.res_config_settings_view_form
+msgid "Home page"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.presence_content
 msgid "I am on site"
 msgstr ""
@@ -107,6 +125,11 @@ msgid "On site"
 msgstr ""
 
 #. module: event_webapp_plan_raffle
+#: model:ir.model.fields,field_description:event_webapp_plan_raffle.field_res_config_settings__ewp_onsite_card
+msgid "On-site card"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_content
 msgid "Public name"
 msgstr ""
@@ -119,6 +142,15 @@ msgstr ""
 #. module: event_webapp_plan_raffle
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_content
 msgid "Save the public name"
+msgstr ""
+
+#. module: event_webapp_plan_raffle
+#: model:ir.model.fields,help:event_webapp_plan_raffle.field_res_config_settings__ewp_onsite_card
+msgid ""
+"Shows the \"On site\" card on the home page of the web app: an attendee "
+"tells the organizers that they are at the event. For information only: the "
+"attendance of the raffles comes from the check-in scan. Turned off, the card "
+"and its route are gone and the declared attendance already saved is kept."
 msgstr ""
 
 #. module: event_webapp_plan_raffle
