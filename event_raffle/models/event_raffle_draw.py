@@ -49,6 +49,12 @@ class EventRaffleDraw(models.Model):
         ondelete="cascade",
         index=True,
     )
+    raffle_is_test = fields.Boolean(
+        related="raffle_id.is_test",
+        string="Test Raffle",
+        help="The raffle of this draw is a test raffle: the Prod and Test "
+        "filters of the winner list rely on it.",
+    )
     sequence = fields.Integer(string="Draw #", default=1)
     name = fields.Char(string="Name", compute="_compute_name", store=True)
     prize = fields.Char(string="Prize")

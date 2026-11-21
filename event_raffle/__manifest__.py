@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 {
     "name": "Event Raffle (Tirage)",
-    "version": "18.0.1.6.0",
+    "version": "18.0.1.7.0",
     "summary": "Animated prize draws (3D wheel) for events",
     "author": "TechnoLibre",
     "website": "https://technolibre.ca",

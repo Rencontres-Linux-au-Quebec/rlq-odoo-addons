@@ -26,6 +26,20 @@
         </field>
     </record>
 
+    <record id="event_raffle_draw_view_search" model="ir.ui.view">
+        <field name="name">event.raffle.draw.search</field>
+        <field name="model">event.raffle.draw</field>
+        <field name="arch" type="xml">
+            <search string="Draws">
+                <field name="winner_name" />
+                <field name="raffle_id" />
+                <field name="partner_id" />
+                <filter string="Prod" name="production" domain="[('raffle_is_test', '=', False)]" />
+                <filter string="Test" name="test" domain="[('raffle_is_test', '=', True)]" />
+            </search>
+        </field>
+    </record>
+
     <record id="event_raffle_draw_view_form" model="ir.ui.view">
         <field name="name">event.raffle.draw.form</field>
         <field name="model">event.raffle.draw</field>

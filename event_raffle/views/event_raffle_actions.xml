@@ -4,6 +4,7 @@
         <field name="name">Raffles</field>
         <field name="res_model">event.raffle</field>
         <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_production': 1}</field>
     </record>
 
     <record id="action_event_raffle_draw" model="ir.actions.act_window">

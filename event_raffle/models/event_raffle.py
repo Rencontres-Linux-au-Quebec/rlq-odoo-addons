@@ -122,6 +122,13 @@ class EventRaffle(models.Model):
         index=True,
     )
     context_note = fields.Text(string="Context")
+    is_test = fields.Boolean(
+        string="Test Raffle",
+        default=False,
+        help="Marks a rehearsal or trial raffle, kept apart from the real "
+        "ones: the raffle list opens on the Prod filter, which hides it, "
+        "and its form shows a Test ribbon.",
+    )
     remove_winner = fields.Boolean(
         string="Remove Winner",
         default=_default("default_remove_winner", True),

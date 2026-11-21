@@ -490,6 +490,7 @@ msgstr "Tir #{numéro} : {gagnant} a gagné ! ({prix}) {lien}"
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__draw_ids
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_draw_view_search
 #: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_view_form
 msgid "Draws"
 msgstr "Tirs"
@@ -744,6 +745,17 @@ msgstr "Marquer absent"
 #: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_draw_view_form
 msgid "Mark Present"
 msgstr "Marquer présent"
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle__is_test
+msgid ""
+"Marks a rehearsal or trial raffle, kept apart from the real ones: the raffle"
+" list opens on the Prod filter, which hides it, and its form shows a Test "
+"ribbon."
+msgstr ""
+"Marque un tirage de répétition ou d'essai, tenu à l'écart des vrais : la "
+"liste des tirages s'ouvre sur le filtre Prod, qui le cache, et son "
+"formulaire affiche un ruban Test."
 
 #. module: event_raffle
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notify_wizard__sender__me
@@ -1074,6 +1086,12 @@ msgid "Prize:"
 msgstr "Lot :"
 
 #. module: event_raffle
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_draw_view_search
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_view_search
+msgid "Prod"
+msgstr "Prod"
+
+#. module: event_raffle
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_start_wizard__copy_strategy__question_and_present
 msgid "Questionnaire filled and present"
 msgstr "Questionnaire rempli et présent"
@@ -1152,6 +1170,7 @@ msgstr "Tirage..."
 #: model:ir.ui.menu,name:event_raffle.menu_event_raffle
 #: model_terms:ir.ui.view,arch_db:event_raffle.event_event_view_form_raffle
 #: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_view_list
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_view_search
 msgid "Raffles"
 msgstr "Tirages"
 
@@ -1321,6 +1340,19 @@ msgstr ""
 "Planifiée : activités futures."
 
 #. module: event_raffle
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_draw_view_search
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_view_form
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_view_search
+msgid "Test"
+msgstr "Test"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__is_test
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__raffle_is_test
+msgid "Test Raffle"
+msgstr "Tirage de test"
+
+#. module: event_raffle
 #: model:ir.model.fields,help:event_raffle.field_event_raffle__flag_text
 msgid ""
 "Text of the flag shown by the 'Free software flag' animation. A random line "
@@ -1375,6 +1407,15 @@ msgstr ""
 #: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
 msgid "The message is empty."
 msgstr "Le message est vide."
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle_draw__raffle_is_test
+msgid ""
+"The raffle of this draw is a test raffle: the Prod and Test filters of the "
+"winner list rely on it."
+msgstr ""
+"Le tirage de ce tir est un tirage de test : les filtres Prod et Test de la "
+"liste des gagnants s'appuient sur lui."
 
 #. module: event_raffle
 #. odoo-python

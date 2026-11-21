@@ -18,6 +18,10 @@ button sur l'événement affiche la liste des gagnants.
 Aucune configuration requise. Par activité de tirage, l'onglet **Paramètres**
 regroupe les réglages :
 
+- **Tirage de test** (décoché par défaut) : marque un tirage de répétition
+  ou d'essai. Le formulaire affiche alors un ruban **Test**, et la liste des
+  tirages le montre en orange, avec la colonne *Tirage de test* cochée.
+  Voir *Tirages de test et filtre Prod* ci-dessous.
 - **Retirer le gagnant** : exclut le gagnant des tirs suivants (activé par défaut).
 - **Durée de rotation** / **Nombre de tours** : cinématique de la roue.
 - **Afficher les feux d'artifice** : feux à la révélation du gagnant.
@@ -104,6 +108,16 @@ Tux se tient à **gauche** de la roue, sauf pour les thèmes *Linux* où il pass
 à **droite** pour laisser voir le terminal d'arrière-plan. Dans la barre
 d'outils, le champ *Lot* est à gauche, le **gagnant est centré**, et le bouton
 *Prochain tirage* est à droite au-dessus de l'historique.
+
+## Tirages de test et filtre Prod
+
+La liste des tirages (menu **Tirage → Tirages**, et bouton intelligent
+**Tirages** de l'événement) s'ouvre sur le filtre **Prod**, qui n'affiche que
+les tirages dont la case **Tirage de test** est décochée. Le filtre **Test**
+montre les tirages de test ; cocher les deux, ou retirer la facette *Prod*,
+affiche tous les tirages. La liste des gagnants offre les mêmes filtres
+**Prod** et **Test**, d'après le tirage de chaque tir, sans en appliquer
+aucun par défaut.
 
 ## Usage
 
@@ -217,6 +231,11 @@ L'effet est surtout pensé pour le mode **plein écran** (projection).
 
 ## Changes
 
+- **18.0.1.7.0** : case **Tirage de test** dans l'onglet *Paramètres* du
+  tirage, ruban **Test** sur le formulaire et colonne dans la liste. La
+  liste des tirages s'ouvre sur le nouveau filtre **Prod**, qui cache les
+  tirages de test ; filtres **Prod** et **Test** aussi dans la liste des
+  gagnants. Les tirages existants restent en production.
 - **18.0.1.6.0** : paramètre `{lien}` / `{link}`, le lien de prix du tir,
   dans le **Message canal** et dans le **Message notification**, qui accepte
   désormais tous les paramètres du message canal, à l'envoi automatique

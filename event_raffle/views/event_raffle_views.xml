@@ -4,13 +4,29 @@
         <field name="name">event.raffle.list</field>
         <field name="model">event.raffle</field>
         <field name="arch" type="xml">
-            <list string="Raffles">
+            <list string="Raffles" decoration-warning="is_test">
                 <field name="name" />
                 <field name="event_id" />
                 <field name="participant_count" />
                 <field name="draw_count" />
                 <field name="state" />
+                <field name="is_test" optional="show" />
             </list>
+        </field>
+    </record>
+
+    <record id="event_raffle_view_search" model="ir.ui.view">
+        <field name="name">event.raffle.search</field>
+        <field name="model">event.raffle</field>
+        <field name="arch" type="xml">
+            <search string="Raffles">
+                <field name="name" />
+                <field name="event_id" />
+                <!-- One group, so the two filters combine with OR: both
+                     selected show every raffle. -->
+                <filter string="Prod" name="production" domain="[('is_test', '=', False)]" />
+                <filter string="Test" name="test" domain="[('is_test', '=', True)]" />
+            </search>
         </field>
     </record>
 
@@ -23,6 +39,7 @@
                     <field name="state" widget="statusbar" />
                 </header>
                 <sheet>
+                    <widget name="web_ribbon" title="Test" bg_color="text-bg-warning" invisible="not is_test" />
                     <div class="oe_title">
                         <h1>
                             <field name="name" />
@@ -75,6 +92,7 @@
                         </page>
                         <page string="Settings" name="settings">
                             <group>
+                                <field name="is_test" />
                                 <field name="theme" />
                                 <field name="winner_celebration" />
                                 <field name="remove_winner" />
