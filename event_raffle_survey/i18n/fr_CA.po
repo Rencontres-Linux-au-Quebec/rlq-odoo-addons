@@ -1,0 +1,151 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* event_raffle_survey
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-05 06:36+0000\n"
+"PO-Revision-Date: 2026-10-05 07:40+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr_CA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Odoo\n"
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_start_wizard__survey_anonymous_count
+msgid "Anonymous Among Them"
+msgstr "Dont anonymes"
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_start_wizard__survey_question_match
+msgid "Answered"
+msgstr "Répondu à"
+
+#. module: event_raffle_survey
+#: model:ir.model.fields.selection,name:event_raffle_survey.selection__event_raffle_start_wizard__survey_question_match__any
+msgid "At least one"
+msgstr "Au moins une"
+
+#. module: event_raffle_survey
+#. odoo-python
+#: code:addons/event_raffle_survey/wizard/event_raffle_start_wizard.py:0
+msgid "Choose the survey whose respondents enter the raffle."
+msgstr "Choisissez le sondage dont les répondants entrent dans le tirage."
+
+#. module: event_raffle_survey
+#: model:ir.model.fields.selection,name:event_raffle_survey.selection__event_raffle_start_wizard__survey_question_match__all
+msgid "Each"
+msgstr "Chacune"
+
+#. module: event_raffle_survey
+#. odoo-python
+#: code:addons/event_raffle_survey/wizard/event_raffle_start_wizard.py:0
+msgid "Guest"
+msgstr "Invité"
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,help:event_raffle_survey.field_event_raffle_start_wizard__survey_respondent_count
+msgid "How many people Start puts in the raffle, with the choices made above."
+msgstr ""
+"Nombre de personnes que Démarrer met dans le tirage, selon les choix ci-"
+"dessus."
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,help:event_raffle_survey.field_event_raffle_start_wizard__survey_id
+msgid ""
+"Its respondents enter the raffle instead of the registrations: every "
+"completed answer that is not a test and answers at least one question."
+msgstr ""
+"Ses répondants entrent dans le tirage à la place des inscrits : toute "
+"participation terminée qui n'est pas un test et répond à au moins une "
+"question."
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,help:event_raffle_survey.field_event_raffle_start_wizard__survey_question_ids
+msgid ""
+"Optional. When the list holds questions, only the respondents who answered "
+"them enter the raffle: each of them, or at least one, as Answered says."
+msgstr ""
+"Facultatif. Si la liste contient des questions, seuls les répondants qui y "
+"ont répondu entrent dans le tirage : à chacune, ou à au moins une, selon « "
+"Répondu à »."
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_start_wizard__copy_strategy
+msgid "Participants"
+msgstr "Participants"
+
+#. module: event_raffle_survey
+#: model:ir.model,name:event_raffle_survey.model_event_raffle_participant
+msgid "Raffle Participant"
+msgstr "Participant au tirage"
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_start_wizard__survey_question_ids
+msgid "Required Questions"
+msgstr "Questions exigées"
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_start_wizard__survey_respondent_count
+msgid "Respondents Entering"
+msgstr "Répondants retenus"
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,help:event_raffle_survey.field_event_raffle_start_wizard__survey_anonymous_count
+msgid ""
+"Respondents with no contact, email or nickname: each enters as a separate "
+"Guest, and a guest who wins cannot be identified."
+msgstr ""
+"Répondants sans contact, courriel ni pseudo : chacun entre comme un Invité "
+"distinct, et un invité gagnant ne peut pas être identifié."
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_participant__source
+msgid "Source"
+msgstr "Source"
+
+#. module: event_raffle_survey
+#: model:ir.model,name:event_raffle_survey.model_event_raffle_start_wizard
+msgid "Start a Raffle from an Event"
+msgstr "Démarrer un tirage à partir d'un événement"
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_start_wizard__survey_id
+#: model:ir.model.fields.selection,name:event_raffle_survey.selection__event_raffle_participant__source__survey
+msgid "Survey"
+msgstr "Sondage"
+
+#. module: event_raffle_survey
+#: model:ir.model.fields.selection,name:event_raffle_survey.selection__event_raffle_start_wizard__copy_strategy__survey_only
+msgid "Survey filled only"
+msgstr "Sondage rempli seulement"
+
+#. module: event_raffle_survey
+#. odoo-python
+#: code:addons/event_raffle_survey/wizard/event_raffle_start_wizard.py:0
+msgid "The required questions must be questions of the chosen survey."
+msgstr "Les questions exigées doivent être des questions du sondage choisi."
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,help:event_raffle_survey.field_event_raffle_start_wizard__survey_question_match
+msgid ""
+"Which of the required questions a respondent must have answered: each of "
+"them, or at least one."
+msgstr ""
+"Les questions exigées auxquelles un répondant doit avoir répondu : chacune, "
+"ou au moins une."
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,help:event_raffle_survey.field_event_raffle_start_wizard__copy_strategy
+msgid ""
+"Who enters the raffle. Both 'Questionnaire' choices keep only the attendees "
+"who answered the event's registration questionnaire."
+msgstr ""
+"Qui entre dans le tirage. Les deux choix « Questionnaire » ne gardent que "
+"les inscrits ayant répondu au questionnaire d'inscription de l'événement."
