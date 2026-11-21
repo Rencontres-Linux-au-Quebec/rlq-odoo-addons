@@ -1,0 +1,204 @@
+// Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
+// Copyright (C) 2026 Rencontres Linux au Québec contributors
+// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+//
+// Style of the raffle prize blocks of the event web app ("My prize" and
+// "On site") and of the prize lines of its raffle block, compiled after webapp.scss in the bundle
+// event_webapp_plan.assets_webapp. Every rule sits under the body class
+// .o_ewp_webapp and takes the custom properties of the pages (--ewp-*), so
+// a theme and the dark scheme restyle it with the rest.
+//
+// The state of a prize is a sentence; the bar beside an item only repeats
+// it. No animation and no transition. The toggle "I am on site" is a toggle
+// button of the display options (.o_ewp_pref_toggle). In text-only mode the
+// blocks are one column of text.
+
+.o_ewp_webapp {
+    // A prize not chosen yet, declined or never chosen in the raffle
+    // block: its words say it, the slant sets it apart.
+    .o_ewp_draw_prize[data-ewp-prize-status="to_choose"],
+    .o_ewp_draw_prize[data-ewp-prize-status="declined"],
+    .o_ewp_draw_prize[data-ewp-prize-status="expired"] {
+        font-style: italic;
+    }
+
+    .ewp_prize_box[hidden],
+    .ewp_prize_item[hidden] {
+        display: none;
+    }
+
+    .ewp_prize_card h2,
+    .ewp_presence h2 {
+        margin: 0;
+    }
+
+    .ewp_prize_body,
+    .ewp_presence_body {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-width: 0;
+
+        p {
+            margin: 0;
+        }
+    }
+
+    ul.ewp_prize_list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .ewp_prize_item {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        min-width: 0;
+        padding: 12px;
+        border-left: 4px solid var(--ewp-border);
+        border-radius: var(--ewp-radius-xs);
+        background: var(--ewp-surface-2);
+        overflow-wrap: anywhere;
+
+        &[data-ewp-prize-state="open"] {
+            border-left-color: var(--ewp-warm);
+            background: var(--ewp-warm-soft);
+        }
+
+        &[data-ewp-prize-state="reserved"],
+        &[data-ewp-prize-state="shipped"],
+        &[data-ewp-prize-state="delivered"] {
+            border-left-color: var(--ewp-success);
+        }
+    }
+
+    .ewp_prize_title {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 1.3;
+    }
+
+    .ewp_prize_name {
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+    .ewp_prize_meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 12px;
+        color: var(--ewp-ink-soft);
+        font-size: 14px;
+    }
+
+    .ewp_prize_category {
+        padding: 1px 8px;
+        border: 1px solid var(--ewp-dashed);
+        border-radius: var(--ewp-radius-pill);
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .ewp_prize_status {
+        font-weight: 600;
+    }
+
+    .ewp_prize_tracking,
+    .ewp_prize_carrier {
+        font-size: 15px;
+    }
+
+    .ewp_prize_tracking_ref {
+        font-family: monospace;
+        font-weight: 700;
+    }
+
+    .ewp_prize_choose {
+        max-width: 100%;
+        text-align: center;
+    }
+
+    .ewp_prize_notice {
+        padding: 8px 12px;
+        border-left: 4px solid var(--ewp-success);
+        background: var(--ewp-success-soft);
+        color: var(--ewp-success-text);
+        font-weight: 600;
+    }
+
+    .ewp_prize_public {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-top: 12px;
+        border-top: 1px solid var(--ewp-rule);
+
+        h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+    }
+
+    .ewp_prize_form {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        margin: 0;
+    }
+
+    .ewp_prize_field_label {
+        font-weight: 600;
+    }
+
+    .ewp_prize_input {
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 28rem;
+        min-height: 48px;
+        padding: 8px 12px;
+        border: 1px solid var(--ewp-muted);
+        border-radius: var(--ewp-radius-md);
+        background: var(--ewp-surface);
+        color: var(--ewp-ink);
+        font-family: inherit;
+        font-size: 16px;
+    }
+
+    // A button of the card drawn as the link buttons of the web app.
+    button.ewp_prize_save {
+        border: 0;
+        font-family: inherit;
+        cursor: pointer;
+    }
+
+    .ewp_presence_toggle {
+        min-height: 48px;
+    }
+
+    .ewp_presence_time {
+        color: var(--ewp-ink-soft);
+        font-size: 14px;
+    }
+
+    &.o_ewp_text_only {
+        .ewp_prize_item {
+            padding: 8px 0 0;
+            border-left-width: 0;
+            border-top: 1px solid var(--ewp-rule);
+            border-radius: 0;
+            background: none;
+        }
+
+        .ewp_prize_category {
+            padding: 0;
+            border: 0;
+        }
+    }
+}

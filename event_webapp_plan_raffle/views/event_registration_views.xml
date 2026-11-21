@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
+  Copyright (C) 2026 Rencontres Linux au Québec contributors
+  License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+
+  Registration form and list: the attendance the attendee declared in the
+  event web app, read only. It is information: the state of the
+  registration, set by the check-in scan, stays the attendance of the
+  raffles.
+-->
+<odoo>
+    <record id="event_registration_view_form" model="ir.ui.view">
+        <field name="name">event.registration.form (event_webapp_plan_raffle)</field>
+        <field name="model">event.registration</field>
+        <field name="inherit_id" ref="event.view_event_registration_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='event']" position="inside">
+                <field name="attendance_declared" />
+                <field name="attendance_declared_date" invisible="not attendance_declared" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="event_registration_view_list" model="ir.ui.view">
+        <field name="name">event.registration.list (event_webapp_plan_raffle)</field>
+        <field name="model">event.registration</field>
+        <field name="inherit_id" ref="event.view_event_registration_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="before">
+                <field name="attendance_declared" optional="hide" />
+            </xpath>
+        </field>
+    </record>
+</odoo>
