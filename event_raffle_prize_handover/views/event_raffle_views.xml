@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_raffle_view_form_prize_handover" model="ir.ui.view">
+        <field name="name">event.raffle.form.prize.handover</field>
+        <field name="model">event.raffle</field>
+        <field name="inherit_id" ref="event_raffle_prize.event_raffle_view_form_prize" />
+        <field name="arch" type="xml">
+            <field name="prize_closing_draw" position="before">
+                <field name="prize_pickup_location" placeholder="e.g. Welcome desk, main hall" />
+            </field>
+        </field>
+    </record>
+</odoo>

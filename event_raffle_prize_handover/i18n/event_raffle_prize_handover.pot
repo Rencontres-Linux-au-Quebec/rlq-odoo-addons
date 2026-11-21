@@ -1,0 +1,793 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* event_raffle_prize_handover
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-18 22:17+0000\n"
+"PO-Revision-Date: 2026-11-18 22:17+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/controllers/main.py:0
+msgid "%(prize)s handed over to %(name)s."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "%s is not a virtual prize."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.winners_page
+msgid "%s new winners"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/controllers/main.py:0
+msgid "%s winners are waiting for a prize."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.winners_page
+msgid "(opens in a new tab)"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.winners_page
+msgid ""
+".\n"
+"                    The page refreshes every 10 minutes."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.winners_page
+msgid "1 new winner"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/controllers/main.py:0
+msgid "1 winner is waiting for a prize."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:mail.template,body_html:event_raffle_prize_handover.mail_template_prize_shipped
+msgid ""
+"<div style=\"margin: 0px; padding: 0px; font-size: 14px;\">\n"
+"    <t t-set=\"prize\" t-value=\"object._raffle_prize_mail_values()\"/>\n"
+"    <p style=\"margin: 0px 0px 12px 0px;\">Hello <t t-out=\"object.partner_id.name or ''\">Winner</t>,</p>\n"
+"    <p style=\"margin: 0px 0px 12px 0px;\">\n"
+"        Your prize is on its way: <strong t-out=\"prize['prize']\">Prize</strong>.\n"
+"    </p>\n"
+"    <p class=\"o_raffle_prize_tracking\" style=\"margin: 0px 0px 12px 0px;\">\n"
+"        Tracking number: <strong t-out=\"prize['tracking_ref']\">0000</strong>\n"
+"        <t t-if=\"prize['carrier']\">(<t t-out=\"prize['carrier']\">Carrier</t>)</t>\n"
+"    </p>\n"
+"    <p t-if=\"prize['sponsor_name']\" style=\"margin: 0px 0px 12px 0px;\">\n"
+"        Offered by\n"
+"        <a t-if=\"prize['sponsor_url']\" t-att-href=\"prize['sponsor_url']\" t-out=\"prize['sponsor_name']\">Sponsor</a>\n"
+"        <t t-else=\"\" t-out=\"prize['sponsor_name']\">Sponsor</t>\n"
+"    </p>\n"
+"    <p style=\"margin: 0px;\">Congratulations!</p>\n"
+"</div>\n"
+"            "
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:mail.template,body_html:event_raffle_prize_handover.mail_template_prize_reserved
+msgid ""
+"<div style=\"margin: 0px; padding: 0px; font-size: 14px;\">\n"
+"    <t t-set=\"prize\" t-value=\"object._raffle_prize_mail_values()\"/>\n"
+"    <p style=\"margin: 0px 0px 12px 0px;\">Hello <t t-out=\"object.partner_id.name or ''\">Winner</t>,</p>\n"
+"    <p style=\"margin: 0px 0px 12px 0px;\">\n"
+"        Your prize is reserved: <strong t-out=\"prize['prize']\">Prize</strong>.\n"
+"    </p>\n"
+"    <p t-if=\"prize['category']\" style=\"margin: 0px 0px 12px 0px;\">\n"
+"        Token category: <t t-out=\"prize['category']\">Token</t>\n"
+"    </p>\n"
+"    <p t-if=\"prize['sponsor_name']\" style=\"margin: 0px 0px 12px 0px;\">\n"
+"        Offered by\n"
+"        <a t-if=\"prize['sponsor_url']\" t-att-href=\"prize['sponsor_url']\" t-out=\"prize['sponsor_name']\">Sponsor</a>\n"
+"        <t t-else=\"\" t-out=\"prize['sponsor_name']\">Sponsor</t>\n"
+"    </p>\n"
+"    <p class=\"o_raffle_prize_handover\" style=\"margin: 0px 0px 12px 0px;\" t-out=\"prize['handover']\">Pick up your prize at the event.</p>\n"
+"    <p style=\"margin: 0px;\">Congratulations!</p>\n"
+"</div>\n"
+"            "
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.portal_my_details_fields_public_name
+msgid ""
+"<small id=\"o_raffle_public_name_account_help\" class=\"form-text text-muted\">\n"
+"                    Shown instead of your full name on the public raffle winners page. Leave it empty\n"
+"                    to show your full name.\n"
+"                </small>"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.winners_item
+msgid "<span class=\"visually-hidden\"> (opens in a new tab)</span>"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "A virtual prize is sent by email: use Send the Virtual Prize."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.handover_step
+msgid "Back to the list"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.event_raffle_prize_ship_wizard_form
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.event_raffle_prize_virtual_wizard_form
+msgid "Cancel"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_draw__prize_carrier_name
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_ship_wizard__carrier_name
+msgid "Carrier"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_virtual_wizard__code
+msgid "Code"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,help:event_raffle_prize_handover.field_event_raffle_prize_virtual_wizard__code
+msgid ""
+"Code or licence key of this unit, added to the email and masked in the "
+"draw's notification log."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.handover_step
+msgid "Confirm the hand-over"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model,name:event_raffle_prize_handover.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_ship_wizard__create_uid
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_virtual_wizard__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_ship_wizard__create_date
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_virtual_wizard__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_ship_wizard__display_name
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_virtual_wizard__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_ship_wizard__draw_id
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_virtual_wizard__draw_id
+msgid "Draw"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model,name:event_raffle_prize_handover.model_event_event
+msgid "Event"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model,name:event_raffle_prize_handover.model_event_raffle
+msgid "Event Raffle"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "Give the tracking number of the parcel."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.handover_list
+msgid "Hand over"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.handover_step
+msgid "Hand over the prize"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_draw__prize_handover_photo
+msgid "Hand-over photo"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "Hand-over photo added."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "Hand-over photo, %s"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.event_raffle_draw_view_form_prize_handover
+msgid "Has the winner received this prize?"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/wizard/event_raffle_prize_virtual_wizard.py:0
+msgid "Here is your prize: %s."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.product_template_form_view_raffle_prize_handover
+msgid "How the winner uses this prize: where to enter the code, until when..."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_ship_wizard__id
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_virtual_wizard__id
+msgid "ID"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_ship_wizard__write_uid
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_virtual_wizard__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_ship_wizard__write_date
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_virtual_wizard__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.event_raffle_draw_view_form_prize_handover
+msgid "Mark as Received"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.event_raffle_draw_view_form_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.event_raffle_prize_ship_wizard_form
+msgid "Mark as Shipped"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_virtual_wizard__body
+msgid "Message"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,help:event_raffle_prize_handover.field_product_product__raffle_virtual_instructions
+#: model:ir.model.fields,help:event_raffle_prize_handover.field_product_template__raffle_virtual_instructions
+msgid ""
+"Message emailed to the winner of this virtual prize, in their language: how "
+"to use it. The event user may complete it before sending, and adds the code "
+"apart."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.handover_list
+msgid "Name, public name, email or draw number."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,help:event_raffle_prize_handover.field_res_partner__raffle_public_name
+#: model:ir.model.fields,help:event_raffle_prize_handover.field_res_users__raffle_public_name
+msgid ""
+"Nickname shown instead of the full name on the public pages of the raffle, "
+"such as the winners page. Empty shows the full name."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/controllers/main.py:0
+msgid "No winner is waiting for a prize."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.winners_page
+msgid "No winner yet."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.winners_item
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.winners_page
+msgid "Offered by"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "Only a reserved prize can be handed over."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "Only a shipped prize can be received."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,help:event_raffle_prize_handover.field_event_raffle_draw__prize_handover_photo
+msgid ""
+"Photo of the winner with the sponsor, taken at the hand-over. It is never "
+"public."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.handover_step
+msgid "Photo with the sponsor (optional)"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "Pick up your prize at %s."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "Pick up your prize at the event."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle__prize_pickup_location
+msgid "Pick-up location"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.event_raffle_prize_ship_wizard_form
+msgid "Postal service, courier..."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.handover_claim_details
+msgid "Prize"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "Prize %(prize)s shipped, tracking number %(ref)s."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "Prize %s received by the winner."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_draw__claim_state
+msgid "Prize Claim"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.event_raffle_draw_view_form_prize_handover
+msgid "Prize Delivery"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.actions.act_url,name:event_raffle_prize_handover.action_event_raffle_prize_handover_screen
+#: model:ir.ui.menu,name:event_raffle_prize_handover.menu_event_raffle_prize_handover
+msgid "Prize Hand-over"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_ship_wizard__prize_product_id
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_virtual_wizard__prize_product_id
+msgid "Prize Product"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.handover_list
+msgid "Prize hand-over"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/controllers/main.py:0
+msgid "Prizes to hand over"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/controllers/main.py:0
+msgid "Prizes to hand over matching \"%s\""
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model,name:event_raffle_prize_handover.model_product_template
+msgid "Product"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model,name:event_raffle_prize_handover.model_product_product
+msgid "Product Variant"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_draw__winner_public_name
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_res_partner__raffle_public_name
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_res_users__raffle_public_name
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.claim_done_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.handover_claim_details
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.portal_my_details_fields_public_name
+msgid "Public name"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,help:event_raffle_prize_handover.field_event_raffle_draw__winner_public_name
+msgid ""
+"Public name of the winner's contact, shown on the winners page instead of "
+"the winner's name. Empty shows the winner's name."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_event__raffle_winners_published
+msgid "Publish the winners page"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.handover_claim_details
+msgid "Raffle"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model,name:event_raffle_prize_handover.model_event_raffle_draw
+msgid "Raffle Draw"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:mail.template,name:event_raffle_prize_handover.mail_template_prize_shipped
+msgid "Raffle: your prize is shipped"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:mail.template,name:event_raffle_prize_handover.mail_template_prize_reserved
+msgid "Raffle: your prize, with pick-up or delivery"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_virtual_wizard__recipient
+msgid "Recipient"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model,name:event_raffle_prize_handover.model_sale_order
+msgid "Sales Order"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.claim_done_handover
+msgid "Save the public name"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.handover_list
+msgid "Search"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.handover_list
+msgid "Search a winner"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model,name:event_raffle_prize_handover.model_event_raffle_prize_virtual_wizard
+msgid "Send a Virtual Raffle Prize"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.event_raffle_draw_view_form_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.event_raffle_prize_virtual_wizard_form
+msgid "Send the Virtual Prize"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.handover_step
+msgid "Sending..."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:mail.template,description:event_raffle_prize_handover.mail_template_prize_reserved
+msgid "Sent to a raffle winner when their prize is reserved"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:mail.template,description:event_raffle_prize_handover.mail_template_prize_shipped
+msgid "Sent to a raffle winner when their prize is shipped"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model,name:event_raffle_prize_handover.model_event_raffle_prize_ship_wizard
+msgid "Ship a Raffle Prize"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields.selection,name:event_raffle_prize_handover.selection__event_raffle_draw__claim_state__shipped
+msgid "Shipped"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_draw__prize_shipped_date
+msgid "Shipped on"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.handover_list
+msgid "Show all"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.claim_done_handover
+msgid "Shown as:"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.handover_claim_details
+msgid "Sponsor"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.event_raffle_prize_ship_wizard_form
+msgid ""
+"The delivery of the prize is validated and the winner receives the tracking number\n"
+"                    by email. Mark the prize received once the winner has it."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.event_raffle_prize_virtual_wizard_form
+msgid ""
+"The message and the code go to the winner by email, in their language. The prize is\n"
+"                    then handed over: one unit leaves the stock."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "The photo could not be read."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "The photo is too large."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.handover_step
+msgid "The photo stays private: only the event team sees it, on the draw."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.handover_step
+msgid "The prize could not be handed over:"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/controllers/main.py:0
+msgid "The public name holds %s characters at most."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.claim_done_handover
+msgid ""
+"The public winners page shows your public name, a nickname if you like, or your\n"
+"                    full name when you leave it empty."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid ""
+"The winner has no email address: add one to the draw or to the winner "
+"contact first."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,help:event_raffle_prize_handover.field_event_raffle_draw__prize_virtual
+#: model:ir.model.fields,help:event_raffle_prize_handover.field_product_product__raffle_virtual_prize
+#: model:ir.model.fields,help:event_raffle_prize_handover.field_product_template__raffle_virtual_prize
+msgid ""
+"The winner receives this prize by email: the checkout asks for no address, "
+"and the draw's Send the Virtual Prize button emails the instructions below "
+"with an optional code."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "This draw has no winner contact to name publicly."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.handover_step
+msgid "This prize is no longer waiting to be handed over."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.handover_claim_details
+msgid "Token category"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.winners_item
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.winners_page
+msgid "Token category:"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_draw__prize_tracking_ref
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_prize_ship_wizard__tracking_ref
+msgid "Tracking number"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.winners_page
+msgid "Updated at"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.product_template_form_view_raffle_prize_handover
+msgid "Virtual Prize Instructions"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_raffle_draw__prize_virtual
+msgid "Virtual prize"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "Virtual prize %s sent by email."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_product_product__raffle_virtual_prize
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_product_template__raffle_virtual_prize
+msgid "Virtual prize (no delivery)"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_product_product__raffle_virtual_instructions
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_product_template__raffle_virtual_instructions
+msgid "Virtual prize instructions"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,help:event_raffle_prize_handover.field_event_raffle__prize_pickup_location
+msgid ""
+"Where on-site winners pick up a physical prize. The \"Your prize\" email and"
+" the confirmation page give it."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.winners_page
+msgid "Winners"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,field_description:event_raffle_prize_handover.field_event_event__raffle_winners_url
+msgid "Winners page"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.winners_page
+msgid "Winners:"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "Your code:"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.claim_done_handover
+msgid "Your name on the winners page"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:mail.template,subject:event_raffle_prize_handover.mail_template_prize_shipped
+msgid ""
+"Your prize is shipped: {{ object._raffle_prize_mail_values()['prize'] }}"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "Your prize will be sent to you by email."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "Your prize will be shipped to you."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:mail.template,subject:event_raffle_prize_handover.mail_template_prize_reserved
+msgid "Your prize: {{ object._raffle_prize_mail_values()['prize'] }}"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.claim_done_handover
+msgid "Your public name is saved."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.event_raffle_view_form_prize_handover
+msgid "e.g. Welcome desk, main hall"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_handover.handover_list
+msgid "the prize of"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#: model:ir.model.fields,help:event_raffle_prize_handover.field_event_event__raffle_winners_published
+msgid ""
+"Anyone may read the page of the event's raffle winners, by hour: their "
+"public name, the prize or that it is still to choose, declined or not "
+"chosen, its sponsor and the token category."
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "%(group)s, prize to choose"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "Prize to choose"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "Prize declined"
+msgstr ""
+
+#. module: event_raffle_prize_handover
+#. odoo-python
+#: code:addons/event_raffle_prize_handover/models/event_raffle_draw.py:0
+msgid "No prize chosen"
+msgstr ""

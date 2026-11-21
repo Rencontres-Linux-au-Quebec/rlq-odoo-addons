@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_raffle_draw_view_list_prize_handover" model="ir.ui.view">
+        <field name="name">event.raffle.draw.list.prize.handover</field>
+        <field name="model">event.raffle.draw</field>
+        <field name="inherit_id" ref="event_raffle_prize.event_raffle_draw_view_list_prize" />
+        <field name="arch" type="xml">
+            <field name="claim_state" position="after">
+                <field name="winner_public_name" optional="hide" />
+                <field name="prize_tracking_ref" optional="hide" />
+            </field>
+        </field>
+    </record>
+
+    <record id="event_raffle_draw_view_form_prize_handover" model="ir.ui.view">
+        <field name="name">event.raffle.draw.form.prize.handover</field>
+        <field name="model">event.raffle.draw</field>
+        <field name="inherit_id" ref="event_raffle_prize.event_raffle_draw_view_form_prize" />
+        <field name="arch" type="xml">
+            <button name="action_open_prize_choose_wizard" position="attributes">
+                <attribute name="invisible">claim_state in ('reserved', 'shipped', 'delivered') or not winner_participant_id</attribute>
+            </button>
+            <button name="action_prize_deliver" position="attributes">
+                <attribute name="invisible">claim_state != 'reserved' or prize_virtual</attribute>
+            </button>
+            <button name="action_prize_deliver" position="after">
+                <button
+                    name="action_open_prize_virtual_wizard"
+                    type="object"
+                    string="Send the Virtual Prize"
+                    class="btn-primary"
+                    invisible="claim_state != 'reserved' or not prize_virtual"
+                    groups="event.group_event_user"
+                />
+                <button
+                    name="action_open_prize_ship_wizard"
+                    type="object"
+                    string="Mark as Shipped"
+                    class="btn-secondary"
+                    invisible="claim_state != 'reserved' or prize_virtual"
+                    groups="event.group_event_user"
+                />
+                <button
+                    name="action_prize_received"
+                    type="object"
+                    string="Mark as Received"
+                    class="btn-primary"
+                    confirm="Has the winner received this prize?"
+                    invisible="claim_state != 'shipped'"
+                    groups="event.group_event_user"
+                />
+            </button>
+            <field name="partner_id" position="after">
+                <field name="winner_public_name" invisible="not partner_id" />
+            </field>
+            <xpath expr="//group[@name='prize_claim']" position="after">
+                <group
+                    string="Prize Delivery"
+                    name="prize_delivery"
+                    invisible="claim_state not in ('reserved', 'shipped', 'delivered')"
+                >
+                    <group>
+                        <field name="prize_virtual" />
+                        <field name="prize_tracking_ref" invisible="not prize_tracking_ref" />
+                        <field name="prize_carrier_name" invisible="not prize_carrier_name" />
+                        <field name="prize_shipped_date" invisible="not prize_shipped_date" />
+                    </group>
+                    <group>
+                        <field
+                            name="prize_handover_photo"
+                            widget="image"
+                            options="{'size': [0, 180]}"
+                            invisible="not prize_handover_photo"
+                        />
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

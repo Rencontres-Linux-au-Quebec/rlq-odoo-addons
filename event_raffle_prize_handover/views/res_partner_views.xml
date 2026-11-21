@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="res_partner_view_form_raffle_public_name" model="ir.ui.view">
+        <field name="name">res.partner.form.raffle.public.name</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="arch" type="xml">
+            <field name="function" position="after">
+                <field name="raffle_public_name" invisible="is_company" />
+            </field>
+        </field>
+    </record>
+</odoo>
