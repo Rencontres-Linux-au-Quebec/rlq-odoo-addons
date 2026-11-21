@@ -8,8 +8,8 @@
 # option) any later version. (http://www.gnu.org/licenses/agpl)
 """End-to-end scenario of the raffle prizes in the event day web app.
 
-It plays the sponsored prize scenario of the same folder
-(e2e_raffle_sponsor_prize.py: sponsor portal, event, raffle,
+It plays the sponsored prize scenario of event_raffle_prize_sponsor
+(selenium/e2e_raffle_sponsor_prize.py: sponsor portal, event, raffle,
 approval, draws, Discuss, token checkout, winners page) and adds the
 checks of event_webapp_plan_raffle at the two moments that matter:
 
@@ -34,10 +34,11 @@ import os
 import sys
 from pathlib import Path
 
-__version__ = "1.1.20261121.015248"
+__version__ = "1.2.20261121.021753"
 
-# Folder of the sponsored prize scenario: the folder of this file, unless
-# the environment variable or --raffle-e2e-dir names another.
+# Folder of the sponsored prize scenario: the selenium folder of the
+# event_raffle_prize_sponsor module beside this one, unless the
+# environment variable or --raffle-e2e-dir names another.
 RAFFLE_E2E_DIR_ENV = "RAFFLE_E2E_DIR"
 CHANGELOG = Path(__file__).resolve().parent / "CHANGELOG.md"
 PROGRAM = "e2e_webapp_raffle_prize"
@@ -60,7 +61,9 @@ CONFIG_REFUSED = {
 
 def default_raffle_dir():
     return os.environ.get(RAFFLE_E2E_DIR_ENV) or str(
-        Path(__file__).resolve().parent
+        Path(__file__).resolve().parents[2]
+        / "event_raffle_prize_sponsor"
+        / "selenium"
     )
 
 
@@ -315,8 +318,9 @@ def main(argv=None):
     parser.add_argument(
         "--raffle-e2e-dir",
         default=raffle_dir,
-        help="Folder of e2e_raffle_sponsor_prize.py (default: the folder of"
-        f" this program, or {RAFFLE_E2E_DIR_ENV}).",
+        help="Folder of e2e_raffle_sponsor_prize.py (default: the selenium"
+        " folder of event_raffle_prize_sponsor, or"
+        f" {RAFFLE_E2E_DIR_ENV}).",
     )
     parser.add_argument(
         "--version", action="version", version=f"%(prog)s {__version__}"

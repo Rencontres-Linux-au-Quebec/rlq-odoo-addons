@@ -23,7 +23,7 @@ These scripts are not Odoo tests: the module test suites do not run them.
     --http-port 8471 --gevent-port 8472 &
 
 .venv.erplibre/bin/python \
-    odoo18.0/addons/addons/selenium/e2e_raffle_sponsor_prize.py \
+    odoo18.0/addons/addons/event_raffle_prize_sponsor/selenium/e2e_raffle_sponsor_prize.py \
     --url http://127.0.0.1:8471 --db ewp_sel_demo \
     --evidence-dir /tmp/raffle_e2e --video
 ```
@@ -105,5 +105,7 @@ screenshot and its page (`NN_<step>_FAILED.png` and `.html`),
 
 ## Builds on it
 
-`e2e_webapp_raffle_prize.py`, in this folder (event day web app, see
-[README.md](README.md)), imports this scenario and inserts its own steps.
+`event_webapp_plan_raffle/selenium/e2e_webapp_raffle_prize.py` (event day
+web app, see [its README](../../event_webapp_plan_raffle/selenium/README.md))
+imports this scenario and inserts its own steps; `e2e_lib.py`, beside this
+scenario, is the library both use.

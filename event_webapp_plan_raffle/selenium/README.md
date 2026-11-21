@@ -7,8 +7,9 @@
 `e2e_webapp_raffle_prize.py` checks, in a real browser (Chrome, headless by
 default), that the raffle prizes reach the web app of
 `event_webapp_plan_raffle` (`/webapp_event/<day>`). It plays the sponsored
-prize scenario of the same folder (`e2e_raffle_sponsor_prize.py`, see
-[README.raffle_sponsor_prize.md](README.raffle_sponsor_prize.md): sponsor portal,
+prize scenario of `event_raffle_prize_sponsor`
+(`selenium/e2e_raffle_sponsor_prize.py`, see
+[its README](../../event_raffle_prize_sponsor/selenium/README.md): sponsor portal,
 event, raffle, approval, draws, Discuss, token checkout, winners page) and
 inserts three steps:
 
@@ -28,14 +29,14 @@ Same server and database as the base scenario, with
 or `rlq_event_webapp_plan` if the day should look as on site):
 
 ```bash
-.venv.erplibre/bin/python odoo18.0/addons/addons/selenium/e2e_webapp_raffle_prize.py \
+.venv.erplibre/bin/python odoo18.0/addons/addons/event_webapp_plan_raffle/selenium/e2e_webapp_raffle_prize.py \
     --url http://127.0.0.1:8471 --db ewp_sel_demo \
     --evidence-dir /tmp/webapp_e2e --video
 ```
 
 - `--raffle-e2e-dir` (or `RAFFLE_E2E_DIR`) names the folder of
-  `e2e_raffle_sponsor_prize.py`; by default, the folder of this
-  program.
+  `e2e_raffle_sponsor_prize.py`; by default, the `selenium` folder of
+  `event_raffle_prize_sponsor`.
 - `--version`, `--changelog` (this program's changes, `CHANGELOG.md`).
 - Configuration: `/etc/default/e2e_webapp_raffle_prize.conf`, then
   `~/.e2e_webapp_raffle_prize.conf`, `option = value` lines (the last
@@ -62,9 +63,9 @@ in the evidence folder), `2` the tool fails or a guard refuses.
 `e2e_webapp_raffle_prize.py` vérifie, dans un vrai navigateur (Chrome, sans
 fenêtre par défaut), que les prix de tirage arrivent dans l'app web de
 `event_webapp_plan_raffle` (`/webapp_event/<journée>`). Il joue le
-scénario des prix commandités du même dossier
-(`e2e_raffle_sponsor_prize.py`, voir
-[README.raffle_sponsor_prize.md](README.raffle_sponsor_prize.md) : portail du commanditaire,
+scénario des prix commandités de `event_raffle_prize_sponsor`
+(`selenium/e2e_raffle_sponsor_prize.py`, voir
+[son README](../../event_raffle_prize_sponsor/selenium/README.md) : portail du commanditaire,
 événement, tirage, approbation, tirs, Discussion, achat au jeton, page des
 gagnants) et y insère trois étapes :
 
@@ -80,4 +81,4 @@ français comme en anglais.
 
 Lancement, options, configuration, garde-fous et codes de sortie : voir
 la partie anglaise ci-dessus, et
-[README.raffle_sponsor_prize.md](README.raffle_sponsor_prize.md).
+[le README du scénario de base](../../event_raffle_prize_sponsor/selenium/README.md).

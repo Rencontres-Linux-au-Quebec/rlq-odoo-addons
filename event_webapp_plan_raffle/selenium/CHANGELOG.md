@@ -1,5 +1,21 @@
 # Changelog: e2e_webapp_raffle_prize.py
 
+### 1.2.20261121.021753 - Scenarios in the modules they test
+
+- Reason: the end-to-end scenarios sat in a selenium folder at the root of
+  the repository, apart from the modules they test.
+- Details: `e2e_raffle_sponsor_prize.py` and the shared `e2e_lib.py` are
+  in `event_raffle_prize_sponsor/selenium/`, this program in
+  `event_webapp_plan_raffle/selenium/`; `default_raffle_dir()` returns the
+  selenium folder of `event_raffle_prize_sponsor`. `--raffle-e2e-dir` and
+  `RAFFLE_E2E_DIR` still name another. Help text, docstring and both
+  READMEs updated.
+- Bugs fixed: none.
+- Safeguards: unchanged.
+- Checks: run from the new paths on a fresh neutralized database, 14 of
+  14 steps passing.
+- Action required: run the scripts from their new paths.
+
 ### 1.1.20261121.015248 - Base scenario read from the same folder
 
 - Reason: the sponsored prize scenario (`e2e_raffle_sponsor_prize.py`,
