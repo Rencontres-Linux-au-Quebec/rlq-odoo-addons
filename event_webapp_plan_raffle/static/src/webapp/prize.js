@@ -19,6 +19,11 @@
 //   live region (ewp:announce of webapp.js) with its data-ewp-prize-say;
 //   the focus never moves. Polling stops for good on a 403, a 404 or a
 //   redirect (day closed, session expired).
+// - Automatic updates: the card reports its times to the footer of
+//   webapp.js (ewp:refresh, id "my_prize"): the time of the last answer,
+//   the page load at first, and the next planned request, the earliest of
+//   the next tick of the minute, a pending ewp:raffle-drawn request and the
+//   deadline of an open link.
 // - Forms (form[data-ewp-prize-form]: the public name, "I am on site"):
 //   posted with fetch and an Accept header for JSON, with the value of the
 //   button that sent them. The answer replaces the card, or the body of
@@ -26,6 +31,8 @@
 //   focus goes back to the same field or button, and its message is said
 //   in the live region. Without fetch, or on an answer that is not JSON,
 //   the form is posted as is and the server redirects back to the page.
+//   The "On site" form is in the page only while the setting "On-site
+//   card" is ticked; without it, nothing here touches that block.
 (function () {
     "use strict";
 
@@ -48,6 +55,10 @@
         return states;
     }
 
+    function report(detail) {
+        document.dispatchEvent(new CustomEvent("ewp:refresh", {bubbles: true, detail: {...detail, id: "my_prize"}}));
+    }
+
     function setupCard(root) {
         const card = root.querySelector("[data-ewp-prize-url]");
         if (!card) {
@@ -59,6 +70,37 @@
         let pending = null;
         let stopped = false;
         let deadlineTimer = null;
+        // Planned requests, for the automatic updates: time of the last
+        // minute tick (the page load at first), time of the deadline
+        // timer, times of the requests that follow ewp:raffle-drawn. The
+        // interval keeps its own phase, which a suspended device or a
+        // clock change moves away from Date.now(): each tick takes its
+        // time from Date.now() when it runs, so the next one is reported
+        // from the moment the interval really fired.
+        const loadedAt = Date.now();
+        let tickAt = loadedAt;
+        let deadlineDue = null;
+        const drawnDue = new Set();
+
+        // Reports the earliest planned request; nothing without fetch, as
+        // nothing is requested then.
+        function planned() {
+            if (stopped || !window.fetch) {
+                return;
+            }
+            const now = Date.now();
+            // Until a late tick runs (timers throttled in a hidden tab, a
+            // suspended device), the next one is counted from its expected
+            // time by whole intervals.
+            const late = Math.max(0, Math.floor((now - tickAt) / REFRESH_MS));
+            let next = tickAt + (late + 1) * REFRESH_MS;
+            for (const due of [deadlineDue, ...drawnDue]) {
+                if (due !== null && due > now) {
+                    next = Math.min(next, due);
+                }
+            }
+            report({next});
+        }
 
         function focusInside() {
             const active = document.activeElement;
@@ -71,10 +113,13 @@
             const moments = [...body.querySelectorAll("[data-ewp-prize-deadline]")]
                 .map((item) => Date.parse(item.dataset.ewpPrizeDeadline))
                 .filter((moment) => !Number.isNaN(moment) && moment > now);
+            deadlineDue = null;
             if (moments.length) {
                 const delay = Math.min(Math.min(...moments) - now + DEADLINE_MARGIN_MS, MAX_TIMEOUT_MS);
                 deadlineTimer = setTimeout(refresh, delay);
+                deadlineDue = now + delay;
             }
+            planned();
         }
 
         // Writes the answer `data` ({signature, count, html}) in the card
@@ -113,6 +158,7 @@
             if (stopped || document.hidden || !window.fetch) {
                 return;
             }
+            report({state: "busy"});
             let response = null;
             try {
                 response = await fetch(card.dataset.ewpPrizeUrl, {
@@ -121,20 +167,29 @@
                     redirect: "manual",
                 });
             } catch {
+                report({state: "error"});
+                planned();
                 return;
             }
             if (response.type === "opaqueredirect" || response.status === 403 || response.status === 404) {
                 stopped = true;
+                report({state: "stopped", next: null});
                 return;
             }
             if (!response.ok) {
+                report({state: "error"});
+                planned();
                 return;
             }
             try {
-                offer(await response.json());
+                const data = await response.json();
+                report({state: "running", last: Date.now()});
+                offer(data);
             } catch {
                 // An answer that is not JSON changes nothing.
+                report({state: "error"});
             }
+            planned();
         }
 
         card.addEventListener("focusout", () => {
@@ -144,13 +199,30 @@
                 }
             }, 0);
         });
-        document.addEventListener("ewp:raffle-drawn", () => setTimeout(refresh, DRAWN_DELAY_MS));
+        document.addEventListener("ewp:raffle-drawn", () => {
+            const due = Date.now() + DRAWN_DELAY_MS;
+            drawnDue.add(due);
+            setTimeout(() => {
+                drawnDue.delete(due);
+                refresh();
+            }, DRAWN_DELAY_MS);
+            planned();
+        });
         document.addEventListener("visibilitychange", () => {
             if (!document.hidden) {
                 refresh();
             }
         });
-        setInterval(refresh, REFRESH_MS);
+        // The next tick is reported once the request of this one is sent
+        // (or skipped while the tab is hidden).
+        setInterval(() => {
+            tickAt = Date.now();
+            refresh();
+            planned();
+        }, REFRESH_MS);
+        if (window.fetch) {
+            report({state: "running", last: loadedAt});
+        }
         scheduleDeadline();
         return {apply};
     }

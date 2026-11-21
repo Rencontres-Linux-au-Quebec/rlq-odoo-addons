@@ -7,8 +7,8 @@
 Odoo 18.0 module. It brings the raffle prizes of
 `event_raffle_prize_handover` into the web app of `event_webapp_plan`
 (`/webapp_event`): a **My prize** card for the logged-in winner, the
-**public name** of the winners page, and an **I am on site** toggle. The
-generic module `event_webapp_plan` keeps no dependency on the prize
+**public name** of the winners page, and an optional **I am on site**
+toggle. The generic module `event_webapp_plan` keeps no dependency on the prize
 modules: only this bridge brings them.
 
 ### Setup
@@ -20,8 +20,11 @@ modules: only this bridge brings them.
    the card. The raffle block lists the raffles listed on the day only
    (tab **Raffles** of the day): list a raffle there to show its winners
    in the web app.
-3. Nothing else: the card reads the draws, their prize link and their
-   claim, as the raffle and prize modules set them.
+3. Nothing else for the card: it reads the draws, their prize link and
+   their claim, as the raffle and prize modules set them.
+4. **On-site card** (**Settings > Event Web App > Home page**, off by
+   default, also on a database that updates the module): tick it to show
+   the **On site** card on every day of the web app.
 
 ### What the attendee sees
 
@@ -50,9 +53,9 @@ modules: only this bridge brings them.
   prize; "Prize declined" for a declined prize and "No prize chosen" for a
   claim that ended without a choice. The live refresh and the new winner
   announcement of the block say the same text.
-- **On site** (after the other cards): for a user registered to an event
-  of the day, a toggle button **I am on site**, and the time it was
-  declared.
+- **On site** (after the other cards), while the setting **On-site card**
+  is ticked: for a user registered to an event of the day, a toggle button
+  **I am on site**, and the time it was declared.
 
 ### Live updates
 
@@ -64,7 +67,8 @@ When the answer changes, the body of the card is replaced (never while the
 focus is inside it: the next change waits until the focus leaves), the
 card shows or hides, and each item whose state is new is said once in the
 shared live region ("Your prize, Morning, draw 3: Choose your prize before
-3:45 PM."). The focus never moves.
+3:45 PM."). The focus never moves. The row "My prize" of the automatic
+updates of the web app counts down to the earliest of these requests.
 
 The two forms post with fetch when the script runs: the block is
 re-rendered, the focus stays on the field or the button, and the result is
@@ -80,6 +84,12 @@ form shows them for its winner, beside the attendance mode. They are
 (`attendance_mode`, module `event_raffle_prize`) still comes from the
 check-in scan, and so do the eligibility, the quotas and the delivery mode.
 The tests check that declaring changes none of them.
+
+The setting **On-site card** (config parameter
+`event_webapp_plan_raffle.onsite_card`) only shows or hides the card and
+opens or closes its route: turning it off keeps the attendance already
+declared, which the backend still shows and the card shows again once it
+is back on. The check-in at the welcome desk does not depend on it.
 
 ### Access
 
@@ -98,7 +108,7 @@ The tests check that declaring changes none of them.
   claim). A contact of another account is never changed.
 - **On site** `/webapp_event/<day>/presence` (POST, CSRF, `on_site` "1" or
   "0"): writes the registrations of the user's contact to the events of
-  the day only.
+  the day only; 404 while the setting **On-site card** is off.
 
 ### Accessibility
 
@@ -118,11 +128,14 @@ odoo-bin -d TEST_DB -i event_webapp_plan_raffle --test-enable \
 
 Use a disposable database and free ports. `tests/test_models.py` covers the
 draws of a day won by a contact, the registrations of a contact and the
-declared attendance (attendance mode unchanged); `tests/test_controllers.py`
+declared attendance (attendance mode unchanged), the setting **On-site
+card** (off by default, written by the settings form);
+`tests/test_controllers.py`
 the card (hidden, prize link of its own winner, states with the pick-up
 location, e-mail and tracking number), the JSON route, the public name form
 (CSRF, own contact only, raffle block), the toggle (CSRF, own registrations
-only), the text-only mode and French; `tests/test_selenium_prize.py`, in a
+only; absent with its route while the setting is off, the declared
+attendance kept), the text-only mode and French; `tests/test_selenium_prize.py`, in a
 real browser, the card that comes in with a new draw, both forms by
 keyboard, and axe-core when `EWP_AXE_JS` names a copy of `axe.min.js` (the
 test skips without the variable and fails when the file is missing).
@@ -132,8 +145,8 @@ test skips without the variable and fails when the file is missing).
 Module Odoo 18.0. Il amène les prix de tirage de
 `event_raffle_prize_handover` dans l'app web de `event_webapp_plan`
 (`/webapp_event`) : une carte **Mon prix** pour la personne gagnante
-connectée, le **nom public** de la page des gagnants et un bouton **Je suis
-sur place**. Le module générique `event_webapp_plan` ne dépend pas des
+connectée, le **nom public** de la page des gagnants et un bouton optionnel
+**Je suis sur place**. Le module générique `event_webapp_plan` ne dépend pas des
 modules de prix : seul ce pont les amène.
 
 ### Mise en place
@@ -145,8 +158,13 @@ modules de prix : seul ce pont les amène.
    journée, sont les tirages de la carte. Le bloc des tirages ne liste que
    les tirages listés sur la journée (onglet **Tirages** de la journée) :
    y lister un tirage pour montrer ses gagnants dans l'app web.
-3. Rien d'autre : la carte lit les tirs, leur lien de prix et leur
-   attribution, tels que les modules de tirage et de prix les tiennent.
+3. Rien d'autre pour la carte : elle lit les tirs, leur lien de prix et
+   leur attribution, tels que les modules de tirage et de prix les
+   tiennent.
+4. **Carte « Sur place »** (**Paramètres > Application web d'événement >
+   Page d'accueil**, désactivée par défaut, aussi sur une base qui met le
+   module à jour) : la cocher pour afficher la carte **Sur place** sur
+   toutes les journées de l'app web.
 
 ### Ce que voit la personne inscrite
 
@@ -174,9 +192,10 @@ modules de prix : seul ce pont les amène.
   prix ; « Prix refusé » pour un prix refusé et « Aucun prix choisi » pour
   une attribution terminée sans choix. Le rafraîchissement en direct et
   l'annonce des nouveaux gagnants du bloc disent le même texte.
-- **Sur place** (après les autres cartes) : pour une personne inscrite à un
-  événement de la journée, un bouton à bascule **Je suis sur place** et
-  l'heure de la déclaration.
+- **Sur place** (après les autres cartes), tant que le paramètre **Carte
+  « Sur place »** est coché : pour une personne inscrite à un événement de
+  la journée, un bouton à bascule **Je suis sur place** et l'heure de la
+  déclaration.
 
 ### Mises à jour en direct
 
@@ -188,7 +207,8 @@ lien ouvert. Quand la réponse change, le corps de la carte est remplacé
 (jamais pendant que le focus y est : le changement attend qu'il en sorte),
 la carte s'affiche ou se masque, et chaque élément dont l'état est nouveau
 est annoncé une fois dans la région live partagée. Le focus ne bouge
-jamais.
+jamais. La ligne « Mon prix » des mises à jour automatiques de l'app web
+compte à rebours jusqu'à la plus proche de ces requêtes.
 
 Les deux formulaires passent par fetch quand le script tourne : le bloc
 est réaffiché, le focus reste sur le champ ou le bouton, et le résultat est
@@ -205,6 +225,12 @@ de participation des tirages (`attendance_mode`, module
 `event_raffle_prize`) vient toujours de la lecture du billet à l'accueil,
 comme l'admissibilité, les quotas et le mode de remise. Les tests vérifient
 qu'une déclaration ne change aucun d'eux.
+
+Le paramètre **Carte « Sur place »** (paramètre de configuration
+`event_webapp_plan_raffle.onsite_card`) ne fait qu'afficher ou masquer la
+carte et ouvrir ou fermer sa route : le désactiver conserve la présence
+déjà déclarée, que le backend montre toujours et que la carte affiche de
+nouveau une fois réactivée. L'enregistrement à l'accueil n'en dépend pas.
 
 ### Accès
 
@@ -225,7 +251,8 @@ qu'une déclaration ne change aucun d'eux.
   jamais modifié.
 - **Sur place** `/webapp_event/<journée>/presence` (POST, CSRF, `on_site`
   « 1 » ou « 0 ») : n'écrit que les inscriptions du contact de
-  l'utilisateur aux événements de la journée.
+  l'utilisateur aux événements de la journée ; 404 tant que le paramètre
+  **Carte « Sur place »** est désactivé.
 
 ### Accessibilité
 
@@ -241,7 +268,9 @@ seul.
 Voir la commande de la section anglaise. `tests/test_models.py`,
 `tests/test_controllers.py` et `tests/test_selenium_prize.py` couvrent les
 tirs d'une journée, la présence déclarée (mode de participation inchangé),
-la carte et ses états, la route JSON, les deux formulaires (CSRF, contact
+le paramètre **Carte « Sur place »** (désactivé par défaut, absent avec sa
+route une fois désactivé, présence déclarée conservée), la carte et ses
+états, la route JSON, les deux formulaires (CSRF, contact
 et inscriptions de l'utilisateur seulement), le mode texte seul, le
 français, et axe-core quand `EWP_AXE_JS` nomme une copie de `axe.min.js`.
 

@@ -83,6 +83,18 @@ msgid "%(drawn)s drawn of %(total)s"
 msgstr "%(drawn)s tirés sur %(total)s"
 
 #. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "%(minutes)s min %(seconds)s s"
+msgstr "%(minutes)s min %(seconds)s s"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "%(seconds)s s"
+msgstr "%(seconds)s s"
+
+#. module: event_webapp_plan
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_brand
 msgid "<span class=\"o_ewp_app_label\">Event Web App</span>"
 msgstr "<span class=\"o_ewp_app_label\">Application web d'événement</span>"
@@ -175,6 +187,23 @@ msgid ""
 msgstr ""
 "<strong>Aperçu en dehors des heures d'ouverture.</strong> Seuls les "
 "modérateurs et les administrateurs voient cette page."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
+msgid ""
+"A raffle of a listed event joins the day when\n"
+"                                its planned date falls inside the opening\n"
+"                                window or, without planned date, when its\n"
+"                                event lies entirely inside it. Test raffles\n"
+"                                never join. A raffle removed by hand stays off\n"
+"                                until a change of the day or of the raffle makes\n"
+"                                it fit anew."
+msgstr ""
+"Un tirage d'un événement de la liste rejoint la journée quand sa date "
+"prévue tombe dans la fenêtre d'ouverture ou, sans date prévue, quand son "
+"événement se tient en entier dans cette fenêtre. Les tirages de test ne la "
+"rejoignent jamais. Un tirage retiré à la main reste retiré jusqu'à ce qu'un "
+"changement de la journée ou du tirage le fasse correspondre de nouveau."
 
 #. module: event_webapp_plan
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_raffles_content
@@ -334,6 +363,11 @@ msgstr ""
 "automatiquement avec la salle."
 
 #. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_refresh
+msgid "Automatic updates"
+msgstr "Mises à jour automatiques"
+
+#. module: event_webapp_plan
 #: model:ir.model.fields.selection,name:event_webapp_plan.selection__res_config_settings__ewp_bbb_display__auto
 msgid ""
 "Automatic: embedded only when the server is on the same site as this web app"
@@ -425,6 +459,11 @@ msgstr "Couleur"
 #: model:ir.model.fields,help:event_webapp_plan.field_event_webapp_room__color
 msgid "Colour of the room area on the plan, as #RRGGBB."
 msgstr "Couleur de la zone de la salle sur le plan, au format #RRGGBB."
+
+#. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_refresh
+msgid "Conference"
+msgstr "Conférence"
 
 #. module: event_webapp_plan
 #: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp_room__bbb_room_url
@@ -548,6 +587,11 @@ msgid "Event"
 msgstr "Événement"
 
 #. module: event_webapp_plan
+#: model:ir.model,name:event_webapp_plan.model_event_raffle
+msgid "Event Raffle"
+msgstr "Tirage d'événement"
+
+#. module: event_webapp_plan
 #: model:ir.module.category,name:event_webapp_plan.module_category_event_webapp
 #: model:ir.ui.menu,name:event_webapp_plan.menu_event_webapp_root
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.res_config_settings_view_form
@@ -628,6 +672,12 @@ msgstr "Application web d'événement : mode texte seul"
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
 msgid "Events"
 msgstr "Événements"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Failed, retrying in %(delay)s"
+msgstr "Échec, nouvel essai dans %(delay)s"
 
 #. module: event_webapp_plan
 #: model:ir.model.fields.selection,name:event_webapp_plan.selection__res_users__ewp_motion__auto
@@ -814,6 +864,11 @@ msgid "Links"
 msgstr "Liens"
 
 #. module: event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_refresh
+msgid "Live rooms"
+msgstr "Salles en direct"
+
+#. module: event_webapp_plan
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_closed_footer
 msgid "Log out"
 msgstr "Se déconnecter"
@@ -902,6 +957,12 @@ msgstr "Nouveau gagnant, %(raffle)s, %(prize)s : %(winner)s."
 #: code:addons/event_webapp_plan/controllers/main.py:0
 msgid "New winner, %(raffle)s: %(winner)s."
 msgstr "Nouveau gagnant, %(raffle)s : %(winner)s."
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Next in %(delay)s"
+msgstr "Prochaine dans %(delay)s"
 
 #. module: event_webapp_plan
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_raffles_content
@@ -1058,6 +1119,12 @@ msgid "Past"
 msgstr "Passées"
 
 #. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Paused while the page is hidden"
+msgstr "En pause tant que la page est cachée"
+
+#. module: event_webapp_plan
 #: model:ir.model.fields,help:event_webapp_plan.field_event_webapp_room__pos_height
 #: model:ir.model.fields,help:event_webapp_plan.field_event_webapp_room__pos_y
 msgid "Percent of the image height."
@@ -1085,8 +1152,27 @@ msgstr "Plan et salles"
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_raffle_view_list_select
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_page_main
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_refresh
 msgid "Raffles"
 msgstr "Tirages"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,field_description:event_webapp_plan.field_event_webapp__ewp_raffle_proposed_ids
+msgid "Raffles proposed in the form"
+msgstr "Tirages proposés dans le formulaire"
+
+#. module: event_webapp_plan
+#: model:ir.model.fields,help:event_webapp_plan.field_event_webapp__raffle_ids
+msgid ""
+"Raffles shown on the web app. A raffle of a listed event is added when its "
+"planned date falls inside the opening window or, without planned date, when "
+"its event lies entirely inside it; test raffles never are. Nothing is "
+"removed automatically."
+msgstr ""
+"Tirages affichés dans l'application web. Un tirage d'un événement de la "
+"liste est ajouté quand sa date prévue tombe dans la fenêtre d'ouverture ou, "
+"sans date prévue, quand son événement se tient en entier dans cette fenêtre "
+"; les tirages de test ne le sont jamais. Rien n'est retiré automatiquement."
 
 #. module: event_webapp_plan
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.event_webapp_view_form
@@ -1303,6 +1389,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan.webapp_layout
 msgid "Skip to main content"
 msgstr "Aller au contenu principal"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Stopped, reload the page"
+msgstr "Arrêtée, rechargez la page"
 
 #. module: event_webapp_plan
 #. odoo-javascript
@@ -1737,6 +1829,12 @@ msgstr "Mis à jour il y a %(minutes)s min"
 #: code:addons/event_webapp_plan/controllers/main.py:0
 msgid "Updated %(seconds)s s ago"
 msgstr "Mis à jour il y a %(seconds)s s"
+
+#. module: event_webapp_plan
+#. odoo-python
+#: code:addons/event_webapp_plan/controllers/main.py:0
+msgid "Updating now"
+msgstr "Mise à jour en cours"
 
 #. module: event_webapp_plan
 #. odoo-javascript

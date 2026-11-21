@@ -14,12 +14,72 @@ controller reads it with sudo and exposes only the fields it renders, after
 
 The room chats are reserved to the access group of each room, which the room
 page gives to its visitors (see event.webapp.room).
+
+The raffles of a day are chosen by hand, and pre-filled: a raffle joins the
+day when it starts to fit it (see `raffle_fits_day()`), because the day
+gained its event, the window of the day moved, or the raffle itself changed
+(see event.raffle in this module). Nothing is ever removed automatically,
+and a raffle taken off by hand comes back only when its own fit is lost and
+found again.
 """
 
 from odoo import Command, _, api, fields, models
 from odoo.exceptions import ValidationError
 
 MODERATOR_GROUP = "event_webapp_plan.group_event_webapp_moderator"
+# Fields of a day that decide which raffles fit it.
+RAFFLE_FIT_FIELDS = frozenset(("event_ids", "date_start", "date_end"))
+# Context key that turns the pre-fill of the raffles off, for a copy.
+NO_RAFFLE_FILL = "ewp_no_raffle_fill"
+# Fit state of a day that does not exist yet: no event, no window.
+NO_FIT_STATE = (frozenset(), False, False)
+
+
+def raffle_fits_day(raffle, event_ids, date_start, date_end):
+    """Return whether `raffle` belongs on a day listing the events of ids
+    `event_ids` (a set) and open from `date_start` to `date_end` (naive
+    UTC datetimes, or False).
+
+    A test raffle never fits, nor a raffle whose event the day does not
+    list, nor any raffle on a day without window. A raffle with a planned
+    date fits when the window holds that moment, bounds included. Without
+    one, it fits when its event begins and ends inside the window: a
+    raffle of an event spread over several days waits for its date.
+    `raffle` is read as given: a sudo record reads the raffles and events
+    that the caller may not.
+    """
+    if (
+        raffle.is_test
+        or raffle.event_id.id not in event_ids
+        or not (date_start and date_end)
+    ):
+        return False
+    if raffle.date_planned:
+        return date_start <= raffle.date_planned <= date_end
+    event = raffle.event_id
+    return bool(
+        event.date_begin
+        and event.date_end
+        and date_start <= event.date_begin
+        and event.date_end <= date_end
+    )
+
+
+def _command_ids(commands):
+    """Return the set of record ids that x2many `commands` link or set.
+
+    Accepts the LINK and SET commands that the web client sends for a
+    many2many field, and bare ids; ignores the others.
+    """
+    ids = set()
+    for command in commands or ():
+        if isinstance(command, int):
+            ids.add(command)
+        elif command[0] == Command.LINK:
+            ids.add(command[1])
+        elif command[0] == Command.SET:
+            ids = set(command[2])
+    return ids
 
 
 class EventWebapp(models.Model):
@@ -65,6 +125,19 @@ class EventWebapp(models.Model):
         "webapp_id",
         "raffle_id",
         string="Raffles",
+        help="Raffles shown on the web app. A raffle of a listed event is "
+        "added when its planned date falls inside the opening window or, "
+        "without planned date, when its event lies entirely inside it; test "
+        "raffles never are. Nothing is removed automatically.",
+    )
+    # Memory of the form between two onchanges: the raffles the form
+    # already added in the current edit, so that a raffle taken off by hand
+    # is not proposed again, and so that saving does not add it back.
+    # Never stored: create() and write() drop it from their values.
+    ewp_raffle_proposed_ids = fields.Many2many(
+        "event.raffle",
+        string="Raffles proposed in the form",
+        compute="_compute_ewp_raffle_proposed_ids",
     )
     plan_image = fields.Image(
         string="Site plan", max_width=2560, max_height=2560
@@ -134,11 +207,145 @@ class EventWebapp(models.Model):
         for webapp in self:
             webapp.bbb_configured = bool(api)
 
+    def _compute_ewp_raffle_proposed_ids(self):
+        self.ewp_raffle_proposed_ids = False
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        skips = [
+            _command_ids(vals.pop("ewp_raffle_proposed_ids", None))
+            for vals in vals_list
+        ]
+        webapps = super().create(vals_list)
+        if not self.env.context.get(NO_RAFFLE_FILL):
+            webapps._ewp_add_fitting_raffles(
+                {}, dict(zip(webapps.ids, skips, strict=True))
+            )
+        return webapps
+
     def write(self, vals):
+        proposed = _command_ids(vals.pop("ewp_raffle_proposed_ids", None))
+        fill = bool(RAFFLE_FIT_FIELDS & vals.keys()) and not (
+            self.env.context.get(NO_RAFFLE_FILL)
+        )
+        if fill:
+            old_states = self._ewp_raffle_state()
+            old_raffles = {
+                webapp.id: set(webapp.sudo().raffle_ids.ids) for webapp in self
+            }
         result = super().write(vals)
         if "name" in vals:
             self.room_ids._ewp_sync_names()
+        if fill:
+            # A raffle that this very write takes off stays off.
+            skips = {
+                webapp.id: proposed
+                | (old_raffles[webapp.id] - set(webapp.sudo().raffle_ids.ids))
+                for webapp in self
+            }
+            self._ewp_add_fitting_raffles(old_states, skips)
         return result
+
+    def copy(self, default=None):
+        """Copy the days with the raffle list of the original as it is: the
+        pre-fill would add back the raffles taken off by hand."""
+        webapps = super(
+            EventWebapp, self.with_context(**{NO_RAFFLE_FILL: True})
+        ).copy(default)
+        return webapps.with_env(self.env)
+
+    # ------------------------------------------------------------------
+    # Raffles of the day
+    # ------------------------------------------------------------------
+
+    def _ewp_raffle_state(self):
+        """Return {day id: (event ids, opening, closing)}, the values of
+        each day that `raffle_fits_day()` reads."""
+        return {
+            webapp.id: (
+                frozenset(webapp.sudo().event_ids._origin.ids),
+                webapp.date_start,
+                webapp.date_end,
+            )
+            for webapp in self
+        }
+
+    def _ewp_new_fitting_raffles(self, old_state):
+        """Return the raffles that fit this day now and did not fit it in
+        `old_state` (a value of `_ewp_raffle_state()`), as sudo records.
+
+        Works on a new record too, as the onchange holds one. The search
+        runs as superuser to find the candidates only: the callers keep
+        those the user may read.
+        """
+        self.ensure_one()
+        (state,) = self._ewp_raffle_state().values()
+        event_ids, date_start, date_end = state
+        raffles = self.env["event.raffle"].sudo()
+        if not event_ids or not (date_start and date_end):
+            return raffles
+        candidates = raffles.search(
+            [("event_id", "in", list(event_ids)), ("is_test", "=", False)]
+        )
+        return candidates.filtered(
+            lambda raffle: raffle_fits_day(raffle, *state)
+            and not raffle_fits_day(raffle, *old_state)
+        )
+
+    def _ewp_add_fitting_raffles(self, old_states, skips):
+        """Add to each day the raffles that started to fit it since
+        `old_states` ({day id: fit state}; a missing day is a new one),
+        except the ids of `skips` ({day id: set of raffle ids}).
+
+        Adds only: a raffle already listed, or taken off by hand, is left
+        as it is. The write runs as the current user, with the raffles this
+        user may read.
+        """
+        for webapp in self:
+            raffles = webapp._ewp_new_fitting_raffles(
+                old_states.get(webapp.id, NO_FIT_STATE)
+            )
+            raffles = raffles.with_env(webapp.env)._filtered_access("read")
+            raffle_ids = (
+                set(raffles.ids)
+                - set(webapp.sudo().raffle_ids.ids)
+                - skips.get(webapp.id, set())
+            )
+            if raffle_ids:
+                webapp.write(
+                    {
+                        "raffle_ids": [
+                            Command.link(raffle_id)
+                            for raffle_id in sorted(raffle_ids)
+                        ]
+                    }
+                )
+
+    @api.onchange("event_ids", "date_start", "date_end")
+    def _onchange_ewp_raffle_ids(self):
+        """Show in the form the raffles that saving would add.
+
+        The form keeps the raffles it added in `ewp_raffle_proposed_ids`:
+        once taken off by hand, a raffle is not proposed again in the same
+        edit, and saving sends that list so the server skips it too.
+        """
+        for webapp in self:
+            origin = webapp._origin
+            old_state = (
+                origin._ewp_raffle_state()[origin.id]
+                if origin
+                else NO_FIT_STATE
+            )
+            raffles = webapp._ewp_new_fitting_raffles(old_state)
+            raffles = raffles.with_env(webapp.env)._filtered_access("read")
+            known = set(webapp.raffle_ids._origin.ids) | set(
+                webapp.ewp_raffle_proposed_ids._origin.ids
+            )
+            raffles = raffles.filtered(lambda r, k=known: r.id not in k)
+            if raffles:
+                raffles = raffles.with_env(webapp.env)
+                webapp.raffle_ids |= raffles
+                webapp.ewp_raffle_proposed_ids |= raffles
 
     # ------------------------------------------------------------------
     # Helpers of the controller

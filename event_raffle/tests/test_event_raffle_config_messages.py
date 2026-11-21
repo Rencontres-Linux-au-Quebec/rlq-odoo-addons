@@ -294,31 +294,34 @@ class TestRaffleConfigMessages(TransactionCase):
     # Form and labels
 
     def test_settings_form_has_the_messages_section(self):
-        Config = self.env["event.raffle.config"]
-        arch = etree.fromstring(Config.get_view(False, "form")["arch"])
-        (section,) = arch.xpath("//group[@name='messages']")
+        Settings = self.env["res.config.settings"]
+        arch = etree.fromstring(Settings.get_view(False, "form")["arch"])
+        (section,) = arch.xpath(
+            "//block[@name='raffle_messages_setting_container']"
+        )
         names = section.xpath(".//field/@name")
         self.assertEqual(
             names,
             [
-                "default_notify_winner_auto",
-                "default_notify_winner_message",
-                "default_announce_channel_auto",
-                "default_announce_channel_id",
-                "default_announce_channel_message",
+                "raffle_default_notify_winner_auto",
+                "raffle_default_notify_winner_message",
+                "raffle_default_announce_channel_auto",
+                "raffle_default_announce_channel_id",
+                "raffle_default_announce_channel_message",
             ],
         )
+        # The settings of every app share one form: a required field here
+        # would block saving them all. The singleton's check refuses
+        # "announce" without a channel on save instead.
         (channel,) = section.xpath(
-            ".//field[@name='default_announce_channel_id']"
+            ".//field[@name='raffle_default_announce_channel_id']"
         )
-        self.assertEqual(
-            channel.get("required"), "default_announce_channel_auto"
-        )
+        self.assertIsNone(channel.get("required"))
 
-    def test_settings_form_requires_the_channel_when_announcing(self):
-        form = Form(self.config)
-        form.default_announce_channel_auto = True
-        with self.assertRaises(AssertionError):
+    def test_settings_form_refuses_announcing_without_a_channel(self):
+        form = Form(self.env["res.config.settings"])
+        form.raffle_default_announce_channel_auto = True
+        with self.assertRaises(ValidationError):
             form.save()
 
     def test_labels_in_french(self):
@@ -339,7 +342,7 @@ class TestRaffleConfigMessages(TransactionCase):
         for name, label in labels.items():
             self.assertEqual(described[name]["string"], label)
             self.assertIn("nouveau", described[name]["help"])
-        arch = fr["event.raffle.config"].get_view(False, "form")["arch"]
-        self.assertIn('string="Messages"', arch)
+        arch = fr["res.config.settings"].get_view(False, "form")["arch"]
+        self.assertIn('title="Messages"', arch)
         self.assertIn(NOTIFY_FR, arch)
         self.assertIn(ANNOUNCE_FR, arch)

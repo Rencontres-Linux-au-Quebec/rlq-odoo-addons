@@ -13,11 +13,25 @@ the controller passes the partner of the current user, never one from the
 request.
 """
 
-from odoo import models
+from odoo import api, models
+from odoo.tools import str2bool
+
+from .res_config_settings import PARAM_ONSITE_CARD
 
 
 class EventWebapp(models.Model):
     _inherit = "event.webapp"
+
+    @api.model
+    def _ewp_onsite_card_enabled(self):
+        """True when the setting "On-site card" is ticked (config parameter
+        PARAM_ONSITE_CARD, read as superuser); False when the parameter is
+        missing, which is the default, or holds anything but a true
+        value."""
+        value = (
+            self.env["ir.config_parameter"].sudo().get_param(PARAM_ONSITE_CARD)
+        )
+        return bool(str2bool(value or "", default=False))
 
     def _ewp_prize_raffles(self):
         """Raffles of this day, as superuser: those listed on the day and

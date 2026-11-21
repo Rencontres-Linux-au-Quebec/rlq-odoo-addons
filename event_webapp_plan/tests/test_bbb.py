@@ -1453,6 +1453,39 @@ class TestBbbRoomPage(HttpCase):
             self.assertNotIn(SECRET, response.text)
             self.assertNotIn("checksum", response.text)
 
+    def test_automatic_updates_rows_of_the_conference(self):
+        """The automatic updates have the row "Live rooms" on the home page
+        of a day with meetings, and the row "Conference" on the page of a
+        room with a conference, none on a room without one."""
+
+        def rows(page):
+            return [
+                (
+                    row.get("data-ewp-refresh"),
+                    " ".join(
+                        row.xpath(".//*[@class='o_ewp_refresh_label']")[0]
+                        .text_content()
+                        .split()
+                    ),
+                )
+                for row in page.xpath(
+                    "//section[@id='o_ewp_refresh']//li[@data-ewp-refresh]"
+                )
+                # The rows of this module; a bridge module adds its own.
+                if row.get("data-ewp-refresh") in ("live", "conference")
+            ]
+
+        self.authenticate("ewp_bbb_portal", "ewp_bbb_portal")
+        with fake_network(FakeNetwork(running=False)):
+            response = self._get("/webapp_event/%s" % self.day.id)
+            page = lxml_html.fromstring(response.text)
+            self.assertEqual(rows(page), [("live", "Live rooms")])
+            self.assertEqual(
+                rows(self._page(self.room_api)[1]),
+                [("conference", "Conference")],
+            )
+            self.assertEqual(rows(self._page(self.room_plain)[1]), [])
+
     def test_server_error_falls_back_to_the_conference_url(self):
         self.authenticate("ewp_bbb_portal", "ewp_bbb_portal")
         for api_error in ("network", "http"):

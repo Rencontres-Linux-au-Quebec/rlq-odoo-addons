@@ -5,6 +5,22 @@
     "version": "18.0.1.0.0",
     "summary": "Prize pick-up, virtual prizes, shipping, hand-over screen "
     "and public winners page",
+    "description": """
+English
+
+How a reserved prize reaches its winner: picked up on site, sent by email
+when it is virtual, or shipped to a virtual winner. A phone screen lets the
+event team find a winner and hand the prize over, and a public page lists
+the winners of an event hour by hour. Details: README.md of the module.
+
+Français
+
+Comment un prix réservé atteint son gagnant : retiré sur place, envoyé par
+courriel s'il est virtuel, ou expédié à un gagnant virtuel. Un écran de
+téléphone permet à l'équipe de trouver un gagnant et de lui remettre le
+prix, et une page publique liste les gagnants d'un événement heure par
+heure. Détails : README.md du module.
+""",
     "author": "TechnoLibre",
     "website": "https://technolibre.ca",
     "category": "Marketing/Events",

@@ -25,7 +25,9 @@
     Accessibility: every page starts with skip links (main content,
     display options) and ends with the display options (text-only mode,
     animations), forms that post to /webapp_event/preferences and work
-    without script. One polite live region, #o_ewp_announcer, carries
+    without script. Above them, the home and room pages hold the section
+    "Automatic updates" (#o_ewp_refresh), hidden until the page script
+    reports a refresher. One polite live region, #o_ewp_announcer, carries
     every announcement of the page script, from the translated texts of its
     data-ewp-messages attribute. In text-only mode (text_only) the pages
     render no plan image, no decorative image and no mascot or banner slot;
@@ -67,6 +69,7 @@
                     </span>
                 </div>
                 <t t-out="0"/>
+                <t t-if="ewp_page in ('home', 'room')" t-call="event_webapp_plan.webapp_refresh"/>
                 <t t-call="event_webapp_plan.webapp_preferences"/>
                 <!-- The one live region of the page: webapp.js writes each
                      announcement there, from the texts of data-ewp-messages. -->
@@ -119,6 +122,50 @@
         </footer>
     </template>
 
+    <!-- Automatic updates of the home and room pages: one row per block
+         that the page script refreshes by itself, its label written here,
+         its times ("Updated 12 s ago", "Next in 18 s", paused, retrying,
+         stopped) by webapp.js from the patterns of
+         data-ewp-refresh-texts. The section and each row ship hidden: a
+         row shows once its refresher reports (ewp:refresh), so the page
+         without script, or a block that does not poll, shows none. Not a
+         live region: the countdown is read on demand only. The slot
+         webapp_slot_refresh receives the rows of other modules, each made
+         with webapp_refresh_row. -->
+    <template id="webapp_refresh" name="Event web app: automatic updates">
+        <section id="o_ewp_refresh" class="o_ewp_refresh" aria-labelledby="o_ewp_h_refresh" hidden="hidden"
+                 t-att-data-ewp-refresh-texts="refresh_texts_json">
+            <h2 id="o_ewp_h_refresh" class="o_ewp_refresh_title">Automatic updates</h2>
+            <ul class="o_ewp_refresh_list" role="list">
+                <t t-if="ewp_page == 'home' and has_raffles" t-call="event_webapp_plan.webapp_refresh_row">
+                    <t t-set="refresh_id" t-value="'raffles'"/>
+                    Raffles
+                </t>
+                <t t-if="ewp_page == 'home' and rooms_live_url" t-call="event_webapp_plan.webapp_refresh_row">
+                    <t t-set="refresh_id" t-value="'live'"/>
+                    Live rooms
+                </t>
+                <t t-if="ewp_page == 'room' and bbb" t-call="event_webapp_plan.webapp_refresh_row">
+                    <t t-set="refresh_id" t-value="'conference'"/>
+                    Conference
+                </t>
+                <t t-call="event_webapp_plan.webapp_slot_refresh"/>
+            </ul>
+        </section>
+    </template>
+
+    <!-- One row of the automatic updates: refresh_id, the id its script
+         reports; the body of the call, its label. The two cells are
+         filled by webapp.js; the punctuation hidden on screen separates
+         them for screen readers. -->
+    <template id="webapp_refresh_row" name="Event web app: automatic update row">
+        <li class="o_ewp_refresh_row" t-att-data-ewp-refresh="refresh_id" hidden="hidden">
+            <span class="o_ewp_refresh_label"><t t-out="0"/></span><span class="o_ewp_sr_only">: </span>
+            <time class="o_ewp_refresh_last"/><span class="o_ewp_sr_only">, </span>
+            <span class="o_ewp_refresh_next"/>
+        </li>
+    </template>
+
     <!-- Theme slots, empty here. A theme inherits them with
          <xpath expr="." position="inside">. -->
     <template id="webapp_slot_mascot" name="Event web app: mascot slot"/>
@@ -131,6 +178,9 @@
     <!-- Last item of the main content of a room page, after the chat. -->
     <template id="webapp_slot_room_main" name="Event web app: room page slot"/>
     <template id="webapp_slot_footer" name="Event web app: footer slot"/>
+    <!-- Inside the list of the automatic updates of the home and room
+         pages, after the rows of this module: rows of other modules. -->
+    <template id="webapp_slot_refresh" name="Event web app: automatic updates slot"/>
 
     <!-- Brand of the app bars: the app icon on an accent square and the app
          label, two items of the header grid. -->

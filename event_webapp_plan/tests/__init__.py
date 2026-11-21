@@ -12,6 +12,7 @@ from . import (
     test_browser,
     test_controllers,
     test_models,
+    test_raffle_fill,
     test_selenium_cameo,
     test_selenium_plan,
     test_selenium_webapp,

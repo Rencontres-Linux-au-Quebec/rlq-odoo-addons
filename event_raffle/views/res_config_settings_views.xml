@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Defaults of the new raffles, app block "Raffle" of the general
+         settings. Every field is related to the default-settings singleton
+         (event.raffle.config, see res_config_settings.py), which keeps the
+         values. -->
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.event_raffle</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Raffle" string="Raffle" name="event_raffle" groups="base.group_system">
+                    <!-- Holds the singleton in the form, so that the fields
+                         related to it show its values. -->
+                    <field name="raffle_config_id" invisible="1" />
+                    <block
+                        title="Wheel"
+                        name="raffle_wheel_setting_container"
+                        help="These values are applied by default when a new raffle is created."
+                    >
+                        <setting id="raffle_default_theme">
+                            <field name="raffle_default_theme" />
+                        </setting>
+                        <setting id="raffle_default_remove_winner">
+                            <field name="raffle_default_remove_winner" />
+                        </setting>
+                        <setting id="raffle_default_spin_duration">
+                            <field name="raffle_default_spin_duration" />
+                        </setting>
+                        <setting id="raffle_default_spin_turns">
+                            <field name="raffle_default_spin_turns" />
+                        </setting>
+                        <setting id="raffle_default_pointer_angle">
+                            <field name="raffle_default_pointer_angle" />
+                        </setting>
+                    </block>
+                    <block title="Celebration &amp; Animation" name="raffle_celebration_setting_container">
+                        <setting id="raffle_default_winner_celebration">
+                            <field name="raffle_default_winner_celebration" />
+                        </setting>
+                        <setting id="raffle_default_show_fireworks">
+                            <field name="raffle_default_show_fireworks" />
+                        </setting>
+                        <setting id="raffle_default_show_tux">
+                            <field name="raffle_default_show_tux" />
+                        </setting>
+                        <setting id="raffle_default_belly_logo">
+                            <field name="raffle_default_belly_logo" />
+                        </setting>
+                        <setting id="raffle_default_tux_animation">
+                            <field name="raffle_default_tux_animation" />
+                        </setting>
+                        <setting id="raffle_default_flag_text">
+                            <field name="raffle_default_flag_text" />
+                        </setting>
+                    </block>
+                    <block title="Messages" name="raffle_messages_setting_container">
+                        <setting id="raffle_winner_notification" title="Winner Notification">
+                            <field name="raffle_default_notify_winner_auto" />
+                            <div class="content-group">
+                                <div>
+                                    <label for="raffle_default_notify_winner_message" class="o_light_label" />
+                                </div>
+                                <field
+                                    name="raffle_default_notify_winner_message"
+                                    class="w-100"
+                                    placeholder="You won a prize, come and claim it! {link}"
+                                />
+                            </div>
+                        </setting>
+                        <setting id="raffle_announce_channel" title="Channel Announcement">
+                            <field name="raffle_default_announce_channel_auto" />
+                            <div class="content-group">
+                                <div>
+                                    <label for="raffle_default_announce_channel_id" class="o_light_label" />
+                                </div>
+                                <field
+                                    name="raffle_default_announce_channel_id"
+                                    class="w-100"
+                                    options="{'no_create': True}"
+                                />
+                                <div class="mt8">
+                                    <label for="raffle_default_announce_channel_message" class="o_light_label" />
+                                </div>
+                                <field
+                                    name="raffle_default_announce_channel_message"
+                                    class="w-100"
+                                    placeholder="Draw #{number}: {winner} won! ({prize}) {link}"
+                                />
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_event_raffle_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'event_raffle', 'bin_size': False}</field>
+    </record>
+</odoo>

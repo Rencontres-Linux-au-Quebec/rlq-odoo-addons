@@ -7,6 +7,7 @@
 from . import (
     bbb_client,
     discuss_channel,
+    event_raffle,
     event_webapp,
     event_webapp_bbb_meetings,
     event_webapp_link,

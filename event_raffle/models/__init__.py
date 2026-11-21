@@ -7,5 +7,6 @@ from . import (
     event_raffle_draw,
     event_raffle_draw_notification,
     event_raffle_participant,
+    res_config_settings,
     res_partner,
 )

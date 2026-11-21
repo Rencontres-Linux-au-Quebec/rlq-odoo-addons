@@ -15,8 +15,14 @@ button sur l'événement affiche la liste des gagnants.
 
 ## Configuration
 
-Aucune configuration requise. Par activité de tirage, l'onglet **Paramètres**
-regroupe les réglages :
+Aucune configuration requise. Sous l'événement, le champ facultatif **Date
+prévue** dit quand le tirage doit avoir lieu. Le module ne s'en sert pas
+lui-même : il s'affiche en colonne facultative dans la liste des tirages,
+et l'application web de journée d'événement (`event_webapp_plan`) s'en sert
+pour ajouter le tirage à la journée qui contient ce moment. Un tirage
+dupliqué n'en garde pas la date prévue.
+
+Par activité de tirage, l'onglet **Paramètres** regroupe les réglages :
 
 - **Tirage de test** (décoché par défaut) : marque un tirage de répétition
   ou d'essai. Le formulaire affiche alors un ruban **Test**, et la liste des
@@ -74,12 +80,17 @@ regroupe les réglages :
   directe n'est jamais acceptée : ni au choix, ni à la publication, qui
   laisse alors une note sur le tir.
 
-Le menu **Tirage → Paramètres** définit les valeurs par défaut (thème,
-célébration, animation, etc.) appliquées à chaque nouveau tirage. Le gagnant
+Le menu **Tirage → Paramètres** ouvre les **Paramètres** généraux d'Odoo sur
+le bloc **Tirage**, comme les autres applications. Ce bloc définit les valeurs
+par défaut (thème, célébration, animation, etc.) appliquées à chaque nouveau
+tirage, en trois sections : **Roue**, **Célébration & animation** et
+**Messages**. Le menu et le bloc sont réservés aux administrateurs des
+réglages, seuls à modifier ces valeurs ; les utilisateurs des événements les
+lisent à la création d'un tirage. Le gagnant
 **reste sur la roue** après un tir et n'est retiré du pool qu'au **tir suivant**.
 Les noms longs sont **répartis sur plusieurs lignes** (max 4) dans la roue.
 
-Sa section **Messages** donne aussi les valeurs de départ de chaque nouveau
+La section **Messages** donne aussi les valeurs de départ de chaque nouveau
 tirage : **Notifier le gagnant automatiquement**, **Message notification**,
 **Annoncer chaque tir dans un canal de discussion**, **Canal de discussion**
 et **Message canal**. Un message laissé vide donne le message standard, dans
@@ -153,8 +164,8 @@ aucun par défaut.
    propose un message modifiable, par défaut *« Vous avez gagné un prix, venez
    le réclamer ! {lien} »*, ou le **Message notification** du tirage quand
    celui-ci notifie ses gagnants automatiquement. Les paramètres du message
-   (`{gagnant}`, `{lien}`, etc.) sont remplacés à l'envoi. L'envoi dépend du
-   gagnant :
+   (`{gagnant}`, `{lien}`, etc.) sont remplacés à l'envoi. Le **Moyen
+   d'envoi** proposé dépend du gagnant :
    - son contact a un **compte utilisateur interne** actif : un **clavardage
      privé** dans *Discussion*, la conversation directe entre l'expéditeur et
      le gagnant, créée au besoin ;
@@ -163,6 +174,14 @@ aucun par défaut.
      ici : il n'a pas accès à *Discussion* et un clavardage ne lui parviendrait
      pas ;
    - sinon : l'assistant explique pourquoi et n'offre pas de bouton *Envoyer*.
+
+   Le **Moyen d'envoi** se force au besoin entre **Clavardage** et
+   **Courriel**, par exemple pour s'assurer qu'un utilisateur interne reçoive
+   le message par courriel. Un choix qui ne peut joindre le gagnant s'affiche
+   en avertissement et l'envoi est refusé : le clavardage exige un compte
+   utilisateur interne actif, le courriel une adresse (du contact ou du tir).
+   L'envoi automatique après un tir garde toujours le moyen proposé. La
+   notification consignée sur le tir porte le moyen réellement utilisé.
 
    Un gagnant **absent** peut être notifié : c'est l'usage principal. Chaque
    envoi est consigné sur le tir (section *Notifications* du formulaire) et
@@ -231,6 +250,18 @@ L'effet est surtout pensé pour le mode **plein écran** (projection).
 
 ## Changes
 
+- **18.0.1.9.0** : champ facultatif **Date prévue** sur le tirage, sous
+  l'événement dans le formulaire et en colonne facultative de la liste ;
+  non copié à la duplication. À la mise à jour, un tirage existant qui a
+  un événement reçoit la date de début de cet événement ; les autres restent
+  sans date.
+- **18.0.1.8.0** : les valeurs par défaut des tirages passent dans les
+  **Paramètres** généraux, bloc **Tirage**, avec les mêmes libellés et les
+  mêmes contrôles (annonce sans canal, discussion directe refusées). Le menu
+  **Tirage → Paramètres** y mène ; il n'est plus visible qu'aux
+  administrateurs des réglages, seuls à modifier ces valeurs, et non plus aux
+  gestionnaires des événements. L'ancien formulaire disparaît ; à la mise à
+  jour, les valeurs enregistrées restent telles quelles.
 - **18.0.1.7.0** : case **Tirage de test** dans l'onglet *Paramètres* du
   tirage, ruban **Test** sur le formulaire et colonne dans la liste. La
   liste des tirages s'ouvre sur le nouveau filtre **Prod**, qui cache les

@@ -3,6 +3,9 @@
 Odoo 18.0 module. A mobile, installable web app for one event day at
 `/webapp_event`, reserved to logged-in users (portal or internal).
 Anonymous visitors are sent to the login page and come back after login.
+The short address `/w` (and `/w/<day>`) redirects to `/webapp_event` (and
+`/webapp_event/<day>`) with the same query string, easier to type or to
+print on a poster.
 
 ## What the visitor sees
 
@@ -16,6 +19,19 @@ Anonymous visitors are sent to the login page and come back after login.
   BigBlueButton);
 - the raffle draws of the day (module `event_raffle`), refreshed live.
 
+**Automatic updates.** Above the display options, the home and room pages
+list the blocks that refresh by themselves (raffles, live rooms,
+conference, and the rows other modules add: "My prize", "Agenda"), each
+with the age of its last answer and a countdown to its next request,
+"Failed, retrying in ..." after a failed answer (the next try of the
+conference doubles while its server fails), "Paused while the page is
+hidden" while the tab is hidden, "Stopped, reload the page" once the
+session or the day ends. The section shows with the first refresher that
+reports, never without script; it is not a live region, so a screen
+reader reads the countdown only on demand. The intervals do not change:
+30 s for the raffles and the live rooms, 20 s for a conference that has
+not started (up to 2 minutes while its server fails).
+
 ## Configuration
 
 Application **Event Web App > Event days** (groups below). One record per
@@ -27,7 +43,7 @@ day:
 | Announcement | rich text shown at the top of the page |
 | Links | label, URL, description, ordered by drag and drop |
 | Events | `event.event` records of the day |
-| Raffles | `event.raffle` records of the day |
+| Raffles | `event.raffle` records of the day, pre-filled (see below) |
 | Plan & Rooms | plan image, visual room editor, list of rooms |
 
 **Visual room editor**: select a room in the side list (or click its area),
@@ -93,6 +109,32 @@ rooms: the visitors of the original do not enter the copy. The button
 **Create missing chat channels** recreates the group and the channel of a
 room that lost them. The optional column **Access group** of the room list
 shows the group.
+
+**Raffles of the day**: the raffle block of the web app shows the raffles
+listed on the day, and only those. The list is pre-filled, then edited by
+hand. A raffle of an event listed on the day joins the day when:
+
+- its **Planned Date** (field of `event_raffle`) falls inside the opening
+  window, bounds included; a raffle of an event held over several days
+  thus joins the day of its draw only;
+- without planned date, its event begins and ends inside the window: a
+  one-day event brings its raffles, an event held over several days waits
+  for their planned dates.
+
+A test raffle never joins. The pre-fill runs when a raffle starts to fit a
+day: the day gains the raffle's event, the window of the day moves, or the
+raffle is created or gets a new planned date, event or test flag. In the
+form, adding an event or moving the window shows the raffles at once,
+before saving. Nothing is ever removed automatically: a raffle removed by
+hand stays off through any later write that leaves its fit unchanged,
+such as adding another event, renaming the day, or a new planned date
+inside the same day. A change of the event's own dates adds nothing. A
+duplicated day keeps the raffle list of the original as it is.
+
+The day side searches the candidate raffles as superuser, then adds only
+those the user who saves the day may read (company rules). The raffle
+side adds the saved raffle as superuser, to the days that already list its
+event: the user who saves a raffle seldom may write the days.
 
 **Default day**: `/webapp_event` shows the active day that is open now,
 else the next one to open, else the one that closed most recently.
@@ -512,6 +554,7 @@ receives the values of the page, among them `ewp_page` and `day_state`
 | `event_webapp_plan.webapp_slot_room_item` | inside each link of the room list of the home page, after the room description (part of the name of the link); receives `room`, the values of that room (`id`, `name`, `url`...); rendered in text-only mode |
 | `event_webapp_plan.webapp_slot_room_main` | last item of the main content of a room page, after the chat; on a wide screen it spans both columns, under the conference and the chat; receives `room` (`id`, `name`, `description`, `color`); rendered in text-only mode |
 | `event_webapp_plan.webapp_slot_footer` | end of `.o_ewp_app`, on every page |
+| `event_webapp_plan.webapp_slot_refresh` | inside the list of the automatic updates (`#o_ewp_refresh`) of the home and room pages, after the rows of this module: rows made with `<t t-call="event_webapp_plan.webapp_refresh_row">`, `refresh_id` set inside the call, the label as its body |
 
 The page templates keep stable ids (`webapp_layout`, `webapp_page_main`,
 `webapp_page_room`, `webapp_page_closed`, `webapp_page_none`,
@@ -679,6 +722,7 @@ later in the same bundle receives them.
 | `ewp:bbb-state` | `state`, `previous`, `initial`, `live` | room page with a conference: at start (`running`, `frame`, `waiting`, `unavailable`, `button`, or `left` after the redirect of `bbb_left`), then `left`, `moved` (open in a new tab) or `running` after "Join again"; `live` is true for `running`, and for `button` when the meeting runs behind the new tab button |
 | `ewp:raffle-drawn` | `drawId`, `raffle`, `prize`, `winner` | for each draw that got a winner since the previous refresh |
 | `ewp:rooms-live` | `ids`, `initial` | home page: on the first answer of the live route, then on each answer that changes the live rooms |
+| `ewp:refresh` | `id`, `state` (`running`, `busy`, `error`, `stopped`), `last`, `next` (ms since the epoch) | each refresher (`raffles`, `live`, `conference`; `my_prize`, `agenda` of the bridge modules) when it plans, sends or gets a request; a detail carries only the fields that change. `webapp.js` listens to it too: a script of the bundle reports its own refresher this way, and its row `li[data-ewp-refresh="<id>"]` shows; the row carries `data-ewp-refresh-state` (`paused` while the tab is hidden) |
 | `ewp:cameo` | `phase` (`enter`, `exit`), `actor`, `action`, `trigger` (`schedule`, `raffle`, `bbb`, `day`, `play`), `reason` (exit: `done`, `stop`, `hidden`, `overlap`, `replaced`), `rect` | `webapp_cameo.js`: each cameo that enters or leaves |
 
 ```javascript

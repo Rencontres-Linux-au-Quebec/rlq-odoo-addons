@@ -4,4 +4,9 @@
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or (at your option) any later version. (http://www.gnu.org/licenses/agpl)
-from . import event_raffle_draw, event_registration, event_webapp
+from . import (
+    event_raffle_draw,
+    event_registration,
+    event_webapp,
+    res_config_settings,
+)

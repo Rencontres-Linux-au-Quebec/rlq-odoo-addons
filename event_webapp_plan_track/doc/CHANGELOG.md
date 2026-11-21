@@ -1,5 +1,27 @@
 # Changelog - event_webapp_plan_track
 
+## 18.0.1.2.0
+
+**Short title:** the agenda reports its refresh times to the automatic updates of the web app.
+
+**Reason for the request:** event_webapp_plan 18.0.1.10.0 lists the refresh timers of the blocks at the bottom of the pages.
+
+**Changes:**
+
+- `views/webapp_templates.xml`: template `agenda_refresh_row`, the row "Agenda" (`agenda`) in the slot `webapp_slot_refresh`, on the home page with an agenda and on the page of a room with its block.
+- `static/src/webapp/agenda.js`: `ewp:refresh` when the program is asked and answered, and when a check of the clock changes the state of a session; the next one is the earliest of the next program request and the next start or end of a session; header comment.
+- `README.md`: the row.
+- `i18n/`: the new place of "Agenda".
+- `tests/test_controllers.py`: `test_automatic_updates_row`, `test_automatic_updates_count_to_the_next_session` (browser).
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:** the clock checks, the program requests and their interval do not change; the checks of every minute that change nothing do not count as an update.
+
+**Checks:** see the 18.0.1.10.0 entry of event_webapp_plan.
+
+**Action required:** update the module (`-u event_webapp_plan_track`).
+
 ## 18.0.1.1.0
 
 **Short title:** a session that starts plays a "speak" cameo near the agenda.

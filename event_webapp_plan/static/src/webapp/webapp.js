@@ -110,11 +110,33 @@
 //                       answer of the live route that changes them
 //     ewp:motion        {paused, mode, initial}: sent at start, then when
 //                       the mode or the system setting changes the state
+//     ewp:refresh      {id, state, last, next}: see "Automatic updates"
 //   The events of the start are sent after a zero delay, so a script loaded
 //   after this one in the same bundle receives them.
 //   The script listens to one event: ewp:announce {text}, dispatched on
 //   document by another script of the bundle, says `text` in the shared
 //   live region, with the same rule against repeats as its own messages.
+// - Automatic updates: each refresher of the page (raffles, live rooms,
+//   conference here; the scripts of other modules add theirs) reports its
+//   times with ewp:refresh on document, detail {id, state, last, next}:
+//   `id` names the row li[data-ewp-refresh] of the section #o_ewp_refresh;
+//   `state` is "running" (a request is planned at `next`), "busy" (a
+//   request is under way), "error" (the last request failed, the next one
+//   is at `next`) or "stopped" (no request any more); `last` is the time
+//   of the last successful answer, the page load at first; `next` the time
+//   of the next planned request (ms since the epoch). A detail carries only
+//   what changes: the fields it leaves out keep their value. The listener
+//   is set when this script is evaluated, so a report of a later script is
+//   never lost. The section and its rows ship hidden; a row shows with its
+//   first report, the section with its first row. While the tab is visible
+//   the rows are written again every 500 ms ("Updated X ago", "Next in
+//   Y"), from the translated patterns of data-ewp-refresh-texts; a hidden
+//   tab shows "paused" (every refresher waits for the tab to show again).
+//   Each row carries data-ewp-refresh-state (running, busy, error, stopped,
+//   paused) for the style. The section is not a live region: a countdown
+//   is never announced. The ids reported here: "raffles", "live" (live
+//   rooms) and "conference" (state of the conference of a room page; its
+//   `next` follows the doubled interval while the server fails).
 (function () {
     "use strict";
 
@@ -140,9 +162,45 @@
     // Element focused on the page loaded again by the conference block.
     const BBB_FOCUS_ID = "o_ewp_h_bbb";
     const MOTION_MODES = ["auto", "on", "off"];
+    // Period of the rewrite of the automatic updates rows: below a second,
+    // so the countdown never skips a number.
+    const REFRESH_RENDER_MS = 500;
+    const REFRESH_STATES = ["running", "busy", "error", "stopped"];
 
     function emit(name, detail) {
         document.dispatchEvent(new CustomEvent(name, {bubbles: true, detail}));
+    }
+
+    // Last report of each refresher id ({state, last, next}), kept from the
+    // evaluation of this script on; the board shows them once it exists.
+    const refreshReports = new Map();
+    let refreshBoard = null;
+
+    document.addEventListener("ewp:refresh", (ev) => {
+        const detail = ev.detail || {};
+        const id = typeof detail.id === "string" ? detail.id : "";
+        if (!id) {
+            return;
+        }
+        const report = refreshReports.get(id) || {state: "running", last: null, next: null};
+        if (REFRESH_STATES.includes(detail.state)) {
+            report.state = detail.state;
+        }
+        for (const key of ["last", "next"]) {
+            if (Object.prototype.hasOwnProperty.call(detail, key)) {
+                const value = detail[key] === null ? NaN : Number(detail[key]);
+                report[key] = Number.isFinite(value) ? value : null;
+            }
+        }
+        refreshReports.set(id, report);
+        if (refreshBoard) {
+            refreshBoard.render();
+        }
+    });
+
+    // Reporter of the refresher `id`: reporter(detail) sends ewp:refresh.
+    function refreshReporter(id) {
+        return (detail) => emit("ewp:refresh", {...detail, id});
     }
 
     // Loads the page again from the server. The address loses its fragment
@@ -529,6 +587,111 @@
         };
     }
 
+    // The section #o_ewp_refresh: one row per reported refresher, written
+    // from refreshReports. Returns {render} or null without the section.
+    function setupRefreshBoard(root) {
+        const section = root.querySelector("#o_ewp_refresh");
+        if (!section) {
+            return null;
+        }
+        let texts = {};
+        try {
+            texts = JSON.parse(section.dataset.ewpRefreshTexts || "{}") || {};
+        } catch {
+            texts = {};
+        }
+        let timer = null;
+
+        function fill(key, params = {}) {
+            return (texts[key] || "").replace(/%\((\w+)\)s/g, (match, name) =>
+                Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : match
+            );
+        }
+
+        // `ms` as "42 s" or "4 min 07 s", rounded up to the second, with
+        // no-break spaces: a delay never splits across two lines.
+        function delay(ms) {
+            const total = Math.max(0, Math.ceil(ms / 1000));
+            let text = fill("delay_seconds", {seconds: total});
+            if (total >= 60) {
+                text = fill("delay_minutes", {
+                    minutes: Math.floor(total / 60),
+                    seconds: String(total % 60).padStart(2, "0"),
+                });
+            }
+            return text.replace(/ /g, "\u00a0");
+        }
+
+        function age(ms) {
+            const seconds = Math.max(0, Math.floor(ms / 1000));
+            return seconds < 60
+                ? fill("updated_seconds", {seconds})
+                : fill("updated_minutes", {minutes: Math.floor(seconds / 60)});
+        }
+
+        function setText(el, text) {
+            if (el && el.textContent !== text) {
+                el.textContent = text;
+            }
+        }
+
+        // Text of the "next" cell of `report` in the shown `state`.
+        function nextText(report, state, now) {
+            if (state === "stopped" || state === "paused") {
+                return fill(state);
+            }
+            if (state === "busy" || (report.next !== null && report.next <= now)) {
+                return fill("busy");
+            }
+            if (report.next === null) {
+                return "";
+            }
+            return fill(state === "error" ? "retrying" : "next", {delay: delay(report.next - now)});
+        }
+
+        function render() {
+            const now = Date.now();
+            let shown = false;
+            for (const row of section.querySelectorAll("li[data-ewp-refresh]")) {
+                const report = refreshReports.get(row.dataset.ewpRefresh);
+                if (!report) {
+                    continue;
+                }
+                shown = true;
+                row.hidden = false;
+                // Every refresher waits while the tab is hidden.
+                const state = document.hidden && report.state !== "stopped" ? "paused" : report.state;
+                const last = row.querySelector(".o_ewp_refresh_last");
+                if (last) {
+                    setText(last, report.last === null ? "" : age(now - report.last));
+                    if (report.last === null) {
+                        last.removeAttribute("datetime");
+                    } else {
+                        last.setAttribute("datetime", new Date(report.last).toISOString());
+                    }
+                }
+                setText(row.querySelector(".o_ewp_refresh_next"), nextText(report, state, now));
+                if (row.dataset.ewpRefreshState !== state) {
+                    row.dataset.ewpRefreshState = state;
+                }
+            }
+            if (shown && section.hidden) {
+                section.hidden = false;
+            }
+            // Rewritten every REFRESH_RENDER_MS while the tab is visible,
+            // once when it hides (paused).
+            if (document.hidden || !shown) {
+                clearInterval(timer);
+                timer = null;
+            } else if (timer === null) {
+                timer = setInterval(render, REFRESH_RENDER_MS);
+            }
+        }
+
+        document.addEventListener("visibilitychange", render);
+        return {render};
+    }
+
     function setupRaffles(root, announcer) {
         const box = root.querySelector("[data-ewp-raffles-url]");
         if (!box || !window.fetch) {
@@ -553,6 +716,8 @@
         const age = root.querySelector("[data-ewp-label-seconds]");
         let updatedAt = Date.now();
         let ageTimer = null;
+        const report = refreshReporter("raffles");
+        report({state: "running", last: updatedAt});
 
         function showAge() {
             if (!age) {
@@ -649,6 +814,7 @@
         }
 
         function failed() {
+            report({state: "error"});
             failures += 1;
             if (failures >= MAX_RAFFLE_FAILURES) {
                 sayStale();
@@ -660,6 +826,7 @@
                 return;
             }
             busy = true;
+            report({state: "busy"});
             try {
                 const response = await fetch(url, {
                     credentials: "same-origin",
@@ -672,6 +839,7 @@
                     if (response.status === 403 || response.redirected) {
                         stopped = true;
                         clearTimeout(timer);
+                        report({state: "stopped", next: null});
                         sayStale();
                     } else {
                         failed();
@@ -682,6 +850,7 @@
                 failures = 0;
                 staleSaid = false;
                 updatedAt = Date.now();
+                report({state: "running", last: updatedAt});
                 showAge();
                 if (data && typeof data.html === "string" && data.signature !== signature) {
                     signature = data.signature;
@@ -712,6 +881,7 @@
                 await refresh();
                 schedule();
             }, POLL_INTERVAL_MS);
+            report({next: Date.now() + POLL_INTERVAL_MS});
         }
 
         document.addEventListener("visibilitychange", () => {
@@ -737,6 +907,8 @@
         let timer = null;
         let stopped = false;
         let interval = BBB_POLL_INTERVAL_MS;
+        const report = refreshReporter("conference");
+        report({state: "running", last: Date.now()});
 
         function backOff(failed) {
             interval = failed ? Math.min(interval * 2, BBB_POLL_MAX_MS) : BBB_POLL_INTERVAL_MS;
@@ -746,6 +918,7 @@
             if (stopped) {
                 return;
             }
+            report({state: "busy"});
             try {
                 const response = await fetch(url, {
                     credentials: "same-origin",
@@ -756,6 +929,9 @@
                 if (!response.ok || !type.includes("application/json")) {
                     if (response.status === 403 || response.redirected) {
                         stopped = true;
+                        report({state: "stopped", next: null});
+                    } else {
+                        report({state: "error"});
                     }
                     return;
                 }
@@ -779,9 +955,13 @@
                     return;
                 }
                 backOff(failed);
+                // An answer that says the server fails is a failure: the
+                // last update keeps its time, the interval doubles.
+                report(failed ? {state: "error"} : {state: "running", last: Date.now()});
             } catch {
                 // Network error: the next tick tries again, later.
                 backOff(true);
+                report({state: "error"});
             }
         }
 
@@ -794,6 +974,7 @@
                 await check();
                 schedule();
             }, interval);
+            report({next: Date.now() + interval});
         }
 
         document.addEventListener("visibilitychange", () => {
@@ -1023,6 +1204,7 @@
         let live = null;
         let timer = null;
         let stopped = false;
+        const report = refreshReporter("live");
 
         function mark(ids) {
             for (const el of root.querySelectorAll(
@@ -1057,6 +1239,7 @@
             if (stopped) {
                 return;
             }
+            report({state: "busy"});
             try {
                 const response = await fetch(url, {
                     credentials: "same-origin",
@@ -1067,10 +1250,14 @@
                 if (!response.ok || !type.includes("application/json")) {
                     if (response.status === 403 || response.redirected) {
                         stopped = true;
+                        report({state: "stopped", next: null});
+                    } else {
+                        report({state: "error"});
                     }
                     return;
                 }
                 const data = await response.json();
+                report({state: "running", last: Date.now()});
                 const ids = new Set(((data && data.live) || []).map(String));
                 const initial = live === null;
                 if (!initial && ids.size === live.size && [...ids].every((id) => live.has(id))) {
@@ -1084,6 +1271,7 @@
                 emit("ewp:rooms-live", {ids: [...ids], initial});
             } catch {
                 // Network error: the next tick tries again.
+                report({state: "error"});
             }
         }
 
@@ -1096,6 +1284,7 @@
                 await check();
                 schedule();
             }, LIVE_POLL_INTERVAL_MS);
+            report({next: Date.now() + LIVE_POLL_INTERVAL_MS});
         }
 
         document.addEventListener("visibilitychange", () => {
@@ -1125,6 +1314,10 @@
             return;
         }
         const announcer = createAnnouncer(root);
+        refreshBoard = setupRefreshBoard(root);
+        if (refreshBoard) {
+            refreshBoard.render();
+        }
         const motion = setupMotion(root);
         const day = setupDayState(root);
         const bbbState = conferenceState(root);

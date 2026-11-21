@@ -470,6 +470,91 @@ class TestAgendaControllers(HttpCase):
         page, _text = self._page(self._room_url(self.day, self.room_gamma))
         self.assertFalse(page.xpath("//section[@id='ewp_track_room']"))
 
+    def _refresh_rows(self, page):
+        """(id, label) of each row of the automatic updates of ``page``."""
+        return [
+            (
+                row.get("data-ewp-refresh"),
+                self._text(row.xpath(".//*[@class='o_ewp_refresh_label']")[0]),
+            )
+            for row in page.xpath(
+                "//section[@id='o_ewp_refresh']//li[@data-ewp-refresh]"
+            )
+        ]
+
+    def test_automatic_updates_row(self):
+        """The row "Agenda" of the automatic updates is on the home page and
+        on the page of a room with its block, not on a room without one;
+        in French too."""
+        self.authenticate("ewp_agenda_portal", "ewp_agenda_portal")
+        page, _text = self._page(self.home)
+        self.assertIn(("agenda", "Agenda"), self._refresh_rows(page))
+        page, _text = self._page(self._room_url(self.day, self.room_alpha))
+        self.assertIn(("agenda", "Agenda"), self._refresh_rows(page))
+        page, _text = self._page(self._room_url(self.day, self.room_gamma))
+        self.assertNotIn("agenda", dict(self._refresh_rows(page)))
+        self.env["res.lang"]._activate_lang("fr_CA")
+        for module in ("event_webapp_plan", "event_webapp_plan_track"):
+            self.env.ref(f"base.module_{module}")._update_translations(
+                ["fr_CA"]
+            )
+        self.portal_user.lang = "fr_CA"
+        self.authenticate("ewp_agenda_portal", "ewp_agenda_portal")
+        page, _text = self._page(self.home)
+        rows = self._refresh_rows(page)
+        self.assertIn(("agenda", "Agenda"), rows)
+        self.assertEqual(
+            page.xpath("//section[@id='o_ewp_refresh']/h2")[0].text_content(),
+            "Mises à jour automatiques",
+        )
+
+    def test_automatic_updates_count_to_the_next_session(self):
+        """In the browser, the row "Agenda" counts down to the start of the
+        next session when it comes before the next request of the program
+        (every 5 minutes)."""
+        self.env["event.track"].create(
+            {
+                "name": "Soon Agenda Talk",
+                "event_id": self.event.id,
+                "date": fields.Datetime.now() + timedelta(seconds=90),
+                "duration": 0.5,
+                "is_published": True,
+                "location_id": self.loc_alpha.id,
+            }
+        )
+        self.env.flush_all()
+        code = """(async () => {
+            const wait = async (fn, ms = 20000) => {
+                const start = Date.now();
+                while (Date.now() - start < ms) {
+                    const result = fn();
+                    if (result) {
+                        return result;
+                    }
+                    await new Promise((resolve) => setTimeout(resolve, 100));
+                }
+                throw new Error("timeout waiting for " + fn);
+            };
+            const row = await wait(() => {
+                const el = document.querySelector('#o_ewp_refresh li[data-ewp-refresh="agenda"]');
+                return el && !el.hidden && el;
+            });
+            const next = row.querySelector(".o_ewp_refresh_next");
+            const match = await wait(() => next.textContent.match(/^Next in (?:(\\d+)\\smin\\s)?(\\d+)\\ss$/));
+            const seconds = Number(match[1] || 0) * 60 + Number(match[2]);
+            if (seconds > 91 || seconds < 30) {
+                throw new Error("not the next session: " + next.textContent);
+            }
+            console.log("test successful");
+        })().catch((error) => console.error(error.message));
+        """
+        self.browser_js(
+            self.home,
+            code,
+            ready="document.readyState === 'complete'",
+            login="ewp_agenda_portal",
+        )
+
     def test_text_only_mode_keeps_the_agenda(self):
         self.portal_user.ewp_text_only = True
         self.authenticate("ewp_agenda_portal", "ewp_agenda_portal")

@@ -60,6 +60,7 @@ msgstr ""
 #. module: event_webapp_plan_track
 #: model:ir.model.fields,field_description:event_webapp_plan_track.field_event_webapp__track_ids
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan_track.agenda_card
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_track.agenda_refresh_row
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan_track.event_webapp_view_form
 msgid "Agenda"
 msgstr "Agenda"

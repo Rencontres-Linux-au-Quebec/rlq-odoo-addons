@@ -53,6 +53,17 @@ msgid "<span class=\"o_ewp_sr_only\">Token category:</span>"
 msgstr "<span class=\"o_ewp_sr_only\">Catégorie de jeton :</span>"
 
 #. module: event_webapp_plan_raffle
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.res_config_settings_view_form
+msgid ""
+"Attendees tell the organizers that they are at the event. For information "
+"only: the attendance of the raffles comes from the check-in scan at the "
+"welcome desk."
+msgstr ""
+"Les personnes inscrites disent aux organisateurs qu'elles sont à "
+"l'événement. À titre d'information seulement : la présence aux tirages "
+"vient de la lecture du billet à l'accueil."
+
+#. module: event_webapp_plan_raffle
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_content
 msgid "Choose my prize"
 msgstr "Choisir mon prix"
@@ -62,6 +73,11 @@ msgstr "Choisir mon prix"
 #: code:addons/event_webapp_plan_raffle/controllers/main.py:0
 msgid "Choose your prize before %(time)s."
 msgstr "Choisissez votre prix avant %(time)s."
+
+#. module: event_webapp_plan_raffle
+#: model:ir.model,name:event_webapp_plan_raffle.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
 
 #. module: event_webapp_plan_raffle
 #. odoo-python
@@ -92,12 +108,18 @@ msgid "Event Web App Day"
 msgstr "Journée de l'application web d'événement"
 
 #. module: event_webapp_plan_raffle
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.res_config_settings_view_form
+msgid "Home page"
+msgstr "Page d'accueil"
+
+#. module: event_webapp_plan_raffle
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.presence_content
 msgid "I am on site"
 msgstr "Je suis sur place"
 
 #. module: event_webapp_plan_raffle
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_content
+#: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_refresh_row
 msgid "My prize"
 msgstr "Mon prix"
 
@@ -105,6 +127,11 @@ msgstr "Mon prix"
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.presence_card
 msgid "On site"
 msgstr "Sur place"
+
+#. module: event_webapp_plan_raffle
+#: model:ir.model.fields,field_description:event_webapp_plan_raffle.field_res_config_settings__ewp_onsite_card
+msgid "On-site card"
+msgstr "Carte « Sur place »"
 
 #. module: event_webapp_plan_raffle
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_content
@@ -120,6 +147,20 @@ msgstr "Tir du tirage"
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.prize_content
 msgid "Save the public name"
 msgstr "Enregistrer le nom public"
+
+#. module: event_webapp_plan_raffle
+#: model:ir.model.fields,help:event_webapp_plan_raffle.field_res_config_settings__ewp_onsite_card
+msgid ""
+"Shows the \"On site\" card on the home page of the web app: an attendee "
+"tells the organizers that they are at the event. For information only: the "
+"attendance of the raffles comes from the check-in scan. Turned off, the card "
+"and its route are gone and the declared attendance already saved is kept."
+msgstr ""
+"Affiche la carte « Sur place » sur la page d'accueil de l'application web : "
+"une personne inscrite dit aux organisateurs qu'elle est à l'événement. À titre "
+"d'information seulement : la présence aux tirages vient de la lecture du "
+"billet à l'accueil. Désactivée, la carte et sa route disparaissent et la "
+"présence déjà déclarée est conservée."
 
 #. module: event_webapp_plan_raffle
 #: model_terms:ir.ui.view,arch_db:event_webapp_plan_raffle.presence_content

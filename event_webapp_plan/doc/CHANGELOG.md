@@ -1,5 +1,75 @@
 # Changelog - event_webapp_plan
 
+## 18.0.1.12.0
+
+**Short title:** raffles of the day pre-filled from the planned date of each raffle or the dates of its event.
+
+**Reason for the request:** adding an event to a day did not add its raffles, each one was listed by hand. Listing every raffle of the event instead would bring the raffles of the other days of a multi-day event, and their winners, into the web app.
+
+**Changes:**
+
+- `models/event_webapp.py`: `raffle_fits_day()`: a non-test raffle of a listed event fits a day when its planned date (`event_raffle`, `date_planned`) falls inside the window, bounds included, or, without planned date, when its event begins and ends inside the window. `create()` and `write()` (on `event_ids`, `date_start`, `date_end`) add, as the current user, the raffles that start to fit, found as superuser and kept when the user may read them; a raffle the same write takes off stays off. `copy()` keeps the raffle list of the original (context key `ewp_no_raffle_fill`). Onchange `_onchange_ewp_raffle_ids()` shows the additions before saving; the non-stored field `ewp_raffle_proposed_ids` remembers them in the form, so a raffle removed by hand is neither proposed again in the same edit nor added back on save. Help of `raffle_ids`.
+- `models/event_raffle.py` (new): `create()` and `write()` (on `date_planned`, `event_id`, `is_test`) link the raffle, as superuser, to the days, archived ones included, that it starts to fit.
+- `views/event_webapp_views.xml`: hint above the raffle list of the day form, column **Planned Date** in the raffle lists of the day and of the selection dialog.
+- `i18n/fr.po`, `i18n/event_webapp_plan.pot`: the new texts.
+- `README.md`: Configuration, raffles of the day.
+- Tests: `test_raffle_fill.py` (new).
+
+**Safeguards and edge cases:**
+
+- Additions only: nothing leaves a day automatically. A raffle removed by hand comes back only when it stops fitting and fits again (a new event, a new window, a new planned date on another day).
+- A test raffle never joins; a test raffle turned real joins the days it fits.
+- A change of the dates of an event adds nothing: the pre-fill follows the day and the raffle only.
+- The raffle side writes as superuser because the user who saves a raffle seldom may write the days; it only adds that raffle to days that already list its event.
+
+**Checks:** full suite of event_webapp_plan, event_webapp_plan_raffle, event_webapp_plan_track, rlq_event_webapp_plan and event_raffle on a fresh database (browser tests skipped without selenium); each new test fails without the pre-fill; `msgfmt -c` on the catalogues.
+
+**Action required:** update `event_raffle` and the module (`-u event_raffle,event_webapp_plan`). The raffle lists of the existing days do not change: the pre-fill runs at the next change of a day or of a raffle.
+
+## 18.0.1.11.0
+
+**Short title:** short address `/w` of the web app.
+
+**Reason for the request:** `/webapp_event` is long to type and to say on a poster or out loud; a short address leads to the same pages.
+
+**Changes:**
+
+- `controllers/main.py`: `SHORT_ROOT` and the route `webapp_short()`: `/w` and `/w/<day>` (GET, `auth="public"`) answer a 302 redirect to `/webapp_event` and `/webapp_event/<day>`, the query string kept as is; module docstring.
+- `README.md`: the short address.
+- Tests: `test_controllers.py` (`test_short_address_redirects_to_the_web_app`).
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:** the route reads nothing and checks nothing: the target route sends an anonymous visitor to the login page and back to `/webapp_event`, and checks the day (404, closed page). No route of Odoo 18 or of the addons of the checkout uses `/w`.
+
+**Checks:** full suite of event_webapp_plan, event_webapp_plan_raffle, event_webapp_plan_track and rlq_event_webapp_plan on a fresh database (browser tests skipped without selenium); the new test fails without the route.
+
+**Action required:** restart the server; nothing to update in the database.
+
+## 18.0.1.10.0
+
+**Short title:** "Automatic updates" section: the refresh timers of the blocks at the bottom of the home and room pages.
+
+**Reason for the request:** the blocks of the pages refresh by themselves at different rates (raffles, live rooms, conference), and nothing told the visitor when the data on screen was fetched or when it would be fetched again.
+
+**Changes:**
+
+- `views/webapp_templates.xml`: template `webapp_refresh`, the section `#o_ewp_refresh` ("Automatic updates", `h2`) called by the layout of the home and room pages just above the display options, hidden with its rows; rows `raffles`, `live` and `conference`; template `webapp_refresh_row` (one row: label, `time.o_ewp_refresh_last`, `.o_ewp_refresh_next`); slot `webapp_slot_refresh` for the rows of other modules; header comment.
+- `controllers/main.py`: `_ewp_refresh_texts()`, the translated patterns of the rows, in `refresh_texts_json` of every page.
+- `static/src/webapp/webapp.js`: the event `ewp:refresh` `{id, state, last, next}`, listened to as soon as the script is evaluated; `setupRefreshBoard()` writes the rows every 500 ms while the tab is visible, "paused" while it is hidden; the raffle, live room and conference refreshers report when they plan, send and get a request (the conference reports the doubled interval of a failing server); delays written with no-break spaces, so "1 min 19 s" never splits; header comment.
+- `static/src/webapp/webapp.scss`: the section, a grid of cells with tabular digits that keep one line each, empty or not: below 640 px the label, the last answer and the next request on three lines of the full width, from 640 px on one line, so neither the first answer nor the countdown moves the row or the display options below it; a failed or stopped refresh in the warm colour beside its words.
+- `README.md`: the section, the slot `webapp_slot_refresh` and the event `ewp:refresh` in Theming.
+- `i18n/fr.po`, `i18n/event_webapp_plan.pot`: the new texts.
+- Tests: `test_controllers.py` (`test_automatic_updates_section`, `test_automatic_updates_in_french`), `test_bbb.py` (`test_automatic_updates_rows_of_the_conference`), `test_browser.py` (`test_automatic_updates_count_down`, `test_automatic_updates_keep_their_lines`).
+
+**Bugs fixed:** none.
+
+**Safeguards and edge cases:** no interval, request or pause changes: the refreshers only report their times; the label "Updated ... ago" of the raffle card stays. Without script, or for a block that does not poll (a running meeting in the frame), no row shows. The section is not a live region: the countdown is never announced. A row whose id has no element in the page is ignored, a report of an unknown state keeps the previous one.
+
+**Checks:** suites of `event_webapp_plan`, `event_webapp_plan_raffle`, `event_webapp_plan_track` and `rlq_event_webapp_plan` on a fresh database, 187 tests, 0 failed, axe-core included (the Selenium classes skip without selenium in the Odoo environment); the 10 new tests fail without the change; pages checked in a browser in French, light and dark, at 1280 px and 390 px, rows measured from 320 to 1280 px (no horizontal scroll).
+
+**Action required:** update the module (`-u event_webapp_plan`).
+
 ## 18.0.1.9.0
 
 **Short title:** security: BBB secret and meeting choice reserved to the Settings group, room channel access locked, room groups taken back from former moderators.

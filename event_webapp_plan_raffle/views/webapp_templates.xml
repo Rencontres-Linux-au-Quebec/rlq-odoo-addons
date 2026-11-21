@@ -20,13 +20,17 @@
       sentence the live region says when the state changes.
     - "On site" (#ewp_presence, after the other cards: priority 20): a
       toggle button (aria-pressed), for the users registered to an event of
-      the day; information only.
+      the day; information only. The controller gives no presence value
+      while the setting "On-site card" is off: the block is not rendered.
 
     Both forms post with the CSRF token and work without script.
 
     The raffle block of event_webapp_plan gets the status of each prize in
     data-ewp-prize-status (chosen, to_choose, declined, expired), beside
     the text that says it.
+
+    The automatic updates of the home page get the row "My prize"
+    (id my_prize, reported by prize.js) wherever the card can poll.
 -->
 <odoo>
     <!-- The "My prize" card, nothing without a draw; rendered again by
@@ -104,6 +108,16 @@
                  t-att-data-ewp-signature="prize_signature">
                 <t t-call="event_webapp_plan_raffle.prize_content"/>
             </div>
+        </xpath>
+    </template>
+
+    <template id="prize_refresh_row" inherit_id="event_webapp_plan.webapp_slot_refresh" priority="8"
+              name="Event web app raffle: my prize automatic update">
+        <xpath expr="." position="inside">
+            <t t-if="ewp_page == 'home' and prize_url" t-call="event_webapp_plan.webapp_refresh_row">
+                <t t-set="refresh_id" t-value="'my_prize'"/>
+                My prize
+            </t>
         </xpath>
     </template>
 

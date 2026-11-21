@@ -3,7 +3,9 @@
 from unittest.mock import patch
 
 from lxml import etree
+
 from odoo.exceptions import AccessError, UserError
+from odoo.tests import Form
 from odoo.tests.common import TransactionCase, new_test_user
 
 DEFAULT_EN = "You won a prize, come and claim it! {link}"
@@ -248,6 +250,122 @@ class TestRaffleDrawNotify(TransactionCase):
         self._send(draw)
         self.assertTrue(draw.is_absent)
         self.assertEqual(draw.notification_count, 1)
+
+    # Forced delivery method
+
+    def _winner_chats(self, partner):
+        return self.env["discuss.channel"].search(
+            [
+                ("channel_type", "=", "chat"),
+                ("channel_member_ids.partner_id", "=", partner.id),
+            ]
+        )
+
+    def test_the_default_method_follows_the_winner(self):
+        cases = [
+            (self.internal_winner.partner_id, "chat"),
+            (self.portal_winner.partner_id, "email"),
+            (self.contact, "email"),
+        ]
+        for partner, method in cases:
+            wizard = self._wizard(self._draw(partner))
+            self.assertEqual(wizard.delivery_method, method)
+            self.assertEqual(wizard.delivery, method)
+            self.assertTrue(wizard.delivery_ok)
+        nobody = self.env["res.partner"].create({"name": "Nobody"})
+        wizard = self._wizard(self._draw(nobody))
+        self.assertFalse(wizard.delivery_method)
+        self.assertEqual(wizard.delivery, "none")
+        self.assertFalse(wizard.delivery_ok)
+
+    def test_an_internal_winner_can_be_notified_by_email(self):
+        winner = self.internal_winner.partner_id
+        draw = self._draw(winner)
+        wizard = self._wizard(draw, delivery_method="email")
+        self.assertEqual(wizard.delivery, "email")
+        self.assertTrue(wizard.delivery_ok)
+        self.assertEqual(
+            wizard.recipient, "Internal Winner <internal.winner@example.com>"
+        )
+        wizard.action_send()
+        notif = draw.notification_ids
+        self.assertEqual(notif.channel, "email")
+        self.assertFalse(notif.discuss_channel_id)
+        self.assertEqual(notif.mail_id.recipient_ids, winner)
+        self.assertIn(SENT_EN, notif.mail_id.body_html)
+        self.assertEqual(notif.message_id, notif.mail_id.mail_message_id)
+        self.assertFalse(self._winner_chats(winner))
+        self.assertIn(
+            "Notification sent by email by OdooBot.",
+            draw.message_ids.mapped("body")[0],
+        )
+
+    def test_the_form_switches_an_internal_winner_to_email(self):
+        draw = self._draw(self.internal_winner.partner_id)
+        Wizard = self.env["event.raffle.draw.notify.wizard"].with_user(
+            self.organizer
+        )
+        form = Form(Wizard.with_context(default_draw_id=draw.id))
+        self.assertEqual(form.delivery_method, "chat")
+        form.delivery_method = "email"
+        self.assertEqual(form.delivery, "email")
+        wizard = form.save()
+        self.assertEqual(wizard.delivery_method, "email")
+        wizard.action_send()
+        self.assertEqual(draw.notification_ids.channel, "email")
+
+    def test_a_portal_winner_cannot_be_forced_to_chat(self):
+        winner = self.portal_winner.partner_id
+        draw = self._draw(winner)
+        wizard = self._wizard(draw, delivery_method="chat")
+        self.assertEqual(wizard.delivery, "chat")
+        self.assertFalse(wizard.delivery_ok)
+        self.assertIn("a chat cannot reach them", wizard.delivery_info)
+        with self.assertRaisesRegex(UserError, "a chat cannot reach them"):
+            wizard.action_send()
+        self.assertFalse(draw.notification_ids)
+        self.assertFalse(self._winner_chats(winner))
+
+    def test_email_cannot_be_forced_without_an_address(self):
+        self.internal_winner.partner_id.email = False
+        draw = self._draw(self.internal_winner.partner_id)
+        wizard = self._wizard(draw, delivery_method="email")
+        self.assertFalse(wizard.delivery_ok)
+        self.assertIn("no email address", wizard.delivery_info)
+        with self.assertRaisesRegex(UserError, "no email address"):
+            wizard.action_send()
+        self.assertFalse(draw.notification_ids)
+
+    def test_the_draw_address_allows_email_to_an_internal_winner(self):
+        # The email typed on the draw is used when the contact has none.
+        self.internal_winner.partner_id.email = False
+        draw = self._draw(
+            self.internal_winner.partner_id,
+            winner_email="desk.copy@example.com",
+        )
+        notif = self._send(draw, delivery_method="email")
+        self.assertEqual(notif.channel, "email")
+        self.assertEqual(notif.mail_id.email_to, "desk.copy@example.com")
+        self.assertEqual(
+            notif.recipient, "Internal Winner <desk.copy@example.com>"
+        )
+
+    def test_the_chosen_and_used_methods_have_distinct_labels(self):
+        # Two fields of a model with one label log a warning at each
+        # registry load and look alike in field pickers. The form still
+        # titles the "none" state Delivery, like the chosen method.
+        Wizard = self.env["event.raffle.draw.notify.wizard"]
+        labels = {}
+        for name, field in Wizard._fields.items():
+            labels.setdefault(field.string, []).append(name)
+        shared = {k: v for k, v in labels.items() if len(v) > 1}
+        self.assertFalse(shared)
+        view = self.env.ref(
+            "event_raffle.event_raffle_draw_notify_wizard_form"
+        )
+        arch = etree.fromstring(Wizard.get_view(view.id, "form")["arch"])
+        field = arch.xpath("//field[@name='delivery']")[0]
+        self.assertEqual(field.get("string"), "Delivery")
 
     # Access
 

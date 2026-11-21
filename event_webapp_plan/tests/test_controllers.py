@@ -214,6 +214,43 @@ class TestWebappControllers(HttpCase):
         redirect = parse_qs(location.query).get("redirect", [""])[0]
         self.assertTrue(redirect.startswith("/webapp_event"), redirect)
 
+    def test_short_address_redirects_to_the_web_app(self):
+        # Anonymous: /w sends to /webapp_event, which sends to the login
+        # page; the query string goes along unchanged.
+        self.authenticate(None, None)
+        for url, target in (
+            ("/w", "/webapp_event"),
+            ("/w?lang=fr_CA&a=x%20y", "/webapp_event?lang=fr_CA&a=x%20y"),
+            (
+                f"/w/{self.day_open.id}",
+                f"/webapp_event/{self.day_open.id}",
+            ),
+            (
+                f"/w/{self.day_open.id}?from=poster",
+                f"/webapp_event/{self.day_open.id}?from=poster",
+            ),
+        ):
+            response = self._get(url)
+            self.assertEqual(response.status_code, 302, url)
+            location = urlparse(response.headers["Location"])
+            self.assertEqual(
+                location.path
+                + ("?" + location.query if location.query else ""),
+                target,
+                url,
+            )
+        response = self._get("/webapp_event")
+        self.assertEqual(
+            urlparse(response.headers["Location"]).path, "/web/login"
+        )
+        # Logged in: the redirect is the same and the target page shows.
+        self.authenticate("ewp_webapp_portal", "ewp_webapp_portal")
+        response = self._get(f"/w/{self.day_open.id}")
+        self.assertEqual(response.status_code, 302)
+        response = self._get(response.headers["Location"])
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Open Test Day", response.text)
+
     def test_portal_inside_window_sees_rooms(self):
         self.authenticate("ewp_webapp_portal", "ewp_webapp_portal")
         response = self._get("/webapp_event")
@@ -677,6 +714,100 @@ class TestWebappControllers(HttpCase):
         )
         # The page language follows the user's.
         self.assertEqual(page.xpath("//html/@lang"), ["fr-CA"])
+
+    def _refresh_section(self, page):
+        """The section "Automatic updates" of `page`, or None."""
+        sections = page.xpath("//section[@id='o_ewp_refresh']")
+        self.assertLessEqual(len(sections), 1)
+        return sections[0] if sections else None
+
+    def _refresh_rows(self, section):
+        """(id, label) of each row of this module in the automatic updates
+        (the bridge modules, when installed, add theirs)."""
+        return [
+            (
+                row.get("data-ewp-refresh"),
+                " ".join(
+                    row.xpath(".//*[@class='o_ewp_refresh_label']")[0]
+                    .text_content()
+                    .split()
+                ),
+            )
+            for row in section.xpath(".//li[@data-ewp-refresh]")
+            if row.get("data-ewp-refresh") in ("raffles", "live", "conference")
+        ]
+
+    def test_automatic_updates_section(self):
+        """The home and room pages hold the section "Automatic updates"
+        just above the display options, hidden with each of its rows until
+        the page script reports; it is a labelled section, not a live
+        region. The home page has the raffle row; the closed page has no
+        section."""
+        self.authenticate("ewp_webapp_portal", "ewp_webapp_portal")
+        page = lxml_html.fromstring(
+            self._get("/webapp_event/%s" % self.day_open.id).text
+        )
+        section = self._refresh_section(page)
+        self.assertIsNotNone(section)
+        self.assertEqual(section.get("hidden"), "hidden")
+        self.assertEqual(section.getnext().get("id"), "o_ewp_prefs")
+        self.assertIsNone(section.get("aria-live"))
+        self.assertIsNone(section.get("role"))
+        heading = page.xpath("//*[@id='%s']" % section.get("aria-labelledby"))
+        self.assertEqual(heading[0].tag, "h2")
+        self.assertEqual(heading[0].text_content(), "Automatic updates")
+        self.assertEqual(self._refresh_rows(section), [("raffles", "Raffles")])
+        row = section.xpath(".//li[@data-ewp-refresh='raffles']")[0]
+        self.assertEqual(row.get("hidden"), "hidden")
+        self.assertTrue(row.xpath(".//time[@class='o_ewp_refresh_last']"))
+        self.assertTrue(row.xpath(".//span[@class='o_ewp_refresh_next']"))
+        texts = json.loads(section.get("data-ewp-refresh-texts"))
+        self.assertEqual(texts["updated_seconds"], "Updated %(seconds)s s ago")
+        self.assertEqual(texts["next"], "Next in %(delay)s")
+        self.assertEqual(texts["retrying"], "Failed, retrying in %(delay)s")
+        self.assertEqual(texts["paused"], "Paused while the page is hidden")
+        self.assertEqual(
+            texts["delay_minutes"], "%(minutes)s min %(seconds)s s"
+        )
+        # A room without conference: the section, no row of this module.
+        page = lxml_html.fromstring(
+            self._get(self._room_url(self.day_open, self.room_alpha)).text
+        )
+        self.assertEqual(self._refresh_rows(self._refresh_section(page)), [])
+        page = lxml_html.fromstring(
+            self._get("/webapp_event/%s" % self.day_ended.id).text
+        )
+        self.assertIsNone(self._refresh_section(page))
+
+    def test_automatic_updates_in_french(self):
+        self.env["res.lang"]._activate_lang("fr_CA")
+        self.env.ref("base.module_event_webapp_plan")._update_translations(
+            ["fr_CA"]
+        )
+        self.portal_user.lang = "fr_CA"
+        self.authenticate("ewp_webapp_portal", "ewp_webapp_portal")
+        page = lxml_html.fromstring(
+            self._get("/webapp_event/%s" % self.day_open.id).text
+        )
+        section = self._refresh_section(page)
+        self.assertEqual(
+            section.xpath(".//h2")[0].text_content(),
+            "Mises à jour automatiques",
+        )
+        self.assertEqual(self._refresh_rows(section), [("raffles", "Tirages")])
+        texts = json.loads(section.get("data-ewp-refresh-texts"))
+        self.assertEqual(
+            texts["updated_seconds"], "Mis à jour il y a %(seconds)s s"
+        )
+        self.assertEqual(texts["next"], "Prochaine dans %(delay)s")
+        self.assertEqual(
+            texts["retrying"], "Échec, nouvel essai dans %(delay)s"
+        )
+        self.assertEqual(texts["busy"], "Mise à jour en cours")
+        self.assertEqual(
+            texts["paused"], "En pause tant que la page est cachée"
+        )
+        self.assertEqual(texts["stopped"], "Arrêtée, rechargez la page")
 
     def test_pwa_files_are_public(self):
         self.authenticate(None, None)

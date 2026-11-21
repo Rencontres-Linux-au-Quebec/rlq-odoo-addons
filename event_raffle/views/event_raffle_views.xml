@@ -7,6 +7,7 @@
             <list string="Raffles" decoration-warning="is_test">
                 <field name="name" />
                 <field name="event_id" />
+                <field name="date_planned" optional="show" />
                 <field name="participant_count" />
                 <field name="draw_count" />
                 <field name="state" />
@@ -47,6 +48,7 @@
                     </div>
                     <group>
                         <field name="event_id" />
+                        <field name="date_planned" />
                         <field name="company_id" groups="base.group_multi_company" />
                     </group>
                     <field name="context_note" placeholder="Context..." />

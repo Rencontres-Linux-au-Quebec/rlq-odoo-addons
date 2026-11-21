@@ -24,6 +24,9 @@
     changes. The element carrying data-ewp-agenda-url holds the data of
     the script: the sessions (JSON), the translated messages and the
     signature of the program.
+
+    webapp_slot_refresh: the row "Agenda" of the automatic updates (id
+    agenda, reported by agenda.js), on the pages that hold the agenda.
 -->
 <odoo>
     <!-- Title of a session and its two badges, one shown at most. -->
@@ -118,6 +121,17 @@
                     <t t-call="event_webapp_plan_track.agenda_content"/>
                 </div>
             </section>
+        </xpath>
+    </template>
+
+    <template id="agenda_refresh_row" inherit_id="event_webapp_plan.webapp_slot_refresh"
+              name="Event web app agenda: automatic update">
+        <xpath expr="." position="inside">
+            <t t-if="(ewp_page == 'home' and agenda_sessions) or (ewp_page == 'room' and agenda_room)"
+               t-call="event_webapp_plan.webapp_refresh_row">
+                <t t-set="refresh_id" t-value="'agenda'"/>
+                Agenda
+            </t>
         </xpath>
     </template>
 

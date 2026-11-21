@@ -4,6 +4,23 @@
     "name": "Event Raffle Prizes (Prix de tirage)",
     "version": "18.0.1.2.0",
     "summary": "Prize catalogue, stock and assisted prize claims for raffles",
+    "description": """
+English
+
+A catalogue of sponsored prizes with a real inventory, token categories
+Prize Group A to F, and an assisted prize claim for each winner: one token
+of the draw's category takes one prize of that category. A claim log keeps
+declines and expiries, and a draw, raffle or event holding a prize cannot be
+deleted. Details: README.md of the module.
+
+Français
+
+Un catalogue de prix commandités avec un vrai inventaire, des catégories
+de jeton Groupe de prix A à F, et une attribution assistée pour chaque
+gagnant : un jeton de la catégorie du tir prend un prix de cette catégorie.
+Un journal garde refus et expirations, et un tir, tirage ou événement qui
+tient un prix ne peut pas être supprimé. Détails : README.md du module.
+""",
     "author": "TechnoLibre",
     "website": "https://technolibre.ca",
     "category": "Marketing/Events",

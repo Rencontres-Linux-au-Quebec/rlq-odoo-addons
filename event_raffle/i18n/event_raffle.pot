@@ -122,6 +122,7 @@ msgstr ""
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__announce_channel_auto
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_announce_channel_auto
+#: model:ir.model.fields,field_description:event_raffle.field_res_config_settings__raffle_default_announce_channel_auto
 msgid "Announce Each Draw in a Channel"
 msgstr ""
 
@@ -160,24 +161,26 @@ msgid "Candles (Tux dances)"
 msgstr ""
 
 #. module: event_raffle
-#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
+#: model_terms:ir.ui.view,arch_db:event_raffle.res_config_settings_view_form
 msgid "Celebration & Animation"
 msgstr ""
 
 #. module: event_raffle
-#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
 #: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_view_form
+#: model_terms:ir.ui.view,arch_db:event_raffle.res_config_settings_view_form
 msgid "Channel Announcement"
 msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__announce_channel_message
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_announce_channel_message
+#: model:ir.model.fields,field_description:event_raffle.field_res_config_settings__raffle_default_announce_channel_message
 msgid "Channel Message"
 msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,help:event_raffle.field_event_raffle_config__default_announce_channel_message
+#: model:ir.model.fields,help:event_raffle.field_res_config_settings__raffle_default_announce_channel_message
 msgid ""
 "Channel message of each new raffle. Empty, a new raffle gets the standard "
 "message, in the language of the user who creates it. {winner} or {gagnant} "
@@ -196,6 +199,7 @@ msgstr ""
 #. module: event_raffle
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notification__channel__chat
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notify_wizard__delivery__chat
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notify_wizard__delivery_method__chat
 msgid "Chat"
 msgstr ""
 
@@ -203,6 +207,14 @@ msgstr ""
 #: model:ir.model.fields,help:event_raffle.field_event_raffle_draw_notification__message_id
 msgid ""
 "Chat message posted in Discuss, or the message behind the queued email."
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle_draw_notify_wizard__delivery_method
+msgid ""
+"Chat: a private chat in Discuss, which only reaches a winner with an active "
+"internal user account. Email: the email of the winner contact, else the "
+"email typed on the draw."
 msgstr ""
 
 #. module: event_raffle
@@ -236,6 +248,11 @@ msgstr ""
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__winner_celebration__confetti
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_winner_celebration__confetti
 msgid "Confetti cannon"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model,name:event_raffle.model_res_config_settings
+msgid "Config Settings"
 msgstr ""
 
 #. module: event_raffle
@@ -311,80 +328,91 @@ msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_belly_logo
+#: model:ir.model.fields,field_description:event_raffle.field_res_config_settings__raffle_default_belly_logo
 msgid "Default Belly Logo"
 msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_flag_text
+#: model:ir.model.fields,field_description:event_raffle.field_res_config_settings__raffle_default_flag_text
 msgid "Default Flag Text"
 msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_pointer_angle
+#: model:ir.model.fields,field_description:event_raffle.field_res_config_settings__raffle_default_pointer_angle
 msgid "Default Pointer Angle"
 msgstr ""
 
 #. module: event_raffle
-#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
-msgid "Default Raffle Settings"
-msgstr ""
-
-#. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_remove_winner
+#: model:ir.model.fields,field_description:event_raffle.field_res_config_settings__raffle_default_remove_winner
 msgid "Default Remove Winner"
 msgstr ""
 
 #. module: event_raffle
 #. odoo-python
 #: code:addons/event_raffle/models/event_raffle_config.py:0
-#: model:ir.actions.act_window,name:event_raffle.action_event_raffle_config
 msgid "Default Settings"
 msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_show_fireworks
+#: model:ir.model.fields,field_description:event_raffle.field_res_config_settings__raffle_default_show_fireworks
 msgid "Default Show Fireworks"
 msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_show_tux
+#: model:ir.model.fields,field_description:event_raffle.field_res_config_settings__raffle_default_show_tux
 msgid "Default Show Penguin (Tux)"
 msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_spin_duration
+#: model:ir.model.fields,field_description:event_raffle.field_res_config_settings__raffle_default_spin_duration
 msgid "Default Spin Duration (s)"
 msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_spin_turns
+#: model:ir.model.fields,field_description:event_raffle.field_res_config_settings__raffle_default_spin_turns
 msgid "Default Spin Turns"
 msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_theme
+#: model:ir.model.fields,field_description:event_raffle.field_res_config_settings__raffle_default_theme
 msgid "Default Theme"
 msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_tux_animation
+#: model:ir.model.fields,field_description:event_raffle.field_res_config_settings__raffle_default_tux_animation
 msgid "Default Tux Animation"
 msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_winner_celebration
+#: model:ir.model.fields,field_description:event_raffle.field_res_config_settings__raffle_default_winner_celebration
 msgid "Default Winner Celebration"
 msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__channel
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__delivery
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__delivery_method
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_draw_notify_wizard_form
 msgid "Delivery"
 msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__delivery_info
 msgid "Delivery Info"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__delivery
+msgid "Delivery Used"
 msgstr ""
 
 #. module: event_raffle
@@ -402,11 +430,13 @@ msgstr ""
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__announce_channel_id
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_announce_channel_id
+#: model:ir.model.fields,field_description:event_raffle.field_res_config_settings__raffle_default_announce_channel_id
 msgid "Discussion Channel"
 msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,help:event_raffle.field_event_raffle_config__default_announce_channel_id
+#: model:ir.model.fields,help:event_raffle.field_res_config_settings__raffle_default_announce_channel_id
 msgid ""
 "Discussion channel of each new raffle, channel or group chat of Discuss. A "
 "channel archived or deleted since is not given to the new raffles."
@@ -454,7 +484,7 @@ msgstr ""
 #. module: event_raffle
 #. odoo-python
 #: code:addons/event_raffle/models/event_raffle.py:0
-#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
+#: model_terms:ir.ui.view,arch_db:event_raffle.res_config_settings_view_form
 msgid "Draw #{number}: {winner} won! ({prize}) {link}"
 msgstr ""
 
@@ -488,6 +518,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_participant__email
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notification__channel__email
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notify_wizard__delivery__email
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notify_wizard__delivery_method__email
 msgid "Email"
 msgstr ""
 
@@ -750,7 +781,7 @@ msgstr ""
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__message_ids
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__message_ids
-#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
+#: model_terms:ir.ui.view,arch_db:event_raffle.res_config_settings_view_form
 msgid "Messages"
 msgstr ""
 
@@ -831,11 +862,13 @@ msgstr ""
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__notify_winner_message
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_notify_winner_message
+#: model:ir.model.fields,field_description:event_raffle.field_res_config_settings__raffle_default_notify_winner_message
 msgid "Notification Message"
 msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,help:event_raffle.field_event_raffle_config__default_notify_winner_message
+#: model:ir.model.fields,help:event_raffle.field_res_config_settings__raffle_default_notify_winner_message
 msgid ""
 "Notification message of each new raffle. Empty, a new raffle gets the "
 "standard message, in the language of the user who creates it. It takes the "
@@ -892,6 +925,7 @@ msgstr ""
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle__notify_winner_auto
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_config__default_notify_winner_auto
+#: model:ir.model.fields,field_description:event_raffle.field_res_config_settings__raffle_default_notify_winner_auto
 msgid "Notify the Winner Automatically"
 msgstr ""
 
@@ -954,6 +988,11 @@ msgid ""
 "{number} or {numéro}, {raffle} or {tirage}, {prize} or {prix}, and {link} or"
 " {lien}, the prize link when the draw has one. A placeholder without a value"
 " disappears."
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle__date_planned
+msgid "Planned Date"
 msgstr ""
 
 #. module: event_raffle
@@ -1051,6 +1090,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_participant__raffle_id
 #: model:ir.ui.menu,name:event_raffle.menu_event_raffle_root
 #: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_view_form
+#: model_terms:ir.ui.view,arch_db:event_raffle.res_config_settings_view_form
 msgid "Raffle"
 msgstr ""
 
@@ -1058,6 +1098,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/event_raffle/wizard/event_raffle_start_wizard.py:0
 msgid "Raffle - %s"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_res_config_settings__raffle_config_id
+msgid "Raffle Default Settings"
 msgstr ""
 
 #. module: event_raffle
@@ -1078,11 +1123,6 @@ msgstr ""
 #. module: event_raffle
 #: model:ir.model,name:event_raffle.model_event_raffle_participant
 msgid "Raffle Participant"
-msgstr ""
-
-#. module: event_raffle
-#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
-msgid "Raffle Settings"
 msgstr ""
 
 #. module: event_raffle
@@ -1126,6 +1166,11 @@ msgstr ""
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle__theme__rave
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_config__default_theme__rave
 msgid "Rave (lasers)"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__delivery_ok
+msgid "Reaches the Winner"
 msgstr ""
 
 #. module: event_raffle
@@ -1196,7 +1241,8 @@ msgid "Sender"
 msgstr ""
 
 #. module: event_raffle
-#: model:ir.ui.menu,name:event_raffle.menu_event_raffle_config
+#: model:ir.actions.act_window,name:event_raffle.action_event_raffle_settings
+#: model:ir.ui.menu,name:event_raffle.menu_event_raffle_settings
 #: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_view_form
 msgid "Settings"
 msgstr ""
@@ -1220,6 +1266,7 @@ msgstr ""
 #. module: event_raffle
 #: model:ir.model.fields,help:event_raffle.field_event_raffle__show_tux
 #: model:ir.model.fields,help:event_raffle.field_event_raffle_config__default_show_tux
+#: model:ir.model.fields,help:event_raffle.field_res_config_settings__raffle_default_show_tux
 msgid "Show Tux the penguin next to the wheel (hidden by default)."
 msgstr ""
 
@@ -1336,6 +1383,12 @@ msgid "The message is empty."
 msgstr ""
 
 #. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
+msgid "The message is sent by email, not as a private chat in Discuss."
+msgstr ""
+
+#. module: event_raffle
 #: model:ir.model.fields,help:event_raffle.field_event_raffle_draw__raffle_is_test
 msgid ""
 "The raffle of this draw is a test raffle: the Prod and Test filters of the "
@@ -1363,8 +1416,24 @@ msgstr ""
 #. odoo-python
 #: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
 msgid ""
+"The winner has no email address. Add one to the draw or to the winner "
+"contact, or choose Chat."
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
+msgid ""
 "The winner has no internal user account (a portal account does not see "
 "Discuss): the message is sent by email."
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
+msgid ""
+"The winner has no internal user account, and a portal account does not see "
+"Discuss: a chat cannot reach them. Choose Email."
 msgstr ""
 
 #. module: event_raffle
@@ -1393,7 +1462,7 @@ msgid "Theme"
 msgstr ""
 
 #. module: event_raffle
-#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
+#: model_terms:ir.ui.view,arch_db:event_raffle.res_config_settings_view_form
 msgid "These values are applied by default when a new raffle is created."
 msgstr ""
 
@@ -1422,6 +1491,7 @@ msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,help:event_raffle.field_event_raffle_config__default_announce_channel_auto
+#: model:ir.model.fields,help:event_raffle.field_res_config_settings__raffle_default_announce_channel_auto
 msgid ""
 "Value of this option on each new raffle: after each draw, OdooBot posts the "
 "channel message in the discussion channel. A new raffle has it on only while"
@@ -1431,6 +1501,7 @@ msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,help:event_raffle.field_event_raffle_config__default_notify_winner_auto
+#: model:ir.model.fields,help:event_raffle.field_res_config_settings__raffle_default_notify_winner_auto
 msgid ""
 "Value of this option on each new raffle: after each draw, OdooBot sends the "
 "notification message to the winner. The existing raffles keep their own "
@@ -1460,8 +1531,15 @@ msgid "Website communication history"
 msgstr ""
 
 #. module: event_raffle
-#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
+#: model_terms:ir.ui.view,arch_db:event_raffle.res_config_settings_view_form
 msgid "Wheel"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle__date_planned
+msgid ""
+"When the raffle is planned. The event day web app lists it on the day whose "
+"opening window holds this moment."
 msgstr ""
 
 #. module: event_raffle
@@ -1498,8 +1576,8 @@ msgid "Winner Name"
 msgstr ""
 
 #. module: event_raffle
-#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
 #: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_view_form
+#: model_terms:ir.ui.view,arch_db:event_raffle.res_config_settings_view_form
 msgid "Winner Notification"
 msgstr ""
 
@@ -1563,7 +1641,7 @@ msgstr ""
 #. module: event_raffle
 #. odoo-python
 #: code:addons/event_raffle/models/event_raffle.py:0
-#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_config_view_form
+#: model_terms:ir.ui.view,arch_db:event_raffle.res_config_settings_view_form
 msgid "You won a prize, come and claim it! {link}"
 msgstr ""
 

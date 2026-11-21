@@ -58,7 +58,7 @@ Copyright (C) 2026 Rencontres Linux au Québec contributors
 GNU Affero General Public License v3 or later (http://www.gnu.org/licenses/agpl)
 """
     ),
-    "version": "18.0.1.3.2",
+    "version": "18.0.1.4.0",
     "category": "Marketing/Events",
     "author": (
         "Services-Conseils Linux Inc. (info@rencontres-linux.quebec), "

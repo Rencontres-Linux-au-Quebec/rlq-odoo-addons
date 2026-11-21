@@ -11,7 +11,8 @@ The "My prize" card shows up without a reload when the user wins a draw
 while the home page is open, says it once in the live region and leaves
 the focus where it was; the public name form and the "On site" toggle
 work by keyboard with the page script, which keeps the focus on the field
-or the button and says the result. axe-core (WCAG 2.2 A and AA, plus
+or the button and says the result (the class ticks the setting
+"On-site card"). axe-core (WCAG 2.2 A and AA, plus
 "region") runs on the home page with both blocks, at desktop and phone
 widths, in the dark scheme and in text-only mode, once the entrance
 animations of the cards have ended, when EWP_AXE_JS is set: the test
@@ -29,6 +30,7 @@ from odoo.addons.event_webapp_plan.tests.selenium_common import (
     SeleniumCase,
 )
 
+from ..models.res_config_settings import PARAM_ONSITE_CARD
 from .common import PrizeWebappMixin
 
 # axe-core run on the document, WCAG 2.0/2.1/2.2 A and AA rules and the
@@ -67,6 +69,7 @@ class TestSeleniumPrize(PrizeWebappMixin, SeleniumCase):
         super().setUpClass()
         cls._webapp_setup("ewp_prize_se")
         cls.winner = cls._participant_of(cls.winner_user)
+        cls.env["ir.config_parameter"].set_param(PARAM_ONSITE_CARD, True)
 
     def _card_shown(self):
         return self.js(

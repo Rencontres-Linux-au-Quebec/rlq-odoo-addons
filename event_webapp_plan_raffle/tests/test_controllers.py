@@ -10,7 +10,9 @@ states of the claim with the pick-up location, the e-mail and the
 tracking number), its JSON route (anonymous, closed day, unknown day),
 the public name form (CSRF, own contact only, the raffle block), the
 "On site" toggle (CSRF, own registrations only, the attendance mode
-unchanged), the text-only mode and French.
+unchanged, absent with its route while the setting "On-site card" is
+off), the text-only mode and French. The class ticks the setting; the
+test of the setting off clears it.
 
 Every name below is invented for the tests."""
 
@@ -23,7 +25,35 @@ from lxml import html as lxml_html
 from odoo import Command, fields
 from odoo.tests import HttpCase, tagged
 
+from ..models.res_config_settings import PARAM_ONSITE_CARD
 from .common import PrizeWebappMixin
+
+# In the browser: wait(fn, ms) polls `fn` until it returns a truthy value,
+# or throws after `ms`; prizeRow() resolves to the row "My prize" of the
+# automatic updates once it shows; seconds(row) reads its countdown, whose
+# spaces are no-break spaces (\s in a JS pattern).
+JS_PRIZE_ROW = """
+const wait = async (fn, ms = 20000) => {
+    const start = Date.now();
+    while (Date.now() - start < ms) {
+        const result = fn();
+        if (result) {
+            return result;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    throw new Error("timeout waiting for " + fn);
+};
+const prizeRow = () => wait(() => {
+    const el = document.querySelector('#o_ewp_refresh li[data-ewp-refresh="my_prize"]');
+    return el && !el.hidden && el;
+});
+const seconds = (row) => {
+    const text = row.querySelector(".o_ewp_refresh_next").textContent;
+    const match = text.match(/^Next in (?:(\\d+)\\smin\\s)?(\\d+)\\ss$/);
+    return match ? Number(match[1] || 0) * 60 + Number(match[2]) : NaN;
+};
+"""
 
 
 @tagged("post_install", "-at_install")
@@ -34,6 +64,7 @@ class TestPrizeWebappControllers(PrizeWebappMixin, HttpCase):
         cls._webapp_setup("ewp_prize_http")
         cls.winner = cls._participant_of(cls.winner_user)
         cls.other = cls._participant_of(cls.other_user)
+        cls.env["ir.config_parameter"].set_param(PARAM_ONSITE_CARD, True)
 
     # ------------------------------------------------------------------
     # Helpers
@@ -394,6 +425,40 @@ class TestPrizeWebappControllers(PrizeWebappMixin, HttpCase):
         self.assertEqual(remote.attendance_mode, "virtual")
         self.assertEqual(self.winner.attendance_mode, "onsite")
 
+    def test_presence_off_hides_the_card_and_refuses_the_route(self):
+        registration = self.winner.registration_id
+        self.env["ir.config_parameter"].set_param(PARAM_ONSITE_CARD, False)
+        self._login(self.winner_user)
+        page, text = self._page()
+        self.assertNotIn("ewp_presence", text)
+        self.assertNotIn("I am on site", text)
+        csrf = self._csrf(page)
+        for as_json in (False, True):
+            response = self._post(
+                "/presence",
+                {"csrf_token": csrf, "on_site": "1"},
+                as_json=as_json,
+            )
+            self.assertEqual(response.status_code, 404)
+        self.assertFalse(registration.attendance_declared)
+        # A declaration saved while the card was on is kept, and shows
+        # again once the card is back.
+        self.env["ir.config_parameter"].set_param(PARAM_ONSITE_CARD, True)
+        page, _text = self._page()
+        response = self._post(
+            "/presence", {"csrf_token": self._csrf(page), "on_site": "1"}
+        )
+        self.assertEqual(response.status_code, 303)
+        self.env["ir.config_parameter"].set_param(PARAM_ONSITE_CARD, False)
+        _page, text = self._page()
+        self.assertNotIn("ewp_presence", text)
+        self.assertTrue(registration.attendance_declared)
+        self.assertTrue(registration.attendance_declared_date)
+        self.env["ir.config_parameter"].set_param(PARAM_ONSITE_CARD, True)
+        page, _text = self._page()
+        button = page.xpath("//button[@id='ewp_presence_toggle']")[0]
+        self.assertEqual(button.get("aria-pressed"), "true")
+
     def test_presence_needs_a_registration_of_the_day(self):
         user = self._portal_user("ewp_prize_http_nobody", "Nora Nobody")
         self._login(user)
@@ -454,6 +519,100 @@ class TestPrizeWebappControllers(PrizeWebappMixin, HttpCase):
         self.assertIn(
             "Je suis sur place",
             self._text(page.xpath("//button[@id='ewp_presence_toggle']")[0]),
+        )
+
+    def _refresh_rows(self, page):
+        """(id, label) of each row of the automatic updates of ``page``."""
+        return [
+            (
+                row.get("data-ewp-refresh"),
+                self._text(row.xpath(".//*[@class='o_ewp_refresh_label']")[0]),
+            )
+            for row in page.xpath(
+                "//section[@id='o_ewp_refresh']//li[@data-ewp-refresh]"
+            )
+        ]
+
+    def test_automatic_updates_row(self):
+        """The automatic updates of the home page have the row "My prize",
+        for a winner and for a user whose card is still empty and hidden
+        (it polls all the same), in French too."""
+        self._draw(self.winner)
+        for user in (self.winner_user, self.other_user):
+            with self.subTest(user=user.name):
+                self._login(user)
+                page, _text = self._page()
+                self.assertIn(
+                    ("my_prize", "My prize"), self._refresh_rows(page)
+                )
+        self.env["res.lang"]._activate_lang("fr_CA")
+        for module in ("event_webapp_plan", "event_webapp_plan_raffle"):
+            self.env.ref(f"base.module_{module}")._update_translations(
+                ["fr_CA"]
+            )
+        self.other_user.lang = "fr_CA"
+        self._login(self.other_user)
+        page, _text = self._page()
+        self.assertIn(("my_prize", "Mon prix"), self._refresh_rows(page))
+
+    def test_automatic_updates_count_to_the_link_deadline(self):
+        """In the browser, the row "My prize" counts down to the earliest
+        planned request: the deadline of an open link when it comes before
+        the next minute, two seconds after a raffle draw."""
+        draw = self._draw(self.winner)
+        draw._claim_link_issue()
+        draw.sudo().claim_deadline = fields.Datetime.now() + timedelta(
+            seconds=40
+        )
+        self.env.flush_all()
+        code = """(async () => {""" + JS_PRIZE_ROW + """
+            const row = await prizeRow();
+            const next = row.querySelector(".o_ewp_refresh_next");
+            await wait(() => seconds(row) > 0);
+            if (seconds(row) > 42 || seconds(row) < 15) {
+                throw new Error("not the deadline: " + next.textContent);
+            }
+            if (!row.querySelector(".o_ewp_refresh_last").textContent.startsWith("Updated")) {
+                throw new Error("no last update");
+            }
+            document.dispatchEvent(new CustomEvent("ewp:raffle-drawn", {detail: {}}));
+            await wait(() => seconds(row) <= 2, 1500);
+            console.log("test successful");
+        })().catch((error) => console.error(error.message));
+        """
+        self.browser_js(
+            self.home,
+            code,
+            ready="document.readyState === 'complete'",
+            login=self.winner_user.login,
+        )
+
+    def test_automatic_updates_follow_the_minute_tick(self):
+        """The row "My prize" counts the next minute from the moment the
+        interval really runs, not from the page load: with Date.now() 25 s
+        ahead of the timers (a device that slept, a clock that changed),
+        the countdown starts again from a full minute after the tick. The
+        test waits for that tick, a minute after the page load."""
+        code = """(async () => {""" + JS_PRIZE_ROW + """
+            const row = await prizeRow();
+            const last = row.querySelector(".o_ewp_refresh_last");
+            const loaded = Date.parse(last.getAttribute("datetime"));
+            const realNow = Date.now.bind(Date);
+            Date.now = () => realNow() + 25000;
+            await wait(() => Date.parse(last.getAttribute("datetime")) > loaded, 75000);
+            await wait(() => row.dataset.ewpRefreshState === "running");
+            if (!(seconds(row) >= 55)) {
+                throw new Error("not from the tick: " + row.querySelector(".o_ewp_refresh_next").textContent);
+            }
+            console.log("test successful");
+        })().catch((error) => console.error(error.message));
+        """
+        self.browser_js(
+            self.home,
+            code,
+            ready="document.readyState === 'complete'",
+            login=self.other_user.login,
+            timeout=120,
         )
 
     def test_raffle_listed_on_the_day_and_other_events(self):
