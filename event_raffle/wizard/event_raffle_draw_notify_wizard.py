@@ -14,12 +14,14 @@ class EventRaffleDrawNotifyWizard(models.TransientModel):
     event.raffle.draw._message_render()), replaced when it is sent: the
     form shows them as typed, the winner and the log read the result.
 
-    The winner is reached by a private chat in Discuss when its contact has
-    an active internal user, and by email otherwise. A portal user has no
-    Discuss app and a chat member is only notified by web push, so a chat
-    sent to a portal user never reaches it: portal users go by email. The
-    sender is a choice between OdooBot and the current user, never another
-    user: the selection is the only input, and the author is derived from it.
+    The delivery method defaults to a private chat in Discuss when the
+    winner contact has an active internal user, and to email otherwise. A
+    portal user has no Discuss app and a chat member is only notified by web
+    push, so a chat sent to a portal user never reaches it: portal users go
+    by email. The user may force the other method; a method that cannot
+    reach the winner is shown as a warning and refused on send. The sender
+    is a choice between OdooBot and the current user, never another user:
+    the selection is the only input, and the author is derived from it.
     """
 
     _name = "event.raffle.draw.notify.wizard"
@@ -49,10 +51,24 @@ class EventRaffleDrawNotifyWizard(models.TransientModel):
         "or {prix}, and {link} or {lien}, the prize link when the draw has "
         "one. A placeholder without a value disappears.",
     )
+    delivery_method = fields.Selection(
+        [("chat", "Chat"), ("email", "Email")],
+        string="Delivery",
+        compute="_compute_delivery_method",
+        store=True,
+        readonly=False,
+        precompute=True,
+        help="Chat: a private chat in Discuss, which only reaches a winner "
+        "with an active internal user account. Email: the email of the "
+        "winner contact, else the email typed on the draw.",
+    )
     delivery = fields.Selection(
         [("chat", "Chat"), ("email", "Email"), ("none", "Not possible")],
-        string="Delivery",
+        string="Delivery Used",
         compute="_compute_delivery",
+    )
+    delivery_ok = fields.Boolean(
+        string="Reaches the Winner", compute="_compute_delivery"
     )
     recipient = fields.Char(string="Recipient", compute="_compute_delivery")
     delivery_info = fields.Char(compute="_compute_delivery")
@@ -72,41 +88,85 @@ class EventRaffleDrawNotifyWizard(models.TransientModel):
                 or self.env["event.raffle"]._default_notify_winner_message()
             )
 
+    @api.depends("draw_id")
+    def _compute_delivery_method(self):
+        # Decided once, from the draw: a later change of the winner contact
+        # does not overwrite the method the user picked in the form.
+        for wiz in self:
+            wiz.delivery_method = wiz._default_delivery_method()
+
     @api.depends(
+        "delivery_method",
         "draw_id.partner_id.email",
         "draw_id.partner_id.user_ids",
         "draw_id.winner_email",
     )
     def _compute_delivery(self):
+        # delivery is the method a send uses: the chosen one, else the
+        # default, else "none". delivery_ok tells whether it reaches the
+        # winner; delivery_info explains the method, or why it cannot.
         for wiz in self:
             draw = wiz.draw_id
             partner = draw.partner_id
             email = wiz._winner_email()
-            if wiz._winner_user():
-                wiz.delivery = "chat"
-                wiz.recipient = partner.display_name
-                wiz.delivery_info = _(
-                    "The winner has an internal user account: the message "
-                    "is sent as a private chat in Discuss."
-                )
-            elif email:
-                wiz.delivery = "email"
+            user = wiz._winner_user()
+            delivery = (
+                wiz.delivery_method or wiz._default_delivery_method() or "none"
+            )
+            wiz.delivery = delivery
+            wiz.delivery_ok = bool(
+                (delivery == "chat" and user)
+                or (delivery == "email" and email)
+            )
+            if delivery == "email" and email:
                 wiz.recipient = (
                     f"{partner.name} <{email}>" if partner else email
                 )
-                wiz.delivery_info = _(
-                    "The winner has no internal user account (a portal "
-                    "account does not see Discuss): the message is sent by "
-                    "email."
-                )
             else:
-                wiz.delivery = "none"
                 wiz.recipient = partner.display_name or draw.winner_name
+            if delivery == "none":
                 wiz.delivery_info = _(
                     "The winner has neither an internal user account nor an "
                     "email address, so no notification can be sent. Add an "
                     "email to the draw or to the winner contact first."
                 )
+            elif delivery == "chat" and user:
+                wiz.delivery_info = _(
+                    "The winner has an internal user account: the message "
+                    "is sent as a private chat in Discuss."
+                )
+            elif delivery == "chat":
+                wiz.delivery_info = _(
+                    "The winner has no internal user account, and a portal "
+                    "account does not see Discuss: a chat cannot reach "
+                    "them. Choose Email."
+                )
+            elif not email:
+                wiz.delivery_info = _(
+                    "The winner has no email address. Add one to the draw "
+                    "or to the winner contact, or choose Chat."
+                )
+            elif user:
+                wiz.delivery_info = _(
+                    "The message is sent by email, not as a private chat "
+                    "in Discuss."
+                )
+            else:
+                wiz.delivery_info = _(
+                    "The winner has no internal user account (a portal "
+                    "account does not see Discuss): the message is sent by "
+                    "email."
+                )
+
+    def _default_delivery_method(self):
+        """The chat for an internal user, else the email when the winner
+        has an address, else False: the winner cannot be reached."""
+        self.ensure_one()
+        if self._winner_user():
+            return "chat"
+        if self._winner_email():
+            return "email"
+        return False
 
     def _winner_user(self):
         """The active internal user of the winner contact, if any.
@@ -222,7 +282,7 @@ class EventRaffleDrawNotifyWizard(models.TransientModel):
         self.ensure_one()
         draw = self.draw_id
         draw.check_access("write")
-        if self.delivery == "none":
+        if not self.delivery_ok:
             raise UserError(self.delivery_info)
         # The placeholders render for the winner, who alone reads the text.
         body = draw._message_render(self.body, to_winner=True).strip()

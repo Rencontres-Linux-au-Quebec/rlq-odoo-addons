@@ -269,3 +269,35 @@ class TestClaimLinkMessages(ClaimDataMixin, TransactionCase):
         self.assertIn(link, str(notification.mail_id.body_html))
         self.assertTrue(notification.body.endswith(MASKED))
         self.assertNotIn(draw.sudo().claim_token, notification.body)
+
+    def test_a_forced_email_gives_the_link_to_an_internal_winner(self):
+        user = new_test_user(
+            self.env,
+            login="messages_kim",
+            groups="base.group_user",
+            email="messages_kim@example.com",
+            name="Kim Internal",
+        )
+        participant = self._participant("Kim Internal")
+        participant.partner_id = user.partner_id
+        self.raffle.write(
+            {"notify_winner_auto": False, "announce_channel_auto": False}
+        )
+        draw = self._draw_next()
+        link = self._link(draw)
+        # After the draw, the link reaches the internal user by chat.
+        self.assertEqual(draw.notification_ids.mapped("channel"), ["chat"])
+        Wizard = self.env["event.raffle.draw.notify.wizard"]
+        wizard = Wizard.with_user(self.organizer).create(
+            {"draw_id": draw.id, "delivery_method": "email"}
+        )
+        wizard.action_send()
+        notification = draw.notification_ids.sorted("id")[-1]
+        self.assertEqual(notification.channel, "email")
+        self.assertFalse(notification.discuss_channel_id)
+        mail = notification.mail_id
+        self.assertEqual(mail.recipient_ids, user.partner_id)
+        self.assertIn(self._anchor(link), str(mail.body_html))
+        self.assertNotIn("/web/signup", str(mail.body_html))
+        self.assertTrue(notification.body.endswith(MASKED))
+        self.assertNotIn(draw.sudo().claim_token, notification.body)

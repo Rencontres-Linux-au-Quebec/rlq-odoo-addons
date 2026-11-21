@@ -5,16 +5,27 @@
         <field name="model">event.raffle.draw.notify.wizard</field>
         <field name="arch" type="xml">
             <form string="Notify the Winner">
-                <div class="alert alert-warning" role="alert" invisible="delivery != 'none'">
+                <div class="alert alert-warning" role="alert" invisible="delivery_ok">
                     <field name="delivery_info" readonly="1" />
                 </div>
-                <div class="alert alert-info" role="status" invisible="delivery == 'none'">
+                <div class="alert alert-info" role="status" invisible="not delivery_ok">
                     <field name="delivery_info" readonly="1" />
                 </div>
                 <group>
                     <field name="draw_id" readonly="1" />
                     <field name="recipient" />
-                    <field name="delivery" />
+                    <field
+                        name="delivery_method"
+                        widget="radio"
+                        options="{'horizontal': true}"
+                        invisible="delivery == 'none'"
+                        required="delivery != 'none'"
+                    />
+                    <field
+                        name="delivery"
+                        string="Delivery"
+                        invisible="delivery != 'none'"
+                    />
                     <field
                         name="sender"
                         widget="radio"

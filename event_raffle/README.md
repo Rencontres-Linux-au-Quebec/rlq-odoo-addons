@@ -164,8 +164,8 @@ aucun par défaut.
    propose un message modifiable, par défaut *« Vous avez gagné un prix, venez
    le réclamer ! {lien} »*, ou le **Message notification** du tirage quand
    celui-ci notifie ses gagnants automatiquement. Les paramètres du message
-   (`{gagnant}`, `{lien}`, etc.) sont remplacés à l'envoi. L'envoi dépend du
-   gagnant :
+   (`{gagnant}`, `{lien}`, etc.) sont remplacés à l'envoi. Le **Moyen
+   d'envoi** proposé dépend du gagnant :
    - son contact a un **compte utilisateur interne** actif : un **clavardage
      privé** dans *Discussion*, la conversation directe entre l'expéditeur et
      le gagnant, créée au besoin ;
@@ -174,6 +174,14 @@ aucun par défaut.
      ici : il n'a pas accès à *Discussion* et un clavardage ne lui parviendrait
      pas ;
    - sinon : l'assistant explique pourquoi et n'offre pas de bouton *Envoyer*.
+
+   Le **Moyen d'envoi** se force au besoin entre **Clavardage** et
+   **Courriel**, par exemple pour s'assurer qu'un utilisateur interne reçoive
+   le message par courriel. Un choix qui ne peut joindre le gagnant s'affiche
+   en avertissement et l'envoi est refusé : le clavardage exige un compte
+   utilisateur interne actif, le courriel une adresse (du contact ou du tir).
+   L'envoi automatique après un tir garde toujours le moyen proposé. La
+   notification consignée sur le tir porte le moyen réellement utilisé.
 
    Un gagnant **absent** peut être notifié : c'est l'usage principal. Chaque
    envoi est consigné sur le tir (section *Notifications* du formulaire) et

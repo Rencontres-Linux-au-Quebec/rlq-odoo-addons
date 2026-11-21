@@ -171,6 +171,11 @@ How the link reaches the winner:
   previous one stops working. The draw shows the link state (*Not sent*,
   *Open*, *Expired*, *Used*), its deadline and, for event users, the link
   itself to copy.
+- While the link is open, **Notify the Winner** sends it again in its
+  message, by the **Delivery** chosen in the wizard: forcing **Email** for
+  an internal user puts the same link in the email, and the log masks it
+  as for a chat. **Send the Prize Link** and the sends after a draw keep
+  the proposed delivery.
 - An on-site winner (checked in) gives a name and an email at most. A
   virtual winner gives the address Odoo asks for.
 
@@ -482,6 +487,11 @@ Comment le lien joint le gagnant :
   le précédent cesse de fonctionner. Le tir affiche l'état du lien (*Non
   envoyé*, *Ouvert*, *Expiré*, *Utilisé*), son échéance et, pour les
   utilisateurs des événements, le lien lui-même à copier.
+- Tant que le lien est ouvert, **Notifier le gagnant** le renvoie dans son
+  message, par le **Moyen d'envoi** choisi dans l'assistant : forcer
+  **Courriel** pour un utilisateur interne met le même lien dans le
+  courriel, et le journal le masque comme pour un clavardage. **Envoyer le
+  lien de prix** et les envois après un tir gardent le moyen proposé.
 - Un gagnant sur place (scanné à l'accueil) donne au plus un nom et un
   courriel. Un gagnant virtuel donne l'adresse qu'Odoo demande.
 

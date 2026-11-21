@@ -199,6 +199,7 @@ msgstr ""
 #. module: event_raffle
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notification__channel__chat
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notify_wizard__delivery__chat
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notify_wizard__delivery_method__chat
 msgid "Chat"
 msgstr ""
 
@@ -206,6 +207,14 @@ msgstr ""
 #: model:ir.model.fields,help:event_raffle.field_event_raffle_draw_notification__message_id
 msgid ""
 "Chat message posted in Discuss, or the message behind the queued email."
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle_draw_notify_wizard__delivery_method
+msgid ""
+"Chat: a private chat in Discuss, which only reaches a winner with an active "
+"internal user account. Email: the email of the winner contact, else the "
+"email typed on the draw."
 msgstr ""
 
 #. module: event_raffle
@@ -391,13 +400,19 @@ msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__channel
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__delivery
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__delivery_method
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_draw_notify_wizard_form
 msgid "Delivery"
 msgstr ""
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__delivery_info
 msgid "Delivery Info"
+msgstr ""
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__delivery
+msgid "Delivery Used"
 msgstr ""
 
 #. module: event_raffle
@@ -503,6 +518,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_participant__email
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notification__channel__email
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notify_wizard__delivery__email
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notify_wizard__delivery_method__email
 msgid "Email"
 msgstr ""
 
@@ -1153,6 +1169,11 @@ msgid "Rave (lasers)"
 msgstr ""
 
 #. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__delivery_ok
+msgid "Reaches the Winner"
+msgstr ""
+
+#. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__notification_read
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__is_read
 msgid "Read"
@@ -1362,6 +1383,12 @@ msgid "The message is empty."
 msgstr ""
 
 #. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
+msgid "The message is sent by email, not as a private chat in Discuss."
+msgstr ""
+
+#. module: event_raffle
 #: model:ir.model.fields,help:event_raffle.field_event_raffle_draw__raffle_is_test
 msgid ""
 "The raffle of this draw is a test raffle: the Prod and Test filters of the "
@@ -1389,8 +1416,24 @@ msgstr ""
 #. odoo-python
 #: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
 msgid ""
+"The winner has no email address. Add one to the draw or to the winner "
+"contact, or choose Chat."
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
+msgid ""
 "The winner has no internal user account (a portal account does not see "
 "Discuss): the message is sent by email."
+msgstr ""
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
+msgid ""
+"The winner has no internal user account, and a portal account does not see "
+"Discuss: a chat cannot reach them. Choose Email."
 msgstr ""
 
 #. module: event_raffle

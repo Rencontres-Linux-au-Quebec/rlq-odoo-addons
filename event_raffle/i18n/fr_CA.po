@@ -220,6 +220,7 @@ msgstr ""
 #. module: event_raffle
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notification__channel__chat
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notify_wizard__delivery__chat
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notify_wizard__delivery_method__chat
 msgid "Chat"
 msgstr "Clavardage"
 
@@ -230,6 +231,17 @@ msgid ""
 msgstr ""
 "Message de clavardage publié dans Discussion, ou message du courriel mis en "
 "file d'attente."
+
+#. module: event_raffle
+#: model:ir.model.fields,help:event_raffle.field_event_raffle_draw_notify_wizard__delivery_method
+msgid ""
+"Chat: a private chat in Discuss, which only reaches a winner with an active "
+"internal user account. Email: the email of the winner contact, else the "
+"email typed on the draw."
+msgstr ""
+"Clavardage : une conversation privée dans Discussion, qui ne joint qu'un "
+"gagnant ayant un compte utilisateur interne actif. Courriel : le courriel du"
+" contact gagnant, sinon le courriel saisi sur le tir."
 
 #. module: event_raffle
 #. odoo-python
@@ -418,7 +430,8 @@ msgstr "Célébration par défaut"
 
 #. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__channel
-#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__delivery
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__delivery_method
+#: model_terms:ir.ui.view,arch_db:event_raffle.event_raffle_draw_notify_wizard_form
 msgid "Delivery"
 msgstr "Moyen d'envoi"
 
@@ -426,6 +439,11 @@ msgstr "Moyen d'envoi"
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__delivery_info
 msgid "Delivery Info"
 msgstr "Info d'envoi"
+
+#. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__delivery
+msgid "Delivery Used"
+msgstr "Moyen d'envoi retenu"
 
 #. module: event_raffle
 #. odoo-javascript
@@ -535,6 +553,7 @@ msgstr "Éligibles :"
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_participant__email
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notification__channel__email
 #: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notify_wizard__delivery__email
+#: model:ir.model.fields.selection,name:event_raffle.selection__event_raffle_draw_notify_wizard__delivery_method__email
 msgid "Email"
 msgstr "Courriel"
 
@@ -1211,6 +1230,11 @@ msgid "Rave (lasers)"
 msgstr "Rave (lasers)"
 
 #. module: event_raffle
+#: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notify_wizard__delivery_ok
+msgid "Reaches the Winner"
+msgstr "Joint le gagnant"
+
+#. module: event_raffle
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw__notification_read
 #: model:ir.model.fields,field_description:event_raffle.field_event_raffle_draw_notification__is_read
 msgid "Read"
@@ -1435,6 +1459,14 @@ msgid "The message is empty."
 msgstr "Le message est vide."
 
 #. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
+msgid "The message is sent by email, not as a private chat in Discuss."
+msgstr ""
+"Le message est envoyé par courriel, et non en clavardage privé dans "
+"Discussion."
+
+#. module: event_raffle
 #: model:ir.model.fields,help:event_raffle.field_event_raffle_draw__raffle_is_test
 msgid ""
 "The raffle of this draw is a test raffle: the Prod and Test filters of the "
@@ -1469,11 +1501,32 @@ msgstr ""
 #. odoo-python
 #: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
 msgid ""
+"The winner has no email address. Add one to the draw or to the winner "
+"contact, or choose Chat."
+msgstr ""
+"Le gagnant n'a pas d'adresse courriel. Ajoutez-en une au tir ou au contact "
+"gagnant, ou choisissez Clavardage."
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
+msgid ""
 "The winner has no internal user account (a portal account does not see "
 "Discuss): the message is sent by email."
 msgstr ""
 "Le gagnant n'a pas de compte utilisateur interne (un compte portail ne voit "
 "pas Discussion) : le message est envoyé par courriel."
+
+#. module: event_raffle
+#. odoo-python
+#: code:addons/event_raffle/wizard/event_raffle_draw_notify_wizard.py:0
+msgid ""
+"The winner has no internal user account, and a portal account does not see "
+"Discuss: a chat cannot reach them. Choose Email."
+msgstr ""
+"Le gagnant n'a pas de compte utilisateur interne, et un compte portail ne "
+"voit pas Discussion : un clavardage ne peut pas le joindre. Choisissez "
+"Courriel."
 
 #. module: event_raffle
 #: model:ir.model.fields,help:event_raffle.field_event_raffle_draw__notification_read
