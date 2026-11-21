@@ -129,8 +129,9 @@ How the link reaches the winner:
   by the draws without a token category), and the **Alert Channel**, a
   Discuss channel. The link validity of each token category is set in
   **Raffle > Prizes > Token Categories**.
-- **Raffle > Settings** (event managers), group **Sponsored Prizes in the
-  Shop**: **Sponsored prizes in the shop** (on by default) and **Close
+- **Raffle > Settings** (settings administrators), which opens the
+  general settings on the **Raffle** block, section **Sponsored Prizes in
+  the Shop**: **Sponsored prizes in the shop** (on by default) and **Close
   sales on**, an optional date and time. The shop is
   open while the switch is on and the date, if any, is still ahead. To
   reopen it, tick the switch again and move or clear the date.
@@ -434,8 +435,9 @@ Comment le lien joint le gagnant :
   lien (minutes)** (45, pour les tirs sans catégorie de jeton), et le
   **Canal d'alerte**, un canal de Discussion. La validité du lien de chaque
   catégorie de jeton se règle dans **Tirage > Prix > Catégories de jeton**.
-- **Tirage > Paramètres** (gestionnaires des événements), groupe **Prix
-  commandités dans la boutique** : **Prix commandités dans la boutique**
+- **Tirage > Paramètres** (administrateurs des réglages), qui ouvre les
+  paramètres généraux sur le bloc **Tirage**, section **Prix commandités
+  dans la boutique** : **Prix commandités dans la boutique**
   (coché par défaut) et **Fermer les ventes le**, une date et heure
   facultative. La boutique est ouverte tant que la
   case est cochée et que la date, s'il y en a une, n'est pas passée. Pour

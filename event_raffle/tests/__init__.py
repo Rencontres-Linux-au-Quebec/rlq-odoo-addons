@@ -8,5 +8,6 @@ from . import (
     test_event_raffle_migration,
     test_event_raffle_notify,
     test_event_raffle_notify_auto,
+    test_event_raffle_settings,
     test_event_raffle_test_flag,
 )

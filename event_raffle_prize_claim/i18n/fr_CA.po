@@ -186,8 +186,14 @@ msgstr "Choisissez un autre prix."
 
 #. module: event_raffle_prize_claim
 #: model:ir.model.fields,field_description:event_raffle_prize_claim.field_event_raffle_config__sponsored_shop_close_date
+#: model:ir.model.fields,field_description:event_raffle_prize_claim.field_res_config_settings__raffle_sponsored_shop_close_date
 msgid "Close sales on"
 msgstr "Fermer les ventes le"
+
+#. module: event_raffle_prize_claim
+#: model:ir.model,name:event_raffle_prize_claim.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
 
 #. module: event_raffle_prize_claim
 #: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_banner
@@ -245,6 +251,7 @@ msgstr "Pour les prix de tirage"
 
 #. module: event_raffle_prize_claim
 #: model:ir.model.fields,help:event_raffle_prize_claim.field_event_raffle_config__sponsored_shop_close_date
+#: model:ir.model.fields,help:event_raffle_prize_claim.field_res_config_settings__raffle_sponsored_shop_close_date
 msgid ""
 "From this time on, the shop leaves the sponsored prizes out as if the switch"
 " were off. Empty keeps them listed while the switch is on."
@@ -274,6 +281,7 @@ msgstr "Validité du lien (minutes)"
 
 #. module: event_raffle_prize_claim
 #: model:ir.model.fields,help:event_raffle_prize_claim.field_event_raffle_config__sponsored_shop_open
+#: model:ir.model.fields,help:event_raffle_prize_claim.field_res_config_settings__raffle_sponsored_shop_open
 msgid ""
 "Lists the published sponsored prizes in the website shop to every visitor. "
 "Unticked, only the winners' prize links show them."
@@ -480,12 +488,13 @@ msgid "Sponsor Name"
 msgstr "Nom du commanditaire"
 
 #. module: event_raffle_prize_claim
-#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.event_raffle_config_view_form_sponsored_shop
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.res_config_settings_view_form
 msgid "Sponsored Prizes in the Shop"
 msgstr "Prix commandités dans la boutique"
 
 #. module: event_raffle_prize_claim
 #: model:ir.model.fields,field_description:event_raffle_prize_claim.field_event_raffle_config__sponsored_shop_open
+#: model:ir.model.fields,field_description:event_raffle_prize_claim.field_res_config_settings__raffle_sponsored_shop_open
 msgid "Sponsored prizes in the shop"
 msgstr "Prix commandités dans la boutique"
 
@@ -645,19 +654,20 @@ msgid "Well done"
 msgstr "Bravo"
 
 #. module: event_raffle_prize_claim
-#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.event_raffle_config_view_form_sponsored_shop
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.res_config_settings_view_form
 msgid ""
-"While the switch is on and the close date, if any, is still ahead, every visitor\n"
-"                    of the website shop sees the published sponsored prizes: members buy those sold\n"
-"                    to them, the others show as prizes only. Afterwards, only the winners' prize\n"
-"                    links show them. To reopen the sales, tick the switch again and move or clear\n"
-"                    the date."
+"While the switch is on and the close date, if any, is still ahead, every "
+"visitor of the website shop sees the published sponsored prizes: members buy"
+" those sold to them, the others show as prizes only. Afterwards, only the "
+"winners' prize links show them. To reopen the sales, tick the switch again "
+"and move or clear the date."
 msgstr ""
-"Tant que la case est cochée et que la date de fermeture, s'il y en a une, n'est pas passée, tout visiteur\n"
-"                    de la boutique du site voit les prix commandités publiés : les membres achètent ceux qui leur sont\n"
-"                    vendus, les autres s'affichent en prix seulement. Ensuite, seuls les liens de prix des gagnants\n"
-"                    les montrent. Pour rouvrir les ventes, cocher la case de nouveau et déplacer ou effacer\n"
-"                    la date."
+"Tant que la case est cochée et que la date de fermeture, s'il y en a une, "
+"n'est pas passée, tout visiteur de la boutique du site voit les prix "
+"commandités publiés : les membres achètent ceux qui leur sont vendus, les "
+"autres s'affichent en prix seulement. Ensuite, seuls les liens de prix des "
+"gagnants les montrent. Pour rouvrir les ventes, cocher la case de nouveau et"
+" déplacer ou effacer la date."
 
 #. module: event_raffle_prize_claim
 #: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_decline

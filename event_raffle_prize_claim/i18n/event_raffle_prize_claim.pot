@@ -158,7 +158,13 @@ msgstr ""
 
 #. module: event_raffle_prize_claim
 #: model:ir.model.fields,field_description:event_raffle_prize_claim.field_event_raffle_config__sponsored_shop_close_date
+#: model:ir.model.fields,field_description:event_raffle_prize_claim.field_res_config_settings__raffle_sponsored_shop_close_date
 msgid "Close sales on"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model,name:event_raffle_prize_claim.model_res_config_settings
+msgid "Config Settings"
 msgstr ""
 
 #. module: event_raffle_prize_claim
@@ -216,6 +222,7 @@ msgstr ""
 
 #. module: event_raffle_prize_claim
 #: model:ir.model.fields,help:event_raffle_prize_claim.field_event_raffle_config__sponsored_shop_close_date
+#: model:ir.model.fields,help:event_raffle_prize_claim.field_res_config_settings__raffle_sponsored_shop_close_date
 msgid ""
 "From this time on, the shop leaves the sponsored prizes out as if the switch"
 " were off. Empty keeps them listed while the switch is on."
@@ -243,6 +250,7 @@ msgstr ""
 
 #. module: event_raffle_prize_claim
 #: model:ir.model.fields,help:event_raffle_prize_claim.field_event_raffle_config__sponsored_shop_open
+#: model:ir.model.fields,help:event_raffle_prize_claim.field_res_config_settings__raffle_sponsored_shop_open
 msgid ""
 "Lists the published sponsored prizes in the website shop to every visitor. "
 "Unticked, only the winners' prize links show them."
@@ -439,12 +447,13 @@ msgid "Sponsor Name"
 msgstr ""
 
 #. module: event_raffle_prize_claim
-#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.event_raffle_config_view_form_sponsored_shop
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.res_config_settings_view_form
 msgid "Sponsored Prizes in the Shop"
 msgstr ""
 
 #. module: event_raffle_prize_claim
 #: model:ir.model.fields,field_description:event_raffle_prize_claim.field_event_raffle_config__sponsored_shop_open
+#: model:ir.model.fields,field_description:event_raffle_prize_claim.field_res_config_settings__raffle_sponsored_shop_open
 msgid "Sponsored prizes in the shop"
 msgstr ""
 
@@ -595,13 +604,13 @@ msgid "Well done"
 msgstr ""
 
 #. module: event_raffle_prize_claim
-#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.event_raffle_config_view_form_sponsored_shop
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.res_config_settings_view_form
 msgid ""
-"While the switch is on and the close date, if any, is still ahead, every visitor\n"
-"                    of the website shop sees the published sponsored prizes: members buy those sold\n"
-"                    to them, the others show as prizes only. Afterwards, only the winners' prize\n"
-"                    links show them. To reopen the sales, tick the switch again and move or clear\n"
-"                    the date."
+"While the switch is on and the close date, if any, is still ahead, every "
+"visitor of the website shop sees the published sponsored prizes: members buy"
+" those sold to them, the others show as prizes only. Afterwards, only the "
+"winners' prize links show them. To reopen the sales, tick the switch again "
+"and move or clear the date."
 msgstr ""
 
 #. module: event_raffle_prize_claim

@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 {
     "name": "Event Raffle Prize Claim (Lien du gagnant)",
-    "version": "18.0.1.1.0",
+    "version": "18.0.1.2.0",
     "summary": "Single-use prize link, winner shop and member sales of prizes",
     "author": "TechnoLibre",
     "website": "https://technolibre.ca",
@@ -15,9 +15,9 @@
         "data/mail_layout_data.xml",
         "data/mail_template_prize.xml",
         "views/event_raffle_views.xml",
-        "views/event_raffle_config_views.xml",
         "views/event_raffle_draw_views.xml",
         "views/delivery_carrier_views.xml",
+        "views/res_config_settings_views.xml",
         "views/website_templates.xml",
     ],
     "demo": [

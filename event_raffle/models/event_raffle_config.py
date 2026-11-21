@@ -153,7 +153,7 @@ class EventRaffleConfig(models.Model):
     @api.depends_context("lang")
     def _compute_display_name(self):
         # The name is noupdate data that an upgrade never rewrites, so it can
-        # hold a label in another language; the breadcrumb shows the reader's
-        # label instead.
+        # hold a label in another language; the display name gives the
+        # reader's label instead.
         for config in self:
             config.display_name = _("Default Settings")

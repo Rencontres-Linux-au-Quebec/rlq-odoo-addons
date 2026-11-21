@@ -74,12 +74,17 @@ regroupe les réglages :
   directe n'est jamais acceptée : ni au choix, ni à la publication, qui
   laisse alors une note sur le tir.
 
-Le menu **Tirage → Paramètres** définit les valeurs par défaut (thème,
-célébration, animation, etc.) appliquées à chaque nouveau tirage. Le gagnant
+Le menu **Tirage → Paramètres** ouvre les **Paramètres** généraux d'Odoo sur
+le bloc **Tirage**, comme les autres applications. Ce bloc définit les valeurs
+par défaut (thème, célébration, animation, etc.) appliquées à chaque nouveau
+tirage, en trois sections : **Roue**, **Célébration & animation** et
+**Messages**. Le menu et le bloc sont réservés aux administrateurs des
+réglages, seuls à modifier ces valeurs ; les utilisateurs des événements les
+lisent à la création d'un tirage. Le gagnant
 **reste sur la roue** après un tir et n'est retiré du pool qu'au **tir suivant**.
 Les noms longs sont **répartis sur plusieurs lignes** (max 4) dans la roue.
 
-Sa section **Messages** donne aussi les valeurs de départ de chaque nouveau
+La section **Messages** donne aussi les valeurs de départ de chaque nouveau
 tirage : **Notifier le gagnant automatiquement**, **Message notification**,
 **Annoncer chaque tir dans un canal de discussion**, **Canal de discussion**
 et **Message canal**. Un message laissé vide donne le message standard, dans
@@ -231,6 +236,13 @@ L'effet est surtout pensé pour le mode **plein écran** (projection).
 
 ## Changes
 
+- **18.0.1.8.0** : les valeurs par défaut des tirages passent dans les
+  **Paramètres** généraux, bloc **Tirage**, avec les mêmes libellés et les
+  mêmes contrôles (annonce sans canal, discussion directe refusées). Le menu
+  **Tirage → Paramètres** y mène ; il n'est plus visible qu'aux
+  administrateurs des réglages, seuls à modifier ces valeurs, et non plus aux
+  gestionnaires des événements. L'ancien formulaire disparaît ; à la mise à
+  jour, les valeurs enregistrées restent telles quelles.
 - **18.0.1.7.0** : case **Tirage de test** dans l'onglet *Paramètres* du
   tirage, ruban **Test** sur le formulaire et colonne dans la liste. La
   liste des tirages s'ouvre sur le nouveau filtre **Prod**, qui cache les

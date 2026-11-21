@@ -754,22 +754,42 @@ class TestClaimLink(ClaimDataMixin, TransactionCase):
         self._set_shop_window(is_open=True)
         self.assertTrue(Config._sponsored_shop_is_open())
 
-    def test_event_manager_edits_the_shop_window(self):
+    def test_settings_administrator_edits_the_shop_window(self):
+        admin = new_test_user(
+            self.env,
+            login="claim_shop_admin",
+            groups="base.group_user,base.group_system",
+        )
         manager = new_test_user(
             self.env,
             login="claim_shop_manager",
             groups="base.group_user,event.group_event_manager",
         )
         config = self.env.ref("event_raffle.raffle_config_singleton")
-        config.with_user(manager).sponsored_shop_open = False
+        close = fields.Datetime.now() + timedelta(days=2)
+        Settings = self.env["res.config.settings"]
+        Settings.with_user(admin).create(
+            {
+                "raffle_sponsored_shop_open": False,
+                "raffle_sponsored_shop_close_date": close,
+            }
+        ).execute()
         self.assertFalse(config.sponsored_shop_open)
+        self.assertEqual(
+            config.sponsored_shop_close_date, close.replace(microsecond=0)
+        )
+        settings = Settings.create({})
+        self.assertFalse(settings.raffle_sponsored_shop_open)
         with self.assertRaises(AccessError):
             config.with_user(self.organizer).sponsored_shop_open = True
-        arch = self.env["event.raffle.config"].get_views([(False, "form")])[
-            "views"
-        ]["form"]["arch"]
-        self.assertIn('name="sponsored_shop_open"', arch)
-        self.assertIn('name="sponsored_shop_close_date"', arch)
+        for user in (manager, self.organizer):
+            with self.assertRaises(AccessError):
+                Settings.with_user(user).create(
+                    {"raffle_sponsored_shop_open": True}
+                )
+        arch = Settings.get_views([(False, "form")])["views"]["form"]["arch"]
+        self.assertIn('name="raffle_sponsored_shop_open"', arch)
+        self.assertIn('name="raffle_sponsored_shop_close_date"', arch)
 
     # "Your prize" email
 

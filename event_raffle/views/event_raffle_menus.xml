@@ -21,11 +21,11 @@
         sequence="20"
     />
     <menuitem
-        id="menu_event_raffle_config"
+        id="menu_event_raffle_settings"
         name="Settings"
         parent="menu_event_raffle_root"
-        action="action_event_raffle_config"
-        groups="event.group_event_manager"
+        action="action_event_raffle_settings"
+        groups="base.group_system"
         sequence="90"
     />
 </odoo>
