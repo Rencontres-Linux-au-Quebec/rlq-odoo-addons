@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!-- The default token categories, listed A to F. Their value ranges
+         are left to the event managers, who set them for the value of
+         their prizes; until then each range is [0, 0], which places no
+         priced prize. The xml ids of A, B and C predate their names. -->
+    <record id="token_category_gold" model="event.raffle.prize.band">
+        <field name="name">Prize Group A</field>
+        <field name="sequence">1</field>
+        <field name="claim_delay_minutes">45</field>
+    </record>
+    <record id="token_category_silver" model="event.raffle.prize.band">
+        <field name="name">Prize Group B</field>
+        <field name="sequence">2</field>
+        <field name="claim_delay_minutes">45</field>
+    </record>
+    <record id="token_category_bronze" model="event.raffle.prize.band">
+        <field name="name">Prize Group C</field>
+        <field name="sequence">3</field>
+        <field name="claim_delay_minutes">45</field>
+    </record>
+    <record id="token_category_d" model="event.raffle.prize.band">
+        <field name="name">Prize Group D</field>
+        <field name="sequence">4</field>
+        <field name="claim_delay_minutes">45</field>
+    </record>
+    <record id="token_category_e" model="event.raffle.prize.band">
+        <field name="name">Prize Group E</field>
+        <field name="sequence">5</field>
+        <field name="claim_delay_minutes">45</field>
+    </record>
+    <record id="token_category_f" model="event.raffle.prize.band">
+        <field name="name">Prize Group F</field>
+        <field name="sequence">6</field>
+        <field name="claim_delay_minutes">45</field>
+    </record>
+</odoo>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_raffle_prize_decline_wizard_form" model="ir.ui.view">
+        <field name="name">event.raffle.prize.decline.wizard.form</field>
+        <field name="model">event.raffle.prize.decline.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Decline the Prize">
+                <div class="alert alert-info" role="status">
+                    The prize goes back in stock at once. The winner keeps the draw: spin the wheel
+                    again for another winner.
+                </div>
+                <group>
+                    <field name="draw_id" readonly="1" />
+                    <field name="prize_product_id" />
+                    <field name="comment" placeholder="Why the winner declines the prize..." />
+                </group>
+                <footer>
+                    <button string="Decline the Prize" name="action_decline" type="object" class="btn-primary" />
+                    <button string="Cancel" special="cancel" class="btn-secondary" />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

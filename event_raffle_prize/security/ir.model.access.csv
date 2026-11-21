@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_event_raffle_prize_band_user,event.raffle.prize.band user,model_event_raffle_prize_band,event.group_event_user,1,0,0,0
+access_event_raffle_prize_band_manager,event.raffle.prize.band manager,model_event_raffle_prize_band,event.group_event_manager,1,1,1,1
+access_event_raffle_prize_choose_wizard_user,event.raffle.prize.choose.wizard user,model_event_raffle_prize_choose_wizard,event.group_event_user,1,1,1,0
+access_event_raffle_prize_decline_wizard_user,event.raffle.prize.decline.wizard user,model_event_raffle_prize_decline_wizard,event.group_event_user,1,1,1,0
+access_product_template_event_manager,product.template event manager,product.model_product_template,event.group_event_manager,1,1,1,0
+access_product_product_event_manager,product.product event manager,product.model_product_product,event.group_event_manager,1,1,1,0
+access_event_raffle_prize_claim_log_user,event.raffle.prize.claim.log user,model_event_raffle_prize_claim_log,event.group_event_user,1,0,0,0

@@ -1,0 +1,24 @@
+// The wheel toolbar gives every input the width of the prize input: the
+// closing checkbox takes back its own size.
+.o_raffle_wheel .o_raffle_toolbar {
+    .o_raffle_prize_band {
+        width: auto;
+        min-width: 8em;
+    }
+
+    .o_raffle_closing_draw {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0;
+        white-space: nowrap;
+
+        input[type="checkbox"] {
+            width: 1.1em;
+            height: 1.1em;
+            max-width: none;
+            padding: 0;
+            margin: 0;
+        }
+    }
+}

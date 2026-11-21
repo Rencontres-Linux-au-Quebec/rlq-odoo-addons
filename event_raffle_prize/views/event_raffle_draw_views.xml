@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_raffle_draw_view_list_prize" model="ir.ui.view">
+        <field name="name">event.raffle.draw.list.prize</field>
+        <field name="model">event.raffle.draw</field>
+        <field name="inherit_id" ref="event_raffle.event_raffle_draw_view_list" />
+        <field name="arch" type="xml">
+            <field name="prize" position="after">
+                <field name="claim_state" optional="show" />
+                <field name="band_id" optional="hide" />
+                <field name="is_closing_draw" optional="hide" />
+                <field name="prize_value" optional="hide" sum="Total" />
+            </field>
+        </field>
+    </record>
+
+    <record id="event_raffle_draw_view_form_prize" model="ir.ui.view">
+        <field name="name">event.raffle.draw.form.prize</field>
+        <field name="model">event.raffle.draw</field>
+        <field name="inherit_id" ref="event_raffle.event_raffle_draw_view_form" />
+        <field name="arch" type="xml">
+            <button name="action_open_notify_wizard" position="after">
+                <button
+                    name="action_open_prize_choose_wizard"
+                    type="object"
+                    string="Choose the Prize"
+                    class="btn-primary"
+                    invisible="claim_state in ('reserved', 'delivered') or not winner_participant_id"
+                    groups="event.group_event_user"
+                />
+                <button
+                    name="action_prize_deliver"
+                    type="object"
+                    string="Prize Handed Over"
+                    class="btn-primary"
+                    confirm="Hand over this prize to the winner? Its delivery is validated, which cannot be undone here."
+                    invisible="claim_state != 'reserved'"
+                    groups="event.group_event_user"
+                />
+                <button
+                    name="action_open_prize_decline_wizard"
+                    type="object"
+                    string="Decline the Prize"
+                    class="btn-secondary"
+                    invisible="claim_state != 'reserved'"
+                    groups="event.group_event_user"
+                />
+            </button>
+            <field name="is_absent" position="after">
+                <field name="attendance_mode" />
+                <field name="band_id" options="{'no_create': True}" />
+                <field name="is_closing_draw" />
+            </field>
+            <xpath expr="//group[field[@name='comment']]" position="before">
+                <group string="Prize Claim" name="prize_claim">
+                    <group>
+                        <field name="claim_state" />
+                        <field name="prize_product_id" invisible="not prize_product_id" />
+                        <field name="prize_value" invisible="not prize_product_id" />
+                    </group>
+                    <group>
+                        <field name="claim_date" invisible="not claim_date" />
+                        <field
+                            name="prize_order_id"
+                            invisible="not prize_order_id"
+                            groups="sales_team.group_sale_salesman"
+                        />
+                        <field name="decline_comment" invisible="claim_state != 'declined'" />
+                    </group>
+                </group>
+                <group string="Claims Ended" name="prize_claim_log" invisible="not claim_log_ids">
+                    <field name="claim_log_ids" nolabel="1" colspan="2" readonly="1">
+                        <list create="false" delete="false">
+                            <field name="date" />
+                            <field name="kind" />
+                            <field name="product_id" />
+                            <field name="comment" />
+                            <field name="user_id" optional="hide" />
+                            <field name="sale_order_id" optional="hide" groups="sales_team.group_sale_salesman" />
+                        </list>
+                    </field>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

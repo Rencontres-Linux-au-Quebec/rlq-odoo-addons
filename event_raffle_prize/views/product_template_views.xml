@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="product_template_form_view_raffle_prize" model="ir.ui.view">
+        <field name="name">product.template.form.raffle.prize</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='options']" position="inside">
+                <span class="d-inline-flex">
+                    <field name="is_raffle_prize" />
+                    <label for="is_raffle_prize" />
+                </span>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Sponsored Prize" name="raffle_prize" invisible="not is_raffle_prize">
+                    <group>
+                        <group string="Sponsor and Value">
+                            <field name="raffle_sponsor_id" />
+                            <field name="raffle_sponsor_website" widget="url" invisible="not raffle_sponsor_website" />
+                            <field name="list_price" string="Value" widget="monetary" />
+                            <field name="raffle_band_id" />
+                            <field name="raffle_initial_qty" />
+                            <field name="raffle_member_sale_ok" />
+                        </group>
+                        <group string="Who May Win It">
+                            <field name="raffle_attendance" widget="radio" />
+                            <field name="raffle_closing_prize" />
+                            <field name="raffle_event_ids" widget="many2many_tags" />
+                            <field
+                                name="raffle_country_ids"
+                                widget="many2many_tags"
+                                invisible="raffle_attendance == 'onsite'"
+                            />
+                            <field
+                                name="raffle_state_ids"
+                                widget="many2many_tags"
+                                invisible="raffle_attendance == 'onsite'"
+                            />
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_template_search_view_raffle_prize" model="ir.ui.view">
+        <field name="name">product.template.search.raffle.prize.filter</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view" />
+        <field name="arch" type="xml">
+            <filter name="filter_to_purchase" position="after">
+                <filter string="Sponsored Prizes" name="sponsored_prizes" domain="[('is_raffle_prize', '=', True)]" />
+            </filter>
+        </field>
+    </record>
+
+    <record id="product_template_view_list_raffle_prize" model="ir.ui.view">
+        <field name="name">product.template.list.raffle.prize</field>
+        <field name="model">product.template</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <list string="Sponsored Prizes">
+                <field name="name" />
+                <field name="list_price" string="Value" />
+                <field name="raffle_sponsor_id" />
+                <field name="raffle_band_id" />
+                <field name="raffle_member_sale_ok" optional="show" />
+                <field name="raffle_attendance" />
+                <field name="raffle_closing_prize" />
+                <field name="raffle_initial_qty" />
+                <field name="raffle_event_ids" widget="many2many_tags" optional="hide" />
+            </list>
+        </field>
+    </record>
+
+    <record id="product_template_view_kanban_raffle_prize" model="ir.ui.view">
+        <field name="name">product.template.kanban.raffle.prize</field>
+        <field name="model">product.template</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="id" />
+                <templates>
+                    <t t-name="card" class="flex-row">
+                        <aside>
+                            <field name="image_128" widget="image" alt="Prize" />
+                        </aside>
+                        <main class="ms-2">
+                            <field name="name" class="fw-bold" />
+                            <field name="raffle_sponsor_id" />
+                            <field name="list_price" widget="monetary" />
+                            <field name="raffle_band_id" />
+                            <field name="raffle_closing_prize" invisible="1" />
+                            <div invisible="not raffle_closing_prize">
+                                <span class="badge text-bg-success">Closing prize</span>
+                            </div>
+                        </main>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="product_template_view_search_raffle_prize" model="ir.ui.view">
+        <field name="name">product.template.search.raffle.prize</field>
+        <field name="model">product.template</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <search string="Sponsored Prizes">
+                <field name="name" />
+                <field name="raffle_sponsor_id" />
+                <field name="raffle_band_id" />
+                <field name="raffle_event_ids" />
+                <filter string="Closing Prizes" name="closing" domain="[('raffle_closing_prize', '=', True)]" />
+                <filter string="Sold to Members" name="member_sale" domain="[('raffle_member_sale_ok', '=', True)]" />
+                <filter string="Prize Only" name="token_only" domain="[('raffle_member_sale_ok', '=', False)]" />
+                <separator />
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]" />
+                <group expand="0" string="Group By">
+                    <filter string="Sponsor" name="group_sponsor" context="{'group_by': 'raffle_sponsor_id'}" />
+                    <filter string="Token Category" name="group_band" context="{'group_by': 'raffle_band_id'}" />
+                    <filter string="Attendance" name="group_attendance" context="{'group_by': 'raffle_attendance'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_event_raffle_prize_catalogue" model="ir.actions.act_window">
+        <field name="name">Sponsored Prizes</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('is_raffle_prize', '=', True)]</field>
+        <field name="context">
+            {'default_is_raffle_prize': True, 'default_type': 'consu', 'default_is_storable': True}
+        </field>
+        <field name="search_view_id" ref="product_template_view_search_raffle_prize" />
+        <field
+            name="view_ids"
+            eval="[
+                Command.clear(),
+                Command.create({'view_mode': 'kanban', 'view_id': ref('product_template_view_kanban_raffle_prize')}),
+                Command.create({'view_mode': 'list', 'view_id': ref('product_template_view_list_raffle_prize')}),
+            ]"
+        />
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add a sponsored prize</p>
+            <p>
+                A sponsored prize is a product that tracks its inventory, with its sponsor, its
+                value and its token category. Its stock is set in the Inventory app.
+            </p>
+        </field>
+    </record>
+</odoo>

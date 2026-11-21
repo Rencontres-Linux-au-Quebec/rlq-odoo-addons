@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!-- Value ranges of the default token categories, for the demo prizes. -->
+    <record id="event_raffle_prize.token_category_bronze" model="event.raffle.prize.band">
+        <field name="value_min">0.01</field>
+        <field name="value_max">24.99</field>
+    </record>
+    <record id="event_raffle_prize.token_category_silver" model="event.raffle.prize.band">
+        <field name="value_min">25</field>
+        <field name="value_max">99.99</field>
+    </record>
+    <record id="event_raffle_prize.token_category_gold" model="event.raffle.prize.band">
+        <field name="value_min">100</field>
+        <field name="value_max">1000</field>
+    </record>
+
+    <record id="demo_sponsor" model="res.partner">
+        <field name="name">Example Sponsor Inc.</field>
+        <field name="is_company" eval="True" />
+        <field name="website">https://example.com</field>
+    </record>
+
+    <record id="demo_prize_tshirt" model="product.template">
+        <field name="name">T-shirt</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True" />
+        <field name="list_price">30.0</field>
+        <field name="is_raffle_prize" eval="True" />
+        <field name="raffle_sponsor_id" ref="demo_sponsor" />
+        <field name="raffle_attendance">both</field>
+        <field name="raffle_member_sale_ok" eval="True" />
+        <field name="raffle_initial_qty">10</field>
+    </record>
+    <record id="demo_prize_usb_key" model="product.template">
+        <field name="name">USB key</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True" />
+        <field name="list_price">15.0</field>
+        <field name="is_raffle_prize" eval="True" />
+        <field name="raffle_sponsor_id" ref="demo_sponsor" />
+        <field name="raffle_attendance">onsite</field>
+        <field name="raffle_initial_qty">5</field>
+    </record>
+    <record id="demo_prize_laptop" model="product.template">
+        <field name="name">Refurbished laptop</field>
+        <field name="type">consu</field>
+        <field name="is_storable" eval="True" />
+        <field name="list_price">300.0</field>
+        <field name="is_raffle_prize" eval="True" />
+        <field name="raffle_sponsor_id" ref="demo_sponsor" />
+        <field name="raffle_attendance">both</field>
+        <field name="raffle_closing_prize" eval="True" />
+        <field name="raffle_initial_qty">1</field>
+    </record>
+
+    <record id="demo_quant_tshirt" model="stock.quant">
+        <field
+            name="product_id"
+            model="product.product"
+            eval="obj().env.ref('event_raffle_prize.demo_prize_tshirt').product_variant_id.id"
+        />
+        <field name="inventory_quantity">10</field>
+        <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').lot_stock_id.id" />
+    </record>
+    <record id="demo_quant_usb_key" model="stock.quant">
+        <field
+            name="product_id"
+            model="product.product"
+            eval="obj().env.ref('event_raffle_prize.demo_prize_usb_key').product_variant_id.id"
+        />
+        <field name="inventory_quantity">5</field>
+        <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').lot_stock_id.id" />
+    </record>
+    <record id="demo_quant_laptop" model="stock.quant">
+        <field
+            name="product_id"
+            model="product.product"
+            eval="obj().env.ref('event_raffle_prize.demo_prize_laptop').product_variant_id.id"
+        />
+        <field name="inventory_quantity">1</field>
+        <field name="location_id" model="stock.location" eval="obj().env.ref('stock.warehouse0').lot_stock_id.id" />
+    </record>
+    <function model="stock.quant" name="action_apply_inventory">
+        <function
+            eval="[[('id', 'in', (ref('demo_quant_tshirt'), ref('demo_quant_usb_key'), ref('demo_quant_laptop')))]]"
+            model="stock.quant"
+            name="search"
+        />
+    </function>
+</odoo>

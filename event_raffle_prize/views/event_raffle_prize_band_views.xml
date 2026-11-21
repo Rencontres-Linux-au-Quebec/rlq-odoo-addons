@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_raffle_prize_band_view_list" model="ir.ui.view">
+        <field name="name">event.raffle.prize.band.list</field>
+        <field name="model">event.raffle.prize.band</field>
+        <field name="arch" type="xml">
+            <list string="Token Categories" editable="bottom">
+                <field name="sequence" widget="handle" />
+                <field name="name" />
+                <field name="value_min" />
+                <field name="value_max" />
+                <field name="claim_delay_minutes" />
+                <field name="active" column_invisible="True" />
+            </list>
+        </field>
+    </record>
+
+    <record id="event_raffle_prize_band_view_search" model="ir.ui.view">
+        <field name="name">event.raffle.prize.band.search</field>
+        <field name="model">event.raffle.prize.band</field>
+        <field name="arch" type="xml">
+            <search string="Token Categories">
+                <field name="name" />
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]" />
+            </search>
+        </field>
+    </record>
+
+    <record id="action_event_raffle_prize_band" model="ir.actions.act_window">
+        <field name="name">Token Categories</field>
+        <field name="res_model">event.raffle.prize.band</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a token category</p>
+            <p>
+                A winner earns one token of the category of their draw, and a sponsored prize of
+                that category costs exactly that token. The value range places each prize in a
+                category; the link validity is how long the winner's prize link works.
+            </p>
+        </field>
+    </record>
+</odoo>
