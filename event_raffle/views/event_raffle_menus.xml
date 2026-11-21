@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <menuitem
+        id="menu_event_raffle_root"
+        name="Raffle"
+        web_icon="event_raffle,static/description/icon.png"
+        sequence="90"
+    />
+    <menuitem
+        id="menu_event_raffle"
+        name="Raffles"
+        parent="menu_event_raffle_root"
+        action="action_event_raffle"
+        sequence="10"
+    />
+    <menuitem
+        id="menu_event_raffle_draw"
+        name="Winners"
+        parent="menu_event_raffle_root"
+        action="action_event_raffle_draw"
+        sequence="20"
+    />
+    <menuitem
+        id="menu_event_raffle_config"
+        name="Settings"
+        parent="menu_event_raffle_root"
+        action="action_event_raffle_config"
+        groups="event.group_event_manager"
+        sequence="90"
+    />
+</odoo>

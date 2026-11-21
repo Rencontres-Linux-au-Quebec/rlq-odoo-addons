@@ -1,0 +1,135 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* event_raffle_survey
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-05 06:36+0000\n"
+"PO-Revision-Date: 2026-10-05 06:36+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_start_wizard__survey_anonymous_count
+msgid "Anonymous Among Them"
+msgstr ""
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_start_wizard__survey_question_match
+msgid "Answered"
+msgstr ""
+
+#. module: event_raffle_survey
+#: model:ir.model.fields.selection,name:event_raffle_survey.selection__event_raffle_start_wizard__survey_question_match__any
+msgid "At least one"
+msgstr ""
+
+#. module: event_raffle_survey
+#. odoo-python
+#: code:addons/event_raffle_survey/wizard/event_raffle_start_wizard.py:0
+msgid "Choose the survey whose respondents enter the raffle."
+msgstr ""
+
+#. module: event_raffle_survey
+#: model:ir.model.fields.selection,name:event_raffle_survey.selection__event_raffle_start_wizard__survey_question_match__all
+msgid "Each"
+msgstr ""
+
+#. module: event_raffle_survey
+#. odoo-python
+#: code:addons/event_raffle_survey/wizard/event_raffle_start_wizard.py:0
+msgid "Guest"
+msgstr ""
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,help:event_raffle_survey.field_event_raffle_start_wizard__survey_respondent_count
+msgid "How many people Start puts in the raffle, with the choices made above."
+msgstr ""
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,help:event_raffle_survey.field_event_raffle_start_wizard__survey_id
+msgid ""
+"Its respondents enter the raffle instead of the registrations: every "
+"completed answer that is not a test and answers at least one question."
+msgstr ""
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,help:event_raffle_survey.field_event_raffle_start_wizard__survey_question_ids
+msgid ""
+"Optional. When the list holds questions, only the respondents who answered "
+"them enter the raffle: each of them, or at least one, as Answered says."
+msgstr ""
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_start_wizard__copy_strategy
+msgid "Participants"
+msgstr ""
+
+#. module: event_raffle_survey
+#: model:ir.model,name:event_raffle_survey.model_event_raffle_participant
+msgid "Raffle Participant"
+msgstr ""
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_start_wizard__survey_question_ids
+msgid "Required Questions"
+msgstr ""
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_start_wizard__survey_respondent_count
+msgid "Respondents Entering"
+msgstr ""
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,help:event_raffle_survey.field_event_raffle_start_wizard__survey_anonymous_count
+msgid ""
+"Respondents with no contact, email or nickname: each enters as a separate "
+"Guest, and a guest who wins cannot be identified."
+msgstr ""
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_participant__source
+msgid "Source"
+msgstr ""
+
+#. module: event_raffle_survey
+#: model:ir.model,name:event_raffle_survey.model_event_raffle_start_wizard
+msgid "Start a Raffle from an Event"
+msgstr ""
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,field_description:event_raffle_survey.field_event_raffle_start_wizard__survey_id
+#: model:ir.model.fields.selection,name:event_raffle_survey.selection__event_raffle_participant__source__survey
+msgid "Survey"
+msgstr ""
+
+#. module: event_raffle_survey
+#: model:ir.model.fields.selection,name:event_raffle_survey.selection__event_raffle_start_wizard__copy_strategy__survey_only
+msgid "Survey filled only"
+msgstr ""
+
+#. module: event_raffle_survey
+#. odoo-python
+#: code:addons/event_raffle_survey/wizard/event_raffle_start_wizard.py:0
+msgid "The required questions must be questions of the chosen survey."
+msgstr ""
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,help:event_raffle_survey.field_event_raffle_start_wizard__survey_question_match
+msgid ""
+"Which of the required questions a respondent must have answered: each of "
+"them, or at least one."
+msgstr ""
+
+#. module: event_raffle_survey
+#: model:ir.model.fields,help:event_raffle_survey.field_event_raffle_start_wizard__copy_strategy
+msgid ""
+"Who enters the raffle. Both 'Questionnaire' choices keep only the attendees "
+"who answered the event's registration questionnaire."
+msgstr ""

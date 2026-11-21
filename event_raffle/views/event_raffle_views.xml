@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_raffle_view_list" model="ir.ui.view">
+        <field name="name">event.raffle.list</field>
+        <field name="model">event.raffle</field>
+        <field name="arch" type="xml">
+            <list string="Raffles">
+                <field name="name" />
+                <field name="event_id" />
+                <field name="participant_count" />
+                <field name="draw_count" />
+                <field name="state" />
+            </list>
+        </field>
+    </record>
+
+    <record id="event_raffle_view_form" model="ir.ui.view">
+        <field name="name">event.raffle.form</field>
+        <field name="model">event.raffle</field>
+        <field name="arch" type="xml">
+            <form string="Raffle">
+                <header>
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="event_id" />
+                        <field name="company_id" groups="base.group_multi_company" />
+                    </group>
+                    <field name="context_note" placeholder="Context..." />
+                    <widget name="raffle_wheel" />
+                    <notebook>
+                        <page string="Participants" name="participants">
+                            <button name="action_include_all" type="object" string="Include All" class="btn-link" />
+                            <button name="action_exclude_all" type="object" string="Exclude All" class="btn-link" />
+                            <field name="participant_ids">
+                                <list editable="bottom">
+                                    <field name="partner_id" />
+                                    <field name="name" />
+                                    <field name="email" optional="show" />
+                                    <field name="source" />
+                                    <field name="won" readonly="1" />
+                                    <field name="present" widget="boolean_toggle" />
+                                    <field name="excluded" widget="boolean_toggle" />
+                                    <field name="eligible" readonly="1" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Draws" name="draws">
+                            <field name="draw_ids">
+                                <list>
+                                    <field name="sequence" />
+                                    <field name="winner_name" />
+                                    <field name="prize" />
+                                    <field name="prize_received" />
+                                    <field name="prize_received_date" />
+                                    <field name="comment" />
+                                    <field name="is_absent" />
+                                    <field name="date" />
+                                    <field name="name" optional="hide" />
+                                    <field name="partner_id" optional="hide" />
+                                    <field name="winner_participant_id" optional="hide" />
+                                    <field name="winner_email" optional="hide" />
+                                    <field name="prize_description" optional="hide" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Settings" name="settings">
+                            <group>
+                                <field name="theme" />
+                                <field name="winner_celebration" />
+                                <field name="remove_winner" />
+                                <field name="spin_duration" />
+                                <field name="spin_turns" />
+                                <field name="pointer_angle" />
+                                <field name="show_fireworks" />
+                                <field name="show_tux" />
+                                <field name="belly_logo" invisible="not show_tux" />
+                                <field name="tux_animation" />
+                                <field
+                                    name="flag_text"
+                                    placeholder="Vive le logiciel libre"
+                                    invisible="tux_animation not in ('rotate', 'flag')"
+                                />
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter />
+            </form>
+        </field>
+    </record>
+</odoo>

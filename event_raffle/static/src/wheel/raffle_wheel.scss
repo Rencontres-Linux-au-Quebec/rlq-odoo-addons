@@ -1,0 +1,595 @@
+.o_raffle_wheel {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    min-height: 480px;
+
+    // Embedded form widget: nothing between .o_content and here declares a
+    // height, so the `height: 100%` above resolves to auto. Give it a real
+    // one; the fullscreen client action already gets its own from Odoo's
+    // `.o_action_manager > .o_action` rule.
+    // 2/1 keeps the panel at the default canvas proportions (300x150),
+    // declared here so that it does not depend on the bitmap.
+    .o_widget_raffle_wheel > & {
+        aspect-ratio: 2 / 1;
+        height: auto;
+        max-height: 80vh;
+    }
+
+    .o_raffle_toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px;
+        position: relative;
+        z-index: 5;
+
+        button {
+            white-space: nowrap;
+        }
+
+        // "Prize (optional)" input: wide enough for a prize name.
+        input {
+            font-size: 1rem;
+            width: 300px;
+            max-width: 45vw;
+            padding: 7px 12px;
+        }
+
+        // Left group: fullscreen button + prize input.
+        .o_raffle_tb_left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        // Right group: eligible count then the "next draw" button (above the
+        // history panel). The count sits left of the button so the centred
+        // winner never hides it.
+        .o_raffle_tb_right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+        }
+
+        .o_raffle_count {
+            white-space: nowrap;
+        }
+
+        // Winner announcement, centered over the whole toolbar.
+        .o_raffle_winner {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-weight: bold;
+            font-size: 1.4rem;
+            pointer-events: none;
+        }
+    }
+
+    // The drawing buffer (the canvas width/height ATTRIBUTES) must never feed
+    // layout back: `flex: 1 1 0` is a DEFINITE basis, so the canvas is sized
+    // from the container's free space and its intrinsic size is never read.
+    // `min-height: 0` switches off the automatic minimum size, which would
+    // otherwise let that intrinsic size back in as a floor. No `height: 100%`:
+    // it is unresolvable in a form sheet and lets the intrinsic size back in.
+    .o_raffle_canvas {
+        flex: 1 1 0;
+        min-height: 0;
+        width: 100%;
+        display: block;
+        position: relative;
+        z-index: 2;
+    }
+
+    // Winners history panel (top-right, over the canvas).
+    .o_raffle_history {
+        position: absolute;
+        top: 84px;
+        right: 12px;
+        width: 260px;
+        max-height: 60%;
+        overflow-y: auto;
+        border-radius: 8px;
+        padding: 8px 10px;
+        font-size: 0.9rem;
+        z-index: 6;
+
+        &.o_collapsed {
+            width: auto;
+            overflow: visible;
+        }
+
+        .o_raffle_history_title {
+            font-weight: bold;
+            margin-bottom: 6px;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        &.o_collapsed .o_raffle_history_title {
+            margin-bottom: 0;
+        }
+
+        .o_raffle_history_caret {
+            display: inline-block;
+            width: 1em;
+        }
+
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .o_raffle_history_item {
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 6px;
+
+            .o_raffle_history_row {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .o_seq {
+                opacity: 0.7;
+                min-width: 28px;
+            }
+
+            .o_name {
+                font-weight: 600;
+                flex: 1 1 auto;
+            }
+
+            .o_absent_badge {
+                font-size: 0.72rem;
+                text-transform: uppercase;
+                background: #e63946;
+                color: #fff;
+                padding: 1px 6px;
+                border-radius: 10px;
+            }
+
+            &.o_absent .o_name {
+                text-decoration: line-through;
+                opacity: 0.7;
+            }
+
+            .o_raffle_history_details {
+                padding: 4px 6px 6px 34px;
+                font-size: 0.82rem;
+                opacity: 0.85;
+            }
+        }
+    }
+
+    @mixin history-panel($bg, $fg, $hover) {
+        .o_raffle_history {
+            background: $bg;
+            color: $fg;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+
+            .o_raffle_history_item:hover,
+            .o_raffle_history_item.o_expanded {
+                background: $hover;
+            }
+        }
+    }
+
+    // GNOME-Terminal-style background console shared by both Linux themes.
+    // Header bar: title centred, window controls (min/max/close) on the right
+    // (no macOS traffic-light dots).
+    @mixin linux-terminal(
+        $panel, $border, $bar, $barfg, $fg, $cmd, $ok, $dim, $win, $cursor,
+        $glow
+    ) {
+        .o_raffle_terminal {
+            position: absolute;
+            // raised above the history panel (and the wheel pointer) so the
+            // GNOME title bar is not hidden by either.
+            inset: 50px 24px 24px 24px;
+            z-index: 1; // behind the canvas (z-index 2)
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            border-radius: 10px 10px 8px 8px;
+            overflow: hidden;
+            font-family: "DejaVu Sans Mono", "Menlo", "Consolas", monospace;
+            background: $panel;
+            border: 1px solid $border;
+            box-shadow: 0 6px 26px rgba(0, 0, 0, 0.45);
+
+            .o_term_bar {
+                position: relative;
+                display: flex;
+                align-items: center;
+                padding: 7px 10px;
+                background: $bar;
+                border-bottom: 1px solid $border;
+                font-size: 13px;
+                color: $barfg;
+            }
+
+            .o_term_title {
+                flex: 1 1 auto;
+                text-align: center;
+                letter-spacing: 0.02em;
+                font-weight: 600;
+            }
+
+            // GNOME places the window controls on the left.
+            .o_term_winbtns {
+                position: absolute;
+                left: 8px;
+                display: flex;
+                gap: 6px;
+            }
+
+            .o_term_wb {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 13px;
+                font-family: sans-serif;
+                line-height: 20px;
+                text-align: center;
+                background: rgba(128, 128, 128, 0.22);
+                color: $barfg;
+
+                &.o_close {
+                    background: rgba(224, 72, 60, 0.9);
+                    color: #fff;
+                }
+            }
+
+            .o_term_body {
+                flex: 1 1 auto;
+                padding: 12px 16px;
+                overflow: hidden;
+                font-size: clamp(11px, 1.4vw, 16px);
+                line-height: 1.5;
+                color: $fg;
+                text-shadow: $glow;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+            }
+
+            .o_term_line {
+                white-space: pre-wrap;
+                word-break: break-word;
+
+                &.o_term_cmd { color: $cmd; }
+                &.o_term_ok { color: $ok; }
+                &.o_term_dim { color: $dim; }
+                &.o_term_win { color: $win; font-weight: 700; }
+                &.o_term_prompt { color: $cmd; }
+            }
+
+            // The shell prompt shown instantly in front of a command.
+            .o_term_ps {
+                color: $cmd;
+                margin-right: 2px;
+            }
+
+            .o_term_cursor {
+                display: inline-block;
+                vertical-align: text-bottom;
+                width: 9px;
+                height: 1.05em;
+                background: $cursor;
+                animation: raffle-term-blink 1s step-end infinite;
+            }
+        }
+    }
+
+    // ---- Light theme (default) ----
+    &.o_raffle_light {
+        background: radial-gradient(circle at 50% 40%, #f4f6fb, #dfe4ee);
+        color: #1b1b2f;
+
+        .o_raffle_toolbar {
+            color: #1b1b2f;
+        }
+
+        @include history-panel(rgba(255, 255, 255, 0.9), #1b1b2f, rgba(0, 0, 0, 0.06));
+    }
+
+    // ---- Dark theme ----
+    &.o_raffle_dark {
+        background: radial-gradient(circle at 50% 40%, #1b1b2f, #0f0f1a);
+        color: #fff;
+
+        .o_raffle_toolbar {
+            color: #fff;
+        }
+
+        @include history-panel(rgba(20, 20, 34, 0.85), #fff, rgba(255, 255, 255, 0.1));
+    }
+
+    // ---- Show / spotlight theme ----
+    &.o_raffle_spectacle {
+        background: radial-gradient(circle at 50% 120%, #2a2a3a, #050509 70%);
+        color: #fff;
+
+        .o_raffle_toolbar {
+            color: #fff;
+        }
+
+        // Two sweeping stage spotlights behind the wheel.
+        &::before,
+        &::after {
+            content: "";
+            position: absolute;
+            top: -20%;
+            width: 40%;
+            height: 160%;
+            z-index: 1;
+            pointer-events: none;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 210, 0.28),
+                rgba(255, 255, 210, 0)
+            );
+            filter: blur(6px);
+            transform-origin: top center;
+        }
+
+        &::before {
+            left: 12%;
+            animation: raffle-spot-a 4s ease-in-out infinite alternate;
+        }
+
+        &::after {
+            right: 12%;
+            animation: raffle-spot-b 5s ease-in-out infinite alternate;
+        }
+
+        @include history-panel(rgba(10, 10, 18, 0.8), #ffe9a8, rgba(255, 255, 255, 0.12));
+    }
+
+    // ---- Theater theme (gold & angels) ----
+    &.o_raffle_theatre {
+        background: radial-gradient(circle at 50% 30%, #7d1128, #3d0713 80%);
+        color: #ffe9b0;
+
+        .o_raffle_toolbar {
+            color: #ffe9b0;
+        }
+
+        // Gilded frame (the trumpet-playing angels are 3D, in the scene).
+        box-shadow: inset 0 0 0 8px #caa24a, inset 0 0 0 12px #8a6d1f;
+
+        @include history-panel(rgba(61, 7, 19, 0.9), #ffe9b0, rgba(202, 162, 74, 0.25));
+    }
+
+    // ---- Linux techno (dark) ----
+    &.o_raffle_linux {
+        background:
+            linear-gradient(rgba(6, 12, 8, 0.92), rgba(4, 8, 6, 0.96)),
+            repeating-linear-gradient(0deg, #0c3, #0c3 1px, transparent 1px, transparent 26px),
+            repeating-linear-gradient(90deg, #0c3, #0c3 1px, transparent 1px, transparent 26px),
+            #050805;
+        color: #8bffab;
+
+        .o_raffle_toolbar {
+            color: #8bffab;
+            text-shadow: 0 0 6px rgba(60, 255, 130, 0.5);
+        }
+
+        @include history-panel(rgba(4, 12, 6, 0.9), #8bffab, rgba(60, 255, 130, 0.15));
+        // wheel is shifted right in Linux themes -> history goes to the left.
+        .o_raffle_history { left: 12px; right: auto; }
+        @include linux-terminal(
+            $panel: rgba(2, 8, 4, 0.82),
+            $border: rgba(60, 255, 130, 0.28),
+            $bar: rgba(10, 24, 14, 0.96),
+            $barfg: rgba(139, 255, 171, 0.85),
+            $fg: #8bffab,
+            $cmd: #d6ffe4,
+            $ok: #6cff9e,
+            $dim: rgba(139, 255, 171, 0.55),
+            $win: #eaffd0,
+            $cursor: #8bffab,
+            $glow: 0 0 6px rgba(60, 255, 130, 0.35)
+        );
+    }
+
+    // ---- Linux techno (light) ----
+    &.o_raffle_linux_light {
+        background:
+            linear-gradient(rgba(250, 251, 248, 0.9), rgba(238, 242, 235, 0.94)),
+            repeating-linear-gradient(0deg, #bfe6cb, #bfe6cb 1px, transparent 1px, transparent 26px),
+            repeating-linear-gradient(90deg, #bfe6cb, #bfe6cb 1px, transparent 1px, transparent 26px),
+            #eef3ec;
+        color: #14532d;
+
+        .o_raffle_toolbar {
+            color: #14532d;
+        }
+
+        @include history-panel(rgba(248, 250, 245, 0.95), #14532d, rgba(60, 160, 90, 0.16));
+        // wheel is shifted right in Linux themes -> history goes to the left.
+        .o_raffle_history { left: 12px; right: auto; }
+        @include linux-terminal(
+            $panel: rgba(250, 250, 247, 0.92),
+            $border: rgba(40, 110, 70, 0.35),
+            $bar: rgba(226, 228, 222, 0.98),
+            $barfg: #3a3a3a,
+            $fg: #1f6f30,
+            $cmd: #123f1c,
+            $ok: #1a7f37,
+            $dim: rgba(30, 80, 45, 0.6),
+            $win: #0b5a1e,
+            $cursor: #1a7f37,
+            $glow: none
+        );
+    }
+
+    // ---- Rave theme (lasers) ----
+    &.o_raffle_rave {
+        background: #05010a;
+        color: #fff;
+        overflow: hidden;
+
+        .o_raffle_toolbar {
+            color: #fff;
+            text-shadow: 0 0 8px rgba(255, 0, 200, 0.6);
+        }
+
+        // A fan of sweeping laser beams from the top.
+        .o_raffle_lasers {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+
+            span {
+                position: absolute;
+                // origin sits ABOVE the viewport so the fan has no visible
+                // convergence point / cut on screen (beams enter from the top).
+                top: -9%;
+                left: 50%;
+                width: 3px;
+                height: 220%;
+                transform-origin: top center;
+                mix-blend-mode: screen;
+                background: linear-gradient(
+                    to bottom, var(--c), transparent 85%
+                );
+                box-shadow: 0 0 14px var(--c), 0 0 5px var(--c);
+                animation: rave-sweep 2.6s ease-in-out infinite alternate;
+            }
+
+            @for $i from 1 through 12 {
+                span:nth-child(#{$i}) {
+                    --a: #{-55deg + ($i - 1) * 10deg};
+                    animation-duration: #{2 + ($i % 5) * 0.35}s;
+                    animation-delay: #{$i * 0.13}s;
+                }
+            }
+            span:nth-child(4n + 1) { --c: #ff2fd0; }
+            span:nth-child(4n + 2) { --c: #22e3ff; }
+            span:nth-child(4n + 3) { --c: #7cff2f; }
+            span:nth-child(4n + 4) { --c: #ffe11e; }
+        }
+
+        // Strobe flashes.
+        .o_raffle_strobe {
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            pointer-events: none;
+            background: #fff;
+            mix-blend-mode: screen;
+            opacity: 0;
+            animation: rave-strobe 1.5s steps(1) infinite;
+        }
+
+        // Rotating laser fans from the top corners.
+        &::before,
+        &::after {
+            content: "";
+            position: absolute;
+            top: -10%;
+            width: 4px;
+            height: 150%;
+            z-index: 1;
+            pointer-events: none;
+            transform-origin: top center;
+            mix-blend-mode: screen;
+        }
+
+        &::before {
+            left: 22%;
+            background: repeating-linear-gradient(
+                to right,
+                #ff2fd0 0, #ff2fd0 2px, transparent 2px, transparent 26px
+            );
+            box-shadow: 0 0 16px #ff2fd0;
+            animation: raffle-laser-a 2.4s linear infinite alternate;
+        }
+
+        &::after {
+            right: 22%;
+            background: repeating-linear-gradient(
+                to right,
+                #22e3ff 0, #22e3ff 2px, transparent 2px, transparent 26px
+            );
+            box-shadow: 0 0 16px #22e3ff;
+            animation: raffle-laser-b 3s linear infinite alternate;
+        }
+
+        @include history-panel(rgba(10, 2, 20, 0.85), #ff8bf0, rgba(255, 47, 208, 0.2));
+    }
+}
+
+@keyframes raffle-laser-a {
+    from {
+        transform: rotate(-38deg);
+    }
+    to {
+        transform: rotate(38deg);
+    }
+}
+
+@keyframes raffle-laser-b {
+    from {
+        transform: rotate(34deg);
+    }
+    to {
+        transform: rotate(-42deg);
+    }
+}
+
+@keyframes rave-sweep {
+    from {
+        transform: rotate(calc(var(--a) - 16deg));
+    }
+    to {
+        transform: rotate(calc(var(--a) + 16deg));
+    }
+}
+
+@keyframes rave-strobe {
+    0%, 5% { opacity: 0.6; }
+    6%, 34% { opacity: 0; }
+    35%, 39% { opacity: 0.45; }
+    40%, 100% { opacity: 0; }
+}
+
+@keyframes raffle-spot-a {
+    from {
+        transform: rotate(-14deg);
+    }
+    to {
+        transform: rotate(16deg);
+    }
+}
+
+@keyframes raffle-spot-b {
+    from {
+        transform: rotate(12deg);
+    }
+    to {
+        transform: rotate(-18deg);
+    }
+}
+
+@keyframes raffle-term-blink {
+    0%, 50% { opacity: 1; }
+    50.01%, 100% { opacity: 0; }
+}

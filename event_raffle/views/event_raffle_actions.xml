@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="action_event_raffle" model="ir.actions.act_window">
+        <field name="name">Raffles</field>
+        <field name="res_model">event.raffle</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_event_raffle_draw" model="ir.actions.act_window">
+        <field name="name">Winners</field>
+        <field name="res_model">event.raffle.draw</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('winner_participant_id', '!=', False)]</field>
+    </record>
+</odoo>

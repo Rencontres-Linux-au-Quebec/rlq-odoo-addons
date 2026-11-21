@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_raffle_start_wizard_form_survey" model="ir.ui.view">
+        <field name="name">event.raffle.start.wizard.form.survey</field>
+        <field name="model">event.raffle.start.wizard</field>
+        <field name="inherit_id" ref="event_raffle.event_raffle_start_wizard_form" />
+        <field name="arch" type="xml">
+            <!-- Every survey field needs the right to read survey answers:
+                 without it, the form shows none of them and fields_get leaves
+                 the survey strategy out of the choices. -->
+            <field name="copy_strategy" position="after">
+                <!-- Closing a survey archives it: without active_test, a
+                     closed survey would vanish from this list. -->
+                <field
+                    name="survey_id"
+                    invisible="copy_strategy != 'survey_only'"
+                    required="copy_strategy == 'survey_only'"
+                    context="{'active_test': False}"
+                    options="{'no_create': True}"
+                    groups="survey.group_survey_user"
+                />
+                <!-- Optional filter on the chosen survey's questions; the
+                     list links existing questions and creates none. -->
+                <field
+                    name="survey_question_ids"
+                    invisible="copy_strategy != 'survey_only' or not survey_id"
+                    groups="survey.group_survey_user"
+                >
+                    <list create="0">
+                        <field name="title" />
+                        <field name="question_type" />
+                    </list>
+                </field>
+                <field
+                    name="survey_question_match"
+                    widget="radio"
+                    options="{'horizontal': true}"
+                    invisible="copy_strategy != 'survey_only' or not survey_id or not survey_question_ids"
+                    groups="survey.group_survey_user"
+                />
+                <field
+                    name="survey_respondent_count"
+                    invisible="copy_strategy != 'survey_only' or not survey_id"
+                    groups="survey.group_survey_user"
+                />
+                <field
+                    name="survey_anonymous_count"
+                    invisible="copy_strategy != 'survey_only' or not survey_id or not survey_anonymous_count"
+                    decoration-warning="survey_anonymous_count"
+                    groups="survey.group_survey_user"
+                />
+            </field>
+        </field>
+    </record>
+</odoo>

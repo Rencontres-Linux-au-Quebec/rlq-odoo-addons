@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_raffle_draw_view_list" model="ir.ui.view">
+        <field name="name">event.raffle.draw.list</field>
+        <field name="model">event.raffle.draw</field>
+        <field name="arch" type="xml">
+            <list string="Winners">
+                <field name="sequence" />
+                <field name="raffle_id" />
+                <field name="winner_name" />
+                <field name="prize" />
+                <field name="prize_received" />
+                <field name="prize_received_date" />
+                <field name="comment" />
+                <field name="is_absent" />
+                <field name="date" />
+                <field name="name" optional="hide" />
+                <field name="partner_id" optional="hide" />
+                <field name="winner_participant_id" optional="hide" />
+                <field name="winner_email" optional="hide" />
+                <field name="prize_description" optional="hide" />
+            </list>
+        </field>
+    </record>
+
+    <record id="event_raffle_draw_view_form" model="ir.ui.view">
+        <field name="name">event.raffle.draw.form</field>
+        <field name="model">event.raffle.draw</field>
+        <field name="arch" type="xml">
+            <form string="Draw">
+                <header>
+                    <button
+                        name="action_mark_absent"
+                        type="object"
+                        string="Mark Absent"
+                        class="btn-secondary"
+                        invisible="is_absent"
+                    />
+                    <button
+                        name="action_mark_present"
+                        type="object"
+                        string="Mark Present"
+                        class="btn-secondary"
+                        invisible="not is_absent"
+                    />
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="raffle_id" />
+                            <field name="sequence" />
+                            <field name="winner_name" />
+                            <field name="winner_email" />
+                            <field name="winner_participant_id" />
+                            <field name="partner_id" />
+                            <field name="is_absent" />
+                        </group>
+                        <group>
+                            <field name="prize" />
+                            <field name="prize_description" />
+                            <field name="date" />
+                            <field name="prize_received" />
+                            <field name="prize_received_date" />
+                        </group>
+                    </group>
+                    <group string="Comment">
+                        <field
+                            name="comment"
+                            nolabel="1"
+                            placeholder="Prize hand-over, contact details, follow-up..."
+                        />
+                    </group>
+                </sheet>
+                <chatter />
+            </form>
+        </field>
+    </record>
+</odoo>
