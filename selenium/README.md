@@ -7,8 +7,8 @@
 `e2e_webapp_raffle_prize.py` checks, in a real browser (Chrome, headless by
 default), that the raffle prizes reach the web app of
 `event_webapp_plan_raffle` (`/webapp_event/<day>`). It plays the sponsored
-prize scenario of the ERPLibre_erplibre_addons repository
-(`selenium/e2e_raffle_sponsor_prize.py`, see its README: sponsor portal,
+prize scenario of the same folder (`e2e_raffle_sponsor_prize.py`, see
+[README.raffle_sponsor_prize.md](README.raffle_sponsor_prize.md): sponsor portal,
 event, raffle, approval, draws, Discuss, token checkout, winners page) and
 inserts three steps:
 
@@ -34,8 +34,8 @@ or `rlq_event_webapp_plan` if the day should look as on site):
 ```
 
 - `--raffle-e2e-dir` (or `RAFFLE_E2E_DIR`) names the folder of
-  `e2e_raffle_sponsor_prize.py`; by default, the `selenium` folder of
-  `ERPLibre_erplibre_addons` next to this repository.
+  `e2e_raffle_sponsor_prize.py`; by default, the folder of this
+  program.
 - `--version`, `--changelog` (this program's changes, `CHANGELOG.md`).
 - Configuration: `/etc/default/e2e_webapp_raffle_prize.conf`, then
   `~/.e2e_webapp_raffle_prize.conf`, `option = value` lines (the last
@@ -62,8 +62,9 @@ in the evidence folder), `2` the tool fails or a guard refuses.
 `e2e_webapp_raffle_prize.py` vérifie, dans un vrai navigateur (Chrome, sans
 fenêtre par défaut), que les prix de tirage arrivent dans l'app web de
 `event_webapp_plan_raffle` (`/webapp_event/<journée>`). Il joue le
-scénario des prix commandités du dépôt ERPLibre_erplibre_addons
-(`selenium/e2e_raffle_sponsor_prize.py` : portail du commanditaire,
+scénario des prix commandités du même dossier
+(`e2e_raffle_sponsor_prize.py`, voir
+[README.raffle_sponsor_prize.md](README.raffle_sponsor_prize.md) : portail du commanditaire,
 événement, tirage, approbation, tirs, Discussion, achat au jeton, page des
 gagnants) et y insère trois étapes :
 
@@ -78,4 +79,5 @@ traduction : le scénario tourne dans la langue de l'organisateur, en
 français comme en anglais.
 
 Lancement, options, configuration, garde-fous et codes de sortie : voir
-la partie anglaise ci-dessus, et le README du scénario de base.
+la partie anglaise ci-dessus, et
+[README.raffle_sponsor_prize.md](README.raffle_sponsor_prize.md).
