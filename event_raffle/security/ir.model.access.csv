@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_event_raffle_user,event.raffle user,model_event_raffle,event.group_event_user,1,1,1,0
+access_event_raffle_manager,event.raffle manager,model_event_raffle,event.group_event_manager,1,1,1,1
+access_event_raffle_participant_user,event.raffle.participant user,model_event_raffle_participant,event.group_event_user,1,1,1,1
+access_event_raffle_participant_manager,event.raffle.participant manager,model_event_raffle_participant,event.group_event_manager,1,1,1,1
+access_event_raffle_draw_user,event.raffle.draw user,model_event_raffle_draw,event.group_event_user,1,1,1,0
+access_event_raffle_draw_manager,event.raffle.draw manager,model_event_raffle_draw,event.group_event_manager,1,1,1,1
+access_event_raffle_start_wizard_user,event.raffle.start.wizard user,model_event_raffle_start_wizard,event.group_event_user,1,1,1,0
+access_event_raffle_start_wizard_manager,event.raffle.start.wizard manager,model_event_raffle_start_wizard,event.group_event_manager,1,1,1,1
+access_event_raffle_config_user,event.raffle.config user,model_event_raffle_config,event.group_event_user,1,0,0,0
+access_event_raffle_config_manager,event.raffle.config manager,model_event_raffle_config,event.group_event_manager,1,1,1,0

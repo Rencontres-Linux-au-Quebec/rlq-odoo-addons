@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<templates xml:space="preserve">
+    <t t-name="event_raffle.RaffleWheel">
+        <!-- `o_action` is what makes Odoo give the fullscreen client action its
+             height (.o_action_manager > .o_action). On the embedded widget it
+             cannot match that rule, but it DOES match a descendant rule in
+             action_dialog.scss, which then overrides our own height. So carry
+             it only where it is meant to work. -->
+        <div
+            class="o_raffle_wheel"
+            t-att-class="'o_raffle_' + state.theme
+                          + (isFullscreen ? ' o_action' : '')"
+        >
+            <div class="o_raffle_lasers" t-if="state.theme === 'rave'">
+                <span />
+                <span />
+                <span />
+                <span />
+                <span />
+                <span />
+                <span />
+                <span />
+                <span />
+                <span />
+                <span />
+                <span />
+            </div>
+            <div class="o_raffle_strobe" t-if="state.theme === 'rave'" />
+            <div class="o_raffle_terminal" t-if="state.theme === 'linux' or state.theme === 'linux_light'">
+                <div class="o_term_bar">
+                    <span class="o_term_winbtns">
+                        <span class="o_term_wb o_min">−</span>
+                        <span class="o_term_wb o_max">□</span>
+                        <span class="o_term_wb o_close">×</span>
+                    </span>
+                    <span class="o_term_title">raffle@tux: ~</span>
+                </div>
+                <div class="o_term_body">
+                    <div
+                        t-foreach="state.terminal"
+                        t-as="line"
+                        t-key="line_index"
+                        class="o_term_line"
+                        t-att-class="'o_term_' + (line.cls || 'out')"
+                    >
+                        <span t-if="line.prompt" class="o_term_ps" t-esc="line.prompt" />
+                        <t t-esc="line.text" />
+                        <span t-if="line_last" class="o_term_cursor" />
+                    </div>
+                </div>
+            </div>
+            <div class="o_raffle_toolbar">
+                <div class="o_raffle_tb_left">
+                    <button
+                        t-if="!isFullscreen"
+                        class="btn btn-secondary o_raffle_fullscreen"
+                        t-on-click="() => this.openFullscreen()"
+                        t-att-disabled="state.spinning"
+                    >
+                        Full Screen
+                    </button>
+                    <button
+                        t-if="isFullscreen"
+                        class="btn btn-secondary o_raffle_exit"
+                        t-on-click="() => this.exitFullscreen()"
+                        t-att-disabled="state.spinning"
+                    >
+                        Exit Full Screen
+                    </button>
+                    <input
+                        type="text"
+                        placeholder="Prize (optional)"
+                        t-model="state.prize"
+                        t-att-disabled="state.spinning"
+                    />
+                </div>
+                <div class="o_raffle_winner" t-if="state.winner">
+                    🎉 Winner:
+                    <t t-esc="state.winner" />
+                </div>
+                <div class="o_raffle_tb_right">
+                    <span class="o_raffle_count">
+                        Eligible:
+                        <t t-esc="state.eligibleCount" />
+                    </span>
+                    <button
+                        class="btn btn-primary o_raffle_spin"
+                        t-on-click="() => this.spin()"
+                        t-att-disabled="state.spinning or !state.canDrawNext"
+                        t-att-title="!state.canDrawNext and !state.spinning ? noDrawLeftTitle : false"
+                    >
+                        <t t-if="state.drawCount === 0">Start the Raffle</t>
+                        <t t-else="">Next Draw</t>
+                    </button>
+                </div>
+            </div>
+            <div
+                class="o_raffle_history"
+                t-if="state.history.length"
+                t-att-class="{o_collapsed: state.historyCollapsed}"
+            >
+                <div class="o_raffle_history_title" t-on-click="() => this.toggleHistoryCollapsed()">
+                    <span class="o_raffle_history_caret" t-esc="state.historyCollapsed ? '▸' : '▾'" />
+                    Winner History
+                    <t t-esc="'(' + state.history.length + ')'" />
+                </div>
+                <ul t-if="!state.historyCollapsed">
+                    <li
+                        t-foreach="state.history"
+                        t-as="draw"
+                        t-key="draw.id"
+                        class="o_raffle_history_item"
+                        t-att-class="{
+                            'o_absent': draw.is_absent,
+                            'o_expanded': state.expandedId === draw.id}"
+                        t-on-click="() => this.toggleHistory(draw.id)"
+                    >
+                        <div class="o_raffle_history_row">
+                            <span class="o_seq" t-esc="'#' + draw.sequence" />
+                            <span class="o_name">
+                                <t t-esc="draw.winner_name" />
+                            </span>
+                            <span class="o_absent_badge" t-if="!draw.present">not present</span>
+                        </div>
+                        <div class="o_raffle_history_details" t-if="state.expandedId === draw.id">
+                            <div t-if="draw.prize">
+                                Prize:
+                                <t t-esc="draw.prize" />
+                            </div>
+                            <div t-if="draw.prize_description">
+                                Description:
+                                <t t-esc="draw.prize_description" />
+                            </div>
+                            <div t-if="draw.date">
+                                Date:
+                                <t t-esc="draw.date" />
+                            </div>
+                            <div>
+                                Present:
+                                <t t-if="draw.present">Yes</t>
+                                <t t-else="">No</t>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <canvas t-ref="canvas" class="o_raffle_canvas" />
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="res_partner_view_form_raffle" model="ir.ui.view">
+        <field name="name">res.partner.form.raffle</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="arch" type="xml">
+            <!-- Restricted to event users: they are the only ones allowed to
+                 read event.raffle.draw, so the button would land on an access
+                 error for anyone else. -->
+            <div name="button_box" position="inside">
+                <button
+                    name="action_view_raffle_wins"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-trophy"
+                    groups="event.group_event_user"
+                    invisible="raffle_win_count == 0"
+                >
+                    <field name="raffle_win_count" widget="statinfo" string="Raffle Winner" />
+                </button>
+            </div>
+        </field>
+    </record>
+
+    <record id="res_partner_view_search_raffle" model="ir.ui.view">
+        <field name="name">res.partner.search.raffle</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter" />
+        <field name="arch" type="xml">
+            <filter name="type_company" position="after">
+                <separator />
+                <filter
+                    string="Raffle Winner"
+                    name="raffle_winner"
+                    domain="[('raffle_draw_ids.winner_participant_id',
+                                  '!=', False)]"
+                />
+            </filter>
+        </field>
+    </record>
+</odoo>
