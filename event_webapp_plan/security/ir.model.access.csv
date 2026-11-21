@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_event_webapp_moderator,event.webapp moderator,model_event_webapp,group_event_webapp_moderator,1,0,0,0
+access_event_webapp_manager,event.webapp manager,model_event_webapp,group_event_webapp_manager,1,1,1,1
+access_event_webapp_room_moderator,event.webapp.room moderator,model_event_webapp_room,group_event_webapp_moderator,1,0,0,0
+access_event_webapp_room_manager,event.webapp.room manager,model_event_webapp_room,group_event_webapp_manager,1,1,1,1
+access_event_webapp_link_moderator,event.webapp.link moderator,model_event_webapp_link,group_event_webapp_moderator,1,0,0,0
+access_event_webapp_link_manager,event.webapp.link manager,model_event_webapp_link,group_event_webapp_manager,1,1,1,1
+access_event_event_ewp_webapp_moderator,event.event ewp webapp moderator,event.model_event_event,group_event_webapp_moderator,1,0,0,0
+access_event_raffle_ewp_webapp_moderator,event.raffle ewp webapp moderator,event_raffle.model_event_raffle,group_event_webapp_moderator,1,0,0,0
+access_event_webapp_bbb_meetings_manager,event.webapp.bbb.meetings manager,model_event_webapp_bbb_meetings,group_event_webapp_manager,1,1,1,1
+access_event_webapp_bbb_meeting_line_manager,event.webapp.bbb.meeting.line manager,model_event_webapp_bbb_meeting_line,group_event_webapp_manager,1,1,1,1

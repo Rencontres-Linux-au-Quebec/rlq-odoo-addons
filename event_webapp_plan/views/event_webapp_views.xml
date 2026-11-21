@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
+  Copyright (C) 2026 Rencontres Linux au Québec contributors
+  License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+-->
+<odoo>
+    <record id="event_webapp_view_list" model="ir.ui.view">
+        <field name="name">event.webapp.list</field>
+        <field name="model">event.webapp</field>
+        <field name="arch" type="xml">
+            <list string="Event days">
+                <field name="name" />
+                <field name="date_start" />
+                <field name="date_end" />
+                <field name="room_count" string="Rooms" />
+                <field name="is_open" widget="boolean" />
+                <field name="active" column_invisible="True" />
+            </list>
+        </field>
+    </record>
+
+    <record id="event_webapp_view_search" model="ir.ui.view">
+        <field name="name">event.webapp.search</field>
+        <field name="model">event.webapp</field>
+        <field name="arch" type="xml">
+            <search string="Event days">
+                <field name="name" />
+                <field name="event_ids" />
+                <filter
+                    name="filter_not_ended"
+                    string="Today and later"
+                    domain="[('date_end', '&gt;=', context_today().strftime('%Y-%m-%d'))]"
+                />
+                <filter
+                    name="filter_ended"
+                    string="Past"
+                    domain="[('date_end', '&lt;', context_today().strftime('%Y-%m-%d'))]"
+                />
+                <separator />
+                <filter name="filter_archived" string="Archived" domain="[('active', '=', False)]" />
+                <group expand="0" string="Group By">
+                    <filter name="group_date_start" string="Opening month" context="{'group_by': 'date_start:month'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="event_webapp_view_form" model="ir.ui.view">
+        <field name="name">event.webapp.form</field>
+        <field name="model">event.webapp</field>
+        <field name="arch" type="xml">
+            <form string="Event day">
+                <header>
+                    <button
+                        name="action_open_webapp"
+                        type="object"
+                        string="Open the web app"
+                        class="btn-primary"
+                        invisible="not id"
+                    />
+                    <button
+                        name="action_create_missing_channels"
+                        type="object"
+                        string="Create missing chat channels"
+                        groups="event_webapp_plan.group_event_webapp_manager"
+                        invisible="not id"
+                    />
+                    <button
+                        name="action_open_bbb_meetings"
+                        type="object"
+                        string="Running BBB meetings"
+                        groups="base.group_system"
+                        invisible="not id or not bbb_configured"
+                    />
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active" />
+                    <widget
+                        name="web_ribbon"
+                        title="Open now"
+                        bg_color="text-bg-success"
+                        invisible="not active or not is_open"
+                    />
+                    <field name="active" invisible="1" />
+                    <field name="bbb_configured" invisible="1" />
+                    <div class="oe_title">
+                        <label for="name" />
+                        <h1>
+                            <field name="name" placeholder="e.g. Annual meeting day" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Opening window">
+                            <field name="date_start" />
+                            <field name="date_end" />
+                            <field name="is_open" />
+                        </group>
+                        <group string="Web app">
+                            <field name="webapp_url" widget="CopyClipboardChar" invisible="not id" />
+                            <field name="room_count" string="Rooms" />
+                        </group>
+                    </group>
+                    <div class="text-muted mb-3">
+                        Logged-in users (portal or internal) see the web app
+                        between the opening and the closing moment. Moderators
+                        and administrators see it at any time, to test it.
+                    </div>
+                    <notebook>
+                        <page string="Announcement" name="page_announcement">
+                            <field
+                                name="announcement"
+                                placeholder="General announcement shown at the top of the web app..."
+                            />
+                        </page>
+                        <page string="Links" name="page_links">
+                            <field name="link_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle" />
+                                    <field name="name" />
+                                    <field name="url" widget="url" />
+                                    <field name="description" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Events" name="page_events">
+                            <field name="event_ids">
+                                <list>
+                                    <field name="name" />
+                                    <field name="date_begin" />
+                                    <field name="date_end" />
+                                    <field name="address_id" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Raffles" name="page_raffles">
+                            <field
+                                name="raffle_ids"
+                                context="{'list_view_ref': 'event_webapp_plan.event_raffle_view_list_select'}"
+                            >
+                                <list>
+                                    <field name="name" />
+                                    <field name="event_id" />
+                                    <field name="state" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Plan &amp; Rooms" name="page_plan">
+                            <group>
+                                <field name="plan_image" widget="image" options="{'size': [0, 120]}" />
+                            </group>
+                            <!-- The rooms appear twice: the visual editor
+                                 draws their areas on the plan image, and the
+                                 editable list below edits name, colour and
+                                 channel. The web client merges both
+                                 occurrences into one list of sub-records, so
+                                 a room added below shows up in the editor at
+                                 once. The editor must stay FIRST: the list's
+                                 complete field definitions then override the
+                                 minimal ones the editor declares. -->
+                            <field name="room_ids" widget="ewp_room_plan_editor" nolabel="1" />
+                            <field name="room_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle" />
+                                    <field name="name" />
+                                    <field name="color" widget="color" />
+                                    <field name="description" optional="hide" />
+                                    <field name="pos_x" optional="hide" />
+                                    <field name="pos_y" optional="hide" />
+                                    <field name="pos_width" optional="hide" />
+                                    <field name="pos_height" optional="hide" />
+                                    <field name="pos_rotation" optional="hide" />
+                                    <field
+                                        name="channel_id"
+                                        domain="[('channel_type', '=', 'channel'), ('parent_channel_id', '=', False), '|', ('group_public_id', '=', False), ('group_public_id', '=', access_group_id)]"
+                                        options="{'no_create': True}"
+                                    />
+                                    <field name="access_group_id" optional="hide" />
+                                    <!-- Only the Settings group chooses the
+                                         meeting of a room (see the model):
+                                         the others read it. -->
+                                    <field name="bbb_meeting_id" optional="show" groups="base.group_system" />
+                                    <field
+                                        name="bbb_meeting_id"
+                                        optional="show"
+                                        groups="!base.group_system"
+                                        readonly="1"
+                                    />
+                                    <field name="bbb_room_url" widget="url" optional="show" />
+                                    <field name="bbb_frameable" optional="show" />
+                                    <field name="bbb_frame_checked" optional="hide" />
+                                    <button
+                                        name="action_bbb_recheck"
+                                        type="object"
+                                        groups="event_webapp_plan.group_event_webapp_manager"
+                                        string="Re-check"
+                                        title="Check again whether the conference URL can be shown in the page"
+                                        icon="fa-refresh"
+                                        invisible="not bbb_room_url"
+                                    />
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter />
+            </form>
+        </field>
+    </record>
+
+    <!-- List of the "Add a line" dialog of the Raffles tab. The default list
+         of event.raffle counts participants and draws, which an Event Web
+         App administrator without rights on the Events app cannot read:
+         this one shows only fields of event.raffle itself. A high priority
+         keeps it out of the way of the default list. -->
+    <record id="event_raffle_view_list_select" model="ir.ui.view">
+        <field name="name">event.raffle.list.select (event_webapp_plan)</field>
+        <field name="model">event.raffle</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <list string="Raffles">
+                <field name="name" />
+                <field name="event_id" />
+                <field name="state" />
+            </list>
+        </field>
+    </record>
+
+    <record id="event_webapp_action" model="ir.actions.act_window">
+        <field name="name">Event days</field>
+        <field name="res_model">event.webapp</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="event_webapp_view_search" />
+        <field name="context">{'search_default_filter_not_ended': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create an event day</p>
+            <p>
+                An event day is the web app shown at /webapp_event: an
+                announcement, links, the events and raffles of the day, and
+                the site plan with one chat per room.
+            </p>
+        </field>
+    </record>
+</odoo>

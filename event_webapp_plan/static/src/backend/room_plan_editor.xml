@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
+  Copyright (C) 2026 Rencontres Linux au Québec contributors
+  License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+-->
+<templates xml:space="preserve">
+    <t t-name="event_webapp_plan.RoomPlanEditor">
+        <div class="o_ewp_plan_editor d-flex flex-column flex-lg-row gap-3 w-100 mb-3">
+            <div class="o_ewp_plan_rooms flex-shrink-0">
+                <div class="fw-bold mb-2">Rooms</div>
+                <div t-if="!rooms.length" class="text-muted small">
+                    Add the rooms in the list below, then draw them on the plan.
+                </div>
+                <div class="list-group">
+                    <button
+                        t-foreach="rooms"
+                        t-as="room"
+                        t-key="room.id"
+                        type="button"
+                        class="list-group-item list-group-item-action d-flex align-items-center gap-2"
+                        t-att-class="{ active: room.id === state.selectedId }"
+                        t-att-aria-pressed="room.id === state.selectedId ? 'true' : 'false'"
+                        t-on-click="() => this.selectRoom(room)"
+                    >
+                        <span
+                            class="o_ewp_plan_swatch flex-shrink-0"
+                            t-att-style="'background-color: ' + roomColor(room)"
+                        />
+                        <span class="flex-grow-1 text-truncate" t-esc="roomName(room)" />
+                        <span t-if="hasArea(room)" class="fa fa-check-square-o" title="Placed on the plan" />
+                        <span t-else="" class="fa fa-square-o text-muted" title="Not placed on the plan yet" />
+                    </button>
+                </div>
+                <div t-if="canEdit and selectedRoom" class="mt-2">
+                    <div class="small text-muted mb-2">
+                        Drag on the plan to draw the area of
+                        <strong t-esc="roomName(selectedRoom)" />
+                    </div>
+                    <div t-if="hasArea(selectedRoom)" class="small text-muted mb-2">
+                        <t>Drag inside the area to move it, a handle to resize it, the round knob to rotate it (Shift: 1° steps).</t>
+                    </div>
+                    <div
+                        class="o_ewp_plan_rotation mb-2"
+                        role="group"
+                        aria-label="Rotation of the area"
+                    >
+                        <div class="d-flex align-items-center gap-1 mb-1">
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-secondary o_ewp_plan_rotate_left"
+                                t-att-disabled="!canRotate"
+                                title="Rotate left by 15° (Shift: 1°)"
+                                aria-label="Rotate left"
+                                t-on-click="(ev) => this.rotateBy(ev, -1)"
+                            >
+                                <i class="fa fa-rotate-left" aria-hidden="true" />
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-secondary o_ewp_plan_rotate_right"
+                                t-att-disabled="!canRotate"
+                                title="Rotate right by 15° (Shift: 1°)"
+                                aria-label="Rotate right"
+                                t-on-click="(ev) => this.rotateBy(ev, 1)"
+                            >
+                                <i class="fa fa-rotate-right" aria-hidden="true" />
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-secondary o_ewp_plan_straighten"
+                                t-att-disabled="!canRotate"
+                                title="Set the angle back to 0°"
+                                t-on-click="straighten"
+                            >
+                                Straighten
+                            </button>
+                        </div>
+                        <label class="d-flex align-items-center gap-2 small mb-0">
+                            <span>Angle (°)</span>
+                            <input
+                                type="number"
+                                class="form-control form-control-sm o_ewp_plan_angle_input"
+                                min="-180"
+                                max="180"
+                                step="1"
+                                t-att-disabled="!canRotate"
+                                t-att-value="selectedAngle"
+                                title="Angle of the area in degrees, clockwise, from -180 to 180"
+                                t-on-change="onAngleChange"
+                            />
+                        </label>
+                    </div>
+                    <button
+                        t-if="hasArea(selectedRoom)"
+                        type="button"
+                        class="btn btn-sm btn-secondary"
+                        t-on-click="clearArea"
+                    >
+                        Remove from the plan
+                    </button>
+                </div>
+                <div t-elif="canEdit and rooms.length" class="small text-muted mt-2">
+                    Select a room, then drag on the plan to draw its area.
+                </div>
+            </div>
+            <div class="o_ewp_plan_canvas flex-grow-1">
+                <div t-if="!planUrl" class="alert alert-info mb-0" role="status">
+                    Upload a site plan image above, then draw the rooms on it.
+                </div>
+                <div
+                    t-else=""
+                    t-ref="surface"
+                    class="o_ewp_plan_surface"
+                    t-att-class="{ o_ewp_plan_drawing: canEdit and selectedRoom }"
+                    t-on-pointerdown="onPointerDown"
+                    t-on-pointermove="onPointerMove"
+                    t-on-pointerup="onPointerUp"
+                    t-on-pointercancel="onPointerCancel"
+                >
+                    <img t-att-src="planUrl" alt="Site plan" draggable="false" />
+                    <!-- The areas clip their turned corners at the edges of
+                         the image; the frame with the handles stays out of
+                         that layer, so a handle beyond the image can still
+                         be grabbed. -->
+                    <div class="o_ewp_plan_areas">
+                        <t t-foreach="rooms" t-as="room" t-key="room.id">
+                            <t t-set="box" t-value="shownBox(room)" />
+                            <div
+                                t-if="box"
+                                class="o_ewp_plan_room"
+                                t-att-class="{
+                                    o_ewp_plan_room_selected: room.id === state.selectedId,
+                                    o_ewp_plan_room_draft: room.id === state.selectedId and state.draft,
+                                }"
+                                t-att-style="roomStyle(room)"
+                                t-att-data-ewp-room-id="room.id"
+                            >
+                                <span t-if="!state.draft or room.id !== state.selectedId" class="o_ewp_plan_room_label" t-esc="roomName(room)" />
+                            </div>
+                        </t>
+                    </div>
+                    <div
+                        t-if="frameBox"
+                        class="o_ewp_plan_frame"
+                        t-att-class="{ o_ewp_plan_frame_active: state.edit }"
+                        t-att-style="frameStyle"
+                    >
+                        <div class="o_ewp_plan_move" data-ewp-handle="move" title="Move" />
+                        <div class="o_ewp_plan_rotate_line" />
+                        <div class="o_ewp_plan_rotate" data-ewp-handle="rotate" title="Rotate (Shift: 1° steps)" />
+                        <div
+                            t-foreach="handles"
+                            t-as="key"
+                            t-key="key"
+                            class="o_ewp_plan_handle"
+                            t-att-class="'o_ewp_plan_handle_' + key"
+                            t-att-data-ewp-handle="key"
+                            t-att-style="handleCursor(key)"
+                            title="Resize"
+                        />
+                        <div
+                            t-if="state.edit and state.edit.mode === 'rotate'"
+                            class="o_ewp_plan_angle_badge"
+                            aria-hidden="true"
+                            t-esc="frameBox.rotation + '°'"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
+  Copyright (C) 2026 Rencontres Linux au Québec contributors
+  License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+-->
+<odoo>
+    <!-- BigBlueButton server of the room pages. The secret field is
+         write-only (see res_config_settings.py): it is always empty here,
+         and "Secret saved" tells whether one is stored. The display mode
+         chooses between the frame of the room page and a new tab. -->
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.event_webapp_plan</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app
+                    data-string="Event Web App"
+                    string="Event Web App"
+                    name="event_webapp_plan"
+                    groups="base.group_system"
+                >
+                    <block title="BigBlueButton" name="ewp_bbb_setting_container">
+                        <setting
+                            id="ewp_bbb_server"
+                            string="BigBlueButton server"
+                            help="Joins the meeting of a room directly in the room page. Run &quot;sudo bbb-conf --secret&quot; on the server to get its URL and its shared secret."
+                        >
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <label for="ewp_bbb_server_url" string="URL" class="col-lg-3 o_light_label" />
+                                    <field
+                                        name="ewp_bbb_server_url"
+                                        placeholder="https://bbb.example.org/bigbluebutton/"
+                                    />
+                                </div>
+                                <div class="row mt16">
+                                    <label for="ewp_bbb_secret" class="col-lg-3 o_light_label" />
+                                    <field
+                                        name="ewp_bbb_secret"
+                                        password="True"
+                                        placeholder="Leave empty to keep the saved secret"
+                                    />
+                                </div>
+                                <field name="ewp_bbb_secret_set" invisible="1" />
+                                <div class="mt8 text-muted" invisible="ewp_bbb_secret_set">No secret is saved.</div>
+                                <div class="mt8" invisible="not ewp_bbb_secret_set">
+                                    <span class="text-muted">A secret is saved.</span>
+                                    <button
+                                        name="action_ewp_bbb_forget_secret"
+                                        type="object"
+                                        string="Forget the secret"
+                                        class="btn-link"
+                                        confirm="The rooms will stop joining their meeting through the server. Forget the secret?"
+                                    />
+                                </div>
+                            </div>
+                        </setting>
+                        <setting
+                            id="ewp_bbb_display"
+                            string="Video conference display"
+                            help="The video conference server keeps the session of each participant in a cookie, which browsers refuse in a page embedded from another site (Safari always refuses it). Automatic embeds the conference only when its server is on the same site as this web app, and otherwise opens it in a new tab."
+                        >
+                            <div class="content-group">
+                                <div class="mt16">
+                                    <field name="ewp_bbb_display" widget="radio" />
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="event_webapp_settings_action" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'event_webapp_plan', 'bin_size': False}</field>
+    </record>
+</odoo>

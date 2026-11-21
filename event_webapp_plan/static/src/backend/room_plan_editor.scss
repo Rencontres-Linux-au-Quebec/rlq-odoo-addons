@@ -1,0 +1,221 @@
+// Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
+// Copyright (C) 2026 Rencontres Linux au Québec contributors
+// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+
+.o_ewp_plan_editor {
+    .o_ewp_plan_rooms {
+        width: 16rem;
+        max-width: 100%;
+    }
+
+    .o_ewp_plan_swatch {
+        width: 1rem;
+        height: 1rem;
+        border-radius: 0.2rem;
+        border: 1px solid rgba(0, 0, 0, 0.25);
+    }
+
+    // The overlay uses the size of the image: rectangles in percent of the
+    // surface are therefore percents of the image.
+    .o_ewp_plan_surface {
+        position: relative;
+        display: inline-block;
+        max-width: 100%;
+        user-select: none;
+        -webkit-user-select: none;
+
+        > img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            pointer-events: none;
+        }
+
+        // Touch drags draw instead of scrolling only while a room is
+        // selected for drawing; otherwise the page scrolls normally.
+        &.o_ewp_plan_drawing {
+            cursor: crosshair;
+            touch-action: none;
+        }
+    }
+
+    // Room for the rotation knob of an area at the top of the image.
+    .o_ewp_plan_canvas {
+        padding-top: 2rem;
+    }
+
+    // Layer of the areas, the size of the image: it clips the corners of
+    // a turned area.
+    .o_ewp_plan_areas {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    // An area and the frame of the selected one turn by --ewp-room-rotate
+    // around their centre.
+    .o_ewp_plan_room,
+    .o_ewp_plan_frame {
+        --ewp-room-color: #2a9d8f;
+        position: absolute;
+        transform: rotate(var(--ewp-room-rotate, 0deg));
+        pointer-events: none;
+    }
+
+    .o_ewp_plan_room {
+        border: 2px solid var(--ewp-room-color);
+        // Size container of its label: see .o_ewp_plan_room_label.
+        container-type: size;
+
+        &::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-color: var(--ewp-room-color);
+            opacity: 0.25;
+        }
+
+        &.o_ewp_plan_room_selected {
+            z-index: 1;
+            border-width: 3px;
+            border-style: dashed;
+
+            &::before {
+                opacity: 0.4;
+            }
+        }
+    }
+
+    // The label sits at the centre of its area and turns back by the angle
+    // of the area, so it stays level. Its width fits the level line across
+    // the centre of the turned shape, min(w / |cos a|, h / |sin a|), capped
+    // at w; max(sin, -sin, 0.01) is |sin a| without abs(), never 0.
+    .o_ewp_plan_room_label {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(calc(-1 * var(--ewp-room-rotate, 0deg)));
+        max-width: 100%;
+        max-width: #{"min(100cqw, 100cqh / max(sin(var(--ewp-room-rotate, 0deg)), -1 * sin(var(--ewp-room-rotate, 0deg)), 0.01))"};
+        padding: 0 0.3rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.75rem;
+        color: #fff;
+        background-color: var(--ewp-room-color);
+    }
+
+    // Frame of the selected area: its inside moves it, the handles resize
+    // it, the knob above its top edge turns it. Only these parts take the
+    // pointer; the rest of the surface draws.
+    .o_ewp_plan_frame {
+        z-index: 2;
+    }
+
+    .o_ewp_plan_move {
+        position: absolute;
+        inset: 0;
+        cursor: move;
+        pointer-events: auto;
+    }
+
+    .o_ewp_plan_handle,
+    .o_ewp_plan_rotate {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        margin: -6px 0 0 -6px;
+        border: 2px solid var(--ewp-room-color);
+        background-color: #fff;
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+        pointer-events: auto;
+        touch-action: none;
+    }
+
+    .o_ewp_plan_handle_nw {
+        top: 0;
+        left: 0;
+    }
+
+    .o_ewp_plan_handle_n {
+        top: 0;
+        left: 50%;
+    }
+
+    .o_ewp_plan_handle_ne {
+        top: 0;
+        left: 100%;
+    }
+
+    .o_ewp_plan_handle_e {
+        top: 50%;
+        left: 100%;
+    }
+
+    .o_ewp_plan_handle_se {
+        top: 100%;
+        left: 100%;
+    }
+
+    .o_ewp_plan_handle_s {
+        top: 100%;
+        left: 50%;
+    }
+
+    .o_ewp_plan_handle_sw {
+        top: 100%;
+        left: 0;
+    }
+
+    .o_ewp_plan_handle_w {
+        top: 50%;
+        left: 0;
+    }
+
+    // The knob sits $ewp-rotate-gap above the middle of the top edge,
+    // joined to it by a short line.
+    $ewp-rotate-gap: 22px;
+
+    .o_ewp_plan_rotate {
+        top: -$ewp-rotate-gap;
+        left: 50%;
+        width: 14px;
+        height: 14px;
+        margin: -7px 0 0 -7px;
+        border-radius: 50%;
+        cursor: grab;
+    }
+
+    .o_ewp_plan_frame_active .o_ewp_plan_rotate {
+        cursor: grabbing;
+    }
+
+    .o_ewp_plan_rotate_line {
+        position: absolute;
+        top: -$ewp-rotate-gap;
+        left: 50%;
+        height: $ewp-rotate-gap;
+        border-left: 2px solid var(--ewp-room-color);
+        margin-left: -1px;
+    }
+
+    // Angle shown while the knob turns the area, level above the knob.
+    .o_ewp_plan_angle_badge {
+        position: absolute;
+        top: -$ewp-rotate-gap - 26px;
+        left: 50%;
+        padding: 0 0.35rem;
+        border-radius: 0.25rem;
+        transform: translateX(-50%) rotate(calc(-1 * var(--ewp-room-rotate, 0deg)));
+        font-size: 0.75rem;
+        white-space: nowrap;
+        color: #fff;
+        background-color: rgba(0, 0, 0, 0.75);
+    }
+
+    .o_ewp_plan_angle_input {
+        width: 6rem;
+    }
+}

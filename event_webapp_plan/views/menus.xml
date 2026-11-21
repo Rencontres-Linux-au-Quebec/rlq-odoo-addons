@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
+  Copyright (C) 2026 Rencontres Linux au Québec contributors
+  License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+-->
+<odoo>
+    <menuitem
+        id="menu_event_webapp_root"
+        name="Event Web App"
+        web_icon="event_webapp_plan,static/description/icon.png"
+        groups="event_webapp_plan.group_event_webapp_moderator"
+        sequence="45"
+    />
+    <menuitem
+        id="menu_event_webapp_days"
+        name="Event days"
+        parent="menu_event_webapp_root"
+        action="event_webapp_action"
+        sequence="10"
+    />
+    <menuitem
+        id="menu_event_webapp_config"
+        name="Configuration"
+        parent="menu_event_webapp_root"
+        groups="base.group_system"
+        sequence="90"
+    />
+    <menuitem
+        id="menu_event_webapp_settings"
+        name="Settings"
+        parent="menu_event_webapp_config"
+        action="event_webapp_settings_action"
+        groups="base.group_system"
+        sequence="10"
+    />
+</odoo>

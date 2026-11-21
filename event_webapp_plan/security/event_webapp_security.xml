@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
+  Copyright (C) 2026 Rencontres Linux au Québec contributors
+  License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+-->
+<odoo>
+    <record id="module_category_event_webapp" model="ir.module.category">
+        <field name="name">Event Web App</field>
+        <field name="description">
+            Access to the event day web app (/webapp_event) and to its
+            configuration.
+        </field>
+        <field name="sequence">40</field>
+    </record>
+
+    <!-- Category of the room groups. event.webapp.room creates one
+         group per room in it; each group is the authorized group of the
+         room channel, so the rule ir_rule_discuss_channel_all hides that
+         channel from anonymous visitors and from every user outside it.
+         The groups imply nothing, so portal users can hold them, and
+         res.groups lists the category among the hidden ones of the user
+         form. -->
+    <record id="module_category_event_webapp_room" model="ir.module.category">
+        <field name="name">Event Web App Rooms</field>
+        <field name="description">
+            One group per room of the event web app: the users who entered
+            the room page, allowed to read and write in its chat.
+        </field>
+        <field name="sequence">41</field>
+    </record>
+
+    <!-- Moderator: reads the configuration and sees the web app outside
+         its opening window. The room model links every room group to its
+         implied groups, so moderators read every room chat. Command.link
+         keeps those runtime links when the module is updated. A user who
+         leaves the group loses the room groups that no visit gave them
+         (models/res_users.py). -->
+    <record id="group_event_webapp_moderator" model="res.groups">
+        <field name="name">Moderator</field>
+        <field name="category_id" ref="module_category_event_webapp" />
+        <field name="implied_ids" eval="[Command.link(ref('base.group_user'))]" />
+        <field name="comment">
+            Reads the event days, sees the web app outside its opening
+            window, to test it, and reads every room chat.
+        </field>
+    </record>
+
+    <!-- Administrator: creates and edits the event days. -->
+    <record id="group_event_webapp_manager" model="res.groups">
+        <field name="name">Administrator</field>
+        <field name="category_id" ref="module_category_event_webapp" />
+        <field name="implied_ids" eval="[Command.link(ref('group_event_webapp_moderator'))]" />
+        <field name="users" eval="[Command.link(ref('base.user_root')), Command.link(ref('base.user_admin'))]" />
+        <field name="comment">
+            Creates and edits the event days: opening window, announcement,
+            links, events, raffles, plan and rooms.
+        </field>
+    </record>
+</odoo>

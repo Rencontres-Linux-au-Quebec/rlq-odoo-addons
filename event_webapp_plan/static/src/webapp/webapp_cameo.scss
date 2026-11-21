@@ -1,0 +1,379 @@
+// Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
+// Copyright (C) 2026 Rencontres Linux au Québec contributors
+// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+//
+// Cameos of the event web app pages (webapp_cameo.js), compiled after
+// webapp.scss in the same bundle, whose mixin ewp-motion-allowed it uses.
+//
+// The layer covers the window, clips the cameos that slide in from its
+// edges and takes no pointer event. A cameo comes in from the side named by
+// o_ewp_cameo_from_<side> (bottom: rises, left and right: slides, pop:
+// grows in place), plays its action while data-ewp-phase is "act" and leaves the
+// same way while it is "exit", by keyframes of its own (ewp-cameo-*-out):
+// the enter name with `reverse` would update the finished enter animation
+// in place, not start it again, and the cameo would vanish at once rather
+// than leave. Every keyframe sits inside
+// ewp-motion-allowed: under a paused page the script removes the cameos
+// anyway, and the stop rules of webapp.scss set every animation to none.
+// The neutral actor moves by transforms and opacity only, at periods of
+// 0.6 s or more: nothing flashes.
+
+.o_ewp_webapp {
+    .o_ewp_cameo_layer {
+        position: fixed;
+        inset: 0;
+        z-index: 900;
+        overflow: hidden;
+        pointer-events: none;
+        contain: strict;
+    }
+
+    .o_ewp_cameo {
+        position: absolute;
+        pointer-events: none;
+        filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.25));
+    }
+
+    .o_ewp_cameo_actor {
+        width: 100%;
+        height: 100%;
+
+        > svg {
+            display: block;
+            overflow: visible;
+        }
+    }
+
+    // ---- Neutral actor -----------------------------------------------------
+    .o_ewp_cameo_neutral {
+        .o_ewp_cameo_body {
+            fill: var(--ewp-accent);
+        }
+
+        .o_ewp_cameo_eye {
+            fill: var(--ewp-on-accent);
+        }
+
+        .o_ewp_cameo_mouth,
+        .o_ewp_cameo_arm,
+        .o_ewp_cameo_steam,
+        .o_ewp_cameo_handle,
+        .o_ewp_cameo_stand,
+        .o_ewp_cameo_wave {
+            fill: none;
+            stroke: var(--ewp-ink);
+            stroke-width: 3;
+            stroke-linecap: round;
+        }
+
+        .o_ewp_cameo_mouth {
+            stroke: var(--ewp-on-accent);
+        }
+
+        .o_ewp_cameo_arm {
+            stroke: var(--ewp-accent);
+            stroke-width: 7;
+            transform-origin: 74px 58px;
+        }
+
+        .o_ewp_cameo_steam {
+            stroke: var(--ewp-muted);
+            stroke-width: 2;
+        }
+
+        .o_ewp_cameo_cup,
+        .o_ewp_cameo_mic,
+        .o_ewp_cameo_board {
+            fill: var(--ewp-warm);
+        }
+
+        .o_ewp_cameo_key {
+            fill: var(--ewp-surface);
+        }
+
+        .o_ewp_cameo_confetti {
+            fill: var(--ewp-warm);
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+
+        .o_ewp_cameo_confetti_2 {
+            fill: var(--ewp-success);
+        }
+
+        .o_ewp_cameo_confetti_3 {
+            fill: var(--ewp-accent);
+        }
+    }
+
+    // ---- Motion ------------------------------------------------------------
+    @include ewp-motion-allowed {
+        .o_ewp_cameo_from_bottom {
+            animation: ewp-cameo-rise var(--ewp-cameo-enter, 0.7s) cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+        }
+
+        .o_ewp_cameo_from_left {
+            animation: ewp-cameo-slide-left var(--ewp-cameo-enter, 0.7s) cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
+        }
+
+        .o_ewp_cameo_from_right {
+            animation: ewp-cameo-slide-right var(--ewp-cameo-enter, 0.7s) cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
+        }
+
+        .o_ewp_cameo_from_pop {
+            animation: ewp-cameo-pop var(--ewp-cameo-enter, 0.7s) cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+        }
+
+        .o_ewp_cameo[data-ewp-phase="exit"] {
+            &.o_ewp_cameo_from_bottom {
+                animation: ewp-cameo-rise-out var(--ewp-cameo-exit, 0.6s) ease-in both;
+            }
+
+            &.o_ewp_cameo_from_left {
+                animation: ewp-cameo-slide-left-out var(--ewp-cameo-exit, 0.6s) ease-in both;
+            }
+
+            &.o_ewp_cameo_from_right {
+                animation: ewp-cameo-slide-right-out var(--ewp-cameo-exit, 0.6s) ease-in both;
+            }
+
+            &.o_ewp_cameo_from_pop {
+                animation: ewp-cameo-pop-out var(--ewp-cameo-exit, 0.6s) ease-in both;
+            }
+        }
+
+        .o_ewp_cameo[data-ewp-phase="act"] .o_ewp_cameo_actor {
+            animation: ewp-cameo-bob 1.2s ease-in-out infinite;
+        }
+
+        .o_ewp_cameo_do_celebrate[data-ewp-phase="act"] .o_ewp_cameo_actor {
+            animation: ewp-cameo-hop 0.7s ease-in-out infinite;
+        }
+
+        .o_ewp_cameo[data-ewp-phase="act"] .o_ewp_cameo_neutral {
+            .o_ewp_cameo_arm {
+                animation: ewp-cameo-wave 0.6s ease-in-out infinite alternate;
+            }
+
+            .o_ewp_cameo_steam {
+                animation: ewp-cameo-steam 1.8s ease-out infinite;
+            }
+
+            .o_ewp_cameo_steam_2 {
+                animation-delay: 0.9s;
+            }
+
+            .o_ewp_cameo_key {
+                animation: ewp-cameo-type 1.2s ease-in-out infinite;
+            }
+
+            .o_ewp_cameo_key_2 {
+                animation-delay: 0.3s;
+            }
+
+            .o_ewp_cameo_key_3 {
+                animation-delay: 0.6s;
+            }
+
+            .o_ewp_cameo_key_4 {
+                animation-delay: 0.9s;
+            }
+
+            .o_ewp_cameo_wave {
+                animation: ewp-cameo-voice 1.2s ease-out infinite;
+            }
+
+            .o_ewp_cameo_wave_2 {
+                animation-delay: 0.4s;
+            }
+
+            .o_ewp_cameo_confetti {
+                animation: ewp-cameo-fall 1.4s ease-in infinite;
+            }
+
+            .o_ewp_cameo_confetti_2 {
+                animation-delay: 0.45s;
+            }
+
+            .o_ewp_cameo_confetti_3 {
+                animation-delay: 0.9s;
+            }
+        }
+    }
+}
+
+@keyframes ewp-cameo-rise {
+    from {
+        transform: translateY(110%);
+    }
+
+    to {
+        transform: none;
+    }
+}
+
+@keyframes ewp-cameo-slide-left {
+    from {
+        transform: translateX(-130%) rotate(-12deg);
+    }
+
+    to {
+        transform: none;
+    }
+}
+
+@keyframes ewp-cameo-slide-right {
+    from {
+        transform: translateX(130%) rotate(12deg);
+    }
+
+    to {
+        transform: none;
+    }
+}
+
+@keyframes ewp-cameo-pop {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    to {
+        transform: none;
+        opacity: 1;
+    }
+}
+
+@keyframes ewp-cameo-rise-out {
+    from {
+        transform: none;
+    }
+
+    to {
+        transform: translateY(110%);
+    }
+}
+
+@keyframes ewp-cameo-slide-left-out {
+    from {
+        transform: none;
+    }
+
+    to {
+        transform: translateX(-130%) rotate(-12deg);
+    }
+}
+
+@keyframes ewp-cameo-slide-right-out {
+    from {
+        transform: none;
+    }
+
+    to {
+        transform: translateX(130%) rotate(12deg);
+    }
+}
+
+@keyframes ewp-cameo-pop-out {
+    from {
+        transform: none;
+        opacity: 1;
+    }
+
+    to {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+@keyframes ewp-cameo-bob {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-6%);
+    }
+}
+
+@keyframes ewp-cameo-hop {
+    0%,
+    100% {
+        transform: translateY(0) scale(1, 1);
+    }
+
+    40% {
+        transform: translateY(-7%) scale(0.96, 1.04);
+    }
+}
+
+@keyframes ewp-cameo-wave {
+    from {
+        transform: rotate(-18deg);
+    }
+
+    to {
+        transform: rotate(22deg);
+    }
+}
+
+@keyframes ewp-cameo-steam {
+    0% {
+        transform: translateY(4px);
+        opacity: 0;
+    }
+
+    40% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
+}
+
+@keyframes ewp-cameo-type {
+    0%,
+    60%,
+    100% {
+        transform: translateY(0);
+    }
+
+    30% {
+        transform: translateY(2px);
+    }
+}
+
+@keyframes ewp-cameo-voice {
+    0% {
+        transform: translateX(-3px);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(4px);
+        opacity: 0;
+    }
+}
+
+@keyframes ewp-cameo-fall {
+    0% {
+        transform: translateY(-6px) rotate(0deg);
+        opacity: 0;
+    }
+
+    30% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(20px) rotate(180deg);
+        opacity: 0;
+    }
+}
