@@ -1,0 +1,280 @@
+// Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
+// Copyright (C) 2026 Rencontres Linux au Québec contributors
+// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+//
+// Style of the agenda blocks of the event web app, compiled after
+// webapp.scss in the bundle event_webapp_plan.assets_webapp. Every rule sits
+// under the body class .o_ewp_webapp and takes the custom properties of the
+// pages (--ewp-*), so a theme and the dark scheme restyle it with the rest.
+//
+// No animation and no transition: the states of the sessions change as
+// text ("Now", "Next") and as a still mark beside it, never as motion and
+// never as a colour alone. The filter buttons are the toggle buttons of the
+// display options (.o_ewp_pref_toggle: a box with a check mark when
+// pressed). In text-only mode the blocks are one column of text.
+
+.o_ewp_webapp {
+    .ewp_track_filter {
+        margin: 0;
+    }
+
+    .ewp_track_filter_choices {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .ewp_track_filter_label {
+        flex-basis: 100%;
+        color: var(--ewp-muted);
+        font-size: 14px;
+    }
+
+    .ewp_track_filter_choice {
+        max-width: 100%;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        text-align: left;
+        white-space: normal;
+    }
+
+    ol.ewp_track_slots,
+    ul.ewp_track_sessions,
+    ol.ewp_track_sessions {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .ewp_track_slots {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .ewp_track_slot_time {
+        margin: 0 0 6px;
+        color: var(--ewp-accent-text);
+        font-size: 15px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .ewp_track_sessions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .ewp_track_session {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+        padding: 10px 12px;
+        border-left: 4px solid var(--ewp-border);
+        border-radius: var(--ewp-radius-xs);
+        background: var(--ewp-surface-2);
+
+        p {
+            margin: 0;
+        }
+
+        // Session in progress: a thick bar of the success colour, beside
+        // the "Now" badge that says it.
+        &[data-ewp-state="now"] {
+            border-left-color: var(--ewp-success);
+            background: var(--ewp-success-soft);
+        }
+
+        &[data-ewp-state="next"] {
+            border-left-color: var(--ewp-warm);
+        }
+
+        // The filter by room hides an item with the attribute hidden: the
+        // display above would otherwise keep it on screen, and in the
+        // accessibility tree, beside the shown sessions of its slot.
+        &[hidden] {
+            display: none;
+        }
+    }
+
+    .ewp_track_title {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 4px 8px;
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 1.3;
+    }
+
+    .ewp_track_badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        border-radius: var(--ewp-radius-pill);
+        font-family: var(--ewp-font);
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.4;
+
+        &[hidden] {
+            display: none;
+        }
+    }
+
+    .ewp_track_badge_now {
+        background: var(--ewp-success);
+        color: var(--ewp-on-accent);
+    }
+
+    .ewp_track_badge_next {
+        background: var(--ewp-warm-soft);
+        color: var(--ewp-warm);
+        box-shadow: inset 0 0 0 1px currentColor;
+    }
+
+    .ewp_track_meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2px 12px;
+        color: var(--ewp-ink-soft);
+        font-size: 14px;
+    }
+
+    .ewp_track_when {
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+    }
+
+    .ewp_track_room_link {
+        display: inline-block;
+        min-height: 24px;
+        color: var(--ewp-accent-text);
+        text-decoration: underline;
+    }
+
+    .ewp_track_speaker {
+        color: var(--ewp-ink-soft);
+        font-size: 14px;
+    }
+
+    .ewp_track_function {
+        color: var(--ewp-muted);
+    }
+
+    .ewp_track_tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .ewp_track_tag {
+        padding: 1px 8px;
+        border: 1px solid var(--ewp-dashed);
+        border-radius: var(--ewp-radius-pill);
+        color: var(--ewp-ink-soft);
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .ewp_track_details {
+        font-size: 14px;
+
+        summary {
+            display: inline-flex;
+            align-items: center;
+            min-height: 44px;
+            color: var(--ewp-accent-text);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .o_ewp_rich {
+            margin-top: 4px;
+        }
+    }
+
+    // Line under a room of the room list, and state line of a room page.
+    .ewp_track_room_session,
+    .ewp_track_room_status {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        color: var(--ewp-ink-soft);
+        font-size: 13px;
+
+        &[hidden] {
+            display: none;
+        }
+
+        // A still dot beside "Now:", which the text already says.
+        &[data-ewp-state="now"]::before {
+            content: "";
+            flex: none;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--ewp-success);
+        }
+    }
+
+    .ewp_track_room_status {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    // Area of the plan with a session in progress: a still dot in its
+    // corner (the area is hidden from assistive technologies; the room list
+    // says it in words).
+    .o_ewp_hotspot[data-ewp-session="now"]::after {
+        content: "";
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        width: 12px;
+        height: 12px;
+        border: 2px solid var(--ewp-surface);
+        border-radius: 50%;
+        background: var(--ewp-success);
+    }
+
+    // Room page: the block under the conference and the chat.
+    .ewp_track_room {
+        margin: 16px;
+
+        h2 {
+            margin: 0;
+        }
+    }
+
+    .ewp_track_room_body {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    &.o_ewp_text_only {
+        .ewp_track_session {
+            border-left-width: 0;
+            border-top: 1px solid var(--ewp-rule);
+            border-radius: 0;
+            background: none;
+        }
+
+        .ewp_track_room_session::before,
+        .ewp_track_room_status::before {
+            display: none;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .ewp_track_room {
+            margin: 0;
+        }
+    }
+}
