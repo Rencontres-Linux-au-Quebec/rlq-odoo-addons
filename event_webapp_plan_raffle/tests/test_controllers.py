@@ -717,8 +717,16 @@ class TestPrizeWebappControllers(PrizeWebappMixin, HttpCase):
         raffle of the day's event left off the day, whose winners page is
         not published, shows neither its draws nor its winners, in the
         page or in its JSON route, until it is listed on the day."""
+        # The day holds the current moment, the default planned date of a
+        # new raffle: the test raffles are taken off the day, and this one
+        # has no date, so that nothing lists it on the day by itself.
+        self.day.raffle_ids = [Command.clear()]
         volunteers = self.env["event.raffle"].create(
-            {"name": "Volunteers Raffle", "event_id": self.event.id}
+            {
+                "name": "Volunteers Raffle",
+                "event_id": self.event.id,
+                "date_planned": False,
+            }
         )
         self.assertFalse(volunteers.is_test)
         self.assertFalse(self.event.raffle_winners_published)

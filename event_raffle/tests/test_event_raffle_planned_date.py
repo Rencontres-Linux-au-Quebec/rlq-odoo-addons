@@ -8,7 +8,7 @@ from odoo.tests.common import TransactionCase
 
 
 class TestEventRafflePlannedDate(TransactionCase):
-    def test_planned_date_is_optional_and_not_copied(self):
+    def test_planned_date_defaults_to_now_and_is_not_copied(self):
         raffle = self.env["event.raffle"].create(
             {"name": "Tirage fictif", "date_planned": "2031-06-10 17:00:00"}
         )
@@ -16,9 +16,17 @@ class TestEventRafflePlannedDate(TransactionCase):
             raffle.date_planned,
             fields.Datetime.to_datetime("2031-06-10 17:00:00"),
         )
-        self.assertFalse(raffle.copy().date_planned)
+        before = fields.Datetime.now()
+        copy = raffle.copy()
+        new = self.env["event.raffle"].create({"name": "Nouveau tirage"})
+        after = fields.Datetime.now()
+        # A new raffle, and a copy, take the current moment.
+        for record in (copy, new):
+            self.assertTrue(before <= record.date_planned <= after)
         self.assertFalse(
-            self.env["event.raffle"].create({"name": "Sans date"}).date_planned
+            self.env["event.raffle"]
+            .create({"name": "Sans date", "date_planned": False})
+            .date_planned
         )
 
     def test_planned_date_is_on_the_form_and_the_list(self):
@@ -60,7 +68,9 @@ class TestEventRafflePlannedDateMigration(TransactionCase):
                 "date_planned": "2031-06-10 17:00:00",
             }
         )
-        alone = Raffle.create({"name": "Tirage sans événement"})
+        alone = Raffle.create(
+            {"name": "Tirage sans événement", "date_planned": False}
+        )
         # The column of an upgraded database is empty on every old row.
         self.env.cr.execute(
             "UPDATE event_raffle SET date_planned = NULL WHERE id = %s",
@@ -76,3 +86,18 @@ class TestEventRafflePlannedDateMigration(TransactionCase):
             fields.Datetime.to_datetime("2031-06-10 17:00:00"),
         )
         self.assertFalse(alone.date_planned)
+
+    def test_pre_migration_keeps_an_existing_column(self):
+        raffle = self.env["event.raffle"].create(
+            {"name": "Tirage daté", "date_planned": "2031-06-10 17:00:00"}
+        )
+        script = load_script(
+            "event_raffle/migrations/18.0.1.9.0/pre-migration.py",
+            "event_raffle_pre_migration_18_0_1_9_0",
+        )
+        script.migrate(self.env.cr, "18.0.1.8.0")
+        self.env["event.raffle"].invalidate_model(["date_planned"])
+        self.assertEqual(
+            raffle.date_planned,
+            fields.Datetime.to_datetime("2031-06-10 17:00:00"),
+        )

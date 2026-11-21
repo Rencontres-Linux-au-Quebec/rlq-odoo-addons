@@ -122,14 +122,16 @@ class EventRaffle(models.Model):
         index=True,
     )
     context_note = fields.Text(string="Context")
-    # Not copied: a duplicated raffle usually serves another moment, and
-    # its date is set again.
+    # Not copied: a duplicated raffle usually serves another moment, so the
+    # copy takes the current moment, like any new raffle.
     date_planned = fields.Datetime(
         string="Planned Date",
         copy=False,
+        default=fields.Datetime.now,
         tracking=True,
-        help="When the raffle is planned. The event day web app lists it "
-        "on the day whose opening window holds this moment.",
+        help="When the raffle is planned, the moment it is created by "
+        "default. The event day web app lists it on the day whose opening "
+        "window holds this moment.",
     )
     is_test = fields.Boolean(
         string="Test Raffle",

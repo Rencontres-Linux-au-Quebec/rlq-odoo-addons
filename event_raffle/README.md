@@ -250,6 +250,11 @@ L'effet est surtout pensé pour le mode **plein écran** (projection).
 
 ## Changes
 
+- **18.0.1.10.0** : un nouveau tirage, et une copie, prennent le moment
+  présent comme **Date prévue**, toujours modifiable ou effaçable. À la
+  mise à jour depuis une version antérieure à 18.0.1.9.0, la colonne est
+  d'abord créée vide, pour que les tirages existants reçoivent la date de
+  début de leur événement et non le moment de la mise à jour.
 - **18.0.1.9.0** : champ facultatif **Date prévue** sur le tirage, sous
   l'événement dans le formulaire et en colonne facultative de la liste ;
   non copié à la duplication. À la mise à jour, un tirage existant qui a
