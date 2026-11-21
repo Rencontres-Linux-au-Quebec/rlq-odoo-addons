@@ -1,0 +1,142 @@
+# Translation of Odoo Server.
+# This file contains the French translation of the following modules:
+# 	* rlq_event_webapp_plan
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-14 23:13+0000\n"
+"PO-Revision-Date: 2026-11-14 21:14+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: rlq_event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:rlq_event_webapp_plan.webapp_slot_banner
+msgid "Convivial"
+msgstr "Convivial"
+
+#. module: rlq_event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:rlq_event_webapp_plan.webapp_page_main
+msgid "Convivial · Informative · Fun"
+msgstr "Convivial · Informatif · Amusant"
+
+#. module: rlq_event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:rlq_event_webapp_plan.webapp_slot_banner
+msgid ""
+"Convivial, informative, fun: friendly chats, tips and tricks, questions and "
+"debates."
+msgstr ""
+"Convivial, informatif, amusant : discussions sympas, trucs et astuces, "
+"questions et débats."
+
+#. module: rlq_event_webapp_plan
+#: model:ir.model,name:rlq_event_webapp_plan.model_event_webapp
+msgid "Event Web App Day"
+msgstr "Journée de l'application web d'événement"
+
+#. module: rlq_event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:rlq_event_webapp_plan.webapp_slot_home_lead
+msgid ""
+"Every Friday at noon (Eastern time) on BigBlueButton. Let's chat about Linux"
+" over a virtual coffee!"
+msgstr ""
+"Tous les vendredis midis (HAE) sur BigBlueButton. Jasons Linux et prenons un"
+" café virtuel !"
+
+#. module: rlq_event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:rlq_event_webapp_plan.webapp_slot_banner
+#: model_terms:ir.ui.view,arch_db:rlq_event_webapp_plan.webapp_slot_home_lead
+msgid "Friendly chats"
+msgstr "Discussions sympas"
+
+#. module: rlq_event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:rlq_event_webapp_plan.webapp_slot_banner
+msgid "Fun"
+msgstr "Amusant"
+
+#. module: rlq_event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:rlq_event_webapp_plan.webapp_slot_mascot
+msgid "GNU/Linux · Québec"
+msgstr "GNU/Linux · Québec"
+
+#. module: rlq_event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:rlq_event_webapp_plan.webapp_slot_banner
+msgid "Informative"
+msgstr "Informatif"
+
+#. module: rlq_event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:rlq_event_webapp_plan.webapp_slot_home_lead
+msgid "Pause Café Linux"
+msgstr "Pause Café Linux"
+
+#. module: rlq_event_webapp_plan
+#: model:ir.model.fields,field_description:rlq_event_webapp_plan.field_event_webapp__rlq_show_poster
+msgid "Pause Café Linux card"
+msgstr "Carte Pause Café Linux"
+
+#. module: rlq_event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:rlq_event_webapp_plan.webapp_slot_home_lead
+msgid ""
+"Pause Café Linux poster: Tux with a fleur-de-lys and a cup of coffee in a "
+"warm café"
+msgstr ""
+"Affiche Pause Café Linux : Tux avec une fleur de lys et une tasse de café "
+"dans un café chaleureux"
+
+#. module: rlq_event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:rlq_event_webapp_plan.webapp_slot_banner
+msgid "Pause the scrolling words"
+msgstr "Mettre en pause le défilement des mots"
+
+#. module: rlq_event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:rlq_event_webapp_plan.webapp_slot_banner
+#: model_terms:ir.ui.view,arch_db:rlq_event_webapp_plan.webapp_slot_home_lead
+msgid "Questions and debates"
+msgstr "Questions et débats"
+
+#. module: rlq_event_webapp_plan
+#. odoo-python
+#: code:addons/rlq_event_webapp_plan/controllers/main.py:0
+msgid "Rencontres Linux"
+msgstr "Rencontres Linux"
+
+#. module: rlq_event_webapp_plan
+#. odoo-python
+#: code:addons/rlq_event_webapp_plan/controllers/main.py:0
+msgid "Rencontres Linux event day"
+msgstr "Journée Rencontres Linux"
+
+#. module: rlq_event_webapp_plan
+#: model:ir.model.fields,help:rlq_event_webapp_plan.field_event_webapp__rlq_show_poster
+msgid ""
+"Shows the card of the weekly Pause Café Linux, with its poster, on the home "
+"page of the web app."
+msgstr ""
+"Affiche la carte de la Pause Café Linux hebdomadaire, avec son affiche, sur "
+"la page d'accueil de l'application web."
+
+#. module: rlq_event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:rlq_event_webapp_plan.webapp_slot_mascot
+msgid "The coffee is brewing..."
+msgstr "Le café infuse…"
+
+#. module: rlq_event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:rlq_event_webapp_plan.webapp_slot_banner
+#: model_terms:ir.ui.view,arch_db:rlq_event_webapp_plan.webapp_slot_home_lead
+msgid "Tips and tricks"
+msgstr "Trucs et astuces"
+
+#. module: rlq_event_webapp_plan
+#: model_terms:ir.ui.view,arch_db:rlq_event_webapp_plan.tux_raster
+msgid ""
+"Tux, the GNU/Linux penguin, with a fleur-de-lys on its belly and a cup of "
+"coffee in its flipper"
+msgstr ""
+"Tux, le manchot de GNU/Linux, une fleur de lys sur le ventre, tasse de café "
+"à la main"

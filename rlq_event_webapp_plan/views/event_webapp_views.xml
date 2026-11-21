@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
+    Copyright (C) 2026 Rencontres Linux au Québec contributors
+    License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+-->
+<odoo>
+    <record id="event_webapp_view_form" model="ir.ui.view">
+        <field name="name">event.webapp.form.rlq</field>
+        <field name="model">event.webapp</field>
+        <field name="inherit_id" ref="event_webapp_plan.event_webapp_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='room_count']" position="after">
+                <field name="rlq_show_poster" />
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,636 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Copyright (C) 2026 Services-Conseils Linux Inc.  (info@rencontres-linux.quebec)
+    Copyright (C) 2026 Rencontres Linux au Québec contributors
+    License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+
+    Example event day, demo data only: an open house on Linux with its
+    tickets, five presentation places, 21 tracks, a raffle of 7 draws and
+    the web app day whose five rooms follow the five places. The people are
+    invented, with no surname, organisation or biography taken from a real
+    speaker. Dates are stored in UTC: the event is in America/Montreal,
+    UTC-5 on that day (standard time).
+-->
+<odoo>
+    <data noupdate="1">
+        <record id="demo_event" model="event.event">
+            <field name="name">Journée portes ouvertes sur Linux 2026</field>
+            <field name="date_tz">America/Montreal</field>
+            <field name="date_begin">2026-11-21 13:00:00</field>
+            <field name="date_end">2026-11-21 23:00:00</field>
+            <field name="address_id" eval="False" />
+            <field name="website_menu" eval="True" />
+            <field name="website_track" eval="True" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_event_ticket_1" model="event.event.ticket">
+            <field name="event_id" ref="demo_event" />
+            <field name="sequence">1</field>
+            <field name="name">Visiteur</field>
+            <field name="description">Pour voir des présentations ou se faire installer Linux</field>
+            <field name="end_sale_datetime">2026-11-21 23:00:00</field>
+        </record>
+        <record id="demo_event_ticket_2" model="event.event.ticket">
+            <field name="event_id" ref="demo_event" />
+            <field name="sequence">2</field>
+            <field name="name">Bénévole</field>
+            <field name="description">Si vous voulez nous aider à l'organisation</field>
+            <field name="end_sale_datetime">2026-11-21 23:00:00</field>
+        </record>
+        <record id="demo_event_ticket_3" model="event.event.ticket">
+            <field name="event_id" ref="demo_event" />
+            <field name="sequence">3</field>
+            <field name="name">Commanditaire</field>
+            <field name="description">Si vous voulez être commanditaires</field>
+            <field name="end_sale_datetime">2026-11-21 23:00:00</field>
+        </record>
+        <record id="demo_track_location_1" model="event.track.location">
+            <field name="name">Salle de démonstration (pour le grand public et les entreprises)</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="demo_track_location_2" model="event.track.location">
+            <field name="name">Salle de présentation entreprises</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="demo_track_location_3" model="event.track.location">
+            <field name="name">Salle de présentation grand public</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="demo_track_location_4" model="event.track.location">
+            <field name="name">Salle d'installation Linux</field>
+            <field name="sequence">4</field>
+        </record>
+        <record id="demo_track_location_5" model="event.track.location">
+            <field name="name">Pavillon B (hall d'entrée)</field>
+            <field name="sequence">5</field>
+        </record>
+        <record id="demo_track_tag_category" model="event.track.tag.category">
+            <field name="name">Formule</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="demo_track_tag_1" model="event.track.tag">
+            <field name="name">Présentiel</field>
+            <field name="color">10</field>
+            <field name="sequence">1</field>
+            <field name="category_id" ref="demo_track_tag_category" />
+        </record>
+        <record id="demo_track_tag_2" model="event.track.tag">
+            <field name="name">Virtuel</field>
+            <field name="color">4</field>
+            <field name="sequence">2</field>
+            <field name="category_id" ref="demo_track_tag_category" />
+        </record>
+        <record id="demo_track_tag_3" model="event.track.tag">
+            <field name="name">Démo_Débutant</field>
+            <field name="color">3</field>
+            <field name="sequence">3</field>
+            <field name="category_id" ref="demo_track_tag_category" />
+        </record>
+        <record id="demo_track_tag_4" model="event.track.tag">
+            <field name="name">Démo_Avancé</field>
+            <field name="color">2</field>
+            <field name="sequence">4</field>
+            <field name="category_id" ref="demo_track_tag_category" />
+        </record>
+        <record id="demo_track_01" model="event.track">
+            <field name="name">Arrivée des bénévoles</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 12:30:00</field>
+            <field name="duration" eval="30 / 60" />
+            <field name="location_id" ref="demo_track_location_5" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_1'), ref('demo_track_tag_2')])]" />
+            <field name="partner_name">Camille Desrosiers</field>
+            <field name="partner_function">Gestionnaire de projet</field>
+            <field name="description" type="html">
+                <p>Les bénévoles arrivent dès 7 h pour préparer la journée : installation des salles, tables d'accueil, postes de démonstration et affichage.</p>
+                <p>Au programme de l'équipe :</p>
+                <ul>
+                    <li>Briefing de 10 minutes et attribution des rôles</li>
+                    <li>Montage des salles Installations et Démonstrations</li>
+                    <li>Vérification du WiFi, des écrans et des postes Linux</li>
+                    <li>Mise en place du hall d'accueil et de l'inscription</li>
+                </ul>
+                <p>Tu veux donner un coup de main? Écris-nous, on a toujours de la place pour une paire de bras de plus.</p>
+            </field>
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_track_02" model="event.track">
+            <field name="name">Accueil et inscription des participants (validation du code QR)</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 13:00:00</field>
+            <field name="duration" eval="30 / 60" />
+            <field name="location_id" ref="demo_track_location_5" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_1')])]" />
+            <field name="partner_name">Inès Villeneuve</field>
+            <field name="partner_function">Coordonnatrice de l'accueil</field>
+            <field name="description" type="html">
+                <p>Bienvenue! Ton billet avec code QR t'a été envoyé par courriel avant l'événement. C'est lui qui te fait entrer.</p>
+                <ul>
+                    <li>Ouvre ton billet sur ton téléphone (ou apporte-le imprimé)</li>
+                    <li>Présente le code QR à l'accueil : un bénévole le scanne et ton inscription est validée en quelques secondes</li>
+                    <li>Récupère ton programme de la journée et ton bulletin pour le tirage des prix de présence</li>
+                </ul>
+                <p>Tu ne retrouves plus ton billet? Cherche dans tes courriels le message de confirmation d'inscription (vérifie aussi tes pourriels), ou donne ton nom à l'accueil et on te retrouve dans la liste.</p>
+            </field>
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_track_03" model="event.track">
+            <field name="name">Déjeuner et réseautage</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 13:40:00</field>
+            <field name="duration" eval="60 / 60" />
+            <field name="location_id" ref="demo_track_location_5" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_1'), ref('demo_track_tag_2')])]" />
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_track_04" model="event.track">
+            <field name="name">Accueil et inscription des participants (validation du code QR)</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 14:30:00</field>
+            <field name="duration" eval="150 / 60" />
+            <field name="location_id" ref="demo_track_location_5" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_1')])]" />
+            <field name="partner_name">Inès Villeneuve</field>
+            <field name="partner_function">Coordonnatrice de l'accueil</field>
+            <field name="description" type="html">
+                <p>Bienvenue! Ton billet avec code QR t'a été envoyé par courriel avant l'événement. C'est lui qui te fait entrer.</p>
+                <ul>
+                    <li>Ouvre ton billet sur ton téléphone (ou apporte-le imprimé)</li>
+                    <li>Présente le code QR à l'accueil : un bénévole le scanne et ton inscription est validée en quelques secondes</li>
+                    <li>Récupère ton programme de la journée et ton bulletin pour le tirage des prix de présence</li>
+                </ul>
+                <p>Tu ne retrouves plus ton billet? Cherche dans tes courriels le message de confirmation d'inscription (vérifie aussi tes pourriels), ou donne ton nom à l'accueil et on te retrouve dans la liste.</p>
+            </field>
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_track_05" model="event.track">
+            <field name="name">Installations Linux</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 14:30:00</field>
+            <field name="duration" eval="180 / 60" />
+            <field name="location_id" ref="demo_track_location_4" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_1')])]" />
+            <field name="partner_name">Olivier Lacasse</field>
+            <field name="partner_function">Coordonnateur des installations Linux</field>
+            <field name="description" type="html">
+                <p>Vous voulez essayer Linux, mais vous ne savez pas par où commencer? Cet atelier est fait pour vous!</p>
+                <p>Apportez votre ordinateur portable, et nos bénévoles expérimentés vous accompagneront pas à pas pour installer Linux en toute sécurité, soit en parallèle de votre système actuel (double démarrage), soit en remplacement de Windows. C'est une excellente option si votre ordinateur est vieillissant ou si Windows 10 ne vous convient plus.</p>
+                <p>Ce que vous pouvez faire pendant l'atelier:</p>
+                <ul>
+                    <li>Choisir une distribution Linux adaptée à vos besoins et à votre ordinateur</li>
+                    <li>Tester Linux sans rien installer, directement à partir d'une clé USB</li>
+                    <li>Faire l'installation avec l'aide de nos experts</li>
+                    <li>Obtenir de l'aide pour configurer votre nouveau système</li>
+                </ul>
+                <p>À prévoir:</p>
+                <ul>
+                    <li>Votre ordinateur portable et son chargeur</li>
+                    <li>Une sauvegarde de vos fichiers importants (photos, documents, etc.). Même si on fait tout pour éviter les pépins, on ne prend jamais de chance avec vos données!</li>
+                    <li>Une clé USB d'au moins 8 Go, si vous en avez une (on en aura quelques-unes sur place)</li>
+                </ul>
+                <p>Aucune expérience requise. Les débutants sont les bienvenus!</p>
+            </field>
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_track_06" model="event.track">
+            <field name="name">Découverte des environnements de bureau Linux</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 14:30:00</field>
+            <field name="duration" eval="90 / 60" />
+            <field name="location_id" ref="demo_track_location_1" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_3'), ref('demo_track_tag_1'), ref('demo_track_tag_2'), ref('demo_track_tag_4')])]" />
+            <field name="partner_name">Julien Mercier</field>
+            <field name="partner_function">Coordonnateur de la salle des démonstrations</field>
+            <field name="description" type="html">
+                <p>Sur Linux, tu choisis l'allure de ton ordinateur.</p>
+                <p>Julien Mercier te fait visiter KDE, GNOME et Xfce côte à côte, en direct. Tu vas vite voir lequel te ressemble.</p>
+                <p>Comment chaque bureau organise menus, fenêtres et réglages</p>
+                <p>Ce qui se passe derrière : le serveur d'affichage Xorg et son successeur Wayland et aussi X11</p>
+                <p>Tes questions à Julien, sans jargon obligatoire</p>
+                <p>Pour qui : débutant à intermédiaire. Rien à installer, tu essaies sur place.</p>
+            </field>
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_track_07" model="event.track">
+            <field name="name">Discours d'ouverture</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 14:30:00</field>
+            <field name="duration" eval="40 / 60" />
+            <field name="location_id" ref="demo_track_location_3" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_1'), ref('demo_track_tag_2')])]" />
+            <field name="partner_name">Simone Archambault</field>
+            <field name="partner_function">Animatrice de la journée</field>
+            <field name="description" type="html">
+                <p>Un survol de la journée, salle par salle</p>
+                <p>L'histoire d'une communauté francophone du logiciel libre</p>
+                <p>Comment profiter au maximum des démonstrations, des ateliers et des tirages</p>
+                <p>Pour qui : tout le monde, de l'utilisateur curieux au vétéran du libre.</p>
+            </field>
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_track_08" model="event.track">
+            <field name="name">Reprendre le contrôle de ses données avec le logiciel libre</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 15:00:00</field>
+            <field name="duration" eval="60 / 60" />
+            <field name="location_id" ref="demo_track_location_2" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_1'), ref('demo_track_tag_2')])]" />
+            <field name="partner_name">Rémi Bastarache</field>
+            <field name="partner_function">Conseiller en logiciel libre</field>
+            <field name="description" type="html">
+                <p>Comment une organisation reprend la maîtrise de ses données en choisissant des outils libres : hébergement, documents partagés et travail d'équipe.</p>
+                <p>Au programme : les questions à se poser avant de migrer, des exemples d'outils libres et les pièges à éviter.</p>
+                <p>Pour qui : gestionnaires et curieux, aucune connaissance technique requise.</p>
+            </field>
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_track_09" model="event.track">
+            <field name="name">Tirage de prix de présence #1</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 16:00:00</field>
+            <field name="duration" eval="5 / 60" />
+            <field name="location_id" ref="demo_track_location_1" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_1'), ref('demo_track_tag_2')])]" />
+            <field name="partner_name">Yannick Dufresne</field>
+            <field name="partner_function">Coordonnateur des prix de présence</field>
+            <field name="description" type="html">
+                <p>La roue tourne : seras-tu le premier gagnant de la journée?</p>
+                <p>C'est le coup d'envoi des tirages de prix de présence. Il y en a un nouveau à chaque heure jusqu'à 17 h. Il suffit d'être inscrit et d'être là.</p>
+                <p>Viens voir la roue en direct dans la salle de démonstration.</p>
+                <p>Vérifie la page des gagnants : ton nom y est? Viens réclamer ton prix à la salle de démonstration (pour le grand public et les entreprises).</p>
+            </field>
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_track_10" model="event.track">
+            <field name="name">ERPLibre et ses nouveautés</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 16:00:00</field>
+            <field name="duration" eval="60 / 60" />
+            <field name="location_id" ref="demo_track_location_2" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_1'), ref('demo_track_tag_2')])]" />
+            <field name="partner_name">Amélie Charbonneau</field>
+            <field name="partner_function">Développeuse de logiciel libre</field>
+            <field name="description" type="html">
+                <p>Démonstration des avancements sur la plateforme ERPLibre.</p>
+                <ul>
+                    <li>Support Odoo 8 à 20</li>
+                    <li>Outil de développement</li>
+                    <li>Outil sur le déploiement</li>
+                    <li>Intégration du développement avec Intelligence Artificielle</li>
+                    <li>Progression de l'intégration sur Mainframe IBM s390x</li>
+                </ul>
+                <p>Et plus encore</p>
+            </field>
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_track_11" model="event.track">
+            <field name="name">Découverte des environnements de bureau Linux</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 16:15:00</field>
+            <field name="duration" eval="45 / 60" />
+            <field name="location_id" ref="demo_track_location_1" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_3'), ref('demo_track_tag_1'), ref('demo_track_tag_2'), ref('demo_track_tag_4')])]" />
+            <field name="partner_name">Julien Mercier</field>
+            <field name="partner_function">Coordonnateur de la salle des démonstrations</field>
+            <field name="description" type="html">
+                <p>Julien Mercier te fait visiter KDE, GNOME et Xfce côte à côte, en direct. Tu vas vite voir lequel te ressemble.</p>
+                <p>Comment chaque bureau organise menus, fenêtres et réglages</p>
+                <p>Ce qui se passe derrière : le serveur d'affichage Xorg et son successeur Wayland et aussi X11</p>
+                <p>Tes questions à Julien, sans jargon obligatoire</p>
+                <p>Pour qui : débutant à intermédiaire. Rien à installer, tu essaies sur place.</p>
+            </field>
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_track_12" model="event.track">
+            <field name="name">Dîner, réseautage et photo de groupe</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 17:00:00</field>
+            <field name="duration" eval="60 / 60" />
+            <field name="location_id" ref="demo_track_location_5" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_1'), ref('demo_track_tag_2')])]" />
+            <field name="partner_name">Inès Villeneuve</field>
+            <field name="partner_function">Coordonnatrice de l'accueil</field>
+            <field name="description" type="html">
+                <p>Bon appétit! Profites-en pour :</p>
+                <ul>
+                    <li>Retourner voir les salles Installations et Démonstrations, souvent plus calmes pendant le dîner</li>
+                    <li>Prendre rendez-vous avec un bénévole pour installer Linux cet après-midi</li>
+                    <li>Inscrire ton nom au tirage des prix de présence si ce n'est pas déjà fait</li>
+                    <li>Consulter la page des gagnants des prix de présence : si ton nom y est affiché, viens réclamer ton prix à la salle démonstrations</li>
+                </ul>
+                <p>Les prix non réclamés seront remis à un autre tirage.</p>
+            </field>
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_track_13" model="event.track">
+            <field name="name">Tirage de prix de présence #2</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 17:00:00</field>
+            <field name="duration" eval="5 / 60" />
+            <field name="location_id" ref="demo_track_location_1" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_1'), ref('demo_track_tag_2')])]" />
+            <field name="partner_name">Yannick Dufresne</field>
+            <field name="partner_function">Coordonnateur des prix de présence</field>
+            <field name="description" type="html">
+                <p>La roue tourne : seras-tu le prochain gagnant?</p>
+                <p>Un tirage de prix de présence a lieu à chaque heure jusqu'à 17 h. Il suffit d'être inscrit et d'être là.</p>
+                <p>Viens voir la roue en direct dans la salle de démonstration.</p>
+                <p>Vérifie la page des gagnants : ton nom y est? Viens réclamer ton prix à la salle de démonstration (pour le grand public et les entreprises).</p>
+            </field>
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_track_14" model="event.track">
+            <field name="name">Tirage de prix de présence #3</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 18:00:00</field>
+            <field name="duration" eval="5 / 60" />
+            <field name="location_id" ref="demo_track_location_1" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_1'), ref('demo_track_tag_2')])]" />
+            <field name="partner_name">Yannick Dufresne</field>
+            <field name="partner_function">Coordonnateur des prix de présence</field>
+            <field name="description" type="html">
+                <p>La roue tourne : seras-tu le prochain gagnant?</p>
+                <p>Un tirage de prix de présence a lieu à chaque heure jusqu'à 17 h. Il suffit d'être inscrit et d'être là.</p>
+                <p>Viens voir la roue en direct dans la salle de démonstration.</p>
+                <p>Vérifie la page des gagnants : ton nom y est? Viens réclamer ton prix à la salle de démonstration (pour le grand public et les entreprises).</p>
+            </field>
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_track_15" model="event.track">
+            <field name="name">Découverte des environnements de bureau Linux</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 18:15:00</field>
+            <field name="duration" eval="45 / 60" />
+            <field name="location_id" ref="demo_track_location_1" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_3'), ref('demo_track_tag_1'), ref('demo_track_tag_2'), ref('demo_track_tag_4')])]" />
+            <field name="partner_name">Julien Mercier</field>
+            <field name="partner_function">Coordonnateur de la salle des démonstrations</field>
+            <field name="description" type="html">
+                <p>Julien Mercier te fait visiter KDE, GNOME et Xfce côte à côte, en direct. Tu vas vite voir lequel te ressemble.</p>
+                <p>Comment chaque bureau organise menus, fenêtres et réglages</p>
+                <p>Ce qui se passe derrière : le serveur d'affichage Xorg et son successeur Wayland et aussi X11</p>
+                <p>Tes questions à Julien, sans jargon obligatoire</p>
+                <p>Pour qui : débutant à intermédiaire. Rien à installer, tu essaies sur place.</p>
+            </field>
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_track_16" model="event.track">
+            <field name="name">Tirage de prix de présence #4</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 19:00:00</field>
+            <field name="duration" eval="5 / 60" />
+            <field name="location_id" ref="demo_track_location_1" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_1'), ref('demo_track_tag_2')])]" />
+            <field name="partner_name">Yannick Dufresne</field>
+            <field name="partner_function">Coordonnateur des prix de présence</field>
+            <field name="description" type="html">
+                <p>La roue tourne : seras-tu le prochain gagnant?</p>
+                <p>Un tirage de prix de présence a lieu à chaque heure jusqu'à 17 h. Il suffit d'être inscrit et d'être là.</p>
+                <p>Viens voir la roue en direct dans la salle de démonstration.</p>
+                <p>Vérifie la page des gagnants : ton nom y est? Viens réclamer ton prix à la salle de démonstration (pour le grand public et les entreprises).</p>
+            </field>
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_track_17" model="event.track">
+            <field name="name">SteamOS et Recalbox sur Raspberry Pi 3</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 19:15:00</field>
+            <field name="duration" eval="45 / 60" />
+            <field name="location_id" ref="demo_track_location_1" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_3'), ref('demo_track_tag_1'), ref('demo_track_tag_2')])]" />
+            <field name="partner_name">Yannick Dufresne</field>
+            <field name="partner_function">Coordonnateur des prix de présence</field>
+            <field name="description" type="html">
+                <p>SteamOS : jouer sur Linux</p>
+                <p>Linux, c'est aussi pour jouer.</p>
+                <p>Découvre SteamOS, le système Linux de Valve pensé pour le jeu, en démonstration sur place.</p>
+                <p>Un système Linux conçu pour le jeu, que tu vois fonctionner en direct</p>
+                <p>Comment des jeux conçus pour Windows tournent sur Linux grâce à Proton</p>
+                <p>Ce qui marche très bien et ce qui reste à surveiller</p>
+                <p>Pour qui : joueurs curieux, débutants bienvenus.</p>
+                <p>Recalbox sur Raspberry Pi 3</p>
+                <p>Un mini-ordinateur de la taille d'un jeu de cartes qui devient ta console de jeux rétro.</p>
+                <p>Prends une manette et joue. Recalbox, un système libre pour le jeu rétro, tourne sur un simple Raspberry Pi 3.</p>
+                <p>Des jeux prêts à lancer</p>
+                <p>Comment monter ta propre station chez toi</p>
+                <p>Pourquoi le libre est un terrain de jeu formidable</p>
+                <p>Pour qui : petits et grands. Aucune connaissance requise, juste une manette et l'envie de jouer.</p>
+            </field>
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_track_18" model="event.track">
+            <field name="name">Tirage de prix de présence #5</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 20:00:00</field>
+            <field name="duration" eval="5 / 60" />
+            <field name="location_id" ref="demo_track_location_1" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_1'), ref('demo_track_tag_2')])]" />
+            <field name="partner_name">Yannick Dufresne</field>
+            <field name="partner_function">Coordonnateur des prix de présence</field>
+            <field name="description" type="html">
+                <p>La roue tourne : seras-tu le prochain gagnant?</p>
+                <p>Un tirage de prix de présence a lieu à chaque heure jusqu'à 17 h. Il suffit d'être inscrit et d'être là.</p>
+                <p>Viens voir la roue en direct dans la salle de démonstration.</p>
+                <p>Vérifie la page des gagnants : ton nom y est? Viens réclamer ton prix à la salle de démonstration (pour le grand public et les entreprises).</p>
+            </field>
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_track_19" model="event.track">
+            <field name="name">Tirage de prix de présence #6</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 21:00:00</field>
+            <field name="duration" eval="5 / 60" />
+            <field name="location_id" ref="demo_track_location_1" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_1'), ref('demo_track_tag_2')])]" />
+            <field name="partner_name">Yannick Dufresne</field>
+            <field name="partner_function">Coordonnateur des prix de présence</field>
+            <field name="description" type="html">
+                <p>La roue tourne : seras-tu le prochain gagnant?</p>
+                <p>Un tirage de prix de présence a lieu à chaque heure jusqu'à 17 h. Il suffit d'être inscrit et d'être là.</p>
+                <p>Viens voir la roue en direct dans la salle de démonstration.</p>
+                <p>Vérifie la page des gagnants : ton nom y est? Viens réclamer ton prix à la salle de démonstration (pour le grand public et les entreprises).</p>
+            </field>
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_track_20" model="event.track">
+            <field name="name">Tirage de prix de présence #7</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 22:00:00</field>
+            <field name="duration" eval="5 / 60" />
+            <field name="location_id" ref="demo_track_location_1" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_1'), ref('demo_track_tag_2')])]" />
+            <field name="partner_name">Yannick Dufresne</field>
+            <field name="partner_function">Coordonnateur des prix de présence</field>
+            <field name="description" type="html">
+                <p>La roue tourne : seras-tu le prochain gagnant?</p>
+                <p>Un tirage de prix de présence a lieu à chaque heure jusqu'à 17 h. Il suffit d'être inscrit et d'être là.</p>
+                <p>Viens voir la roue en direct dans la salle de démonstration.</p>
+                <p>Vérifie la page des gagnants : ton nom y est? Viens réclamer ton prix à la salle de démonstration (pour le grand public et les entreprises).</p>
+            </field>
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_track_21" model="event.track">
+            <field name="name">Souper au resto-pub du quartier</field>
+            <field name="event_id" ref="demo_event" />
+            <field name="date">2026-11-21 23:00:00</field>
+            <field name="duration" eval="180 / 60" />
+            <field name="location_id" ref="demo_track_location_5" />
+            <field name="tag_ids" eval="[Command.set([ref('demo_track_tag_1')])]" />
+            <field name="stage_id" ref="website_event_track.event_track_stage3" />
+            <field name="is_published" eval="True" />
+        </record>
+        <record id="demo_raffle" model="event.raffle">
+            <field name="name">Prix de présence</field>
+            <field name="event_id" ref="demo_event" />
+        </record>
+        <record id="demo_raffle_draw_1" model="event.raffle.draw">
+            <field name="raffle_id" ref="demo_raffle" />
+            <field name="sequence">1</field>
+            <field name="prize">Prix de présence 1</field>
+            <field name="date">2026-11-21 16:00:00</field>
+        </record>
+        <record id="demo_raffle_draw_2" model="event.raffle.draw">
+            <field name="raffle_id" ref="demo_raffle" />
+            <field name="sequence">2</field>
+            <field name="prize">Prix de présence 2</field>
+            <field name="date">2026-11-21 17:00:00</field>
+        </record>
+        <record id="demo_raffle_draw_3" model="event.raffle.draw">
+            <field name="raffle_id" ref="demo_raffle" />
+            <field name="sequence">3</field>
+            <field name="prize">Prix de présence 3</field>
+            <field name="date">2026-11-21 18:00:00</field>
+        </record>
+        <record id="demo_raffle_draw_4" model="event.raffle.draw">
+            <field name="raffle_id" ref="demo_raffle" />
+            <field name="sequence">4</field>
+            <field name="prize">Prix de présence 4</field>
+            <field name="date">2026-11-21 19:00:00</field>
+        </record>
+        <record id="demo_raffle_draw_5" model="event.raffle.draw">
+            <field name="raffle_id" ref="demo_raffle" />
+            <field name="sequence">5</field>
+            <field name="prize">Prix de présence 5</field>
+            <field name="date">2026-11-21 20:00:00</field>
+        </record>
+        <record id="demo_raffle_draw_6" model="event.raffle.draw">
+            <field name="raffle_id" ref="demo_raffle" />
+            <field name="sequence">6</field>
+            <field name="prize">Prix de présence 6</field>
+            <field name="date">2026-11-21 21:00:00</field>
+        </record>
+        <record id="demo_raffle_draw_7" model="event.raffle.draw">
+            <field name="raffle_id" ref="demo_raffle" />
+            <field name="sequence">7</field>
+            <field name="prize">Prix de présence 7</field>
+            <field name="date">2026-11-21 22:00:00</field>
+        </record>
+        <record id="demo_webapp" model="event.webapp">
+            <field name="name">Journée portes ouvertes sur Linux 2026</field>
+            <field name="date_start">2026-11-21 12:30:00</field>
+            <field name="date_end">2026-11-22 02:00:00</field>
+            <field name="announcement" type="html">
+                <p>Venez célébrer avec nous le 23e anniversaire des Rencontres Linux au Québec et découvrir comment Linux peut transformer votre expérience informatique : un ordinateur qui s'essouffle, ou simplement l'envie d'explorer, c'est le bon moment.</p>
+                <ul>
+                    <li>Quand : samedi 21 novembre 2026, de 8 h à 18 h.</li>
+                    <li>Sur place : sur le campus, pavillons A et B.</li>
+                    <li>En ligne : par BigBlueButton. Un ordinateur portable ou un PC est fortement recommandé, plutôt qu'un cellulaire ou une tablette, pour profiter du partage d'écran, du clavardage, des ateliers et des démos.</li>
+                    <li>Inscription gratuite, mais nécessaire : les places sont limitées.</li>
+                    <li>Prix de présence tirés toutes les heures parmi les personnes inscrites.</li>
+                </ul>
+                <p>Aucune connaissance préalable n'est requise : venez seul, en famille ou entre amis, avec un peu de curiosité.</p>
+            </field>
+            <field name="event_ids" eval="[Command.set([ref('demo_event')])]" />
+            <field name="raffle_ids" eval="[Command.set([ref('demo_raffle')])]" />
+            <field name="plan_image" type="base64" file="rlq_event_webapp_plan/demo/event_plan.png" />
+            <field name="rlq_show_poster" eval="True" />
+        </record>
+        <record id="demo_webapp_link_events" model="event.webapp.link">
+            <field name="webapp_id" ref="demo_webapp" />
+            <field name="sequence">10</field>
+            <field name="name">Événements du site</field>
+            <field name="url">/event</field>
+            <field name="description">Programme, inscription et billets.</field>
+        </record>
+        <record id="demo_webapp_room_1" model="event.webapp.room">
+            <field name="webapp_id" ref="demo_webapp" />
+            <field name="sequence">10</field>
+            <field name="name">Salle de démonstration (pour le grand public et les entreprises)</field>
+            <field name="description">Démonstrations des bureaux Linux, des jeux et tirage des prix de présence, toutes les heures.</field>
+            <field name="color">#1F4E9E</field>
+            <field name="pos_x">4</field>
+            <field name="pos_y">8</field>
+            <field name="pos_width">40</field>
+            <field name="pos_height">36</field>
+            <field name="track_location_id" ref="demo_track_location_1" />
+        </record>
+        <record id="demo_webapp_room_2" model="event.webapp.room">
+            <field name="webapp_id" ref="demo_webapp" />
+            <field name="sequence">20</field>
+            <field name="name">Salle de présentation entreprises</field>
+            <field name="description">Présentations pour les entreprises et les organisations.</field>
+            <field name="color">#B3261E</field>
+            <field name="pos_x">48</field>
+            <field name="pos_y">8</field>
+            <field name="pos_width">22</field>
+            <field name="pos_height">36</field>
+            <field name="track_location_id" ref="demo_track_location_2" />
+        </record>
+        <record id="demo_webapp_room_3" model="event.webapp.room">
+            <field name="webapp_id" ref="demo_webapp" />
+            <field name="sequence">30</field>
+            <field name="name">Salle de présentation grand public</field>
+            <field name="description">Présentations pour tout le monde, dont le discours d'ouverture.</field>
+            <field name="color">#2E7D32</field>
+            <field name="pos_x">74</field>
+            <field name="pos_y">8</field>
+            <field name="pos_width">22</field>
+            <field name="pos_height">36</field>
+            <field name="track_location_id" ref="demo_track_location_3" />
+        </record>
+        <record id="demo_webapp_room_4" model="event.webapp.room">
+            <field name="webapp_id" ref="demo_webapp" />
+            <field name="sequence">40</field>
+            <field name="name">Salle d'installation Linux</field>
+            <field name="description">Installation de Linux sur votre portable, avec l'aide des bénévoles. Apportez le chargeur et une sauvegarde de vos fichiers.</field>
+            <field name="color">#7B1FA2</field>
+            <field name="pos_x">4</field>
+            <field name="pos_y">58</field>
+            <field name="pos_width">40</field>
+            <field name="pos_height">34</field>
+            <field name="track_location_id" ref="demo_track_location_4" />
+        </record>
+        <record id="demo_webapp_room_5" model="event.webapp.room">
+            <field name="webapp_id" ref="demo_webapp" />
+            <field name="sequence">50</field>
+            <field name="name">Pavillon B (hall d'entrée)</field>
+            <field name="description">Accueil et inscription, repas et réseautage.</field>
+            <field name="color">#8A5300</field>
+            <field name="pos_x">48</field>
+            <field name="pos_y">58</field>
+            <field name="pos_width">48</field>
+            <field name="pos_height">34</field>
+            <field name="track_location_id" ref="demo_track_location_5" />
+        </record>
+    </data>
+</odoo>
