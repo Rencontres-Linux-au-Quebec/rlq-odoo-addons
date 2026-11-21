@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_event_view_form_raffle_sponsor" model="ir.ui.view">
+        <field name="name">event.event.form.raffle.sponsor</field>
+        <field name="model">event.event</field>
+        <field name="inherit_id" ref="event.view_event_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="raffle_sponsor_thanks_count" invisible="1" />
+                <button
+                    name="action_open_raffle_sponsor_thank_wizard"
+                    type="object"
+                    string="Thank the Sponsors"
+                    invisible="not raffle_sponsor_thanks_count"
+                    groups="event.group_event_user,event_raffle_prize_sponsor.group_raffle_sponsorship_manager"
+                />
+            </xpath>
+            <xpath expr="//group[@name='right_event_details']" position="inside">
+                <field name="raffle_sponsor_managed" groups="event.group_event_user" />
+                <field
+                    name="raffle_sponsor_manager_ids"
+                    widget="many2many_tags"
+                    options="{'no_create': True}"
+                    invisible="not raffle_sponsor_managed"
+                    groups="event.group_event_user"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>

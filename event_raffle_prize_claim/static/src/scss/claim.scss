@@ -1,0 +1,33 @@
+// Copyright 2026 TechnoLibre - Mathieu Benoit
+// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+
+// Claim banner and pages of the prize link. Colours are the body's own,
+// with a dark outline button, so the contrast holds on any theme that
+// keeps a readable body.
+.o_raffle_claim_banner_box {
+    background-color: $body-bg;
+    color: $body-color;
+    border-color: $body-color !important;
+    border-width: 2px !important;
+}
+
+.o_raffle_claim_banner,
+.o_raffle_claim_page,
+.o_raffle_prize_sponsor {
+    a:focus-visible,
+    .btn:focus-visible,
+    textarea:focus-visible {
+        outline: 3px solid $body-color;
+        outline-offset: 2px;
+        box-shadow: none;
+    }
+}
+
+.o_raffle_prize_sponsor a,
+.o_raffle_claim_page p a {
+    text-decoration: underline;
+}
+
+.o_raffle_claim_error {
+    color: $body-color;
+}

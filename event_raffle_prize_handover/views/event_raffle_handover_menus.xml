@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="action_event_raffle_prize_handover_screen" model="ir.actions.act_url">
+        <field name="name">Prize Hand-over</field>
+        <field name="url">/raffle/handover</field>
+        <field name="target">self</field>
+    </record>
+
+    <menuitem
+        id="menu_event_raffle_prize_handover"
+        name="Prize Hand-over"
+        parent="event_raffle.menu_event_raffle_root"
+        action="action_event_raffle_prize_handover_screen"
+        groups="event.group_event_user"
+        sequence="25"
+    />
+</odoo>

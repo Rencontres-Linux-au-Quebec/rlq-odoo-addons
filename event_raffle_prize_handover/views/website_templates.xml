@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Confirmation page of the prize link: how the prize reaches the
+         winner, and the public name form. The values come from
+         controllers/main.py, RafflePrizeHandoverClaim.raffle_prize_done. -->
+    <template id="claim_done_handover" inherit_id="event_raffle_prize_claim.claim_done" name="Raffle Prize Reserved: Hand-over and Public Name">
+        <xpath expr="//div[@id='wrap']/p[not(@class) and not(@t-if)]" position="attributes">
+            <attribute name="t-if">not raffle_handover_line</attribute>
+        </xpath>
+        <xpath expr="//div[@id='wrap']/a[@href='/']" position="before">
+            <p t-if="raffle_handover_line" class="o_raffle_claim_done_handover fw-bold" t-out="raffle_handover_line" />
+            <section
+                t-if="raffle_handover_line"
+                class="o_raffle_public_name my-4 p-3 border rounded"
+                aria-labelledby="o_raffle_public_name_title"
+            >
+                <h2 id="o_raffle_public_name_title" class="h5">Your name on the winners page</h2>
+                <p id="o_raffle_public_name_help" class="mb-2">
+                    The public winners page shows your public name, a nickname if you like, or your
+                    full name when you leave it empty.
+                </p>
+                <p class="mb-2">
+                    Shown as: <strong class="o_raffle_public_name_shown" t-out="raffle_public_name_shown" />
+                </p>
+                <p t-if="raffle_public_name_saved" class="o_raffle_public_name_saved fw-bold" role="status">
+                    Your public name is saved.
+                </p>
+                <form action="/raffle/prize/public-name" method="post" class="o_raffle_public_name_form">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                    <label for="o_raffle_public_name_input" class="form-label">Public name</label>
+                    <input
+                        id="o_raffle_public_name_input"
+                        type="text"
+                        name="public_name"
+                        class="form-control"
+                        autocomplete="nickname"
+                        t-att-maxlength="raffle_public_name_max"
+                        t-att-value="raffle_public_name"
+                        aria-describedby="o_raffle_public_name_help"
+                    />
+                    <button type="submit" class="btn btn-dark mt-2">Save the public name</button>
+                </form>
+            </section>
+        </xpath>
+    </template>
+
+    <!-- Public name in the account form of the portal. -->
+    <template id="portal_my_details_fields_public_name" inherit_id="portal.portal_my_details_fields" name="Raffle Public Name in the Account Form">
+        <xpath expr="//input[@name='email']/.." position="after">
+            <div t-attf-class="mb-3 #{error.get('raffle_public_name') and 'o_has_error' or ''} col-xl-6">
+                <label class="col-form-label label-optional" for="o_raffle_public_name_account">Public name</label>
+                <input
+                    id="o_raffle_public_name_account"
+                    type="text"
+                    name="raffle_public_name"
+                    maxlength="64"
+                    autocomplete="nickname"
+                    t-attf-class="form-control #{error.get('raffle_public_name') and 'is-invalid' or ''}"
+                    t-att-value="raffle_public_name if raffle_public_name is not None else partner.raffle_public_name"
+                    aria-describedby="o_raffle_public_name_account_help"
+                />
+                <small id="o_raffle_public_name_account_help" class="form-text text-muted">
+                    Shown instead of your full name on the public raffle winners page. Leave it empty
+                    to show your full name.
+                </small>
+            </div>
+        </xpath>
+    </template>
+</odoo>

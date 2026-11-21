@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<templates xml:space="preserve">
+    <t t-inherit="event_raffle.RaffleWheel" t-inherit-mode="extension">
+        <xpath expr="//input[@t-model='state.prize']" position="after">
+            <select
+                t-if="prizeState.bands.length"
+                class="form-select o_raffle_prize_band"
+                aria-label="Token category of the next draw"
+                title="Token category of the next draw"
+                t-on-change="onPrizeBandChange"
+                t-att-disabled="state.spinning"
+            >
+                <option value="" t-att-selected="!prizeState.bandId">Any token category</option>
+                <option
+                    t-foreach="prizeState.bands"
+                    t-as="band"
+                    t-key="band.id"
+                    t-att-value="band.id"
+                    t-att-selected="band.id === prizeState.bandId"
+                    t-esc="band.name"
+                />
+            </select>
+            <label class="o_raffle_closing_draw">
+                <input
+                    type="checkbox"
+                    class="form-check-input"
+                    t-att-checked="prizeState.closing"
+                    t-on-change="onClosingDrawChange"
+                    t-att-disabled="state.spinning"
+                />
+                Closing draw
+            </label>
+        </xpath>
+    </t>
+</templates>

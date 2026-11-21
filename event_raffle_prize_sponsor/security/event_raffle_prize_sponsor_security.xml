@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- The members of this group are the internal users listed as
+         sponsorship managers on at least one event: the module adds and
+         removes them when the events change (see
+         res.users._raffle_sponsor_sync_group()). It shows the review menu
+         and filter; the approval itself checks the events of each prize. -->
+    <record id="group_raffle_sponsorship_manager" model="res.groups">
+        <field name="name">Raffle: sponsorship manager (set from the events)</field>
+        <field name="category_id" ref="base.module_category_hidden" />
+        <field name="comment">
+            Set by the module for the users listed as sponsorship managers of an event: they approve
+            and refuse the sponsored prizes of those events.
+        </field>
+    </record>
+
+    <!-- The sponsor report and the thank-you records: an event user reads
+         every event, a sponsorship manager the events that list them. A
+         user in both groups reads every event, as the rules of their
+         groups add up. -->
+    <record id="event_raffle_sponsor_report_rule_user" model="ir.rule">
+        <field name="name">Sponsor report: event users read every event</field>
+        <field name="model_id" ref="model_event_raffle_sponsor_report" />
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[Command.link(ref('event.group_event_user'))]" />
+    </record>
+    <record id="event_raffle_sponsor_report_rule_sponsorship" model="ir.rule">
+        <field name="name">Sponsor report: sponsorship managers read their events</field>
+        <field name="model_id" ref="model_event_raffle_sponsor_report" />
+        <field name="domain_force">[('event_id.raffle_sponsor_manager_ids', 'in', [user.id])]</field>
+        <field name="groups" eval="[Command.link(ref('group_raffle_sponsorship_manager'))]" />
+    </record>
+    <record id="event_raffle_sponsor_report_rule_company" model="ir.rule">
+        <field name="name">Sponsor report: allowed companies</field>
+        <field name="model_id" ref="model_event_raffle_sponsor_report" />
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="event_raffle_sponsor_thanks_rule_user" model="ir.rule">
+        <field name="name">Sponsor thanks: event users read every event</field>
+        <field name="model_id" ref="model_event_raffle_sponsor_thanks" />
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[Command.link(ref('event.group_event_user'))]" />
+    </record>
+    <record id="event_raffle_sponsor_thanks_rule_sponsorship" model="ir.rule">
+        <field name="name">Sponsor thanks: sponsorship managers read their events</field>
+        <field name="model_id" ref="model_event_raffle_sponsor_thanks" />
+        <field name="domain_force">[('event_id.raffle_sponsor_manager_ids', 'in', [user.id])]</field>
+        <field name="groups" eval="[Command.link(ref('group_raffle_sponsorship_manager'))]" />
+    </record>
+
+    <!-- Users already listed on an event when the module is installed or
+         updated. -->
+    <function model="res.users" name="_raffle_sponsor_sync_all_groups" />
+</odoo>

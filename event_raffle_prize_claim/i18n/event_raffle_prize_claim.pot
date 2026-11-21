@@ -1,0 +1,657 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* event_raffle_prize_claim
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-20 03:42+0000\n"
+"PO-Revision-Date: 2026-11-20 03:42+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/sale_order.py:0
+msgid "%s cannot be bought now: remove it from the cart."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/website.py:0
+msgid "%s left"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_banner
+msgid "%s minutes left"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_banner
+msgid ", choose your prize!"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_done
+msgid ", your prize is reserved!"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/website.py:0
+msgid "1 left"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_banner
+msgid "1 minute left"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:mail.template,body_html:event_raffle_prize_claim.mail_template_prize_reserved
+msgid ""
+"<div style=\"margin: 0px; padding: 0px; font-size: 14px;\">\n"
+"    <t t-set=\"prize\" t-value=\"object._raffle_prize_mail_values()\"/>\n"
+"    <p style=\"margin: 0px 0px 12px 0px;\">Hello <t t-out=\"object.partner_id.name or ''\">Winner</t>,</p>\n"
+"    <p style=\"margin: 0px 0px 12px 0px;\">\n"
+"        Your prize is reserved: <strong t-out=\"prize['prize']\">Prize</strong>.\n"
+"    </p>\n"
+"    <p t-if=\"prize['category']\" style=\"margin: 0px 0px 12px 0px;\">\n"
+"        Token category: <t t-out=\"prize['category']\">Token</t>\n"
+"    </p>\n"
+"    <p t-if=\"prize['sponsor_name']\" style=\"margin: 0px 0px 12px 0px;\">\n"
+"        Offered by\n"
+"        <a t-if=\"prize['sponsor_url']\" t-att-href=\"prize['sponsor_url']\" t-out=\"prize['sponsor_name']\">Sponsor</a>\n"
+"        <t t-else=\"\" t-out=\"prize['sponsor_name']\">Sponsor</t>\n"
+"    </p>\n"
+"    <p style=\"margin: 0px 0px 12px 0px;\">We will contact you about pick-up or delivery.</p>\n"
+"    <p style=\"margin: 0px;\">Congratulations!</p>\n"
+"</div>\n"
+"            "
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_done
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.prize_sponsor
+msgid "<span class=\"visually-hidden\"> (opens in a new tab)</span>"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.total_prize_token
+msgid "<strong>Total</strong>"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/sale_order.py:0
+msgid "A prize cart must hold exactly one prize to confirm."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_link_other_account
+msgid ""
+"A prize link opens for the account of its winner only. Sign\n"
+"                    in with the account that received the link to choose the prize."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.constraint,message:event_raffle_prize_claim.constraint_event_raffle_draw_claim_token_unique
+msgid "A prize link token is unique."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_link_invalid
+msgid ""
+"A prize link works once, for a limited time. Ask the event\n"
+"                    team if you think you should still be able to choose a prize."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/controllers/main.py:0
+msgid "A prize order is confirmed without payment."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/sale_order.py:0
+msgid "A raffle prize is given through the link of its draw only."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,help:event_raffle_prize_claim.field_event_raffle__claim_auto_send
+msgid ""
+"After each draw, the winner receives a prize link by chat or email, when at "
+"least one prize is available for them. The link opens once the winner is "
+"signed in; a winner without an account receives a link that creates it "
+"first."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,field_description:event_raffle_prize_claim.field_event_raffle__claim_alert_channel_id
+msgid "Alert Channel"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_decline
+msgid "Back to the prizes"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_declined
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_done
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_link_invalid
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_link_other_account
+msgid "Back to the website"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_banner
+msgid "Choose another prize."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,field_description:event_raffle_prize_claim.field_event_raffle_config__sponsored_shop_close_date
+msgid "Close sales on"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_banner
+msgid "Congratulations"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_banner
+msgid "Congratulations, choose your prize!"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model,name:event_raffle_prize_claim.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_banner
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_decline
+msgid "Decline the prize"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,help:event_raffle_prize_claim.field_event_raffle__claim_alert_channel_id
+msgid ""
+"Discuss channel where OdooBot posts the expired and declined prize links."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model,name:event_raffle_prize_claim.model_event_event
+msgid "Event"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model,name:event_raffle_prize_claim.model_event_raffle
+msgid "Event Raffle"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model,name:event_raffle_prize_claim.model_event_raffle_config
+msgid "Event Raffle Default Settings"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields.selection,name:event_raffle_prize_claim.selection__event_raffle_draw__claim_link_end__expired
+#: model:ir.model.fields.selection,name:event_raffle_prize_claim.selection__event_raffle_draw__claim_link_state__expired
+msgid "Expired"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,field_description:event_raffle_prize_claim.field_delivery_carrier__is_raffle_prize_carrier
+msgid "For Raffle Prizes"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,help:event_raffle_prize_claim.field_event_raffle_config__sponsored_shop_close_date
+msgid ""
+"From this time on, the shop leaves the sponsored prizes out as if the switch"
+" were off. Empty keeps them listed while the switch is on."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,field_description:event_raffle_prize_claim.field_event_raffle_draw__claim_link_end
+msgid "Link Closed"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,field_description:event_raffle_prize_claim.field_event_raffle_draw__claim_deadline
+msgid "Link Deadline"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,field_description:event_raffle_prize_claim.field_event_raffle_draw__claim_token
+msgid "Link Token"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,field_description:event_raffle_prize_claim.field_event_raffle__claim_delay_minutes
+msgid "Link Validity (minutes)"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,help:event_raffle_prize_claim.field_event_raffle_config__sponsored_shop_open
+msgid ""
+"Lists the published sponsored prizes in the website shop to every visitor. "
+"Unticked, only the winners' prize links show them."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,help:event_raffle_prize_claim.field_event_raffle__claim_delay_minutes
+msgid ""
+"Minutes during which a prize link lets the winner choose a prize. Unused, "
+"the link expires and the alert channel is told."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields.selection,name:event_raffle_prize_claim.selection__event_raffle_draw__claim_link_state__none
+msgid "Not sent"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model,name:event_raffle_prize_claim.model_event_raffle_draw_notify_wizard
+msgid "Notify a Raffle Winner"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_done
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.prize_sponsor
+msgid "Offered by"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.product_template_form_view_raffle_prize_claim
+msgid "Offered on the Website"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,help:event_raffle_prize_claim.field_delivery_carrier__is_raffle_prize_carrier
+msgid ""
+"Offered to the carts of a prize claim only, and never to the other carts."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields.selection,name:event_raffle_prize_claim.selection__event_raffle_draw__claim_link_state__open
+msgid "Open"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,help:event_raffle_prize_claim.field_event_raffle_draw__claim_link_url
+msgid "Opens for the winner's account only: whoever opens it signs in first."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/website.py:0
+msgid "Out of stock"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,field_description:event_raffle_prize_claim.field_event_raffle_draw__claim_link_state
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.event_raffle_view_form_prize_claim
+msgid "Prize Link"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,field_description:event_raffle_prize_claim.field_event_raffle_draw__claim_link_url
+msgid "Prize Link URL"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_declined
+msgid "Prize declined"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_link_invalid
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_link_other_account
+msgid "Prize link"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/event_raffle_draw.py:0
+msgid "Prize link sent, valid %(minutes)s minutes, until %(deadline)s."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/product_template.py:0
+msgid "Prize only"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/product_template.py:0
+msgid "Prize only: %s"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_done
+msgid "Prize reserved"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model,name:event_raffle_prize_claim.model_product_template
+msgid "Product"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model,name:event_raffle_prize_claim.model_product_product
+msgid "Product Variant"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model,name:event_raffle_prize_claim.model_event_raffle_draw
+msgid "Raffle Draw"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model,name:event_raffle_prize_claim.model_event_raffle_draw_notification
+msgid "Raffle Draw Notification"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:delivery.carrier,name:event_raffle_prize_claim.carrier_prize_handover
+#: model:product.template,name:event_raffle_prize_claim.product_prize_handover_product_template
+msgid "Raffle prize handover"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.actions.server,name:event_raffle_prize_claim.ir_cron_prize_claim_expire_ir_actions_server
+msgid "Raffle: expire the prize links"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:mail.template,name:event_raffle_prize_claim.mail_template_prize_reserved
+msgid "Raffle: your prize"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model,name:event_raffle_prize_claim.model_sale_order
+msgid "Sales Order"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model,name:event_raffle_prize_claim.model_sale_order_line
+msgid "Sales Order Line"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/event_raffle_draw.py:0
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_decline
+msgid "Say why you decline the prize."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.event_raffle_draw_view_form_prize_claim
+msgid "Send a new prize link to the winner? A link sent before stops working."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,field_description:event_raffle_prize_claim.field_event_raffle__claim_auto_send
+msgid "Send the Link After Each Draw"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.event_raffle_draw_view_form_prize_claim
+msgid "Send the Prize Link"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:mail.template,description:event_raffle_prize_claim.mail_template_prize_reserved
+msgid "Sent to a raffle winner when their prize is reserved"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model,name:event_raffle_prize_claim.model_delivery_carrier
+msgid "Shipping Methods"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_link_other_account
+msgid "Sign in with another account"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,field_description:event_raffle_prize_claim.field_product_product__raffle_sponsor_url
+#: model:ir.model.fields,field_description:event_raffle_prize_claim.field_product_template__raffle_sponsor_url
+msgid "Sponsor Link"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,field_description:event_raffle_prize_claim.field_product_product__raffle_sponsor_name
+#: model:ir.model.fields,field_description:event_raffle_prize_claim.field_product_template__raffle_sponsor_name
+msgid "Sponsor Name"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.event_raffle_config_view_form_sponsored_shop
+msgid "Sponsored Prizes in the Shop"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,field_description:event_raffle_prize_claim.field_event_raffle_config__sponsored_shop_open
+msgid "Sponsored prizes in the shop"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_done
+msgid "The event team will tell you how to get it."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_banner
+msgid "The link has expired."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_declined
+msgid "The prize goes back to the other winners. Thank you!"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_decline
+msgid ""
+"The prize goes back to the other winners. Your answer is\n"
+"                    final: the link stops working once it is sent."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/event_raffle_draw.py:0
+msgid "The prize link could not be sent: %s"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/event_raffle_draw.py:0
+msgid "The prize link expired before the winner chose a prize."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/event_raffle_draw.py:0
+msgid ""
+"The prize link of draw #%(sequence)s (%(winner)s) in %(raffle)s expired."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,help:event_raffle_prize_claim.field_event_raffle_draw__claim_deadline
+msgid "The prize link works until this time."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/event_raffle_draw.py:0
+msgid "The prize of this draw is settled: no link is sent."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.product_template_form_view_raffle_prize_claim
+msgid ""
+"The shop lists a published prize to the winners it is allowed to, through "
+"their prize link, and to every visitor while the sponsored shop window is "
+"open."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.constraint,message:event_raffle_prize_claim.constraint_event_raffle_claim_delay_minutes_positive
+msgid "The validity of the prize link must be at least one minute."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/event_raffle_draw.py:0
+msgid "The winner declined the prize through the prize link: %s"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/event_raffle_draw.py:0
+msgid ""
+"The winner of draw #%(sequence)s (%(winner)s) in %(raffle)s declined the "
+"prize: %(comment)s"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/event_raffle_draw.py:0
+msgid "This draw has no winner to send a link to."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/event_raffle_draw.py:0
+msgid ""
+"This link first creates your account on the website, then opens your prize."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_banner
+msgid "This prize could not be reserved:"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/sale_order.py:0
+msgid "This prize is not available to you."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_link_invalid
+msgid "This prize link does not work"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_link_other_account
+msgid "This prize link is for another account"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/event_raffle_draw.py:0
+msgid "This prize link no longer works."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/sale_order.py:0
+msgid "This product is not available."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields.selection,name:event_raffle_prize_claim.selection__event_raffle_draw__claim_link_end__used
+#: model:ir.model.fields.selection,name:event_raffle_prize_claim.selection__event_raffle_draw__claim_link_state__used
+msgid "Used"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model,name:event_raffle_prize_claim.model_website
+msgid "Website"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model,name:event_raffle_prize_claim.model_website_snippet_filter
+msgid "Website Snippet Filter"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_done
+msgid "Well done"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.event_raffle_config_view_form_sponsored_shop
+msgid ""
+"While the switch is on and the close date, if any, is still ahead, every visitor\n"
+"                    of the website shop sees the published sponsored prizes: members buy those sold\n"
+"                    to them, the others show as prizes only. Afterwards, only the winners' prize\n"
+"                    links show them. To reopen the sales, tick the switch again and move or clear\n"
+"                    the date."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_decline
+msgid ""
+"Why do you decline the prize?\n"
+"                            <span class=\"text-nowrap\">(required)</span>"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:ir.model.fields,help:event_raffle_prize_claim.field_event_raffle_draw__claim_link_end
+msgid "Why the last prize link stopped working."
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/event_raffle_draw.py:0
+msgid ""
+"You won a prize (%(token)s)! Choose it here: %(link)s (valid %(minutes)s "
+"minutes)"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/event_raffle_draw.py:0
+msgid "You won a prize! Choose it here: %(link)s (valid %(minutes)s minutes)"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_declined
+msgid "Your answer is recorded"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_banner
+msgid "Your link is valid until"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_claim.claim_done
+msgid "Your prize is reserved!"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#: model:mail.template,subject:event_raffle_prize_claim.mail_template_prize_reserved
+msgid "Your prize: {{ object._raffle_prize_mail_values()['prize'] }}"
+msgstr ""
+
+#. module: event_raffle_prize_claim
+#. odoo-python
+#: code:addons/event_raffle_prize_claim/models/event_raffle_draw.py:0
+msgid "Your token: %(token)s, valid %(minutes)s minutes."
+msgstr ""

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_raffle_prize_claim_log_view_list" model="ir.ui.view">
+        <field name="name">event.raffle.prize.claim.log.list</field>
+        <field name="model">event.raffle.prize.claim.log</field>
+        <field name="arch" type="xml">
+            <list string="Claims Ended" create="false" edit="false" delete="false">
+                <field name="date" />
+                <field name="event_id" />
+                <field name="raffle_id" optional="show" />
+                <field name="draw_name" />
+                <field name="draw_id" optional="hide" />
+                <field name="kind" />
+                <field name="product_id" />
+                <field name="band_id" optional="show" />
+                <field name="comment" />
+                <field name="draw_date" optional="hide" />
+                <field name="user_id" optional="hide" />
+                <field name="company_id" optional="hide" groups="base.group_multi_company" />
+                <field name="sale_order_id" optional="hide" groups="sales_team.group_sale_salesman" />
+            </list>
+        </field>
+    </record>
+
+    <record id="event_raffle_prize_claim_log_view_search" model="ir.ui.view">
+        <field name="name">event.raffle.prize.claim.log.search</field>
+        <field name="model">event.raffle.prize.claim.log</field>
+        <field name="arch" type="xml">
+            <search string="Claims Ended">
+                <field name="draw_name" />
+                <field name="event_id" />
+                <field name="raffle_id" />
+                <field name="product_id" />
+                <filter string="Declined" name="declined" domain="[('kind', '=', 'declined')]" />
+                <filter string="Expired" name="expired" domain="[('kind', '=', 'expired')]" />
+                <separator />
+                <filter string="No Prize Chosen" name="no_prize" domain="[('product_id', '=', False)]" />
+                <filter string="Draw Deleted" name="draw_deleted" domain="[('draw_id', '=', False)]" />
+                <group expand="0" string="Group By">
+                    <filter string="Event" name="group_event" context="{'group_by': 'event_id'}" />
+                    <filter string="Raffle" name="group_raffle" context="{'group_by': 'raffle_id'}" />
+                    <filter string="End" name="group_kind" context="{'group_by': 'kind'}" />
+                    <filter string="Prize" name="group_product" context="{'group_by': 'product_id'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_event_raffle_prize_claim_log" model="ir.actions.act_window">
+        <field name="name">Claims Ended</field>
+        <field name="res_model">event.raffle.prize.claim.log</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">No claim ended yet</p>
+            <p>
+                Each decline and each expiry of a prize claim is listed here, with the prize it held
+                or the winner had chosen. A line stays when its draw is deleted.
+            </p>
+        </field>
+    </record>
+</odoo>

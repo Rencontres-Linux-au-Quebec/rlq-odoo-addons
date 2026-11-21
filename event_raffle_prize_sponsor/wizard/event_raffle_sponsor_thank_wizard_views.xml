@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_raffle_sponsor_thank_wizard_form" model="ir.ui.view">
+        <field name="name">event.raffle.sponsor.thank.wizard.form</field>
+        <field name="model">event.raffle.sponsor.thank.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Thank the Sponsors">
+                <div class="alert alert-info" role="status" invisible="not line_ids">
+                    Each ticked sponsor receives one email listing its winners by their public name, with the
+                    prize, the token category, the date and how the prize reached them. A sponsor without an
+                    email cannot be ticked.
+                </div>
+                <div class="alert alert-warning" role="status" invisible="line_ids">
+                    No sponsored prize of this event has a winner yet: there is no sponsor to thank.
+                </div>
+                <group>
+                    <field name="event_id" />
+                </group>
+                <!-- The sponsor and email columns have a width, and the
+                     emails and the status are text fields: the list wraps
+                     them instead of cutting them. -->
+                <field name="line_ids" nolabel="1" invisible="not line_ids">
+                    <list editable="bottom" create="false" delete="false" decoration-muted="not can_include">
+                        <field name="can_include" column_invisible="1" />
+                        <field name="include" readonly="not can_include" widget="boolean_toggle" width="70px" />
+                        <field name="sponsor_id" width="220px" />
+                        <field name="winner_count" width="90px" />
+                        <field name="recipient_ids" widget="many2many_tags" column_invisible="1" />
+                        <field name="recipient_emails" width="230px" />
+                        <field
+                            name="status"
+                            decoration-danger="not can_include"
+                            decoration-warning="can_include"
+                        />
+                    </list>
+                </field>
+                <separator string="Preview" invisible="not line_ids" />
+                <group invisible="not line_ids">
+                    <field name="preview_line_id" options="{'no_create': True, 'no_open': True}" />
+                    <field name="preview_subject" readonly="1" />
+                </group>
+                <field
+                    name="preview_body"
+                    readonly="1"
+                    invisible="not line_ids"
+                    class="o_raffle_sponsor_thanks_preview border rounded p-3"
+                />
+                <div class="mt-2" invisible="not can_edit_template">
+                    <field name="template_id" invisible="1" />
+                    <field name="can_edit_template" invisible="1" />
+                    <button
+                        name="action_open_template"
+                        type="object"
+                        string="Edit the email template"
+                        class="btn-link p-0"
+                        icon="fa-envelope-o"
+                    />
+                </div>
+                <footer>
+                    <button
+                        string="Send"
+                        name="action_send"
+                        type="object"
+                        class="btn-primary"
+                        invisible="not line_ids"
+                    />
+                    <button string="Cancel" special="cancel" class="btn-secondary" />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

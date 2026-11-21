@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_raffle_view_form_prize" model="ir.ui.view">
+        <field name="name">event.raffle.form.prize</field>
+        <field name="model">event.raffle</field>
+        <field name="inherit_id" ref="event_raffle.event_raffle_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='participant_ids']/list/field[@name='eligible']" position="before">
+                <field name="attendance_mode" optional="show" />
+            </xpath>
+            <xpath expr="//field[@name='draw_ids']/list/field[@name='prize']" position="after">
+                <field name="claim_state" optional="show" />
+                <field name="band_id" optional="hide" />
+                <field name="is_closing_draw" optional="hide" />
+            </xpath>
+            <xpath expr="//page[@name='settings']/group" position="after">
+                <group string="Prizes" name="prizes">
+                    <field name="prize_band_id" options="{'no_create': True}" />
+                    <field name="prize_closing_draw" />
+                    <field name="quota_default" />
+                    <field name="quota_high" />
+                    <field
+                        name="high_quota_ticket_ids"
+                        widget="many2many_tags"
+                        options="{'no_create': True}"
+                        invisible="not event_id"
+                    />
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

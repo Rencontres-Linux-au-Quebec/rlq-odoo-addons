@@ -1,0 +1,1266 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* event_raffle_prize
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-19 13:42+0000\n"
+"PO-Revision-Date: 2026-11-18 12:17+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr_CA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/wizard/event_raffle_prize_choose_wizard.py:0
+msgid "%(held)s of %(quota)s"
+msgstr "%(held)s sur %(quota)s"
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid "%(note)s (by %(user)s)"
+msgstr "%(note)s (par %(user)s)"
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid "%(prize)s is for %(allowed)s winners only."
+msgstr "%(prize)s est réservé aux gagnants : %(allowed)s."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid "%(prize)s is not in the token category %(band)s of this draw."
+msgstr "%(prize)s n'est pas dans la catégorie de jeton %(band)s de ce tir."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid "%s has no unit left."
+msgstr "Il ne reste aucune unité de %s."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid "%s is a closing prize: only a closing draw gives it."
+msgstr "%s est un prix de clôture : seul un tir de clôture le donne."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid "%s is not a prize of this event."
+msgstr "%s n'est pas un prix de cet événement."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid "%s is not a sponsored prize."
+msgstr "%s n'est pas un prix commandité."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid "%s is not offered in the winner's region."
+msgstr "%s n'est pas offert dans la région du gagnant."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle.py:0
+msgid "- %(raffle)s: %(draw)s"
+msgstr "- %(raffle)s : %(draw)s"
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_prize_band.py:0
+msgid "1 token"
+msgstr "1 jeton"
+
+#. module: event_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_template_view_kanban_raffle_prize
+msgid "<span class=\"badge text-bg-success\">Closing prize</span>"
+msgstr "<span class=\"badge text-bg-success\">Prix de clôture</span>"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle_draw__is_closing_draw
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle_prize_choose_wizard__is_closing_draw
+msgid "A closing draw may give the closing prizes."
+msgstr "Un tir de clôture peut donner les prix de clôture."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid ""
+"A draw whose prize is reserved cannot be deleted: decline the prize first, "
+"which frees its unit."
+msgstr ""
+"Un tir dont le prix est réservé ne peut pas être supprimé : refusez d'abord "
+"le prix, ce qui libère son unité."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid ""
+"A draw whose prize was handed over or shipped cannot be deleted: its prize "
+"order belongs to it."
+msgstr ""
+"Un tir dont le prix a été remis ou expédié ne peut pas être supprimé : sa commande de prix lui appartient."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle.py:0
+msgid ""
+"A raffle whose draws hold a prize cannot be deleted. Decline the reserved prizes first; a draw whose prize was handed over or shipped keeps its raffle.\n"
+"%s"
+msgstr ""
+"Un tirage dont des tirs gardent un prix ne peut pas être supprimé. Refusez d'abord les prix réservés ; un tir dont le prix a été remis ou expédié garde son tirage.\n"
+"%s"
+
+#. module: event_raffle_prize
+#: model_terms:ir.actions.act_window,help:event_raffle_prize.action_event_raffle_prize_catalogue
+msgid ""
+"A sponsored prize is a product that tracks its inventory, with its sponsor, "
+"its\n"
+"                value and its token category. Its stock is set in the "
+"Inventory app."
+msgstr ""
+"Un prix commandité est un article qui suit son inventaire, avec son commanditaire, sa\n"
+"                valeur et sa catégorie de jeton. Son stock se règle dans l'application Inventaire."
+
+#. module: event_raffle_prize
+#: model:ir.model.constraint,message:event_raffle_prize.constraint_event_raffle_prize_band_claim_delay_minutes_positive
+msgid "A token category's link lasts at least one minute."
+msgstr "Le lien d'une catégorie de jeton dure au moins une minute."
+
+#. module: event_raffle_prize
+#: model_terms:ir.actions.act_window,help:event_raffle_prize.action_event_raffle_prize_band
+msgid ""
+"A winner earns one token of the category of their draw, and a sponsored "
+"prize of\n"
+"                that category costs exactly that token. The value range "
+"places each prize in a\n"
+"                category; the link validity is how long the winner's prize "
+"link works."
+msgstr ""
+"Un gagnant obtient un jeton de la catégorie de son tir, et un prix commandité de\n"
+"                cette catégorie coûte exactement ce jeton. L'intervalle de valeur place chaque prix dans une\n"
+"                catégorie ; la validité du lien est la durée pendant laquelle le lien de prix du gagnant fonctionne."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_product_product__raffle_band_id
+#: model:ir.model.fields,help:event_raffle_prize.field_product_template__raffle_band_id
+msgid ""
+"A winner takes this prize for one token of this category. Set from the sales "
+"price when it changes, and editable by hand afterwards."
+msgstr ""
+"Un gagnant prend ce prix pour un jeton de cette catégorie. Réglée d'après le prix de vente quand il change, et modifiable à la main ensuite."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_band__active
+msgid "Active"
+msgstr "Actif"
+
+#. module: event_raffle_prize
+#: model_terms:ir.actions.act_window,help:event_raffle_prize.action_event_raffle_prize_catalogue
+msgid "Add a sponsored prize"
+msgstr "Ajouter un prix commandité"
+
+#. module: event_raffle_prize
+#: model_terms:ir.actions.act_window,help:event_raffle_prize.action_event_raffle_prize_inventory
+msgid ""
+"Add the prizes in Sponsored Prizes: their stock and claims show up here."
+msgstr ""
+"Ajoutez les prix dans Prix commandités : leur stock et leurs attributions apparaissent ici."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_event.py:0
+msgid ""
+"An event whose raffle draws hold a prize cannot be deleted. Decline the reserved prizes first; a draw whose prize was handed over or shipped keeps its event.\n"
+"%s"
+msgstr ""
+"Un événement dont des tirs gardent un prix ne peut pas être supprimé. Refusez d'abord les prix réservés ; un tir dont le prix a été remis ou expédié garde son événement.\n"
+"%s"
+
+#. module: event_raffle_prize
+#. odoo-javascript
+#: code:addons/event_raffle_prize/static/src/wheel/raffle_wheel_prize.xml:0
+msgid "Any token category"
+msgstr "Toute catégorie de jeton"
+
+#. module: event_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_band_view_search
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_template_view_search_raffle_prize
+msgid "Archived"
+msgstr "Archivé"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_draw__attendance_mode
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_participant__attendance_mode
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_choose_wizard__attendance_mode
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_product_view_search_raffle_inventory
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_template_view_search_raffle_prize
+msgid "Attendance"
+msgstr "Mode"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_product_product__raffle_member_sale_ok
+#: model:ir.model.fields,help:event_raffle_prize.field_product_template__raffle_member_sale_ok
+msgid ""
+"Besides the winners' tokens, members may buy this prize at its sales price. "
+"The purchases share the stock with the claims and never count toward a "
+"raffle quota."
+msgstr ""
+"En plus des jetons des gagnants, les membres peuvent acheter ce prix à son prix de vente. Les achats partagent le stock avec les attributions et ne comptent jamais dans un quota de tirage."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields.selection,name:event_raffle_prize.selection__sale_order_line__raffle_prize_sale_type__purchase
+msgid "Bought by a member"
+msgstr "Acheté par un membre"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_claim_log__user_id
+msgid "By"
+msgstr "Par"
+
+#. module: event_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_choose_wizard_form
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_decline_wizard_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: event_raffle_prize
+#: model:ir.model,name:event_raffle_prize.model_event_raffle_prize_choose_wizard
+msgid "Choose a Raffle Prize"
+msgstr "Choisir un prix commandité"
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/wizard/event_raffle_prize_choose_wizard.py:0
+msgid "Choose a prize first."
+msgstr "Choisissez d'abord un prix."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_draw_view_form_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_choose_wizard_form
+msgid "Choose the Prize"
+msgstr "Choisir le prix"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_draw__claim_date
+msgid "Claim Date"
+msgstr "Date d'attribution"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields.selection,name:event_raffle_prize.selection__sale_order_line__raffle_prize_sale_type__claim
+msgid "Claimed with a token"
+msgstr "Réclamé avec un jeton"
+
+#. module: event_raffle_prize
+#: model:ir.actions.act_window,name:event_raffle_prize.action_event_raffle_prize_claim_log
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_draw__claim_log_ids
+#: model:ir.ui.menu,name:event_raffle_prize.menu_event_raffle_prize_claim_log
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_draw_view_form_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_claim_log_view_list
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_claim_log_view_search
+msgid "Claims Ended"
+msgstr "Attributions terminées"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_draw__is_closing_draw
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_choose_wizard__is_closing_draw
+msgid "Closing Draw"
+msgstr "Tir de clôture"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_product__raffle_closing_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_template__raffle_closing_prize
+msgid "Closing Prize"
+msgstr "Prix de clôture"
+
+#. module: event_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_product_view_search_raffle_inventory
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_template_view_search_raffle_prize
+msgid "Closing Prizes"
+msgstr "Prix de clôture"
+
+#. module: event_raffle_prize
+#. odoo-javascript
+#: code:addons/event_raffle_prize/static/src/wheel/raffle_wheel_prize.xml:0
+msgid "Closing draw"
+msgstr "Tir de clôture"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_claim_log__company_id
+msgid "Company"
+msgstr "Société"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle_prize_claim_log__company_id
+msgid "Company of the raffle, else of the event."
+msgstr "Société du tirage, sinon de l'événement."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_product_product__raffle_sponsor_id
+#: model:ir.model.fields,help:event_raffle_prize.field_product_template__raffle_sponsor_id
+msgid "Contact that gave this prize."
+msgstr "Contact qui a donné ce prix."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle__prize_closing_draw
+msgid "Copied on the next draw: a closing draw may give the closing prizes."
+msgstr ""
+"Copié sur le prochain tir : un tir de clôture peut donner les prix de "
+"clôture."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_product__raffle_country_ids
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_template__raffle_country_ids
+msgid "Countries"
+msgstr "Pays"
+
+#. module: event_raffle_prize
+#: model_terms:ir.actions.act_window,help:event_raffle_prize.action_event_raffle_prize_band
+msgid "Create a token category"
+msgstr "Créer une catégorie de jeton"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_band__create_uid
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_choose_wizard__create_uid
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_claim_log__create_uid
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_decline_wizard__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_band__create_date
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_choose_wizard__create_date
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_claim_log__create_date
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_decline_wizard__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_claim_log__date
+msgid "Date"
+msgstr "Date"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle_prize_claim_log__draw_date
+msgid "Date of the draw, which dates the line in the sponsor report."
+msgstr "Date du tir, qui date la ligne dans le bilan des commandites."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_draw__decline_comment
+msgid "Decline Reason"
+msgstr "Raison du refus"
+
+#. module: event_raffle_prize
+#: model:ir.model,name:event_raffle_prize.model_event_raffle_prize_decline_wizard
+msgid "Decline a Raffle Prize"
+msgstr "Refuser un prix commandité"
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_draw_view_form_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_decline_wizard_form
+msgid "Decline the Prize"
+msgstr "Refuser le prix"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields.selection,name:event_raffle_prize.selection__event_raffle_draw__claim_state__declined
+#: model:ir.model.fields.selection,name:event_raffle_prize.selection__event_raffle_prize_claim_log__kind__declined
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_claim_log_view_search
+msgid "Declined"
+msgstr "Refusé"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle__quota_default
+msgid "Default Quota"
+msgstr "Quota par défaut"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_product__raffle_qty_delivered
+msgid "Delivered"
+msgstr "Remis"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_band__display_name
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_choose_wizard__display_name
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_claim_log__display_name
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_decline_wizard__display_name
+msgid "Display Name"
+msgstr "Nom d'affichage"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_choose_wizard__draw_id
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_claim_log__draw_id
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_decline_wizard__draw_id
+msgid "Draw"
+msgstr "Tir"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_claim_log__draw_date
+msgid "Draw Date"
+msgstr "Date du tir"
+
+#. module: event_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_claim_log_view_search
+msgid "Draw Deleted"
+msgstr "Tir supprimé"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_sale_order__raffle_draw_id
+msgid ""
+"Draw whose prize claim created this order. The claim cancels or delivers an "
+"order only when it points back to its draw."
+msgstr ""
+"Tir dont l'attribution a créé cette commande. L'attribution n'annule ou ne "
+"livre une commande que si elle renvoie à son tir."
+
+#. module: event_raffle_prize
+#: model_terms:ir.actions.act_window,help:event_raffle_prize.action_event_raffle_prize_claim_log
+msgid ""
+"Each decline and each expiry of a prize claim is listed here, with the prize it held\n"
+"                or the winner had chosen. A line stays when its draw is deleted."
+msgstr ""
+"Chaque refus et chaque expiration d'une attribution de prix est listé ici, avec le prix\n"
+"                qu'elle réservait ou que le gagnant avait choisi. Une ligne reste quand son tir est supprimé."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle_draw__claim_log_ids
+msgid ""
+"Each decline and each expiry of this draw's claim, with the prize it held or"
+" the winner had chosen."
+msgstr ""
+"Chaque refus et chaque expiration de l'attribution de ce tir, avec le prix qu'elle réservait ou que le gagnant avait choisi."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle__prize_band_id
+msgid ""
+"Each winner of this raffle earns one token of this category: the next draw "
+"copies it, and its winner is offered the prizes of this category only. The "
+"wheel can change it between two draws."
+msgstr ""
+"Chaque gagnant de ce tirage obtient un jeton de cette catégorie : le prochain tir la copie, et son gagnant ne se voit offrir que les prix de cette catégorie. La roue peut la changer entre deux tirs."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle_prize_claim_log__draw_id
+msgid "Empty once the draw is deleted: the line stays."
+msgstr "Vide une fois le tir supprimé : la ligne reste."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_claim_log__kind
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_claim_log_view_search
+msgid "End"
+msgstr "Fin"
+
+#. module: event_raffle_prize
+#: model:ir.model,name:event_raffle_prize.model_event_event
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_claim_log__event_id
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_claim_log_view_search
+msgid "Event"
+msgstr "Événement"
+
+#. module: event_raffle_prize
+#: model:ir.model,name:event_raffle_prize.model_event_raffle
+msgid "Event Raffle"
+msgstr ""
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_product__raffle_event_ids
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_template__raffle_event_ids
+msgid "Events"
+msgstr "Événements"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields.selection,name:event_raffle_prize.selection__event_raffle_draw__claim_state__expired
+#: model:ir.model.fields.selection,name:event_raffle_prize.selection__event_raffle_prize_claim_log__kind__expired
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_claim_log_view_search
+msgid "Expired"
+msgstr "Expiré"
+
+#. module: event_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_claim_log_view_search
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_product_view_search_raffle_inventory
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_template_view_search_raffle_prize
+msgid "Group By"
+msgstr "Regrouper par"
+
+#. module: event_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_draw_view_form_prize
+msgid ""
+"Hand over this prize to the winner? Its delivery is validated, which cannot "
+"be undone here."
+msgstr ""
+"Remettre ce prix au gagnant ? Sa livraison est validée, ce qui ne peut pas "
+"être annulé ici."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields.selection,name:event_raffle_prize.selection__event_raffle_draw__claim_state__delivered
+msgid "Handed over"
+msgstr "Remis"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle__quota_high
+msgid "High Quota"
+msgstr "Quota élevé"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle__high_quota_ticket_ids
+msgid "High Quota Tickets"
+msgstr "Billets à quota élevé"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle_prize_band__value_max
+msgid "Highest sales price of a prize in this token category, included."
+msgstr ""
+"Prix de vente le plus élevé d'un prix de cette catégorie de jeton, inclus."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_sale_order_line__raffle_prize_sale_type
+msgid ""
+"How the sponsored prize of this line leaves: claimed with a raffle token "
+"(the order belongs to a draw), or bought by a member at its sales price."
+msgstr ""
+"Comment part le prix commandité de cette ligne : réclamé avec un jeton de tirage (la commande appartient à un tir), ou acheté par un membre à son prix de vente."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_band__id
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_choose_wizard__id
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_claim_log__id
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_decline_wizard__id
+msgid "ID"
+msgstr "ID"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_product__raffle_initial_qty
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_template__raffle_initial_qty
+msgid "Initial Quantity"
+msgstr "Quantité initiale"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_band__write_uid
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_choose_wizard__write_uid
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_claim_log__write_uid
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_decline_wizard__write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_band__write_date
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_choose_wizard__write_date
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_claim_log__write_date
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_decline_wizard__write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_band__claim_delay_minutes
+msgid "Link Validity (minutes)"
+msgstr "Validité du lien (minutes)"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle_prize_band__value_min
+msgid "Lowest sales price of a prize in this token category, included."
+msgstr ""
+"Prix de vente le plus bas d'un prix de cette catégorie de jeton, inclus."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_band__value_max
+msgid "Maximum Value"
+msgstr "Valeur maximale"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_band__value_min
+msgid "Minimum Value"
+msgstr "Valeur minimale"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle_prize_band__claim_delay_minutes
+msgid ""
+"Minutes during which the prize link of a token of this category lets its "
+"winner choose a prize."
+msgstr ""
+"Minutes pendant lesquelles le lien de prix d'un jeton de cette catégorie permet à son gagnant de choisir un prix."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_band__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle_prize_claim_log__draw_name
+msgid "Name of the draw when the line was written, its number and its winner."
+msgstr "Nom du tir quand la ligne a été écrite, son numéro et son gagnant."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle__prize_closing_draw
+msgid "Next Draw Is a Closing Draw"
+msgstr "Le prochain tir est un tir de clôture"
+
+#. module: event_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_claim_log_view_search
+msgid "No Prize Chosen"
+msgstr "Aucun prix choisi"
+
+#. module: event_raffle_prize
+#: model_terms:ir.actions.act_window,help:event_raffle_prize.action_event_raffle_prize_claim_log
+msgid "No claim ended yet"
+msgstr "Aucune attribution terminée pour l'instant"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields.selection,name:event_raffle_prize.selection__event_raffle_draw__claim_state__none
+msgid "No prize"
+msgstr "Aucun prix"
+
+#. module: event_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_choose_wizard_form
+msgid ""
+"No prize is available for this winner: the quota is reached, or no prize of "
+"the\n"
+"                    token category, attendance, region and closing rules has "
+"a unit left."
+msgstr ""
+"Aucun prix n'est disponible pour ce gagnant : le quota est atteint, ou aucun prix des\n"
+"                    règles de catégorie de jeton, de mode, de région et de clôture n'a d'unité restante."
+
+#. module: event_raffle_prize
+#: model_terms:ir.actions.act_window,help:event_raffle_prize.action_event_raffle_prize_inventory
+msgid "No sponsored prize yet"
+msgstr "Aucun prix commandité pour l'instant"
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid "No unit of %s could be reserved."
+msgstr "Aucune unité de %s n'a pu être réservée."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle__quota_default
+msgid "Number of prizes a person may hold over all the raffles of the event."
+msgstr ""
+"Nombre de prix qu'une personne peut détenir sur l'ensemble des tirages de "
+"l'événement."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle__quota_high
+msgid ""
+"Number of prizes a person with a high quota ticket may hold over all the "
+"raffles of the event."
+msgstr ""
+"Nombre de prix qu'une personne qui a un billet à quota élevé peut détenir "
+"sur l'ensemble des tirages de l'événement."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields.selection,name:event_raffle_prize.selection__event_raffle_participant__attendance_mode__onsite
+#: model:ir.model.fields.selection,name:event_raffle_prize.selection__product_template__raffle_attendance__onsite
+msgid "On site"
+msgstr "Sur place"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields.selection,name:event_raffle_prize.selection__product_template__raffle_attendance__both
+msgid "On site and virtual"
+msgstr "Sur place et virtuel"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle_draw__attendance_mode
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle_participant__attendance_mode
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle_prize_choose_wizard__attendance_mode
+msgid ""
+"On site when the registration is marked attended, which the check-in scan "
+"does. Every other participant, including one without a registration, is "
+"virtual."
+msgstr ""
+"Sur place quand l'inscription est marquée présente, ce que fait le scan à "
+"l'accueil. Tout autre participant, y compris celui qui n'a pas "
+"d'inscription, est virtuel."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_product_product__raffle_closing_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_product_template__raffle_closing_prize
+msgid "Only a closing draw may give this prize."
+msgstr "Seul un tir de clôture peut donner ce prix."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid "Only a reserved prize can be declined."
+msgstr "Seul un prix réservé peut être refusé."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid "Only a reserved prize can be handed over."
+msgstr "Seul un prix réservé peut être remis."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_claim_log__sale_order_id
+msgid "Order"
+msgstr "Commande"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle__high_quota_ticket_ids
+msgid ""
+"Participants whose registration has one of these tickets may hold the high "
+"quota of prizes; the others the default quota."
+msgstr ""
+"Les participants dont l'inscription porte l'un de ces billets peuvent "
+"détenir le quota élevé de prix ; les autres, le quota par défaut."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_choose_wizard__product_id
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_claim_log__product_id
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_choose_wizard_form
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_claim_log_view_search
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_product_view_list_raffle_inventory
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_template_view_kanban_raffle_prize
+msgid "Prize"
+msgstr "Prix"
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid "Prize %(prize)s declined: %(comment)s"
+msgstr "Prix %(prize)s refusé : %(comment)s"
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid "Prize %(prize)s reserved for %(winner)s (order %(order)s)."
+msgstr "Prix %(prize)s réservé pour %(winner)s (commande %(order)s)."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid "Prize %s handed over."
+msgstr "Prix %s remis."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_draw__claim_state
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_draw_view_form_prize
+msgid "Prize Claim"
+msgstr "Attribution du prix"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_product__raffle_claim_ids
+msgid "Prize Claims"
+msgstr "Attributions de prix"
+
+#. module: event_raffle_prize
+#: model:event.raffle.prize.band,name:event_raffle_prize.token_category_gold
+msgid "Prize Group A"
+msgstr "Groupe de prix A"
+
+#. module: event_raffle_prize
+#: model:event.raffle.prize.band,name:event_raffle_prize.token_category_silver
+msgid "Prize Group B"
+msgstr "Groupe de prix B"
+
+#. module: event_raffle_prize
+#: model:event.raffle.prize.band,name:event_raffle_prize.token_category_bronze
+msgid "Prize Group C"
+msgstr "Groupe de prix C"
+
+#. module: event_raffle_prize
+#: model:event.raffle.prize.band,name:event_raffle_prize.token_category_d
+msgid "Prize Group D"
+msgstr "Groupe de prix D"
+
+#. module: event_raffle_prize
+#: model:event.raffle.prize.band,name:event_raffle_prize.token_category_e
+msgid "Prize Group E"
+msgstr "Groupe de prix E"
+
+#. module: event_raffle_prize
+#: model:event.raffle.prize.band,name:event_raffle_prize.token_category_f
+msgid "Prize Group F"
+msgstr "Groupe de prix F"
+
+#. module: event_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_draw_view_form_prize
+msgid "Prize Handed Over"
+msgstr "Prix remis"
+
+#. module: event_raffle_prize
+#: model:ir.actions.act_window,name:event_raffle_prize.action_event_raffle_prize_inventory
+#: model:ir.ui.menu,name:event_raffle_prize.menu_event_raffle_prize_inventory
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_product_view_list_raffle_inventory
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_product_view_pivot_raffle_inventory
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_product_view_search_raffle_inventory
+msgid "Prize Inventory"
+msgstr "Inventaire des prix"
+
+#. module: event_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_template_view_search_raffle_prize
+msgid "Prize Only"
+msgstr "Prix seulement"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_draw__prize_order_id
+msgid "Prize Order"
+msgstr "Commande du prix"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_draw__prize_product_id
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_decline_wizard__prize_product_id
+msgid "Prize Product"
+msgstr "Article du prix"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_draw__prize_value
+msgid "Prize Value"
+msgstr "Valeur du prix"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle_prize_claim_log__sale_order_id
+msgid "Prize order or cart that held the prize."
+msgstr "Commande du prix ou panier qui contenait le prix."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle_prize_claim_log__product_id
+msgid ""
+"Prize the claim held, else the prize of the winner's last cart. Empty when "
+"the winner chose no prize."
+msgstr ""
+"Prix que l'attribution réservait, sinon le prix du dernier panier du gagnant. Vide quand le gagnant n'a choisi aucun prix."
+
+#. module: event_raffle_prize
+#: model:ir.ui.menu,name:event_raffle_prize.menu_event_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_view_form_prize
+msgid "Prizes"
+msgstr "Prix"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_choose_wizard__allowed_product_ids
+msgid "Prizes Allowed"
+msgstr "Prix permis"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_choose_wizard__quota_info
+msgid "Prizes Held"
+msgstr "Prix détenus"
+
+#. module: event_raffle_prize
+#: model:ir.model,name:event_raffle_prize.model_product_template
+msgid "Product"
+msgstr ""
+
+#. module: event_raffle_prize
+#: model:ir.model,name:event_raffle_prize.model_product_product
+msgid "Product Variant"
+msgstr ""
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_product_product__raffle_initial_qty
+#: model:ir.model.fields,help:event_raffle_prize.field_product_template__raffle_initial_qty
+msgid ""
+"Quantity the sponsor gave, shown in the prize inventory. The stock itself "
+"comes from the Inventory app."
+msgstr ""
+"Quantité donnée par le commanditaire, affichée dans l'inventaire des prix. "
+"Le stock lui-même vient de l'application Inventaire."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_claim_log__raffle_id
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_claim_log_view_search
+msgid "Raffle"
+msgstr "Tirage"
+
+#. module: event_raffle_prize
+#: model:ir.model,name:event_raffle_prize.model_event_raffle_draw
+#: model:ir.model.fields,field_description:event_raffle_prize.field_sale_order__raffle_draw_id
+msgid "Raffle Draw"
+msgstr "Tir du tirage"
+
+#. module: event_raffle_prize
+#: model:ir.model,name:event_raffle_prize.model_event_raffle_participant
+msgid "Raffle Participant"
+msgstr ""
+
+#. module: event_raffle_prize
+#: model:ir.model,name:event_raffle_prize.model_event_raffle_prize_claim_log
+msgid "Raffle Prize Claim Log"
+msgstr "Journal des attributions de prix"
+
+#. module: event_raffle_prize
+#: model:ir.model,name:event_raffle_prize.model_event_raffle_prize_band
+msgid "Raffle Token Category"
+msgstr "Catégorie de jeton de tirage"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_product_product__raffle_event_ids
+#: model:ir.model.fields,help:event_raffle_prize.field_product_template__raffle_event_ids
+msgid "Raffles of these events only. Empty means any event."
+msgstr ""
+"Tirages de ces événements seulement. Vide signifie n'importe quel événement."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_claim_log__comment
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_decline_wizard__comment
+msgid "Reason"
+msgstr "Raison"
+
+#. module: event_raffle_prize
+#: model:product.template,name:event_raffle_prize.demo_prize_laptop
+msgid "Refurbished laptop"
+msgstr "Portable reconditionné"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_product__raffle_qty_free
+msgid "Remaining"
+msgstr "Restant"
+
+#. module: event_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_choose_wizard_form
+msgid "Reserve this Prize"
+msgstr "Réserver ce prix"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_product__raffle_qty_reserved
+#: model:ir.model.fields.selection,name:event_raffle_prize.selection__event_raffle_draw__claim_state__reserved
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_product_view_search_raffle_inventory
+msgid "Reserved"
+msgstr "Réservé"
+
+#. module: event_raffle_prize
+#: model:ir.model,name:event_raffle_prize.model_sale_order
+msgid "Sales Order"
+msgstr ""
+
+#. module: event_raffle_prize
+#: model:ir.model,name:event_raffle_prize.model_sale_order_line
+msgid "Sales Order Line"
+msgstr ""
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle_draw__prize_value
+msgid "Sales price of the prize when it was claimed."
+msgstr "Prix de vente du prix au moment de l'attribution."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid "Say why the prize is declined."
+msgstr "Indiquez pourquoi le prix est refusé."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_band__sequence
+msgid "Sequence"
+msgstr "Séquence"
+
+#. module: event_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_template_view_search_raffle_prize
+msgid "Sold to Members"
+msgstr "En vente aux membres"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_product__raffle_member_sale_ok
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_template__raffle_member_sale_ok
+msgid "Sold to members"
+msgstr "En vente aux membres"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_product__raffle_sponsor_id
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_template__raffle_sponsor_id
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_product_view_search_raffle_inventory
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_template_view_search_raffle_prize
+msgid "Sponsor"
+msgstr "Commanditaire"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_product__raffle_sponsor_website
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_template__raffle_sponsor_website
+msgid "Sponsor Website"
+msgstr "Site web du commanditaire"
+
+#. module: event_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_template_form_view_raffle_prize
+msgid "Sponsor and Value"
+msgstr "Commanditaire et valeur"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_product__is_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_template__is_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_template_form_view_raffle_prize
+msgid "Sponsored Prize"
+msgstr "Prix commandité"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_sale_order_line__raffle_prize_sale_type
+msgid "Sponsored Prize Sale"
+msgstr "Vente du prix commandité"
+
+#. module: event_raffle_prize
+#: model:ir.actions.act_window,name:event_raffle_prize.action_event_raffle_prize_catalogue
+#: model:ir.ui.menu,name:event_raffle_prize.menu_event_raffle_prize_catalogue
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_template_search_view_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_template_view_list_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_template_view_search_raffle_prize
+msgid "Sponsored Prizes"
+msgstr "Prix commandités"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_product__raffle_state_ids
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_template__raffle_state_ids
+msgid "States"
+msgstr "Provinces"
+
+#. module: event_raffle_prize
+#: model:product.template,name:event_raffle_prize.demo_prize_tshirt
+msgid "T-shirt"
+msgstr "T-shirt"
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid ""
+"The delivery of %s could not be validated. If its order or delivery was "
+"cancelled, decline the prize, then choose it again."
+msgstr ""
+"La livraison de %s n'a pas pu être validée. Si sa commande ou sa livraison a "
+"été annulée, refusez le prix, puis choisissez-le de nouveau."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_prize_band.py:0
+msgid "The minimum value of the token category %s is above its maximum value."
+msgstr ""
+"La valeur minimale de la catégorie de jeton %s dépasse sa valeur maximale."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid ""
+"The order of %s is no longer confirmed: decline the prize, then choose it "
+"again."
+msgstr ""
+"La commande de %s n'est plus confirmée : refusez le prix, puis choisissez-le "
+"de nouveau."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid ""
+"The prize claim of a draw changes through its buttons only: Choose the "
+"Prize, Decline the Prize and Prize Handed Over."
+msgstr ""
+"L'attribution du prix d'un tir ne change que par ses boutons : Choisir le "
+"prix, Refuser le prix et Prix remis."
+
+#. module: event_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_decline_wizard_form
+msgid ""
+"The prize goes back in stock at once. The winner keeps the draw: spin the "
+"wheel\n"
+"                    again for another winner."
+msgstr ""
+"Le prix revient en stock aussitôt. Le gagnant garde son tir : relancez la "
+"roue\n"
+"                    pour un autre gagnant."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid "The prize order of this draw does not belong to it."
+msgstr "La commande du prix de ce tir ne lui appartient pas."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/product_template.py:0
+msgid ""
+"The sponsored prize %s must be a good that tracks its inventory: a claim "
+"reserves one unit of its stock."
+msgstr ""
+"Le prix commandité %s doit être un bien qui suit son inventaire : une attribution réserve une unité de son stock."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid "The winner already holds their quota of prizes."
+msgstr "Le gagnant détient déjà son quota de prix."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle_draw__band_id
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle_prize_choose_wizard__band_id
+msgid ""
+"The winner earns one token of this category: only its prizes are offered, "
+"and its prize link lasts the category's link validity. Empty offers every "
+"category."
+msgstr ""
+"Le gagnant obtient un jeton de cette catégorie : seuls ses prix sont offerts, et son lien de prix dure la validité du lien de la catégorie. Vide offre toutes les catégories."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid "This draw has no winner to give a prize to."
+msgstr "Ce tir n'a aucun gagnant à qui donner un prix."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid ""
+"This order cannot hold the prize of %s: it must be a draft of this draw with "
+"one unit of one prize."
+msgstr ""
+"Cette commande ne peut pas porter le prix de %s : elle doit être un "
+"brouillon de ce tir avec une unité d'un seul prix."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_product_product__is_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_product_template__is_raffle_prize
+msgid ""
+"This product can be given to the winner of a raffle draw, for one token of "
+"its category."
+msgstr ""
+"Cet article peut être remis au gagnant d'un tir, pour un jeton de sa catégorie."
+
+#. module: event_raffle_prize
+#. odoo-python
+#: code:addons/event_raffle_prize/models/event_raffle_draw.py:0
+msgid "This winner already has a prize."
+msgstr "Ce gagnant a déjà un prix."
+
+#. module: event_raffle_prize
+#: model:ir.actions.act_window,name:event_raffle_prize.action_event_raffle_prize_band
+#: model:ir.ui.menu,name:event_raffle_prize.menu_event_raffle_prize_band
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_band_view_list
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_band_view_search
+msgid "Token Categories"
+msgstr "Catégories de jeton"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_draw__band_id
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_choose_wizard__band_id
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_claim_log__band_id
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_product__raffle_band_id
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_template__raffle_band_id
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_product_view_search_raffle_inventory
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_template_view_search_raffle_prize
+msgid "Token Category"
+msgstr "Catégorie de jeton"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_event_raffle_prize_claim_log__band_id
+msgid "Token category of the draw when the line was written."
+msgstr "Catégorie de jeton du tir quand la ligne a été écrite."
+
+#. module: event_raffle_prize
+#. odoo-javascript
+#: code:addons/event_raffle_prize/static/src/wheel/raffle_wheel_prize.xml:0
+msgid "Token category of the next draw"
+msgstr "Catégorie de jeton du prochain tir"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle__prize_band_id
+msgid "Token category of this raffle"
+msgstr "Catégorie de jeton du tirage"
+
+#. module: event_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_draw_view_list_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_product_view_list_raffle_inventory
+msgid "Total"
+msgstr "Total"
+
+#. module: event_raffle_prize
+#: model:product.template,name:event_raffle_prize.demo_prize_usb_key
+msgid "USB key"
+msgstr "Clé USB"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_product_product__raffle_qty_delivered
+msgid "Units handed over to a winner."
+msgstr "Unités remises à un gagnant."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_product_product__raffle_qty_reserved
+msgid "Units held by a prize claim that is not handed over yet."
+msgstr "Unités retenues par une attribution qui n'est pas encore remise."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_product_product__raffle_qty_free
+msgid ""
+"Units in stock at the default warehouse that no claim or other move has "
+"reserved: what can still be given."
+msgstr ""
+"Unités en stock à l'entrepôt par défaut qu'aucune attribution ni aucun autre "
+"mouvement n'a réservées : ce qui peut encore être donné."
+
+#. module: event_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_choose_wizard_form
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_product_view_list_raffle_inventory
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_template_form_view_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_template_view_list_raffle_prize
+msgid "Value"
+msgstr "Valeur"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields.selection,name:event_raffle_prize.selection__event_raffle_participant__attendance_mode__virtual
+#: model:ir.model.fields.selection,name:event_raffle_prize.selection__product_template__raffle_attendance__virtual
+msgid "Virtual"
+msgstr "Virtuel"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_product_product__raffle_country_ids
+#: model:ir.model.fields,help:event_raffle_prize.field_product_template__raffle_country_ids
+msgid ""
+"Virtual winners must live in one of these countries. Empty means anywhere. "
+"On-site winners pick the prize up at the event."
+msgstr ""
+"Les gagnants virtuels doivent habiter l'un de ces pays. Vide signifie "
+"partout. Les gagnants sur place prennent le prix à l'événement."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_product_product__raffle_state_ids
+#: model:ir.model.fields,help:event_raffle_prize.field_product_template__raffle_state_ids
+msgid ""
+"Virtual winners must live in one of these states. A country listed under "
+"Countries without any of its states listed here stays open as a whole."
+msgstr ""
+"Les gagnants virtuels doivent habiter l'une de ces provinces. Un pays listé "
+"sous Pays dont aucune province n'est listée ici reste ouvert en entier."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,help:event_raffle_prize.field_product_product__raffle_attendance
+#: model:ir.model.fields,help:event_raffle_prize.field_product_template__raffle_attendance
+msgid ""
+"Which winners may take this prize: those checked in at the event (on site), "
+"the others (virtual), or both."
+msgstr ""
+"Quels gagnants peuvent prendre ce prix : ceux enregistrés à l'accueil de "
+"l'événement (sur place), les autres (virtuels), ou les deux."
+
+#. module: event_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.product_template_form_view_raffle_prize
+msgid "Who May Win It"
+msgstr "Qui peut le gagner"
+
+#. module: event_raffle_prize
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize.event_raffle_prize_decline_wizard_form
+msgid "Why the winner declines the prize..."
+msgstr "Pourquoi le gagnant refuse le prix..."
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_product__raffle_attendance
+#: model:ir.model.fields,field_description:event_raffle_prize.field_product_template__raffle_attendance
+msgid "Winner Attendance"
+msgstr "Mode des gagnants"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_choose_wizard__winner_name
+msgid "Winner Name"
+msgstr "Nom du gagnant"
+
+#. module: event_raffle_prize
+#: model:ir.model.fields,field_description:event_raffle_prize.field_event_raffle_prize_claim_log__draw_name
+msgid "Winning Draw"
+msgstr "Tir gagnant"

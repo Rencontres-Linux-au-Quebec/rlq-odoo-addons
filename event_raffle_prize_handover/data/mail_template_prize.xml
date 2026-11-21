@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <!-- Sent instead of event_raffle_prize_claim's "Your prize" when a
+             claim order confirms (sale.order._raffle_prize_mail_template()):
+             the same email, with how the prize reaches the winner. -->
+        <record id="mail_template_prize_reserved" model="mail.template">
+            <field name="name">Raffle: your prize, with pick-up or delivery</field>
+            <field name="model_id" ref="sale.model_sale_order" />
+            <field name="subject">Your prize: {{ object._raffle_prize_mail_values()['prize'] }}</field>
+            <field name="email_from">{{ (object.company_id.email_formatted or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.partner_id.id }}</field>
+            <field name="lang">{{ object.partner_id.lang }}</field>
+            <field name="auto_delete" eval="True" />
+            <field name="description">Sent to a raffle winner when their prize is reserved</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px; font-size: 14px;">
+    <t t-set="prize" t-value="object._raffle_prize_mail_values()" />
+    <p style="margin: 0px 0px 12px 0px;">Hello <t t-out="object.partner_id.name or ''">Winner</t>,</p>
+    <p style="margin: 0px 0px 12px 0px;">
+        Your prize is reserved: <strong t-out="prize['prize']">Prize</strong>.
+    </p>
+    <p t-if="prize['category']" style="margin: 0px 0px 12px 0px;">
+        Token category: <t t-out="prize['category']">Token</t>
+    </p>
+    <p t-if="prize['sponsor_name']" style="margin: 0px 0px 12px 0px;">
+        Offered by
+        <a t-if="prize['sponsor_url']" t-att-href="prize['sponsor_url']" t-out="prize['sponsor_name']">Sponsor</a>
+        <t t-else="" t-out="prize['sponsor_name']">Sponsor</t>
+    </p>
+    <p class="o_raffle_prize_handover" style="margin: 0px 0px 12px 0px;" t-out="prize['handover']">Pick up your prize at the event.</p>
+    <p style="margin: 0px;">Congratulations!</p>
+</div>
+            </field>
+        </record>
+
+        <!-- Sent when an event user marks the prize shipped
+             (event.raffle.draw._prize_ship()). -->
+        <record id="mail_template_prize_shipped" model="mail.template">
+            <field name="name">Raffle: your prize is shipped</field>
+            <field name="model_id" ref="sale.model_sale_order" />
+            <field name="subject">Your prize is shipped: {{ object._raffle_prize_mail_values()['prize'] }}</field>
+            <field name="email_from">{{ (object.company_id.email_formatted or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.partner_id.id }}</field>
+            <field name="lang">{{ object.partner_id.lang }}</field>
+            <field name="auto_delete" eval="True" />
+            <field name="description">Sent to a raffle winner when their prize is shipped</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px; font-size: 14px;">
+    <t t-set="prize" t-value="object._raffle_prize_mail_values()" />
+    <p style="margin: 0px 0px 12px 0px;">Hello <t t-out="object.partner_id.name or ''">Winner</t>,</p>
+    <p style="margin: 0px 0px 12px 0px;">
+        Your prize is on its way: <strong t-out="prize['prize']">Prize</strong>.
+    </p>
+    <p class="o_raffle_prize_tracking" style="margin: 0px 0px 12px 0px;">
+        Tracking number: <strong t-out="prize['tracking_ref']">0000</strong>
+        <t t-if="prize['carrier']">(<t t-out="prize['carrier']">Carrier</t>)</t>
+    </p>
+    <p t-if="prize['sponsor_name']" style="margin: 0px 0px 12px 0px;">
+        Offered by
+        <a t-if="prize['sponsor_url']" t-att-href="prize['sponsor_url']" t-out="prize['sponsor_name']">Sponsor</a>
+        <t t-else="" t-out="prize['sponsor_name']">Sponsor</t>
+    </p>
+    <p style="margin: 0px;">Congratulations!</p>
+</div>
+            </field>
+        </record>
+    </data>
+</odoo>

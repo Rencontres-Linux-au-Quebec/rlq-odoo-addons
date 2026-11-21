@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!-- Each issued link triggers this job at its deadline; the interval
+         only catches a trigger missed while the server was down. -->
+    <record id="ir_cron_prize_claim_expire" model="ir.cron">
+        <field name="name">Raffle: expire the prize links</field>
+        <field name="model_id" ref="event_raffle.model_event_raffle_draw" />
+        <field name="state">code</field>
+        <field name="code">model._cron_claim_link_expire()</field>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="active" eval="True" />
+    </record>
+</odoo>

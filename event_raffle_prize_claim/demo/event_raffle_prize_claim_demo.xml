@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!-- The demo prizes are offered on the website: the shop lists them to
+         the winners they are allowed to only. -->
+    <record id="event_raffle_prize.demo_prize_tshirt" model="product.template">
+        <field name="is_published" eval="True" />
+    </record>
+    <record id="event_raffle_prize.demo_prize_usb_key" model="product.template">
+        <field name="is_published" eval="True" />
+    </record>
+    <record id="event_raffle_prize.demo_prize_laptop" model="product.template">
+        <field name="is_published" eval="True" />
+    </record>
+</odoo>

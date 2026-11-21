@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="product_template_form_view_raffle_prize_handover" model="ir.ui.view">
+        <field name="name">product.template.form.raffle.prize.handover</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="event_raffle_prize.product_template_form_view_raffle_prize" />
+        <field name="arch" type="xml">
+            <field name="raffle_closing_prize" position="before">
+                <field name="raffle_virtual_prize" />
+            </field>
+            <xpath expr="//page[@name='raffle_prize']/group" position="after">
+                <group string="Virtual Prize Instructions" invisible="not raffle_virtual_prize">
+                    <field
+                        name="raffle_virtual_instructions"
+                        nolabel="1"
+                        colspan="2"
+                        placeholder="How the winner uses this prize: where to enter the code, until when..."
+                    />
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_template_view_list_raffle_prize_handover" model="ir.ui.view">
+        <field name="name">product.template.list.raffle.prize.handover</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="event_raffle_prize.product_template_view_list_raffle_prize" />
+        <field name="arch" type="xml">
+            <field name="raffle_closing_prize" position="before">
+                <field name="raffle_virtual_prize" optional="show" />
+            </field>
+        </field>
+    </record>
+</odoo>

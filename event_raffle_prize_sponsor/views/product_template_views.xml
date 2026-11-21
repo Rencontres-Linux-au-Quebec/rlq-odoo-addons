@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="product_template_form_view_raffle_sponsor" model="ir.ui.view">
+        <field name="name">product.template.form.raffle.sponsor</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="event_raffle_prize.product_template_form_view_raffle_prize" />
+        <field name="arch" type="xml">
+            <!-- The buttons follow the events of the prize: an event manager,
+                 or a sponsorship manager of all its events. -->
+            <xpath expr="//header" position="inside">
+                <field name="raffle_sponsor_can_review" invisible="1" />
+                <button
+                    name="action_raffle_sponsor_approve"
+                    type="object"
+                    string="Approve"
+                    class="btn-primary"
+                    invisible="not is_raffle_prize or raffle_sponsor_state == 'approved' or not raffle_sponsor_can_review"
+                />
+                <button
+                    name="action_open_raffle_sponsor_refuse_wizard"
+                    type="object"
+                    string="Refuse"
+                    invisible="not is_raffle_prize or raffle_sponsor_state != 'submitted' or not raffle_sponsor_can_review"
+                />
+            </xpath>
+            <xpath expr="//widget[@name='web_ribbon']" position="attributes">
+                <attribute name="invisible">active or raffle_sponsor_state != 'approved'</attribute>
+            </xpath>
+            <xpath expr="//widget[@name='web_ribbon']" position="after">
+                <widget
+                    name="web_ribbon"
+                    title="To review"
+                    bg_color="text-bg-warning"
+                    invisible="raffle_sponsor_state != 'submitted'"
+                />
+                <widget
+                    name="web_ribbon"
+                    title="Refused"
+                    bg_color="text-bg-danger"
+                    invisible="raffle_sponsor_state != 'refused'"
+                />
+            </xpath>
+            <field name="raffle_sponsor_id" position="after">
+                <field name="raffle_sponsor_state" readonly="1" />
+                <field
+                    name="raffle_sponsor_refusal_reason"
+                    readonly="1"
+                    invisible="raffle_sponsor_state != 'refused'"
+                />
+            </field>
+        </field>
+    </record>
+
+    <record id="product_template_view_list_raffle_sponsor" model="ir.ui.view">
+        <field name="name">product.template.list.raffle.sponsor</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="event_raffle_prize.product_template_view_list_raffle_prize" />
+        <field name="arch" type="xml">
+            <field name="raffle_sponsor_id" position="after">
+                <field
+                    name="raffle_sponsor_state"
+                    widget="badge"
+                    decoration-warning="raffle_sponsor_state == 'submitted'"
+                    decoration-danger="raffle_sponsor_state == 'refused'"
+                    decoration-success="raffle_sponsor_state == 'approved'"
+                    optional="show"
+                />
+            </field>
+        </field>
+    </record>
+
+    <record id="product_template_view_kanban_raffle_sponsor" model="ir.ui.view">
+        <field name="name">product.template.kanban.raffle.sponsor</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="event_raffle_prize.product_template_view_kanban_raffle_prize" />
+        <field name="arch" type="xml">
+            <field name="raffle_band_id" position="after">
+                <field name="raffle_sponsor_state" invisible="1" />
+                <div invisible="raffle_sponsor_state == 'approved'">
+                    <span class="badge text-bg-warning" invisible="raffle_sponsor_state != 'submitted'">To review</span>
+                    <span class="badge text-bg-danger" invisible="raffle_sponsor_state != 'refused'">Refused</span>
+                </div>
+            </field>
+        </field>
+    </record>
+
+    <record id="product_template_view_search_raffle_sponsor" model="ir.ui.view">
+        <field name="name">product.template.search.raffle.sponsor</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="event_raffle_prize.product_template_view_search_raffle_prize" />
+        <field name="arch" type="xml">
+            <filter name="token_only" position="after">
+                <separator />
+                <!-- A submitted or refused prize is archived: naming the
+                     active field in the domain lists it all the same. -->
+                <filter
+                    string="To review"
+                    name="raffle_to_review"
+                    domain="[('raffle_sponsor_state', '=', 'submitted'), ('active', 'in', (True, False))]"
+                    groups="event.group_event_manager,event_raffle_prize_sponsor.group_raffle_sponsorship_manager"
+                />
+                <filter
+                    string="Refused"
+                    name="raffle_refused"
+                    domain="[('raffle_sponsor_state', '=', 'refused'), ('active', 'in', (True, False))]"
+                />
+            </filter>
+        </field>
+    </record>
+
+    <!-- The menu's action: a sponsorship manager lists the prizes of the
+         events they manage only, the ones whose buttons they may use (see
+         product.template._search_raffle_sponsor_can_review()). -->
+    <record id="action_event_raffle_prize_to_review" model="ir.actions.act_window">
+        <field name="name">Sponsored Prizes to Review</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="domain">[('is_raffle_prize', '=', True), ('raffle_sponsor_can_review', '=', True)]</field>
+        <field name="context">{'search_default_raffle_to_review': 1, 'create': False}</field>
+        <field name="search_view_id" ref="event_raffle_prize.product_template_view_search_raffle_prize" />
+        <field
+            name="view_ids"
+            eval="[
+                Command.clear(),
+                Command.create({'view_mode': 'list', 'view_id': ref('event_raffle_prize.product_template_view_list_raffle_prize')}),
+                Command.create({'view_mode': 'kanban', 'view_id': ref('event_raffle_prize.product_template_view_kanban_raffle_prize')}),
+            ]"
+        />
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No prize to review</p>
+            <p>
+                The prizes that sponsors submit in the portal wait here: set the token category of each
+                one, then approve or refuse it.
+            </p>
+        </field>
+    </record>
+</odoo>

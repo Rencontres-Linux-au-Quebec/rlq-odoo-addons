@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_raffle_prize_refuse_wizard_form" model="ir.ui.view">
+        <field name="name">event.raffle.prize.refuse.wizard.form</field>
+        <field name="model">event.raffle.prize.refuse.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Refuse the Prize">
+                <div class="alert alert-info" role="status">
+                    The sponsor reads the reason in the portal. Changing the prize there submits it again.
+                </div>
+                <group>
+                    <field name="product_tmpl_id" readonly="1" />
+                    <field name="reason" placeholder="What the sponsor should change..." />
+                </group>
+                <footer>
+                    <button string="Refuse the Prize" name="action_refuse" type="object" class="btn-primary" />
+                    <button string="Cancel" special="cancel" class="btn-secondary" />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

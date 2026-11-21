@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_raffle_view_form_prize_claim" model="ir.ui.view">
+        <field name="name">event.raffle.form.prize.claim</field>
+        <field name="model">event.raffle</field>
+        <field name="inherit_id" ref="event_raffle_prize.event_raffle_view_form_prize" />
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='prizes']" position="after">
+                <group string="Prize Link" name="prize_link">
+                    <field name="claim_auto_send" />
+                    <field name="claim_delay_minutes" />
+                    <field
+                        name="claim_alert_channel_id"
+                        options="{'no_create': True}"
+                    />
+                </group>
+            </xpath>
+            <xpath expr="//field[@name='draw_ids']/list/field[@name='claim_state']" position="after">
+                <field name="claim_link_state" optional="hide" />
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- One winner of the winners page. static/src/js/winners_refresh.js
+         builds the same markup from the JSON data. The prize line says in
+         words what became of the prize when none is chosen (data-status:
+         chosen, to_choose, declined, expired); its style only follows. -->
+    <template id="winners_item" name="Raffle Winner">
+        <li class="o_raffle_winner col-12 col-md-6 col-lg-4" t-att-data-winner="winner['id']">
+            <div class="card h-100">
+                <div class="card-body">
+                    <p class="o_raffle_winner_name h5 mb-1" t-out="winner['name']" />
+                    <p class="o_raffle_winner_prize mb-1" t-att-data-status="winner['status']" t-out="winner['prize']" />
+                    <p t-if="winner['sponsor']" class="o_raffle_winner_sponsor small mb-1">
+                        Offered by
+                        <a
+                            t-if="winner['sponsor_url']"
+                            t-att-href="winner['sponsor_url']"
+                            t-att-data-focus-key="'sponsor-%s' % winner['id']"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        ><t t-out="winner['sponsor']" /><span class="visually-hidden"> (opens in a new tab)</span></a>
+                        <t t-else="" t-out="winner['sponsor']" />
+                    </p>
+                    <p t-if="winner['category']" class="o_raffle_winner_category small mb-0">
+                        Token category: <t t-out="winner['category']" />
+                    </p>
+                </div>
+            </div>
+        </li>
+    </template>
+
+    <template id="winners_page" name="Raffle Winners">
+        <t t-call="website.layout">
+            <t t-set="additional_title">Winners</t>
+            <!-- Without JavaScript the page reloads itself; with it, the
+                 script below refreshes the list in place. -->
+            <t t-set="head">
+                <noscript><meta http-equiv="refresh" t-att-content="refresh_seconds" /></noscript>
+            </t>
+            <t t-set="label_new_one">1 new winner</t>
+            <t t-set="label_new_many">%s new winners</t>
+            <t t-set="label_offered">Offered by</t>
+            <t t-set="label_new_tab">(opens in a new tab)</t>
+            <t t-set="label_category">Token category:</t>
+            <t t-set="label_empty">No winner yet.</t>
+            <div
+                id="wrap"
+                class="o_raffle_winners container py-4"
+                t-att-data-url="data_url"
+                t-att-data-refresh-seconds="refresh_seconds"
+                t-att-data-label-new-one="label_new_one"
+                t-att-data-label-new-many="label_new_many"
+                t-att-data-label-offered="label_offered"
+                t-att-data-label-new-tab="label_new_tab"
+                t-att-data-label-category="label_category"
+                t-att-data-label-empty="label_empty"
+            >
+                <h1 class="h2">Winners: <t t-out="event_name" /></h1>
+                <p class="o_raffle_winners_updated">
+                    Updated at <time t-att-datetime="data['updated']" t-out="data['updated_label']" />.
+                    The page refreshes every 10 minutes.
+                </p>
+                <p class="o_raffle_winners_live visually-hidden" role="status" aria-live="polite" aria-atomic="true" />
+                <div class="o_raffle_winners_list">
+                    <p t-if="not data['groups']" class="o_raffle_winners_empty" t-out="label_empty" />
+                    <section
+                        t-foreach="data['groups']"
+                        t-as="group"
+                        class="o_raffle_winners_group mb-4"
+                        t-att-aria-labelledby="'o_raffle_winners_hour_%s' % group_index"
+                    >
+                        <h2 class="h4" t-att-id="'o_raffle_winners_hour_%s' % group_index">
+                            <time t-att-datetime="group['key']" t-out="group['label']" />
+                        </h2>
+                        <ul class="list-unstyled row g-3">
+                            <t t-foreach="group['winners']" t-as="winner">
+                                <t t-call="event_raffle_prize_handover.winners_item" />
+                            </t>
+                        </ul>
+                    </section>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- What the hand-over screen shows of one claim: `claim` is
+         event.raffle.draw._prize_handover_values(). -->
+    <template id="handover_claim_details" name="Raffle Prize Hand-over Details">
+        <dl class="o_raffle_handover_details row mb-0">
+            <t t-if="claim['public_name']">
+                <dt class="col-12 col-sm-4">Public name</dt>
+                <dd class="col-12 col-sm-8" t-out="claim['public_name']" />
+            </t>
+            <dt class="col-12 col-sm-4">Prize</dt>
+            <dd class="col-12 col-sm-8 o_raffle_handover_prize" t-out="claim['prize']" />
+            <t t-if="claim['sponsor']">
+                <dt class="col-12 col-sm-4">Sponsor</dt>
+                <dd class="col-12 col-sm-8" t-out="claim['sponsor']" />
+            </t>
+            <t t-if="claim['category']">
+                <dt class="col-12 col-sm-4">Token category</dt>
+                <dd class="col-12 col-sm-8" t-out="claim['category']" />
+            </t>
+            <dt class="col-12 col-sm-4">Raffle</dt>
+            <dd class="col-12 col-sm-8" t-out="claim['raffle']" />
+        </dl>
+    </template>
+
+    <template id="handover_list" name="Raffle Prize Hand-over">
+        <t t-call="website.layout">
+            <t t-set="additional_title">Prize hand-over</t>
+            <div id="wrap" class="o_raffle_handover container py-4">
+                <h1 class="h2">Prize hand-over</h1>
+                <div
+                    t-if="done"
+                    class="o_raffle_handover_done alert alert-success"
+                    role="status"
+                    aria-live="polite"
+                    tabindex="-1"
+                >
+                    <p class="mb-0 fw-bold" t-out="done_message" />
+                </div>
+                <form role="search" method="get" action="/raffle/handover" class="o_raffle_handover_search mb-4">
+                    <label for="o_raffle_handover_search_input" class="form-label fw-bold">Search a winner</label>
+                    <p id="o_raffle_handover_search_help" class="form-text mt-0 mb-2">
+                        Name, public name, email or draw number.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <input
+                            id="o_raffle_handover_search_input"
+                            type="search"
+                            name="search"
+                            class="form-control form-control-lg flex-grow-1"
+                            autocomplete="off"
+                            t-att-value="search"
+                            aria-describedby="o_raffle_handover_search_help"
+                        />
+                        <button type="submit" class="btn btn-dark btn-lg">Search</button>
+                        <a t-if="search" href="/raffle/handover" class="btn btn-outline-dark btn-lg">Show all</a>
+                    </div>
+                </form>
+                <h2 class="h4" id="o_raffle_handover_results_title" t-out="results_title" />
+                <p class="o_raffle_handover_count" t-out="results_count" />
+                <ul t-if="claims" class="o_raffle_handover_claims list-unstyled" aria-labelledby="o_raffle_handover_results_title">
+                    <li t-foreach="claims" t-as="claim" class="o_raffle_handover_claim card mb-3">
+                        <div class="card-body">
+                            <h3 class="h5 card-title">
+                                <span class="o_raffle_handover_number">#<t t-out="claim['number']" /></span>
+                                <t t-out="claim['name']" />
+                            </h3>
+                            <t t-call="event_raffle_prize_handover.handover_claim_details" />
+                            <a
+                                t-attf-href="/raffle/handover/#{claim['draw'].id}"
+                                class="o_raffle_handover_open btn btn-primary btn-lg w-100 mt-3"
+                            >Hand over<span class="visually-hidden"> the prize of <t t-out="claim['name']" /></span></a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </t>
+    </template>
+
+    <template id="handover_step" name="Raffle Prize Hand-over Step">
+        <t t-call="website.layout">
+            <t t-set="additional_title">Hand over the prize</t>
+            <div id="wrap" class="o_raffle_handover container py-4">
+                <h1 class="h2">Hand over the prize</h1>
+                <p t-if="error" id="o_raffle_handover_error" class="o_raffle_handover_error fw-bold" role="alert">
+                    The prize could not be handed over: <t t-out="error" />
+                </p>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h2 class="h5 card-title">
+                            <span class="o_raffle_handover_number">#<t t-out="claim['number']" /></span>
+                            <t t-out="claim['name']" />
+                        </h2>
+                        <t t-call="event_raffle_prize_handover.handover_claim_details" />
+                    </div>
+                </div>
+                <!-- static/src/js/handover_confirm.js marks the form busy
+                     while it is sent, with the label below. -->
+                <t t-set="label_sending">Sending...</t>
+                <form
+                    t-if="reserved"
+                    t-attf-action="/raffle/handover/#{claim['draw'].id}/confirm"
+                    method="post"
+                    enctype="multipart/form-data"
+                    class="o_raffle_handover_form"
+                    t-att-data-label-sending="label_sending"
+                >
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                    <div class="mb-3">
+                        <label for="o_raffle_handover_photo" class="form-label fw-bold">
+                            Photo with the sponsor (optional)
+                        </label>
+                        <input
+                            id="o_raffle_handover_photo"
+                            type="file"
+                            name="photo"
+                            accept="image/*"
+                            capture="environment"
+                            class="form-control form-control-lg"
+                            aria-describedby="o_raffle_handover_photo_help"
+                        />
+                        <p id="o_raffle_handover_photo_help" class="form-text">
+                            The photo stays private: only the event team sees it, on the draw.
+                        </p>
+                    </div>
+                    <button type="submit" class="o_raffle_handover_confirm btn btn-primary btn-lg w-100">Confirm the hand-over</button>
+                    <p class="o_raffle_handover_pending visually-hidden" role="status" aria-live="polite" />
+                </form>
+                <p t-else="" class="fw-bold">This prize is no longer waiting to be handed over.</p>
+                <a href="/raffle/handover" class="btn btn-outline-dark btn-lg w-100 mt-3">Back to the list</a>
+            </div>
+        </t>
+    </template>
+</odoo>

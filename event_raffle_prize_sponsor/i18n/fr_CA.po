@@ -1,0 +1,1613 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* event_raffle_prize_sponsor
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-19 13:43+0000\n"
+"PO-Revision-Date: 2026-11-19 04:04+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr_CA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. module: event_raffle_prize_sponsor
+#: model:res.groups,comment:event_raffle_prize_sponsor.group_raffle_sponsorship_manager
+msgid ""
+"\n"
+"            Set by the module for the users listed as sponsorship managers of an event: they approve\n"
+"            and refuse the sponsored prizes of those events.\n"
+"        "
+msgstr ""
+"\n"
+"            Réglé par le module pour les utilisateurs nommés responsables des commandites d'un événement : ils approuvent\n"
+"            et refusent les prix commandités de ces événements.\n"
+"        "
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/product_template.py:0
+msgid ""
+"%(sponsor)s changed the prize %(prize)s for %(event)s, which waits for "
+"review: check it again, its token category included, before approving it."
+msgstr ""
+"%(sponsor)s a modifié le prix %(prize)s pour %(event)s, qui attend sa "
+"révision : vérifiez-le de nouveau, sa catégorie de jeton comprise, avant de "
+"l'approuver."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/product_template.py:0
+msgid ""
+"%(sponsor)s changed the refused prize %(prize)s for %(event)s: review it "
+"again."
+msgstr ""
+"%(sponsor)s a modifié le prix refusé %(prize)s pour %(event)s : révisez-le "
+"de nouveau."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/product_template.py:0
+msgid ""
+"%(sponsor)s submitted the prize %(prize)s for %(event)s: set its token "
+"category, then approve or refuse it."
+msgstr ""
+"%(sponsor)s a soumis le prix %(prize)s pour %(event)s : choisissez sa "
+"catégorie de jeton, puis approuvez-le ou refusez-le."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/event_registration.py:0
+msgid ""
+"%s has no valid email address: add the attendee's email to the registration "
+"first."
+msgstr ""
+"%s n'a pas d'adresse courriel valide : ajoutez d'abord le courriel du "
+"participant à l'inscription."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/event_registration.py:0
+msgid ""
+"%s is an internal user: they sign in with their own account, no invitation "
+"is needed."
+msgstr ""
+"%s est un utilisateur interne : il se connecte avec son propre compte, "
+"aucune invitation n'est nécessaire."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/product_template.py:0
+msgid ""
+"%s waits for the approval of the organization: approve it instead of "
+"restoring it."
+msgstr ""
+"%s attend l'approbation de l'organisation : approuvez-le plutôt que de le "
+"restaurer."
+
+#. module: event_raffle_prize_sponsor
+#: model:mail.template,body_html:event_raffle_prize_sponsor.mail_template_sponsor_thanks
+msgid ""
+"<div style=\"margin: 0px; padding: 0px; font-size: 14px;\">\n"
+"    <t t-set=\"thanks\" t-value=\"object._raffle_thanks_values()\"/>\n"
+"    <p style=\"margin: 0px 0px 12px 0px;\">Hello <t t-out=\"thanks['sponsor']\">Sponsor</t>,</p>\n"
+"    <p style=\"margin: 0px 0px 12px 0px;\">\n"
+"        Thank you for the prizes you offered for the raffle of <strong t-out=\"thanks['event']\">Event</strong>.\n"
+"        Here are their winners.\n"
+"    </p>\n"
+"    <table class=\"o_raffle_sponsor_thanks_winners\" cellpadding=\"4\" cellspacing=\"0\" style=\"width: 100%; border-collapse: collapse; margin: 0px 0px 12px 0px;\">\n"
+"        <thead>\n"
+"            <tr style=\"text-align: left; border-bottom: 1px solid #cccccc;\">\n"
+"                <th scope=\"col\">Winner</th>\n"
+"                <th scope=\"col\">Prize</th>\n"
+"                <th scope=\"col\">Token category</th>\n"
+"                <th scope=\"col\" style=\"white-space: nowrap;\">Date</th>\n"
+"                <th scope=\"col\">Delivery</th>\n"
+"            </tr>\n"
+"        </thead>\n"
+"        <tbody>\n"
+"        <tr t-foreach=\"thanks['winners']\" t-as=\"winner\" style=\"border-bottom: 1px solid #eeeeee;\">\n"
+"            <td t-out=\"winner['name']\">Winner</td>\n"
+"            <td t-out=\"winner['prize']\">Prize</td>\n"
+"            <td t-out=\"winner['category']\">Token</td>\n"
+"            <td style=\"white-space: nowrap;\" t-out=\"winner['date']\">Date</td>\n"
+"            <td t-out=\"winner['mode']\">Handed over on site</td>\n"
+"        </tr>\n"
+"        </tbody>\n"
+"    </table>\n"
+"    <p style=\"margin: 0px;\">With our thanks,</p>\n"
+"</div>\n"
+"            "
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px; font-size: 14px;\">\n"
+"    <t t-set=\"thanks\" t-value=\"object._raffle_thanks_values()\"/>\n"
+"    <p style=\"margin: 0px 0px 12px 0px;\">Bonjour <t t-out=\"thanks['sponsor']\">Commanditaire</t>,</p>\n"
+"    <p style=\"margin: 0px 0px 12px 0px;\">\n"
+"        Merci pour les prix que vous avez offerts au tirage de <strong t-out=\"thanks['event']\">Événement</strong>.\n"
+"        Voici leurs gagnants.\n"
+"    </p>\n"
+"    <table class=\"o_raffle_sponsor_thanks_winners\" cellpadding=\"4\" cellspacing=\"0\" style=\"width: 100%; border-collapse: collapse; margin: 0px 0px 12px 0px;\">\n"
+"        <thead>\n"
+"            <tr style=\"text-align: left; border-bottom: 1px solid #cccccc;\">\n"
+"                <th scope=\"col\">Gagnant</th>\n"
+"                <th scope=\"col\">Prix</th>\n"
+"                <th scope=\"col\">Catégorie de jeton</th>\n"
+"                <th scope=\"col\" style=\"white-space: nowrap;\">Date</th>\n"
+"                <th scope=\"col\">Remise</th>\n"
+"            </tr>\n"
+"        </thead>\n"
+"        <tbody>\n"
+"        <tr t-foreach=\"thanks['winners']\" t-as=\"winner\" style=\"border-bottom: 1px solid #eeeeee;\">\n"
+"            <td t-out=\"winner['name']\">Gagnant</td>\n"
+"            <td t-out=\"winner['prize']\">Prix</td>\n"
+"            <td t-out=\"winner['category']\">Jeton</td>\n"
+"            <td style=\"white-space: nowrap;\" t-out=\"winner['date']\">Date</td>\n"
+"            <td t-out=\"winner['mode']\">Remis sur place</td>\n"
+"        </tr>\n"
+"        </tbody>\n"
+"    </table>\n"
+"    <p style=\"margin: 0px;\">Avec nos remerciements,</p>\n"
+"</div>\n"
+"            "
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "<option value=\"\">Choose an event</option>"
+msgstr "<option value=\"\">Choisir un événement</option>"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.product_template_view_kanban_raffle_sponsor
+msgid ""
+"<span class=\"badge text-bg-warning\" invisible=\"raffle_sponsor_state != 'submitted'\">To review</span>\n"
+"                    <span class=\"badge text-bg-danger\" invisible=\"raffle_sponsor_state != 'refused'\">Refused</span>"
+msgstr ""
+"<span class=\"badge text-bg-warning\" invisible=\"raffle_sponsor_state != 'submitted'\">À réviser</span>\n"
+"                    <span class=\"badge text-bg-danger\" invisible=\"raffle_sponsor_state != 'refused'\">Refusé</span>"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_registration_view_form_raffle_sponsor
+msgid ""
+"<span class=\"flex-grow-1\">\n"
+"                        This sponsor has no account: they cannot add prizes in the portal.\n"
+"                    </span>"
+msgstr ""
+"<span class=\"flex-grow-1\">\n"
+"                        Ce commanditaire n'a pas de compte : il ne peut pas ajouter de prix dans le portail.\n"
+"                    </span>"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_registration_view_form_raffle_sponsor
+msgid "<span class=\"flex-grow-1\">Invitation sent, not accepted yet.</span>"
+msgstr ""
+"<span class=\"flex-grow-1\">Invitation envoyée, pas encore acceptée.</span>"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "<span class=\"fw-bold\">Event:</span>"
+msgstr "<span class=\"fw-bold\">Événement :</span>"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_field_error
+msgid "<span class=\"visually-hidden\">Error: </span>"
+msgstr "<span class=\"visually-hidden\">Erreur : </span>"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_product_product__raffle_sponsor_state
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_product_template__raffle_sponsor_state
+msgid ""
+"A prize submitted by a sponsor in the portal waits for the organization: it "
+"is offered nowhere until it is approved."
+msgstr ""
+"Un prix soumis par un commanditaire dans le portail attend l'organisation : "
+"il n'est offert nulle part avant d'être approuvé."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/event_registration.py:0
+msgid "Only the event users send the sponsor invitations."
+msgstr ""
+"Seuls les utilisateurs des événements envoient les invitations des "
+"commanditaires."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/product_template.py:0
+msgid "Prize changed: %s"
+msgstr "Prix modifié : %s"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_product_product__raffle_sponsor_ecommerce_portal
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_product_template__raffle_sponsor_ecommerce_portal
+msgid "eCommerce description from the portal"
+msgstr "Description pour le commerce en ligne du portail"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_product_product__raffle_sponsor_ecommerce_portal
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_product_template__raffle_sponsor_ecommerce_portal
+msgid ""
+"The eCommerce description that the portal wrote last, sanitized. The portal "
+"rewrites the eCommerce description only while it still equals this value, or"
+" is empty."
+msgstr ""
+"La description pour le commerce en ligne que le portail a écrite en dernier,"
+" assainie. Le portail ne réécrit la description pour le commerce en ligne "
+"que tant qu'elle lui est encore égale, ou vide."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/controllers/main.py:0
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prizes
+msgid "Add a prize"
+msgstr "Ajouter un prix"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard_line__thanked_label
+msgid "Already thanked"
+msgstr "Déjà remercié"
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/wizard/event_raffle_sponsor_thank_wizard.py:0
+msgid "Already thanked on %s"
+msgstr "Déjà remercié le %s"
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/event_registration.py:0
+msgid ""
+"An account already uses %(email)s, the email of %(attendee)s: if that "
+"account is the attendee's, set its contact as the registration's contact."
+msgstr ""
+"Un compte utilise déjà %(email)s, le courriel de %(attendee)s : si ce compte"
+" est celui du participant, mettez son contact comme contact de "
+"l'inscription."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/product_template.py:0
+msgid "An approved prize can no longer be changed."
+msgstr "Un prix approuvé ne peut plus être modifié."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/product_template.py:0
+msgid "An approved prize can no longer be withdrawn."
+msgstr "Un prix approuvé ne peut plus être retiré."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.constraint,message:event_raffle_prize_sponsor.constraint_event_raffle_sponsor_thanks_event_sponsor_unique
+msgid "An event thanks each sponsor through one record."
+msgstr ""
+"Un événement remercie chaque commanditaire par un seul enregistrement."
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.product_template_form_view_raffle_sponsor
+msgid "Approve"
+msgstr "Approuver"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields.selection,name:event_raffle_prize_sponsor.selection__product_template__raffle_sponsor_state__approved
+msgid "Approved"
+msgstr "Approuvé"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_view
+msgid "Back to the prizes"
+msgstr "Retour aux prix"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__qty_purchased
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_search
+msgid "Bought by Members"
+msgstr "Achetés par des membres"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields.selection,name:event_raffle_prize_sponsor.selection__event_raffle_sponsor_report__line_type__purchase
+msgid "Bought by a member"
+msgstr "Acheté par un membre"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard__can_edit_template
+msgid "Can Edit Template"
+msgstr "Peut modifier le modèle"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard_line__can_include
+msgid "Can Include"
+msgstr "Peut être inclus"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_prize_refuse_wizard_form
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_thank_wizard_form
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prizes
+msgid "Change"
+msgstr "Modifier"
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/controllers/main.py:0
+msgid "Change the prize %s"
+msgstr "Modifier le prix %s"
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/controllers/main.py:0
+msgid "Choose the event of the prize."
+msgstr "Choisissez l'événement du prix."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/controllers/main.py:0
+msgid "Choose the kind of prize."
+msgstr "Choisissez le type de prix."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/controllers/main.py:0
+msgid "Choose the photo again: it is not kept while the form has errors."
+msgstr ""
+"Choisissez la photo de nouveau : elle n'est pas conservée tant que le "
+"formulaire a des erreurs."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__qty_declined
+msgid ""
+"Claims declined, after the prize was reserved or through the prize link, "
+"each decline of a draw counted. A reserved unit is back in stock. A link "
+"declined with no prize in the cart counts on a \"Declined, no choice\" line,"
+" with no prize and no sponsor."
+msgstr ""
+"Attributions refusées, après la réservation du prix ou par le lien de prix, chaque refus d'un tir compté. Une unité réservée est revenue en stock. Un lien refusé sans prix au panier compte sur une ligne « Refusé sans choix », sans prix ni commanditaire."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__company_id
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thanks__company_id
+msgid "Company"
+msgstr "Société"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_registration__raffle_sponsor_partner_id
+msgid ""
+"Contact of the sponsor who signs in to the portal: the registration's "
+"contact when its email is the attendee's, else the contact that Send "
+"invitation finds or creates. A later change of an email does not change it."
+msgstr ""
+"Contact du commanditaire qui se connecte au portail : le contact de "
+"l'inscription quand son courriel est celui du participant, sinon le contact "
+"que le bouton Envoyer invitation trouve ou crée. Un changement de courriel "
+"ensuite ne le modifie pas."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_prize_refuse_wizard__create_uid
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard__create_uid
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard_line__create_uid
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thanks__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_prize_refuse_wizard__create_date
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard__create_date
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard_line__create_date
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thanks__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__currency_id
+msgid "Currency"
+msgstr "Devise"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "Current photo of the prize"
+msgstr "Photo actuelle du prix"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__date
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_search
+msgid "Date"
+msgstr "Date"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__date
+msgid ""
+"Date of the draw, for its claim and the declines and expiries of its claim, "
+"or of the member order. The offered quantity and the stock are dated at the "
+"start of the prize's first event, else at the creation of the prize."
+msgstr ""
+"Date du tir, pour son attribution et les refus et expirations de son attribution, ou de la commande du membre. La quantité offerte et le stock sont datés au début du premier événement du prix, sinon à la création du prix."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__qty_declined
+#: model:ir.model.fields.selection,name:event_raffle_prize_sponsor.selection__event_raffle_sponsor_report__line_type__declined
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_search
+msgid "Declined"
+msgstr "Refusé"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields.selection,name:event_raffle_prize_sponsor.selection__event_raffle_sponsor_report__line_type__declined_unchosen
+msgid "Declined, no choice"
+msgstr "Refusé sans choix"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "Description"
+msgstr "Description"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_prize_refuse_wizard__display_name
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__display_name
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard__display_name
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard_line__display_name
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thanks__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_thank_wizard_form
+msgid ""
+"Each ticked sponsor receives one email listing its winners by their public name, with the\n"
+"                    prize, the token category, the date and how the prize reached them. A sponsor without an\n"
+"                    email cannot be ticked."
+msgstr ""
+"Chaque commanditaire coché reçoit un courriel qui liste ses gagnants par leur nom public, avec le\n"
+"                    prix, la catégorie de jeton, la date et la façon dont le prix leur est parvenu. Un commanditaire sans\n"
+"                    courriel ne peut pas être coché."
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_thank_wizard_form
+msgid "Edit the email template"
+msgstr "Modifier le modèle de courriel"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard__preview_body
+msgid "Email"
+msgstr "Courriel"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard__template_id
+msgid "Email template"
+msgstr "Modèle de courriel"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard_line__recipient_emails
+msgid "Emails"
+msgstr "Courriels"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__sponsor_id
+msgid "Empty on a line of a claim that ended with no prize chosen."
+msgstr "Vide sur la ligne d'une attribution terminée sans prix choisi."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model,name:event_raffle_prize_sponsor.model_event_event
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__event_id
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard__event_id
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thanks__event_id
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_search
+msgid "Event"
+msgstr "Événement"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "Event <span class=\"text-danger\" aria-hidden=\"true\">*</span>"
+msgstr "Événement <span class=\"text-danger\" aria-hidden=\"true\">*</span>"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model,name:event_raffle_prize_sponsor.model_event_registration
+msgid "Event Registration"
+msgstr "Inscription à l'événement"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__qty_expired
+#: model:ir.model.fields.selection,name:event_raffle_prize_sponsor.selection__event_raffle_sponsor_report__line_type__expired
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_search
+msgid "Expired"
+msgstr "Expiré"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields.selection,name:event_raffle_prize_sponsor.selection__event_raffle_sponsor_report__line_type__expired_unchosen
+msgid "Expired link, no choice"
+msgstr "Lien expiré sans choix"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid ""
+"Fields marked with an asterisk (<span aria-hidden=\"true\">*</span>) are "
+"required."
+msgstr ""
+"Les champs marqués d'un astérisque (<span aria-hidden=\"true\">*</span>) "
+"sont obligatoires."
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid ""
+"For a virtual prize only: how the winner uses it, in plain text. The code or the link\n"
+"                            itself is sent apart by the organization."
+msgstr ""
+"Pour un prix virtuel seulement : comment le gagnant l'utilise, en texte simple. Le code ou le lien\n"
+"                            lui-même est envoyé à part par l'organisation."
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.actions.act_window,help:event_raffle_prize_sponsor.action_event_raffle_sponsor_report
+msgid ""
+"For each sponsor, event and prize: what was offered, won, handed over, shipped, declined\n"
+"                or bought by members, and the stock left. The claims that ended with no prize chosen\n"
+"                have their own lines, with no sponsor."
+msgstr ""
+"Pour chaque commanditaire, événement et prix : ce qui a été offert, gagné, remis, expédié, refusé\n"
+"                ou acheté par des membres, et le stock restant. Les attributions terminées sans prix choisi\n"
+"                ont leurs propres lignes, sans commanditaire."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/controllers/main.py:0
+msgid "Give the name of the prize."
+msgstr "Donnez le nom du prix."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/controllers/main.py:0
+msgid "Give the quantity as a whole number from 1 to %s."
+msgstr "Donnez la quantité en nombre entier, de 1 à %s."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/controllers/main.py:0
+msgid "Give the value in dollars, as a number such as 25 or 25.50."
+msgstr "Donnez la valeur en dollars, en chiffres, par exemple 25 ou 25,50."
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_search
+msgid "Group By"
+msgstr "Regrouper par"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__qty_delivered
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_search
+msgid "Handed Over"
+msgstr "Remis"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields.selection,name:event_raffle_prize_sponsor.selection__event_raffle_sponsor_report__line_type__delivered
+msgid "Handed over"
+msgstr "Remis"
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/event_raffle_sponsor_thanks.py:0
+msgid "Handed over on site"
+msgstr "Remis sur place"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields.selection,name:event_raffle_prize_sponsor.selection__event_registration__raffle_sponsor_account_state__active
+msgid "Has an account"
+msgstr "A un compte"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid ""
+"How many units you offer. The organization records the stock when it "
+"receives them."
+msgstr ""
+"Combien d'unités vous offrez. L'organisation inscrit le stock à leur "
+"réception."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_prize_refuse_wizard__id
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__id
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard__id
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard_line__id
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thanks__id
+msgid "ID"
+msgstr "ID"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "Instructions for a virtual prize"
+msgstr "Instructions d'un prix virtuel"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_event__raffle_sponsor_manager_ids
+msgid ""
+"Internal users notified of each prize a sponsor submits for this event. "
+"Empty notifies the event's responsible user."
+msgstr ""
+"Utilisateurs internes avisés de chaque prix qu'un commanditaire soumet pour "
+"cet événement. Vide, le responsable de l'événement est avisé."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/event_registration.py:0
+msgid "Invitation Email"
+msgstr "Courriel d'invitation"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_registration_view_form_raffle_sponsor
+msgid "Invitation email"
+msgstr "Courriel d'invitation"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields.selection,name:event_raffle_prize_sponsor.selection__event_registration__raffle_sponsor_account_state__invited
+msgid "Invitation not accepted yet"
+msgstr "Invitation pas encore acceptée"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_registration__is_raffle_sponsor
+msgid "Is a sponsor"
+msgstr "Est commanditaire"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "JPEG, PNG, GIF or WebP image,"
+msgstr "Image JPEG, PNG, GIF ou WebP,"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_withdraw
+msgid "Keep the prize"
+msgstr "Garder le prix"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_details
+msgid "Kind of prize"
+msgstr "Type de prix"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "Kind of prize <span class=\"text-danger\" aria-hidden=\"true\">*</span>"
+msgstr "Type de prix <span class=\"text-danger\" aria-hidden=\"true\">*</span>"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_prize_refuse_wizard__write_uid
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard__write_uid
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard_line__write_uid
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thanks__write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_prize_refuse_wizard__write_date
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard__write_date
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard_line__write_date
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thanks__write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "Leave it empty to keep the current photo."
+msgstr "Laissez vide pour garder la photo actuelle."
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "MB at most."
+msgstr "Mo au plus."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_event__raffle_sponsor_managed
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_registration__raffle_sponsor_managed
+msgid "Manage with sponsors"
+msgstr "Gérer avec commanditaires"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_product_product__raffle_sponsor_can_review
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_product_template__raffle_sponsor_can_review
+msgid "May approve the prize"
+msgstr "Peut approuver le prix"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__amount_purchased
+msgid "Member Sales"
+msgstr "Ventes aux membres"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "Name of the prize <span class=\"text-danger\" aria-hidden=\"true\">*</span>"
+msgstr "Nom du prix <span class=\"text-danger\" aria-hidden=\"true\">*</span>"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields.selection,name:event_raffle_prize_sponsor.selection__event_registration__raffle_sponsor_account_state__none
+msgid "No account"
+msgstr "Aucun compte"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.actions.act_window,help:event_raffle_prize_sponsor.action_event_raffle_sponsor_report
+msgid "No approved sponsored prize yet"
+msgstr "Aucun prix commandité approuvé pour l'instant"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_search
+msgid "No choice"
+msgstr "Sans choix"
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/wizard/event_raffle_sponsor_thank_wizard.py:0
+msgid ""
+"No email: add one to the sponsor or to the sponsor contact of its "
+"registration."
+msgstr ""
+"Aucun courriel : ajoutez-en un au commanditaire ou au contact "
+"commanditaire de son inscription."
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.actions.act_window,help:event_raffle_prize_sponsor.action_event_raffle_prize_to_review
+msgid "No prize to review"
+msgstr "Aucun prix à réviser"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prizes
+msgid "No prize yet for this event."
+msgstr "Aucun prix pour cet événement pour l'instant."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/wizard/event_raffle_sponsor_thank_wizard.py:0
+msgid "No sponsored prize of this event has a winner yet."
+msgstr "Aucun prix commandité de cet événement n'a encore de gagnant."
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_thank_wizard_form
+msgid ""
+"No sponsored prize of this event has a winner yet: there is no sponsor to "
+"thank."
+msgstr ""
+"Aucun prix commandité de cet événement n'a encore de gagnant : il n'y a "
+"aucun commanditaire à remercier."
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_my_home_raffle_sponsor
+msgid "Offer prizes for the raffle of the events you sponsor"
+msgstr "Offrez des prix pour le tirage des événements que vous commanditez"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__qty_offered
+#: model:ir.model.fields.selection,name:event_raffle_prize_sponsor.selection__event_raffle_sponsor_report__line_type__offer
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_search
+msgid "Offered"
+msgstr "Offert"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_details
+msgid "Offered quantity"
+msgstr "Quantité offerte"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "Offered quantity <span class=\"text-danger\" aria-hidden=\"true\">*</span>"
+msgstr "Quantité offerte <span class=\"text-danger\" aria-hidden=\"true\">*</span>"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__value_offered
+msgid "Offered quantity times the value of the prize."
+msgstr "Quantité offerte multipliée par la valeur du prix."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/event_registration.py:0
+msgid "Only a sponsor registration sends invitations."
+msgstr "Seule une inscription de commanditaire envoie des invitations."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/product_template.py:0
+msgid "Only a submitted or refused prize can be approved."
+msgstr "Seul un prix soumis ou refusé peut être approuvé."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/product_template.py:0
+msgid "Only a submitted prize can be refused."
+msgstr "Seul un prix soumis peut être refusé."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/product_template.py:0
+msgid ""
+"Only an event manager, or a sponsorship manager of every event of %s, "
+"approves or refuses it."
+msgstr ""
+"Seul un gestionnaire des événements, ou un responsable des commandites de "
+"chaque événement de %s, l'approuve ou le refuse."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/event_registration.py:0
+#: code:addons/event_raffle_prize_sponsor/wizard/event_raffle_sponsor_thank_wizard.py:0
+msgid "Only the email template editors change this template."
+msgstr "Seuls les éditeurs de modèles de courriel modifient ce modèle."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/event_event.py:0
+msgid ""
+"Only the event users and the sponsorship managers of %s thank its sponsors."
+msgstr ""
+"Seuls les utilisateurs des événements et les responsables des commandites de"
+" %s remercient ses commanditaires."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/product_template.py:0
+msgid "Operation not supported"
+msgstr "Opération non prise en charge"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "Photo"
+msgstr "Photo"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_view
+msgid "Photo of the prize"
+msgstr "Photo du prix"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_details
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "Physical prize, picked up on site"
+msgstr "Prix physique, à récupérer sur place"
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/event_registration.py:0
+msgid "Portal invitation sent to %s."
+msgstr "Invitation au portail envoyée à %s."
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_thank_wizard_form
+msgid "Preview"
+msgstr "Aperçu"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard__preview_line_id
+msgid "Preview the email of"
+msgstr "Aperçu du courriel de"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_prize_refuse_wizard__product_tmpl_id
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__product_tmpl_id
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_search
+msgid "Prize"
+msgstr "Prix"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__qty_expired
+msgid ""
+"Prize links that ran out. A link whose cart held this prize counts for it as"
+" the winner's interest: no unit went out and nothing was spent. A link with "
+"no prize in the cart counts on an \"Expired link, no choice\" line, with no "
+"prize and no sponsor."
+msgstr ""
+"Liens de prix échus. Un lien dont le panier contenait ce prix compte pour lui comme l'intérêt du gagnant : aucune unité n'est sortie et rien n'a été dépensé. Un lien sans prix au panier compte sur une ligne « Lien expiré sans choix », sans prix ni commanditaire."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/product_template.py:0
+msgid "Prize to review again: %s"
+msgstr "Prix à réviser de nouveau : %s"
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/product_template.py:0
+msgid "Prize to review: %s"
+msgstr "Prix à réviser : %s"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_breadcrumbs_raffle_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_my_home_raffle_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prizes
+msgid "Prizes for raffle"
+msgstr "Prix pour tirage"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model,name:event_raffle_prize_sponsor.model_product_template
+msgid "Product"
+msgstr "Produit"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__qty_offered
+msgid "Quantity the sponsor gave (Initial Quantity of the prize)."
+msgstr "Quantité donnée par le commanditaire (quantité initiale du prix)."
+
+#. module: event_raffle_prize_sponsor
+#: model:res.groups,name:event_raffle_prize_sponsor.group_raffle_sponsorship_manager
+msgid "Raffle: sponsorship manager (set from the events)"
+msgstr "Tirage : responsable des commandites (selon les événements)"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_prize_refuse_wizard__reason
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard_line__no_email_reason
+msgid "Reason"
+msgstr "Raison"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_details
+msgid "Reason of the refusal"
+msgstr "Raison du refus"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard_line__recipient_ids
+msgid "Recipients"
+msgstr "Destinataires"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_product_product__raffle_sponsor_refusal_reason
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_product_template__raffle_sponsor_refusal_reason
+msgid "Refusal reason"
+msgstr "Raison du refus"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.product_template_form_view_raffle_sponsor
+msgid "Refuse"
+msgstr "Refuser"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model,name:event_raffle_prize_sponsor.model_event_raffle_prize_refuse_wizard
+msgid "Refuse a Sponsored Prize"
+msgstr "Refuser un prix commandité"
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/product_template.py:0
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_prize_refuse_wizard_form
+msgid "Refuse the Prize"
+msgstr "Refuser le prix"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields.selection,name:event_raffle_prize_sponsor.selection__product_template__raffle_sponsor_state__refused
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.product_template_form_view_raffle_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.product_template_view_search_raffle_sponsor
+msgid "Refused"
+msgstr "Refusé"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__qty_remaining
+msgid "Remaining Stock"
+msgstr "Stock restant"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.ui.menu,name:event_raffle_prize_sponsor.menu_event_raffle_reporting
+msgid "Reporting"
+msgstr "Analyse"
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/event_raffle_sponsor_thanks.py:0
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__qty_reserved
+#: model:ir.model.fields.selection,name:event_raffle_prize_sponsor.selection__event_raffle_sponsor_report__line_type__reserved
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_search
+msgid "Reserved"
+msgstr "Réservé"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "Save and submit"
+msgstr "Enregistrer et soumettre"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "Saving your changes submits the prize again."
+msgstr "Enregistrer vos modifications soumet le prix de nouveau."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/product_template.py:0
+msgid "Say why the prize is refused."
+msgstr "Dites pourquoi le prix est refusé."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/report/event_raffle_sponsor_report.py:0
+msgid "Select the lines of one event to thank its sponsors."
+msgstr ""
+"Sélectionnez les lignes d'un seul événement pour remercier ses "
+"commanditaires."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard_line__include
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_thank_wizard_form
+msgid "Send"
+msgstr "Envoyer"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_registration_view_form_raffle_sponsor
+msgid "Send invitation"
+msgstr "Envoyer invitation"
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/event_raffle_sponsor_thanks.py:0
+msgid "Sent by email"
+msgstr "Envoyé par courriel"
+
+#. module: event_raffle_prize_sponsor
+#: model:mail.template,description:event_raffle_prize_sponsor.mail_template_sponsor_thanks
+msgid "Sent to each sponsor of an event with the list of its winners"
+msgstr ""
+"Envoyé à chaque commanditaire d'un événement avec la liste de ses gagnants"
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/wizard/event_raffle_sponsor_thank_wizard.py:0
+msgid "Set the email of the company first: it sends the thank-you emails."
+msgstr ""
+"Indiquez d'abord le courriel de la société : elle envoie les courriels de "
+"remerciement."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/product_template.py:0
+msgid ""
+"Set the token category of %s before approving it: winners take a prize with "
+"a token of its category."
+msgstr ""
+"Choisissez la catégorie de jeton de %s avant de l'approuver : les gagnants "
+"prennent un prix avec un jeton de sa catégorie."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/event_raffle_sponsor_thanks.py:0
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__qty_shipped
+#: model:ir.model.fields.selection,name:event_raffle_prize_sponsor.selection__event_raffle_sponsor_report__line_type__shipped
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_search
+msgid "Shipped"
+msgstr "Expédié"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_product_product__raffle_sponsor_refusal_reason
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_product_template__raffle_sponsor_refusal_reason
+msgid ""
+"Shown to the sponsor in the portal. Editing the prize there submits it "
+"again."
+msgstr ""
+"Affichée au commanditaire dans le portail. Modifier le prix à cet endroit le"
+" soumet de nouveau."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__sponsor_id
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard_line__sponsor_id
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thanks__sponsor_id
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_search
+msgid "Sponsor"
+msgstr "Commanditaire"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.actions.act_window,name:event_raffle_prize_sponsor.action_event_raffle_sponsor_report
+#: model:ir.model,name:event_raffle_prize_sponsor.model_event_raffle_sponsor_report
+#: model:ir.ui.menu,name:event_raffle_prize_sponsor.menu_event_raffle_sponsor_report
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_graph
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_list
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_pivot
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_search
+msgid "Sponsor Report"
+msgstr "Bilan des commandites"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_registration__raffle_sponsor_account_state
+msgid "Sponsor account"
+msgstr "Compte du commanditaire"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_product_product__raffle_sponsor_state
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_product_template__raffle_sponsor_state
+msgid "Sponsor approval"
+msgstr "Approbation de la commandite"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_registration__raffle_sponsor_partner_id
+msgid "Sponsor contact"
+msgstr "Contact du commanditaire"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model,name:event_raffle_prize_sponsor.model_event_raffle_sponsor_thank_wizard_line
+msgid "Sponsor to Thank"
+msgstr "Commanditaire à remercier"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prizes
+msgid "Sponsor:"
+msgstr "Commanditaire :"
+
+#. module: event_raffle_prize_sponsor
+#: model:product.public.category,name:event_raffle_prize_sponsor.public_category_sponsored
+msgid "Sponsored"
+msgstr "Commandite"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.actions.act_window,name:event_raffle_prize_sponsor.action_event_raffle_prize_to_review
+#: model:ir.ui.menu,name:event_raffle_prize_sponsor.menu_event_raffle_prize_to_review
+msgid "Sponsored Prizes to Review"
+msgstr "Prix commandités à réviser"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard__line_ids
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_registration_view_search_raffle_sponsor
+msgid "Sponsors"
+msgstr "Commanditaires"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_event__raffle_sponsor_manager_ids
+msgid "Sponsorship managers"
+msgstr "Responsables des commandites"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__line_type
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_search
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_details
+msgid "State"
+msgstr "État"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard_line__status
+msgid "Status"
+msgstr "État"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard__preview_subject
+msgid "Subject"
+msgstr "Objet"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "Submit the prize"
+msgstr "Soumettre le prix"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields.selection,name:event_raffle_prize_sponsor.selection__product_template__raffle_sponsor_state__submitted
+msgid "Submitted"
+msgstr "Soumis"
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/event_event.py:0
+#: model:ir.model,name:event_raffle_prize_sponsor.model_event_raffle_sponsor_thank_wizard
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_event_view_form_raffle_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_list
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_thank_wizard_form
+msgid "Thank the Sponsors"
+msgstr "Remercier les commanditaires"
+
+#. module: event_raffle_prize_sponsor
+#: model:mail.template,subject:event_raffle_prize_sponsor.mail_template_sponsor_thanks
+msgid "Thank you for your prizes: {{ object.event_id.name }}"
+msgstr "Merci pour vos prix : {{ object.event_id.name }}"
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/controllers/main.py:0
+msgid ""
+"Thank you: your prize is submitted. The organization reviews it before "
+"offering it."
+msgstr ""
+"Merci : votre prix est soumis. L'organisation le révise avant de l'offrir."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/wizard/event_raffle_sponsor_thank_wizard.py:0
+msgid "Thank-you Email"
+msgstr "Courriel de remerciement"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model,name:event_raffle_prize_sponsor.model_event_raffle_sponsor_thanks
+msgid "Thank-you Email of a Sponsor"
+msgstr "Courriel de remerciement d'un commanditaire"
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/wizard/event_raffle_sponsor_thank_wizard.py:0
+msgid ""
+"Thank-you email for %(event)s sent for %(count)s winner(s), to %(emails)s."
+msgstr ""
+"Courriel de remerciement pour %(event)s envoyé pour %(count)s gagnant(s), à "
+"%(emails)s."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/wizard/event_raffle_sponsor_thank_wizard.py:0
+msgid ""
+"Thank-you email sent to the sponsor %(sponsor)s for %(count)s winner(s), to "
+"%(emails)s."
+msgstr ""
+"Courriel de remerciement envoyé au commanditaire %(sponsor)s pour %(count)s "
+"gagnant(s), à %(emails)s."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thanks__sent_by_id
+msgid "Thanked by"
+msgstr "Remercié par"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard_line__thanked_date
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thanks__sent_date
+msgid "Thanked on"
+msgstr "Remercié le"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard_line__thanks_id
+msgid "Thanks"
+msgstr "Remerciement"
+
+#. module: event_raffle_prize_sponsor
+#: model:mail.template,name:event_raffle_prize_sponsor.mail_template_sponsor_thanks
+msgid "Thanks to the sponsor"
+msgstr "Merci au commanditaire"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_product_product__raffle_sponsor_can_review
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_product_template__raffle_sponsor_can_review
+msgid ""
+"The current user is an event manager, or a sponsorship manager of every "
+"event of this sponsored prize."
+msgstr ""
+"L'utilisateur courant est un gestionnaire des événements, ou un "
+"responsable des commandites de chaque événement de ce prix commandité."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/controllers/main.py:0
+msgid "The description is too long: %s characters at most."
+msgstr "La description est trop longue : %s caractères au plus."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/controllers/main.py:0
+msgid "The form has %s errors:"
+msgstr "Le formulaire a %s erreurs :"
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/controllers/main.py:0
+msgid "The form has 1 error:"
+msgstr "Le formulaire a 1 erreur :"
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/controllers/main.py:0
+msgid "The instructions are too long: %s characters at most."
+msgstr "Les instructions sont trop longues : %s caractères au plus."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/controllers/main.py:0
+msgid "The name is too long: %s characters at most."
+msgstr "Le nom est trop long : %s caractères au plus."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/product_template.py:0
+msgid ""
+"The organization already holds %s in its inventory or an order: ask the "
+"organization to withdraw it."
+msgstr ""
+"L'organisation a déjà %s dans son inventaire ou dans une commande : demandez"
+" à l'organisation de le retirer."
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "The organization refused this prize:"
+msgstr "L'organisation a refusé ce prix :"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prizes
+msgid ""
+"The organization reviews each prize, sets its token category, then approves it. Until\n"
+"                    then, you may change or withdraw it; an approved prize can no longer be changed."
+msgstr ""
+"L'organisation révise chaque prix, choisit sa catégorie de jeton, puis l'approuve. D'ici là,\n"
+"                    vous pouvez le modifier ou le retirer ; un prix approuvé ne peut plus être modifié."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/product_template.py:0
+msgid "The photo could not be read."
+msgstr "La photo n'a pas pu être lue."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/product_template.py:0
+msgid "The photo is too large."
+msgstr "La photo est trop volumineuse."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/product_template.py:0
+msgid "The photo must be a JPEG, PNG, GIF or WebP image."
+msgstr "La photo doit être une image JPEG, PNG, GIF ou WebP."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/controllers/main.py:0
+msgid "The prize is withdrawn."
+msgstr "Le prix est retiré."
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.actions.act_window,help:event_raffle_prize_sponsor.action_event_raffle_prize_to_review
+msgid ""
+"The prizes that sponsors submit in the portal wait here: set the token category of each\n"
+"                one, then approve or refuse it."
+msgstr ""
+"Les prix que les commanditaires soumettent dans le portail attendent ici : choisissez la catégorie de jeton de chacun,\n"
+"                puis approuvez-le ou refusez-le."
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid ""
+"The retail value of one unit. The organization sets the token category from "
+"it."
+msgstr ""
+"La valeur au détail d'une unité. L'organisation en déduit la catégorie de "
+"jeton."
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_prize_refuse_wizard_form
+msgid ""
+"The sponsor reads the reason in the portal. Changing the prize there submits"
+" it again."
+msgstr ""
+"Le commanditaire lit la raison dans le portail. Modifier le prix à cet "
+"endroit le soumet de nouveau."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_event__raffle_sponsor_managed
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_registration__raffle_sponsor_managed
+msgid ""
+"The sponsors of this event, marked on their registration, submit their "
+"prizes in the portal until the event ends. Each prize waits for the approval"
+" of the organization."
+msgstr ""
+"Les commanditaires de cet événement, indiqués sur leur inscription, "
+"soumettent leurs prix dans le portail jusqu'à la fin de l'événement. Chaque "
+"prix attend l'approbation de l'organisation."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/controllers/main.py:0
+msgid "The value is too high: %s at most."
+msgstr "La valeur est trop élevée : %s au plus."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/models/event_registration.py:0
+msgid "This attendee"
+msgstr "Ce participant"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_registration__is_raffle_sponsor
+msgid ""
+"This attendee represents a sponsor of the event: once they have an account, "
+"they add their prizes in the portal."
+msgstr ""
+"Ce participant représente un commanditaire de l'événement : une fois son "
+"compte créé, il ajoute ses prix dans le portail."
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_view
+msgid "This prize is approved: ask the organization to change it."
+msgstr "Ce prix est approuvé : demandez à l'organisation de le modifier."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/wizard/event_raffle_sponsor_thank_wizard.py:0
+msgid "This sponsor is not one of the event."
+msgstr "Ce commanditaire n'appartient pas à l'événement."
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/wizard/event_raffle_sponsor_thank_wizard.py:0
+msgid "Tick at least one sponsor to thank."
+msgstr "Cochez au moins un commanditaire à remercier."
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.product_template_form_view_raffle_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.product_template_view_search_raffle_sponsor
+msgid "To review"
+msgstr "À réviser"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__band_id
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_search
+msgid "Token Category"
+msgstr "Catégorie de jeton"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_details
+msgid "Token category"
+msgstr "Catégorie de jeton"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_sponsor_report_view_list
+msgid "Total"
+msgstr "Total"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_details
+msgid "Units given"
+msgstr "Unités données"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__qty_delivered
+msgid ""
+"Units handed over on site, sent by email (virtual prizes) or received after "
+"shipping."
+msgstr ""
+"Unités remises sur place, envoyées par courriel (prix virtuels) ou reçues "
+"après expédition."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__qty_remaining
+msgid "Units in the internal locations that no move has reserved."
+msgstr ""
+"Unités dans les emplacements internes qu'aucun mouvement n'a réservées."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__qty_purchased
+msgid "Units on confirmed member orders."
+msgstr "Unités des commandes de membres confirmées."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__qty_reserved
+msgid "Units reserved for a winner, not handed over yet."
+msgstr "Unités réservées pour un gagnant, pas encore remises."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__qty_won
+msgid "Units reserved, shipped or handed over to a winner."
+msgstr "Unités réservées, expédiées ou remises à un gagnant."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__qty_shipped
+msgid "Units shipped to a winner, not received yet."
+msgstr "Unités expédiées à un gagnant, pas encore reçues."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__amount_purchased
+msgid "Untaxed amount of the confirmed member orders."
+msgstr "Montant hors taxes des commandes de membres confirmées."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model,name:event_raffle_prize_sponsor.model_res_users
+msgid "User"
+msgstr "Utilisateur"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_details
+msgid "Value"
+msgstr "Valeur"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "Value ($) <span class=\"text-danger\" aria-hidden=\"true\">*</span>"
+msgstr "Valeur ($) <span class=\"text-danger\" aria-hidden=\"true\">*</span>"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__value_distributed
+msgid "Value Distributed"
+msgstr "Valeur distribuée"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__value_offered
+msgid "Value Offered"
+msgstr "Valeur offerte"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__value_reserved
+msgid "Value Reserved"
+msgstr "Valeur réservée"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__value_distributed
+msgid "Value of the units shipped or handed over to a winner."
+msgstr "Valeur des unités expédiées ou remises à un gagnant."
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prizes
+msgid "View"
+msgstr "Voir"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_details
+msgid "Virtual prize, sent by email"
+msgstr "Prix virtuel, envoyé par courriel"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "Virtual prize: a code or a link sent by email"
+msgstr "Prix virtuel : un code ou un lien envoyé par courriel"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.event_raffle_prize_refuse_wizard_form
+msgid "What the sponsor should change..."
+msgstr "Ce que le commanditaire devrait changer..."
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_form
+msgid "What the winners read about the prize, in plain text."
+msgstr "Ce que les gagnants lisent à propos du prix, en texte simple."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard_line__status
+msgid ""
+"Why the line cannot be ticked, and the date of the last thank-you email sent"
+" to this sponsor for the event."
+msgstr ""
+"Pourquoi la ligne ne peut pas être cochée, et la date du dernier courriel "
+"de remerciement envoyé à ce commanditaire pour l'événement."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard_line__winner_count
+msgid "Winners"
+msgstr "Gagnants"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,help:event_raffle_prize_sponsor.field_event_event__raffle_sponsor_thanks_count
+msgid ""
+"Winners holding a sponsored prize (reserved, shipped or handed over): Thank "
+"the Sponsors is offered once there is one."
+msgstr ""
+"Gagnants qui détiennent un prix commandité (réservé, expédié ou remis) : "
+"Remercier les commanditaires est offert dès qu'il y en a un."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thanks__sent_winner_count
+msgid "Winners in the email"
+msgstr "Gagnants dans le courriel"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_event__raffle_sponsor_thanks_count
+msgid "Winners of sponsored prizes"
+msgstr "Gagnants de prix commandités"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prizes
+msgid "Withdraw"
+msgstr "Retirer"
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/controllers/main.py:0
+msgid "Withdraw %s?"
+msgstr "Retirer %s ?"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_withdraw
+msgid "Withdraw the prize"
+msgstr "Retirer le prix"
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prize_withdraw
+msgid "Withdrawing deletes the prize: the organization will not offer it."
+msgstr "Retirer le prix le supprime : l'organisation ne l'offrira pas."
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_thank_wizard_line__wizard_id
+msgid "Wizard"
+msgstr "Assistant"
+
+#. module: event_raffle_prize_sponsor
+#: model:ir.model.fields,field_description:event_raffle_prize_sponsor.field_event_raffle_sponsor_report__qty_won
+msgid "Won"
+msgstr "Gagnés"
+
+#. module: event_raffle_prize_sponsor
+#. odoo-python
+#: code:addons/event_raffle_prize_sponsor/controllers/main.py:0
+msgid "Your changes are saved."
+msgstr "Vos modifications sont enregistrées."
+
+#. module: event_raffle_prize_sponsor
+#: model_terms:ir.ui.view,arch_db:event_raffle_prize_sponsor.portal_raffle_sponsor_prizes
+msgid "for"
+msgstr "pour"

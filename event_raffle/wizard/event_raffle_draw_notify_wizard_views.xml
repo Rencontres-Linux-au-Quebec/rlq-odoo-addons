@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_raffle_draw_notify_wizard_form" model="ir.ui.view">
+        <field name="name">event.raffle.draw.notify.wizard.form</field>
+        <field name="model">event.raffle.draw.notify.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Notify the Winner">
+                <div class="alert alert-warning" role="alert" invisible="delivery != 'none'">
+                    <field name="delivery_info" readonly="1" />
+                </div>
+                <div class="alert alert-info" role="status" invisible="delivery == 'none'">
+                    <field name="delivery_info" readonly="1" />
+                </div>
+                <group>
+                    <field name="draw_id" readonly="1" />
+                    <field name="recipient" />
+                    <field name="delivery" />
+                    <field
+                        name="sender"
+                        widget="radio"
+                        options="{'horizontal': true}"
+                        invisible="delivery == 'none'"
+                    />
+                    <field name="body" invisible="delivery == 'none'" />
+                </group>
+                <footer>
+                    <button
+                        string="Send"
+                        name="action_send"
+                        type="object"
+                        class="btn-primary"
+                        invisible="delivery == 'none'"
+                    />
+                    <button string="Cancel" special="cancel" class="btn-secondary" />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

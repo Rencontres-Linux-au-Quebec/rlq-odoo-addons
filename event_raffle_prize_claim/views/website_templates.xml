@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Banner of the claim, on the shop pages (shop, product, cart and
+         checkout steps) while the signed-in winner has an open claim. -->
+    <template id="claim_banner" name="Raffle Prize Claim Banner">
+        <t t-set="claim" t-value="raffle_claim_draw._claim_banner_values()" />
+        <t t-set="claim_error" t-value="request.session.pop('raffle_prize_error', None)" />
+        <t t-set="label_many">%s minutes left</t>
+        <t t-set="label_one">1 minute left</t>
+        <t t-set="label_expired">The link has expired.</t>
+        <section
+            class="o_raffle_claim_banner container my-3"
+            aria-labelledby="o_raffle_claim_banner_title"
+        >
+            <div class="o_raffle_claim_banner_box d-flex flex-column flex-md-row gap-3 align-items-md-center p-3 rounded border">
+                <div class="flex-grow-1">
+                    <h2 id="o_raffle_claim_banner_title" class="h5 mb-1">
+                        <t t-if="claim['first_name']">Congratulations <t t-out="claim['first_name']" />, choose your prize!</t>
+                        <t t-else="">Congratulations, choose your prize!</t>
+                    </h2>
+                    <p class="o_raffle_claim_token mb-1" t-out="claim['token_line']" />
+                    <p
+                        class="o_raffle_claim_countdown mb-0"
+                        t-att-data-deadline="claim['deadline_iso']"
+                        t-att-data-label-many="label_many"
+                        t-att-data-label-one="label_one"
+                        t-att-data-label-expired="label_expired"
+                    >
+                        Your link is valid until
+                        <time t-att-datetime="claim['deadline_iso']" t-out="claim['deadline_label']" />
+                        <span class="o_raffle_claim_left" aria-live="polite" aria-atomic="true">
+                            (<t t-if="claim['minutes_left'] == 1" t-out="label_one" /><t t-else="" t-out="label_many % claim['minutes_left']" />)
+                        </span>
+                    </p>
+                    <p t-if="claim_error" class="o_raffle_claim_error mb-0 mt-2 fw-bold" role="alert">
+                        This prize could not be reserved: <t t-out="claim_error" />
+                        Choose another prize.
+                    </p>
+                </div>
+                <a href="/raffle/prize/decline" class="btn btn-outline-dark o_raffle_claim_decline_link">Decline the prize</a>
+            </div>
+        </section>
+    </template>
+
+    <template id="layout_claim_banner" inherit_id="website.layout" name="Raffle Prize Claim Banner in Layout">
+        <xpath expr="//main/t[@t-out='0']" position="before">
+            <t t-if="request and (request.httprequest.path or '').startswith('/shop')">
+                <t t-set="raffle_claim_draw" t-value="request.env['event.raffle.draw']._prize_claim_session_draw()" />
+                <t t-if="raffle_claim_draw" t-call="event_raffle_prize_claim.claim_banner" />
+            </t>
+        </xpath>
+    </template>
+
+    <!-- Sponsor of a prize, with a link to its website. -->
+    <template id="prize_sponsor" name="Raffle Prize Sponsor">
+        <p t-if="product.is_raffle_prize and product.raffle_sponsor_name" class="o_raffle_prize_sponsor mb-2 small">
+            Offered by
+            <a
+                t-if="product.raffle_sponsor_url"
+                t-att-href="product.raffle_sponsor_url"
+                target="_blank"
+                rel="noopener noreferrer"
+            ><t t-out="product.raffle_sponsor_name" /><span class="visually-hidden"> (opens in a new tab)</span></a>
+            <t t-else="" t-out="product.raffle_sponsor_name" />
+        </p>
+    </template>
+
+    <template id="products_item_prize_sponsor" inherit_id="website_sale.products_item" name="Raffle Prize Sponsor on Shop Cards">
+        <xpath expr="//*[hasclass('o_wsale_products_item_title')]" position="after">
+            <t t-call="event_raffle_prize_claim.prize_sponsor" />
+        </xpath>
+    </template>
+
+    <template id="product_prize_sponsor" inherit_id="website_sale.product" name="Raffle Prize Sponsor on the Product Page">
+        <xpath expr="//h1[@itemprop='name']" position="after">
+            <t t-call="event_raffle_prize_claim.prize_sponsor" />
+        </xpath>
+    </template>
+
+    <!-- Remaining quantity of a storable product on its shop card, in
+         the grid and list layouts: the shop computes it once for the
+         page (raffle_shop_stock, see website._raffle_shop_stock()). A card
+         rendered outside the shop page has no value and shows nothing. -->
+    <template id="products_item_stock" inherit_id="website_sale.products_item" name="Remaining Quantity on Shop Cards">
+        <xpath expr="//t[@t-call='event_raffle_prize_claim.prize_sponsor']" position="after">
+            <t t-set="raffle_stock" t-value="raffle_shop_stock and raffle_shop_stock.get(product.id)" />
+            <p
+                t-if="raffle_stock"
+                t-attf-class="o_raffle_shop_stock mb-2 small {{'o_raffle_shop_stock_out fw-bold' if raffle_stock[0] &lt;= 0 else ''}}"
+                t-out="raffle_stock[1]"
+            />
+        </xpath>
+    </template>
+
+    <!-- Prices of the sponsored prizes. A winner reads the token cost of
+         each prize instead of its price; any other visitor reads the price
+         of a prize sold to members, and "Prize only" with its token for
+         the others, with no add to cart. See
+         product.template._raffle_shop_display(). -->
+    <template id="products_item_prize_token" inherit_id="website_sale.products_item" name="Raffle Prize Token on Shop Cards">
+        <xpath expr="//div[hasclass('product_price')]" position="before">
+            <t t-set="raffle_shop" t-value="product._raffle_shop_display()" />
+            <p t-if="raffle_shop" class="o_raffle_token_cost h6 mb-0" t-out="raffle_shop['label']" />
+        </xpath>
+        <xpath expr="//div[hasclass('product_price')]" position="attributes">
+            <attribute name="t-if">not raffle_shop</attribute>
+        </xpath>
+    </template>
+
+    <template id="filter_products_price_prize" inherit_id="website_sale.filter_products_price" name="Raffle Prize Claim Without Price Filter">
+        <xpath expr="//div[@id='o_wsale_price_range_option']" position="attributes">
+            <attribute name="t-if">not request.env['event.raffle.draw']._prize_claim_session_draw()</attribute>
+        </xpath>
+    </template>
+
+    <template id="product_prize_token" inherit_id="website_sale.product" name="Raffle Prize Token on the Product Page">
+        <xpath expr="//t[@t-set='combination_info']" position="after">
+            <t t-set="raffle_shop" t-value="product._raffle_shop_display()" />
+        </xpath>
+        <xpath expr="//t[@t-call='website_sale.product_price']" position="before">
+            <p t-if="raffle_shop" class="o_raffle_token_cost h3 mt-2 mb-3" t-out="raffle_shop['label']" />
+        </xpath>
+        <xpath expr="//t[@t-call='website_sale.product_price']" position="attributes">
+            <attribute name="t-if">not raffle_shop</attribute>
+        </xpath>
+        <xpath expr="//div[@id='o_wsale_cta_wrapper']" position="attributes">
+            <attribute name="t-if">not (raffle_shop and raffle_shop['token_only'])</attribute>
+        </xpath>
+        <!-- website_sale_stock's variant script reads #o_wsale_cta_wrapper
+             on every product page and fails when it is missing: a prize for
+             tokens only keeps an empty one, with no add to cart in it. -->
+        <xpath expr="//div[@id='o_wsale_cta_wrapper']" position="after">
+            <div t-else="" id="o_wsale_cta_wrapper" class="d-none" />
+        </xpath>
+    </template>
+
+    <!-- Product snippets: the label that website.snippet.filter sets on a
+         sponsored prize replaces its price. -->
+    <template id="price_dynamic_filter_prize_token" inherit_id="website_sale.price_dynamic_filter_template_product_product" name="Raffle Prize Token in Product Snippets">
+        <xpath expr="//t[@t-if=&quot;data.get('prevent_zero_price_sale')&quot;]" position="before">
+            <t t-if="data.get('raffle_shop_label')">
+                <span class="o_raffle_token_cost fw-bold" t-out="data['raffle_shop_label']" />
+            </t>
+        </xpath>
+        <xpath expr="//t[@t-if=&quot;data.get('prevent_zero_price_sale')&quot;]" position="attributes">
+            <attribute name="t-if" />
+            <attribute name="t-elif">data.get('prevent_zero_price_sale')</attribute>
+        </xpath>
+    </template>
+
+    <!-- The claim cart shows the token of its prize, never an amount. The
+         amounts website_sale's scripts update stay in the page, hidden. -->
+    <template id="cart_lines_prize_token" inherit_id="website_sale.cart_lines" name="Raffle Prize Token in the Cart">
+        <xpath expr="//div[@name='website_sale_cart_line_price']" position="attributes">
+            <attribute name="t-if">not line._is_raffle_prize_claim_line()</attribute>
+        </xpath>
+        <xpath expr="//div[@name='website_sale_cart_line_price']" position="after">
+            <p
+                t-if="line._is_raffle_prize_claim_line()"
+                class="o_raffle_token_cost mb-0 h6 fw-bold text-end"
+                t-out="line.product_id.product_tmpl_id._raffle_token_cost_label()"
+            />
+        </xpath>
+    </template>
+
+    <template id="checkout_layout_prize_token" inherit_id="website_sale.checkout_layout" name="Raffle Prize Token in the Order Summary">
+        <xpath expr="//span[@id='amount_total_summary']" position="attributes">
+            <attribute name="t-if">not website_sale_order.raffle_draw_id</attribute>
+        </xpath>
+        <xpath expr="//span[@id='amount_total_summary']" position="after">
+            <span
+                t-if="website_sale_order.raffle_draw_id"
+                class="o_raffle_token_cost ms-1"
+                t-out="website_sale_order._raffle_prize_token_label()"
+            />
+        </xpath>
+        <xpath expr="//td[@name='website_sale_cart_summary_line_price']/t" position="attributes">
+            <attribute name="t-if">not line._is_raffle_prize_claim_line()</attribute>
+        </xpath>
+        <xpath expr="//td[@name='website_sale_cart_summary_line_price']/t" position="after">
+            <span
+                t-if="line._is_raffle_prize_claim_line()"
+                class="o_raffle_token_cost text-nowrap"
+                t-out="line.product_id.product_tmpl_id._raffle_token_cost_label()"
+            />
+        </xpath>
+        <!-- A claim cart costs nothing: it is confirmed, never paid. -->
+        <xpath expr="//t[@t-call='payment.express_checkout']" position="attributes">
+            <attribute name="t-if">not website_sale_order.raffle_draw_id and (website.account_on_checkout != 'mandatory' or not website.is_public_user())</attribute>
+        </xpath>
+    </template>
+
+    <template id="total_prize_token" inherit_id="website_sale.total" name="Raffle Prize Token as the Total">
+        <xpath expr="//div[@id='cart_total']/table" position="attributes">
+            <attribute name="class" />
+            <attribute name="t-att-class">'table mb-0 d-none' if website_sale_order.raffle_draw_id else 'table mb-0'</attribute>
+        </xpath>
+        <xpath expr="//div[@id='cart_total']/table" position="after">
+            <p
+                t-if="website_sale_order.raffle_draw_id"
+                class="o_raffle_token_total d-flex justify-content-between gap-2 mb-0 pt-2"
+            >
+                <strong>Total</strong>
+                <strong t-out="website_sale_order._raffle_prize_token_label()" />
+            </p>
+        </xpath>
+    </template>
+
+    <!-- Public pages of the link. -->
+    <template id="claim_link_invalid" name="Raffle Prize Link Not Valid">
+        <t t-call="website.layout">
+            <t t-set="additional_title">Prize link</t>
+            <div id="wrap" class="o_raffle_claim_page container py-5">
+                <h1 class="h2">This prize link does not work</h1>
+                <p>
+                    A prize link works once, for a limited time. Ask the event
+                    team if you think you should still be able to choose a prize.
+                </p>
+                <a href="/" class="btn btn-primary">Back to the website</a>
+            </div>
+        </t>
+    </template>
+
+    <template id="claim_link_other_account" name="Raffle Prize Link of Another Account">
+        <t t-call="website.layout">
+            <t t-set="additional_title">Prize link</t>
+            <div id="wrap" class="o_raffle_claim_page container py-5">
+                <h1 class="h2">This prize link is for another account</h1>
+                <p>
+                    A prize link opens for the account of its winner only. Sign
+                    in with the account that received the link to choose the prize.
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a t-att-href="logout_url" class="btn btn-primary">Sign in with another account</a>
+                    <a href="/" class="btn btn-outline-dark">Back to the website</a>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="claim_decline" name="Raffle Prize Decline Form">
+        <t t-call="website.layout">
+            <t t-set="additional_title">Decline the prize</t>
+            <div id="wrap" class="o_raffle_claim_page container py-5">
+                <h1 class="h2">Decline the prize</h1>
+                <p>
+                    The prize goes back to the other winners. Your answer is
+                    final: the link stops working once it is sent.
+                </p>
+                <form action="/raffle/prize/decline" method="post" class="o_raffle_claim_decline">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                    <div class="mb-3">
+                        <label for="o_raffle_decline_comment" class="form-label">
+                            Why do you decline the prize?
+                            <span class="text-nowrap">(required)</span>
+                        </label>
+                        <textarea
+                            id="o_raffle_decline_comment"
+                            name="comment"
+                            class="form-control"
+                            rows="4"
+                            maxlength="2000"
+                            required="required"
+                            t-att-aria-invalid="'true' if error else None"
+                            t-att-aria-describedby="'o_raffle_decline_error' if error else None"
+                            t-out="comment"
+                        />
+                        <p t-if="error" id="o_raffle_decline_error" class="o_raffle_claim_error mt-2 mb-0 fw-bold" role="alert">
+                            Say why you decline the prize.
+                        </p>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="submit" class="btn btn-dark">Decline the prize</button>
+                        <a href="/shop" class="btn btn-outline-dark">Back to the prizes</a>
+                    </div>
+                </form>
+            </div>
+        </t>
+    </template>
+
+    <template id="claim_declined" name="Raffle Prize Declined">
+        <t t-call="website.layout">
+            <t t-set="additional_title">Prize declined</t>
+            <div id="wrap" class="o_raffle_claim_page container py-5">
+                <h1 class="h2">Your answer is recorded</h1>
+                <p>The prize goes back to the other winners. Thank you!</p>
+                <a href="/" class="btn btn-primary">Back to the website</a>
+            </div>
+        </t>
+    </template>
+
+    <template id="claim_done" name="Raffle Prize Reserved">
+        <t t-call="website.layout">
+            <t t-set="additional_title">Prize reserved</t>
+            <div id="wrap" class="o_raffle_claim_page container py-5">
+                <h1 class="h2">
+                    <t t-if="first_name">Well done <t t-out="first_name" />, your prize is reserved!</t>
+                    <t t-else="">Your prize is reserved!</t>
+                </h1>
+                <p class="o_raffle_claim_done_prize fs-5">
+                    <t t-out="prize_name" />
+                </p>
+                <p t-if="sponsor_name">
+                    Offered by
+                    <a
+                        t-if="sponsor_url"
+                        t-att-href="sponsor_url"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    ><t t-out="sponsor_name" /><span class="visually-hidden"> (opens in a new tab)</span></a>
+                    <t t-else="" t-out="sponsor_name" />
+                </p>
+                <p>The event team will tell you how to get it.</p>
+                <a href="/" class="btn btn-primary">Back to the website</a>
+            </div>
+        </t>
+    </template>
+</odoo>

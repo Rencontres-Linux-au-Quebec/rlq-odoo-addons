@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <!-- Sent to each sponsor by Thank the Sponsors
+             (event.raffle.sponsor.thank.wizard), rendered on the sponsor's
+             thanks record of the event. The winners are named by their
+             public name only. -->
+        <record id="mail_template_sponsor_thanks" model="mail.template">
+            <field name="name">Thanks to the sponsor</field>
+            <field name="model_id" ref="model_event_raffle_sponsor_thanks" />
+            <field name="subject">Thank you for your prizes: {{ object.event_id.name }}</field>
+            <field name="email_from">{{ object._raffle_thanks_email_from() }}</field>
+            <field name="partner_to">{{ object._raffle_thanks_partner_to() }}</field>
+            <field name="lang">{{ object._raffle_thanks_lang() }}</field>
+            <field name="auto_delete" eval="True" />
+            <field name="description">Sent to each sponsor of an event with the list of its winners</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px; font-size: 14px;">
+    <t t-set="thanks" t-value="object._raffle_thanks_values()" />
+    <p style="margin: 0px 0px 12px 0px;">Hello <t t-out="thanks['sponsor']">Sponsor</t>,</p>
+    <p style="margin: 0px 0px 12px 0px;">
+        Thank you for the prizes you offered for the raffle of <strong t-out="thanks['event']">Event</strong>.
+        Here are their winners.
+    </p>
+    <table class="o_raffle_sponsor_thanks_winners" cellpadding="4" cellspacing="0" style="width: 100%; border-collapse: collapse; margin: 0px 0px 12px 0px;">
+        <thead>
+            <tr style="text-align: left; border-bottom: 1px solid #cccccc;">
+                <th scope="col">Winner</th>
+                <th scope="col">Prize</th>
+                <th scope="col">Token category</th>
+                <th scope="col" style="white-space: nowrap;">Date</th>
+                <th scope="col">Delivery</th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr t-foreach="thanks['winners']" t-as="winner" style="border-bottom: 1px solid #eeeeee;">
+            <td t-out="winner['name']">Winner</td>
+            <td t-out="winner['prize']">Prize</td>
+            <td t-out="winner['category']">Token</td>
+            <td style="white-space: nowrap;" t-out="winner['date']">Date</td>
+            <td t-out="winner['mode']">Handed over on site</td>
+        </tr>
+        </tbody>
+    </table>
+    <p style="margin: 0px;">With our thanks,</p>
+</div>
+            </field>
+        </record>
+    </data>
+</odoo>

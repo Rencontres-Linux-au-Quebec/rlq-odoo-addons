@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <menuitem id="menu_event_raffle_prize" name="Prizes" parent="event_raffle.menu_event_raffle_root" sequence="30" />
+    <menuitem
+        id="menu_event_raffle_prize_catalogue"
+        name="Sponsored Prizes"
+        parent="menu_event_raffle_prize"
+        action="action_event_raffle_prize_catalogue"
+        sequence="10"
+    />
+    <menuitem
+        id="menu_event_raffle_prize_inventory"
+        name="Prize Inventory"
+        parent="menu_event_raffle_prize"
+        action="action_event_raffle_prize_inventory"
+        sequence="20"
+    />
+    <menuitem
+        id="menu_event_raffle_prize_claim_log"
+        name="Claims Ended"
+        parent="menu_event_raffle_prize"
+        action="action_event_raffle_prize_claim_log"
+        groups="event.group_event_user"
+        sequence="25"
+    />
+    <menuitem
+        id="menu_event_raffle_prize_band"
+        name="Token Categories"
+        parent="menu_event_raffle_prize"
+        action="action_event_raffle_prize_band"
+        groups="event.group_event_manager"
+        sequence="30"
+    />
+</odoo>

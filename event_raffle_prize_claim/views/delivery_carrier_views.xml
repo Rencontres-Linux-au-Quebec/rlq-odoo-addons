@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_delivery_carrier_form_raffle_prize" model="ir.ui.view">
+        <field name="name">delivery.carrier.form.raffle.prize</field>
+        <field name="model">delivery.carrier</field>
+        <field name="inherit_id" ref="delivery.view_delivery_carrier_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='provider_details']" position="inside">
+                <field name="is_raffle_prize_carrier" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_template_form_view_raffle_prize_claim" model="ir.ui.view">
+        <field name="name">product.template.form.raffle.prize.claim</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="event_raffle_prize.product_template_form_view_raffle_prize" />
+        <field name="arch" type="xml">
+            <field name="raffle_initial_qty" position="after">
+                <field
+                    name="is_published"
+                    string="Offered on the Website"
+                    help="The shop lists a published prize to the winners it is allowed to, through their prize link, and to every visitor while the sponsored shop window is open."
+                />
+            </field>
+        </field>
+    </record>
+
+    <record id="product_template_form_view_raffle_prize_stock" model="ir.ui.view">
+        <field name="name">product.template.form.raffle.prize.stock</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="website_sale_stock.product_template_form_view_inherit_website_sale_stock" />
+        <field name="arch" type="xml">
+            <field name="allow_out_of_stock_order" position="attributes">
+                <attribute name="readonly">is_raffle_prize</attribute>
+            </field>
+        </field>
+    </record>
+</odoo>

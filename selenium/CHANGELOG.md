@@ -1,5 +1,20 @@
 # Changelog: e2e_webapp_raffle_prize.py
 
+### 1.1.20261121.015248 - Base scenario read from the same folder
+
+- Reason: the sponsored prize scenario (`e2e_raffle_sponsor_prize.py`,
+  `e2e_lib.py`) moved into this folder with the raffle modules; the
+  default looked for it in another repository.
+- Details: `default_raffle_dir()` returns the folder of this program;
+  `--raffle-e2e-dir` and `RAFFLE_E2E_DIR` still name another. Help text,
+  module docstring and both READMEs updated; the base scenario's README
+  is `README.raffle_sponsor_prize.md`.
+- Bugs fixed: none.
+- Safeguards: unchanged.
+- Checks: on a fresh neutralized database, 14 of 14 steps passing with
+  the base scenario found in this folder.
+- Action required: none, unless a run relied on the old default folder.
+
 ### 1.0.20261120.115121 - Scenario folder only from the command line
 
 - Reason: `raffle-e2e-dir` in a configuration file was accepted and

@@ -1,0 +1,75 @@
+// Copyright 2026 TechnoLibre - Mathieu Benoit
+// License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+
+// Hand-over screen, public name form and winners page. Colours are the
+// body's own, as on the pages of the prize link, so the contrast holds on
+// any theme that keeps a readable body. The buttons and fields of the
+// hand-over screen and of the public name form of the confirmation page
+// are 48 px high at least.
+.o_raffle_handover,
+.o_raffle_winners,
+.o_raffle_public_name {
+    a:focus-visible,
+    .btn:focus-visible,
+    input:focus-visible,
+    [tabindex="-1"]:focus-visible {
+        outline: 3px solid $body-color;
+        outline-offset: 2px;
+        box-shadow: none;
+    }
+}
+
+.o_raffle_handover {
+    max-width: 40rem;
+
+    .btn,
+    .form-control {
+        min-height: 3rem;
+    }
+
+    .o_raffle_handover_done:focus {
+        outline: 3px solid $body-color;
+        outline-offset: 2px;
+    }
+
+    .o_raffle_handover_details dd {
+        overflow-wrap: anywhere;
+    }
+
+    .o_raffle_handover_form[aria-busy="true"] .btn {
+        cursor: progress;
+    }
+}
+
+.o_raffle_handover_number {
+    font-variant-numeric: tabular-nums;
+    margin-right: 0.25rem;
+}
+
+.o_raffle_winners {
+    .o_raffle_winner_sponsor a {
+        text-decoration: underline;
+    }
+
+    .o_raffle_winner_name,
+    .o_raffle_winner_prize {
+        overflow-wrap: anywhere;
+    }
+
+    // A prize not chosen is set apart by its words, then by the slant;
+    // the colour stays the body's, for the contrast.
+    .o_raffle_winner_prize:not([data-status="chosen"]) {
+        font-style: italic;
+    }
+}
+
+.o_raffle_public_name {
+    max-width: 40rem;
+    background-color: $body-bg;
+    color: $body-color;
+
+    .btn,
+    .form-control {
+        min-height: 3rem;
+    }
+}

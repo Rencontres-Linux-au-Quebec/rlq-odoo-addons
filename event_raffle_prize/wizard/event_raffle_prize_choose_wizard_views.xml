@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="event_raffle_prize_choose_wizard_form" model="ir.ui.view">
+        <field name="name">event.raffle.prize.choose.wizard.form</field>
+        <field name="model">event.raffle.prize.choose.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Choose the Prize">
+                <div class="alert alert-warning" role="alert" invisible="allowed_product_ids">
+                    No prize is available for this winner: the quota is reached, or no prize of the
+                    token category, attendance, region and closing rules has a unit left.
+                </div>
+                <group>
+                    <group>
+                        <field name="draw_id" readonly="1" />
+                        <field name="winner_name" />
+                        <field name="attendance_mode" />
+                    </group>
+                    <group>
+                        <field name="band_id" />
+                        <field name="is_closing_draw" />
+                        <field name="quota_info" />
+                    </group>
+                </group>
+                <field name="allowed_product_ids" nolabel="1" readonly="1">
+                    <list>
+                        <field name="display_name" string="Prize" />
+                        <field name="lst_price" string="Value" />
+                        <field name="raffle_sponsor_id" />
+                        <field name="raffle_band_id" optional="show" />
+                        <field name="raffle_attendance" optional="show" />
+                        <field name="raffle_closing_prize" optional="show" />
+                        <field name="raffle_qty_free" />
+                    </list>
+                </field>
+                <group invisible="not allowed_product_ids">
+                    <field
+                        name="product_id"
+                        options="{'no_create': True, 'no_open': True}"
+                        required="allowed_product_ids"
+                    />
+                </group>
+                <footer>
+                    <button
+                        string="Reserve this Prize"
+                        name="action_confirm"
+                        type="object"
+                        class="btn-primary"
+                        invisible="not allowed_product_ids"
+                    />
+                    <button string="Cancel" special="cancel" class="btn-secondary" />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

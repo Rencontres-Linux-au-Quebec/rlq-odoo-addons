@@ -47,7 +47,11 @@ class EventEvent(models.Model):
             "res_model": "event.raffle",
             "view_mode": "list,form",
             "domain": [("event_id", "=", self.id)],
-            "context": {"default_event_id": self.id},
+            # Opens on the Prod filter, like the Raffles menu.
+            "context": {
+                "default_event_id": self.id,
+                "search_default_production": 1,
+            },
         }
 
     def action_view_raffle_winners(self):
