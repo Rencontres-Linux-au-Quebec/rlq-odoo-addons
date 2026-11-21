@@ -4,6 +4,22 @@
     "name": "Event Raffle Prize Claim (Lien du gagnant)",
     "version": "18.0.1.2.0",
     "summary": "Single-use prize link, winner shop and member sales of prizes",
+    "description": """
+English
+
+A single-use prize link for each winner, opened by the winner's own
+account, and a website shop that shows the prizes of their token category
+and checks out with the token alone. Members may buy sponsored prizes while
+the sponsored shop is open. Details: README.md of the module.
+
+Français
+
+Un lien de prix à usage unique pour chaque gagnant, ouvert par son propre
+compte, et une boutique du site qui montre les prix de sa catégorie de jeton
+et se règle par le jeton seul. Les membres peuvent acheter les prix
+commandités tant que la boutique commanditée est ouverte. Détails :
+README.md du module.
+""",
     "author": "TechnoLibre",
     "website": "https://technolibre.ca",
     "category": "Marketing/Events",

@@ -4,6 +4,24 @@
     "name": "Event Raffle (Tirage)",
     "version": "18.0.1.9.0",
     "summary": "Animated prize draws (3D wheel) for events",
+    "description": """
+English
+
+Animated prize draws for an event: a 3D wheel of the participants, its
+celebration and Tux animations, winners marked absent and drawn again. Each
+draw can notify its winner by chat or email and be announced in a Discuss
+channel; a test raffle stays out of the default lists. The defaults of new
+raffles are in the general settings. Details: README.md of the module.
+
+Français
+
+Tirages de prix animés pour un événement : une roue 3D des participants,
+sa célébration et les animations de Tux, des gagnants marqués absents et
+tirés de nouveau. Chaque tir peut prévenir son gagnant par clavardage ou
+courriel et s'annoncer dans un canal de Discussion ; un tirage de test reste
+hors des listes par défaut. Les défauts des nouveaux tirages sont dans les
+paramètres généraux. Détails : README.md du module.
+""",
     "author": "TechnoLibre",
     "website": "https://technolibre.ca",
     "category": "Marketing/Events",

@@ -5,6 +5,23 @@
     "version": "18.0.1.3.0",
     "summary": "Sponsors submit their raffle prizes in the portal, the "
     "organization approves them",
+    "description": """
+English
+
+The sponsors of an event submit their raffle prizes in the portal, and the
+event's sponsorship managers approve or refuse each one before it is
+offered. A report sums each sponsor's contribution, and one email per
+sponsor thanks it with the list of its winners. Details: README.md of the
+module.
+
+Français
+
+Les commanditaires d'un événement déposent leurs prix au portail, et les
+responsables des commandites de l'événement approuvent ou refusent chacun
+avant qu'il soit offert. Un bilan totalise l'apport de chaque
+commanditaire, et un courriel par commanditaire le remercie avec la liste de
+ses gagnants. Détails : README.md du module.
+""",
     "author": "TechnoLibre",
     "website": "https://technolibre.ca",
     "category": "Marketing/Events",
