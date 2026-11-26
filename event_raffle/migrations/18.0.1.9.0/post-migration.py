@@ -9,7 +9,9 @@ def migrate(cr, version):
     """Give the raffles that predate the planned date the start of their
     event.
 
-    Version 18.0.1.9.0 adds date_planned, empty on the existing rows. A
+    Version 18.0.1.9.0 adds date_planned; the pre-migration creates its
+    column empty, so the existing rows do not take the field default, the
+    moment of the upgrade. A
     raffle that has an event and no planned date takes the event's
     date_begin; a raffle without an event, or whose event has no start,
     stays without a date, and a date already set is kept.
