@@ -122,10 +122,16 @@ class EventRaffleSponsorThanks(models.Model):
 
     def _raffle_thanks_lang(self):
         """Language of the email: the first recipient's, else the
-        sponsor's."""
+        sponsor's, else the event's, else False (Odoo then keeps the
+        sender's)."""
         self.ensure_one()
         recipients = self._raffle_recipients()
-        return recipients[:1].lang or self.sudo().sponsor_id.lang or False
+        return (
+            recipients[:1].lang
+            or self.sudo().sponsor_id.lang
+            or self.sudo().event_id.lang
+            or False
+        )
 
     def _raffle_thanks_email_from(self):
         """Sender of the email: the email of the event's company, else the
