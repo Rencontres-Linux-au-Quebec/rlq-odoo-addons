@@ -6,6 +6,12 @@ repose sur la structure standard du module `survey` d'Odoo 18 CE. Avant
 toute utilisation en production, validez les points suivants sur votre
 **instance de dev/staging**.
 
+## -100. Langue du courriel « Mise à jour de vos réponses » (v1.146.0)
+
+**À confirmer après `-u rlq_survey_report` :**
+1. Sur une base qui n'avait pas encore le modèle : Paramètres > Technique > Modèles de courriel, « Sondage : mise à jour de vos réponses (rlq_survey_report) », champ Langue = `{{ object._rlq_mail_lang() }}` ; envoyé à un participant sans langue, le courriel part en français.
+2. Sur une base qui l'avait déjà (noupdate) : le champ garde sa valeur ; s'il est vide, le remplir à la main.
+
 ## -99. Filtre « Présentiel ou virtuel » (v1.145.0)
 
 **À confirmer après `-u rlq_survey_report` :**

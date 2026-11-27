@@ -136,6 +136,16 @@ class SurveyUserInputAnswerEdit(models.Model):
     def _rlq_update_template(self):
         return self.env.ref("rlq_survey_report.mail_template_mise_a_jour_reponses", raise_if_not_found=False)
 
+    def _rlq_mail_lang(self):
+        """Language of the "Mise à jour de vos réponses" e-mail: the participant's, else French when the database has
+        it installed, else False (Odoo then keeps the sender's). A language that is not installed is refused by Odoo
+        when it renders the e-mail, so French is never returned without being installed."""
+        self.ensure_one()
+        if self.partner_id.lang:
+            return self.partner_id.lang
+        installed = dict(self.env["res.lang"].get_installed())
+        return "fr_CA" if "fr_CA" in installed else False
+
     def _rlq_send_answer_update(self, changes=None):
         """E-mails to the person the changes (default: every change not yet sent) and all the answers as they are now,
         then marks the changes as sent. Returns False (nothing sent) without an e-mail address or without change."""
