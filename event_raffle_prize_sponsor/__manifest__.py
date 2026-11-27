@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 {
     "name": "Event Raffle Prize Sponsors (Commanditaires des prix)",
-    "version": "18.0.1.3.0",
+    "version": "18.0.1.4.0",
     "summary": "Sponsors submit their raffle prizes in the portal, the "
     "organization approves them",
     "description": """

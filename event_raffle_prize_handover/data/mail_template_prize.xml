@@ -10,7 +10,7 @@
             <field name="subject">Your prize: {{ object._raffle_prize_mail_values()['prize'] }}</field>
             <field name="email_from">{{ (object.company_id.email_formatted or user.email_formatted) }}</field>
             <field name="partner_to">{{ object.partner_id.id }}</field>
-            <field name="lang">{{ object.partner_id.lang }}</field>
+            <field name="lang">{{ object._raffle_prize_mail_lang() }}</field>
             <field name="auto_delete" eval="True" />
             <field name="description">Sent to a raffle winner when their prize is reserved</field>
             <field name="body_html" type="html">
@@ -42,7 +42,7 @@
             <field name="subject">Your prize is shipped: {{ object._raffle_prize_mail_values()['prize'] }}</field>
             <field name="email_from">{{ (object.company_id.email_formatted or user.email_formatted) }}</field>
             <field name="partner_to">{{ object.partner_id.id }}</field>
-            <field name="lang">{{ object.partner_id.lang }}</field>
+            <field name="lang">{{ object._raffle_prize_mail_lang() }}</field>
             <field name="auto_delete" eval="True" />
             <field name="description">Sent to a raffle winner when their prize is shipped</field>
             <field name="body_html" type="html">

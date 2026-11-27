@@ -13,6 +13,6 @@ Updated with every change, together with "version" in __manifest__.py and the fi
 18.0.1.137.0 - modifié le ... ») shows VERSION_DATETIME: the time of the last change of the module, not the time of the
 display.
 """
-__version__ = "18.0.1.145.0"
-VERSION_DATETIME = "2026-11-20 08:53:33"          # local time of VERSION_ZONE, format YYYY-MM-DD HH:MM:SS
+__version__ = "18.0.1.146.0"
+VERSION_DATETIME = "2026-11-26 21:34:50"          # local time of VERSION_ZONE, format YYYY-MM-DD HH:MM:SS
 VERSION_ZONE = "America/Toronto"

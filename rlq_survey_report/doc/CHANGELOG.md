@@ -1,5 +1,25 @@
 # Changelog — rlq_survey_report
 
+## 18.0.1.146.0
+
+**Short title:** the "Mise à jour de vos réponses" email falls back on French.
+
+**Reason for the request:** the template had no language: sent to a participant without a language, the email took the language of the team member who sent it, English for one who works in English.
+
+**Changes:**
+
+- `data/mail_template_mise_a_jour.xml`: `lang` = `{{ object._rlq_mail_lang() }}`. `models/survey_answer_edit.py`: `survey.user_input._rlq_mail_lang()`, the participant's language, else French when it is installed, else nothing (the sender's). `release.py`, `__manifest__.py`, `doc/NOTES_VALIDATION.md`.
+
+**Bugs fixed:** email in the sender's language for a participant without a language.
+
+**Safeguards and edge cases:**
+
+- The record is `noupdate="1"`: a new installation, or a database that does not have the template yet, gets the language; a database that already has it keeps its own value, so as not to overwrite a template edited by hand. There, set the "Language" field of the template by hand, or run the database correction script of the site.
+
+**Checks performed:** XML parsed. No Odoo instance here.
+
+**Action required from the user:** `-u rlq_survey_report`; point "v1.146.0" of `doc/NOTES_VALIDATION.md`.
+
 ## 18.0.1.145.0
 
 **Short title:** filter "On site or online" (Présentiel ou virtuel) on every RLQ page.

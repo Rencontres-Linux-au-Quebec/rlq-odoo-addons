@@ -22,6 +22,20 @@ class SaleOrder(models.Model):
 
     _inherit = "sale.order"
 
+    def _raffle_prize_mail_lang(self):
+        """Language of a prize email: the customer's, else the language of
+        the draw's event, else False (Odoo then keeps the sender's).
+
+        Read as sudo: the email can be sent from a visitor's request, who
+        cannot read the raffle.
+        """
+        self.ensure_one()
+        return (
+            self.partner_id.lang
+            or self.sudo().raffle_draw_id.raffle_id.event_id.lang
+            or False
+        )
+
     def _raffle_wanted_qty(self, line, add_qty, set_qty):
         """Quantity the cart update asks for, as website_sale reads it.
 
